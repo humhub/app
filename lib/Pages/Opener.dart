@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'Help.dart';
 import 'WebView.dart';
 
-class LoginDemo extends StatefulWidget {
+class Opener extends StatefulWidget {
   @override
-  _LoginDemoState createState() => _LoginDemoState();
+  _OpenerState createState() => _OpenerState();
 }
 
-class _LoginDemoState extends State<LoginDemo> {
+class _OpenerState extends State<Opener> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
