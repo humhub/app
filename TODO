@@ -1,0 +1,6 @@
+✅ Read <url>/manifest.json and use theme_color before opening WebView Page
+✅ If no manifest.json is found (404) then show error on URL Input Field
+❓ Generated a random token $sessionToken and pass this to WebView
+❓ The $sessionToken from Opener Dialog: Base Functionality #1 should be added to each request via HTTP Header (if not possible as Cookie)
+Other URLs should be opened using the standard browser
+✅ Normal (Browser) navigation behavior inside the WebView for the WebApp (Backward/Forward)
