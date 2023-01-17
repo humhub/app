@@ -16,6 +16,7 @@ class WebViewApp extends ConsumerStatefulWidget {
 class WebViewAppState extends ConsumerState<WebViewApp> {
   late final WebViewController controller;
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  late WebViewController controllerGlobal;
 
   @override
   void initState() {
@@ -35,19 +36,47 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
             debugPrint('Page finished loading: $url');
           },
           onWebResourceError: (WebResourceError error) {},
-          onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('https://github.com')) {
-              launchUrl(Uri.parse(request.url),
-                  mode: LaunchMode.externalApplication);
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
-          },
+          onNavigationRequest: _handleNavigationRequest,
         ),
       )
       ..loadRequest(Uri.parse(widget.manifest.startUrl));
 
     controllerGlobal = controller;
+  }
+
+  NavigationDecision _handleNavigationRequest(NavigationRequest request) {
+    if (!request.url.startsWith(widget.manifest.baseUrl)) {
+      launchUrl(Uri.parse(request.url), mode: LaunchMode.externalApplication);
+      return NavigationDecision.prevent;
+    }
+    return NavigationDecision.navigate;
+  }
+
+  Future<bool> _exitApp(BuildContext context) async {
+    bool canGoBack = await controllerGlobal.canGoBack();
+    if (canGoBack) {
+      controllerGlobal.goBack();
+      return Future.value(false);
+    } else {
+      final exitConfirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Are you sure?'),
+          content: const Text('Do you want to exit an App'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Yes'),
+            ),
+          ],
+        ),
+      );
+      return exitConfirmed ?? false;
+    }
   }
 
   @override
@@ -63,17 +92,5 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         ),
       ),
     );
-  }
-}
-
-late WebViewController controllerGlobal;
-
-Future<bool> _exitApp(BuildContext context) async {
-  bool canGoBack = await controllerGlobal.canGoBack();
-  if (canGoBack) {
-    controllerGlobal.goBack();
-    return Future.value(false);
-  } else {
-    return Future.value(true);
   }
 }
