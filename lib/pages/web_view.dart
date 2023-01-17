@@ -16,7 +16,7 @@ class WebViewApp extends ConsumerStatefulWidget {
 class WebViewAppState extends ConsumerState<WebViewApp> {
   late final WebViewController controller;
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late WebViewController controllerGlobal;
+
 
   @override
   void initState() {
@@ -36,26 +36,39 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
             debugPrint('Page finished loading: $url');
           },
           onWebResourceError: (WebResourceError error) {},
-          onNavigationRequest: _handleNavigationRequest,
+          onNavigationRequest: (NavigationRequest request) {
+            debugPrint('Your mom:${request.url}');
+            if (!request.url.startsWith(widget.manifest.baseUrl)) {
+              launchUrl(Uri.parse(request.url),
+                  mode: LaunchMode.externalApplication);
+              return NavigationDecision.prevent;
+            }
+            return NavigationDecision.navigate;
+          },
         ),
       )
       ..loadRequest(Uri.parse(widget.manifest.startUrl));
-
-    controllerGlobal = controller;
   }
 
-  NavigationDecision _handleNavigationRequest(NavigationRequest request) {
-    if (!request.url.startsWith(widget.manifest.baseUrl)) {
-      launchUrl(Uri.parse(request.url), mode: LaunchMode.externalApplication);
-      return NavigationDecision.prevent;
-    }
-    return NavigationDecision.navigate;
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: () => _exitApp(context),
+        child: Scaffold(
+          key: scaffoldKey,
+          body: WebViewWidget(
+            controller: controller,
+          ),
+        ),
+      ),
+    );
   }
 
   Future<bool> _exitApp(BuildContext context) async {
-    bool canGoBack = await controllerGlobal.canGoBack();
+    bool canGoBack = await controller.canGoBack();
     if (canGoBack) {
-      controllerGlobal.goBack();
+      controller.goBack();
       return Future.value(false);
     } else {
       final exitConfirmed = await showDialog<bool>(
@@ -77,20 +90,5 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       );
       return exitConfirmed ?? false;
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: WillPopScope(
-        onWillPop: () => _exitApp(context),
-        child: Scaffold(
-          key: scaffoldKey,
-          body: WebViewWidget(
-            controller: controller,
-          ),
-        ),
-      ),
-    );
   }
 }
