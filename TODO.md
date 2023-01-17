@@ -6,3 +6,4 @@ Milestone v0.1
 ✅ Other URLs should be opened using the standard browser [/issues/4](https://github.com/luke-/app/issues/4)
 ✅ Normal (Browser) navigation behavior inside the WebView for the WebApp (Backward/Forward) [/issues/4](https://github.com/luke-/app/issues/4)
 ✅ GitHub Actions: Code Style & Tests [/issues/3](https://github.com/luke-/app/issues/3)
+❓ GitHub Actions: Android Deployment [/issues/2](https://github.com/luke-/app/issues/2)
