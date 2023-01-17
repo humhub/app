@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Manifest {
@@ -22,6 +21,14 @@ class Manifest {
       '',
       '',
     );
+  }
+
+  String get baseUrl {
+    int index = startUrl.indexOf("humhub.com");
+    if (index != -1) {
+      return startUrl.substring(0, index + "humhub.com".length);
+    }
+    throw Exception("Can't define base url");
   }
 
   factory Manifest.fromJson(Map<String, dynamic> json) {
