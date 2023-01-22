@@ -34,7 +34,7 @@ jobs:
       - name: Create version.txt with nuGetVersion
         run: echo ${{ steps.gitversion.outputs.nuGetVersion  }} > version.txt
       - name: Upload version.txt
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: gitversion
           path: version.txt
