@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/api_provider.dart';
 import 'package:humhub/util/form_helper.dart';
 import 'package:humhub/util/manifest.dart';
+import '../util/permission_handler.dart';
 import 'help.dart';
 import 'web_view.dart';
 
@@ -19,6 +22,12 @@ class OpenerState extends ConsumerState<Opener> {
   final String error404 = "404";
   late String? postcodeErrorMessage;
   TextEditingController urlTextController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    /*checkAndRequestPermissions();*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +106,7 @@ class OpenerState extends ConsumerState<Opener> {
     // In the future we could define our own TextFormField that would also validate the API responses.
     // But it this is not acceptable I can suggest simple popup or tempPopup.
     if (asyncData.hasError) {
+      log("Open URL error: $asyncData");
       String value = urlTextController.text;
       urlTextController.text = error404;
       helper.validate();
