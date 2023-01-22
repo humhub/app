@@ -14,13 +14,13 @@ jobs:
       - name: Test
         run: flutter test --coverage
   build_apk:
+    needs: lint_and_test
     runs-on: ubuntu-latest
     steps:
       - name: Build APK
-        if: success()
+        uses: subosito/flutter-action@v1
         run: flutter build apk
       - uses: actions/upload-artifact@v1
-        if: success()
         with:
           name: release-apk-${{ github.run_number }}
           path: build/app/outputs/apk/release/app-release.apk
