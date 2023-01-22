@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/api_provider.dart';
 import 'package:humhub/util/form_helper.dart';
 import 'package:humhub/util/manifest.dart';
-import '../util/permission_handler.dart';
 import 'help.dart';
 import 'web_view.dart';
 

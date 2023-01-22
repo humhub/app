@@ -14,14 +14,15 @@ class WebViewApp extends ConsumerStatefulWidget {
 }
 
 class WebViewAppState extends ConsumerState<WebViewApp> {
-  late final WebViewController controller;
+  late final WebViewController webViewController;
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  final WebViewCookieManager cookieManager = WebViewCookieManager();
 
 
   @override
   void initState() {
     super.initState();
-    controller = WebViewController()
+    webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(HexColor(widget.manifest.backgroundColor))
       ..setNavigationDelegate(
@@ -32,12 +33,13 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
           onPageStarted: (String url) {
             debugPrint('Page started loading: $url');
           },
-          onPageFinished: (String url) {
+          onPageFinished: (String url) async {
+            /*final String cookies = await webViewController
+                .runJavaScriptReturningResult('document.cookie') as String;*/
             debugPrint('Page finished loading: $url');
           },
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest request) {
-            debugPrint('Your mom:${request.url}');
             if (!request.url.startsWith(widget.manifest.baseUrl)) {
               launchUrl(Uri.parse(request.url),
                   mode: LaunchMode.externalApplication);
@@ -47,7 +49,9 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
           },
         ),
       )
-      ..loadRequest(Uri.parse(widget.manifest.startUrl));
+      ..loadRequest(Uri.parse(widget.manifest.startUrl),);
+
+    _setCookies(widget.manifest);
   }
 
   @override
@@ -58,7 +62,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         child: Scaffold(
           key: scaffoldKey,
           body: WebViewWidget(
-            controller: controller,
+            controller: webViewController,
           ),
         ),
       ),
@@ -66,9 +70,9 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   }
 
   Future<bool> _exitApp(BuildContext context) async {
-    bool canGoBack = await controller.canGoBack();
+    bool canGoBack = await webViewController.canGoBack();
     if (canGoBack) {
-      controller.goBack();
+      webViewController.goBack();
       return Future.value(false);
     } else {
       final exitConfirmed = await showDialog<bool>(
@@ -90,5 +94,15 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       );
       return exitConfirmed ?? false;
     }
+  }
+
+  Future<void> _setCookies(Manifest manifest) async {
+    await cookieManager.setCookie(
+      WebViewCookie(
+        name: 'is_mobile_app',
+        value: 'true',
+        domain: manifest.baseUrl,
+      ),
+    );
   }
 }
