@@ -19,6 +19,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        run: |
+          git config remote.origin.url https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git fetch --prune --depth=10000
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.7
         with:
