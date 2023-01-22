@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
+        with:
+          fetch-depth: 0
       - name: Fetch all history for all tags and branches
         run: |
           git config remote.origin.url https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
