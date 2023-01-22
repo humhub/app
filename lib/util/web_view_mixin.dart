@@ -19,8 +19,6 @@ mixin WebViewMixin {
             debugPrint('Page started loading: $url');
           },
           onPageFinished: (String url) async {
-            /*final String cookies = await webViewController
-                .runJavaScriptReturningResult('document.cookie') as String;*/
             debugPrint('Page finished loading: $url');
           },
           onWebResourceError: (WebResourceError error) {},
