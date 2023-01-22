@@ -17,8 +17,7 @@ jobs:
     name: Create version number
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
       - name: Fetch all history for all tags and branches
         run: |
           git config remote.origin.url https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
@@ -31,11 +30,11 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.7
       - name: Create version.txt with nuGetVersion
-        run: echo ${{ steps.gitversion.outputs.nuGetVersion }} > version.txt
+        run: echo ${{ steps.gitversion.outputs.nuGetVersion  }} > version.txt
       - name: Upload version.txt
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
-          name: version
+          name: gitversion
           path: version.txt
   #build_apk:
   #  runs-on: ubuntu-latest
