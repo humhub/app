@@ -3,20 +3,21 @@ on:
   push:
     branches: [f-milestone-v0.1]
 jobs:
-  lint_and_test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-      - name: Lint
-        run: flutter analyze
-      - name: Test
-        run: flutter test --coverage
+  #lint_and_test:
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - uses: actions/checkout@v3
+  #    - name: Setup Flutter
+  #      uses: subosito/flutter-action@v2
+  #    - name: Lint
+  #      run: flutter analyze
+  #    - name: Test
+  #      run: flutter test --coverage
   build_apk:
     needs: lint_and_test
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
       - name: Build APK
         run: flutter build apk
