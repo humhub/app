@@ -13,14 +13,37 @@ jobs:
   #      run: flutter analyze
   #    - name: Test
   #      run: flutter test --coverage
-  build_apk:
+  version:
+    name: Create version number
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
-      - name: Build APK
-        run: flutter build apk
-      - uses: actions/upload-artifact@v1
+      - uses: actions/checkout@v1
+      - name: Fetch all history for all tags and branches
+        run: |
+          git config remote.origin.url https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git fetch --prune --depth=10000
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.7
         with:
-          name: release-apk-${{ github.run_number }}
-          path: build/app/outputs/apk/release/app-release.apk
+          versionSpec: "5.x"
+      - name: Use GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.9.7
+      - name: Create version.txt with nuGetVersion
+        run: echo ${{ steps.gitversion.outputs.nuGetVersion  }} > version.txt
+      - name: Upload version.txt
+        uses: actions/upload-artifact@v2
+        with:
+          name: gitversion
+          path: version.txt
+  #build_apk:
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - uses: actions/checkout@v3
+  #    - uses: subosito/flutter-action@v2
+  #    - name: Build APK
+  #      run: flutter build apk
+  #    - uses: actions/upload-artifact@v1
+  #      with:
+  #        name: release-apk-${{ github.run_number }}
+  #        path: build/app/outputs/apk/release/app-release.apk
