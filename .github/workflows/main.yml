@@ -1,6 +1,6 @@
 name: flutter-test
 on: push
-branches: [f-milestone-v0.1]
+  branches: [f-milestone-v0.1]
 jobs:
   lint_and_test:
     runs-on: ubuntu-latest
