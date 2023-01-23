@@ -1,98 +1,33 @@
 name: flutter-test
-on:
-  push:
-    branches: [f-milestone-v0.1]
+on: push
+branches: [f-milestone-v0.1]
 jobs:
-  #lint_and_test:
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    - uses: actions/checkout@v3
-  #    - name: Setup Flutter
-  #      uses: subosito/flutter-action@v2
-  #    - name: Lint
-  #      run: flutter analyze
-  #    - name: Test
-  #      run: flutter test --coverage
-  version:
-    name: Create version number
+  lint_and_test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+      - name: Lint
+        run: flutter analyze
+      - name: Test
+        run: flutter test --coverage
+      - name: Build APK
+        if: success()
+        run: flutter build apk
+      - uses: actions/upload-artifact@v1
+        if: success()
         with:
-          fetch-depth: 0
-      - name: Fetch all history for all tags and branches
-        run: |
-          git config remote.origin.url https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git fetch --prune --depth=10000
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.7
-        with:
-          versionSpec: "5.x"
-      - name: Use GitVersion
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.7
-      - name: Create version.txt with nuGetVersion
-        run: echo ${{ steps.gitversion.outputs.nuGetVersion  }} > version.txt
-      - name: Upload version.txt
-        uses: actions/upload-artifact@v3
-        with:
-          name: gitversion
-          path: version.txt
-  build:
-    name: Build APK and Create release
-    needs: [ version ]
+          name: release-apk-${{ github.run_number }}
+          path: build/app/outputs/apk/release/app-release.apk
+  build_apk:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Get version.txt
-        uses: actions/download-artifact@v2
+      - name: Build APK
+        if: success()
+        run: flutter build apk
+      - uses: actions/upload-artifact@v1
+        if: success()
         with:
-          name: gitversion
-      - name: Create new file without newline char from version.txt
-        run: tr -d '\n' < version.txt > version1.txt
-      - name: Read version
-        id: version
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: version1.txt
-      - name: Update version in YAML
-        run: sed -i 's/99.99.99+99/${{ steps.version.outputs.content }}+${{ github.run_number }}/g' pubspec.yaml
-      - name: Update KeyStore password in gradle properties
-        run: |
-          echo "storePassword=${{ secrets.STORE_PASSWORD }}" > android/key.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
-          echo "keyAlias=upload" >> android/key.properties
-          echo "storeFile=./humhub-keystore.jks" >> android/key.properties
-      - uses: actions/setup-java@v1
-        with:
-          java-version: "12.x"
-      - uses: subosito/flutter-action@v1
-        with:
-          channel: "beta"
-      - run: flutter clean
-      - run: flutter pub get
-      - run: flutter build apk --release --split-per-abi
-      - run: flutter build appbundle --release
-      - name: Create a Release in GitHub
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "build/app/outputs/apk/release/*.apk,build/app/outputs/bundle/release/app-release.aab"
-          token: ${{ secrets.GH_TOKEN }}
-          tag: ${{ steps.version.outputs.content }}
-          commit: ${{ github.sha }}
-      - name: Upload app bundle
-        uses: actions/upload-artifact@v2
-        with:
-          name: appbundle
-          path: build/app/outputs/bundle/release/app-release.aab
-  #build_apk:
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    - uses: actions/checkout@v3
-  #    - uses: subosito/flutter-action@v2
-  #    - name: Build APK
-  #      run: flutter build apk
-  #    - uses: actions/upload-artifact@v1
-  #      with:
-  #        name: release-apk-${{ github.run_number }}
-  #        path: build/app/outputs/apk/release/app-release.apk
+          name: release-apk-${{ github.run_number }}
+          path: build/app/outputs/apk/release/app-release.apk
