@@ -23,12 +23,6 @@ class OpenerState extends ConsumerState<Opener> {
   TextEditingController urlTextController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    /*checkAndRequestPermissions();*/
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,

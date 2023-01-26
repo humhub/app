@@ -1,41 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:humhub/util/manifest.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:humhub/util/extensions.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
-import 'extensions.dart';
+import '../pages/web_view.dart';
+import 'providers.dart';
 
-mixin WebViewMixin {
-  WebViewController getWebViewController(Manifest manifest) {
-    WebViewController controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(HexColor(manifest.backgroundColor))
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onProgress: (int progress) {
-            debugPrint('WebView is loading (progress : $progress%)');
-          },
-          onPageStarted: (String url) {
-            debugPrint('Page started loading: $url');
-          },
-          onPageFinished: (String url) async {
-            debugPrint('Page finished loading: $url');
-          },
-          onWebResourceError: (WebResourceError error) {},
-          onNavigationRequest: (NavigationRequest request) {
-            if (!request.url.startsWith(manifest.baseUrl)) {
-              launchUrl(Uri.parse(request.url),
-                  mode: LaunchMode.externalApplication);
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
-          },
-        ),
-      )
-      ..loadRequest(
-        Uri.parse(manifest.startUrl),
-      );
+extension WebViewPart on WebViewAppState {
+  WebViewController get webViewControllerConfig => WebViewController()
+    ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    ..setBackgroundColor(HexColor(widget.manifest.backgroundColor))
+    ..addJavaScriptChannel('flutterChannel',
+        onMessageReceived: onMessageReceived)
+    ..setNavigationDelegate(
+      NavigationDelegate(
+        onProgress: (int progress) {
+          debugPrint('WebView is loading (progress : $progress%)');
+        },
+        onPageStarted: (String url) {
+          debugPrint('Page started loading: $url');
+        },
+        onPageFinished: (String url) async {
+          debugPrint('Page finished loading: $url');
+        },
+        onWebResourceError: (WebResourceError error) {},
+        onNavigationRequest: (NavigationRequest request) {
+          if (!request.url.startsWith(widget.manifest.baseUrl)) {
+            launchUrl(Uri.parse(request.url),
+                mode: LaunchMode.externalApplication);
+            return NavigationDecision.prevent;
+          }
+          return NavigationDecision.navigate;
+        },
+      ),
+    )
+    ..loadRequest(
+      Uri.parse(widget.manifest.startUrl),
+    );
 
-    return controller;
+  onMessageReceived(JavaScriptMessage message) {
+    ref
+        .read(humHubProvider)
+        .setIsHideDialog(message.message == "humhub.mobile.hideOpener");
+    if (ref.read(humHubProvider).isHideDialog) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
   }
 }

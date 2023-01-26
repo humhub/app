@@ -42,6 +42,15 @@ class Manifest {
     );
   }
 
+  Map<String, dynamic> toJson() => {
+        'display': display,
+        'start_url': startUrl,
+        'short_name': shortName,
+        'name': name,
+        'background_color': backgroundColor,
+        'theme_color': themeColor,
+      };
+
   static Future<Manifest> Function(Dio dio) get(String url) => (dio) async {
         final res = await dio.get('$url/manifest.json');
         return Manifest.fromJson(res.data);

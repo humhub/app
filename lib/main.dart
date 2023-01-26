@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/pages/opener.dart';
+import 'package:humhub/util/providers.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -12,7 +13,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: const Color(0xff21A1B3),
