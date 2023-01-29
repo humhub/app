@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/extensions.dart';
-import 'package:humhub/util/manifest.dart';
-import 'package:humhub/util/web_view_mixin.dart';
+import 'package:humhub/models/manifest.dart';
+import 'package:humhub/util/web_view_extension.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewApp extends ConsumerStatefulWidget {
@@ -13,8 +13,7 @@ class WebViewApp extends ConsumerStatefulWidget {
   WebViewAppState createState() => WebViewAppState();
 }
 
-class WebViewAppState extends ConsumerState<WebViewApp> with WebViewMixin {
-
+class WebViewAppState extends ConsumerState<WebViewApp> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   late final WebViewController webViewController;
   final WebViewCookieManager cookieManager = WebViewCookieManager();
@@ -22,7 +21,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> with WebViewMixin {
   @override
   void initState() {
     super.initState();
-    webViewController = getWebViewController(widget.manifest);
+    webViewController = webViewControllerConfig;
     cookieManager.setMyCookies(widget.manifest);
   }
 
@@ -32,11 +31,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> with WebViewMixin {
       child: WillPopScope(
         onWillPop: () => webViewController.exitApp(context),
         child: Scaffold(
-          key: scaffoldKey,
-          body: WebViewWidget(
-            controller: webViewController,
-          ),
-        ),
+            key: scaffoldKey,
+            body: WebViewWidget(controller: webViewController)),
       ),
     );
   }

@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Manifest {
   final String display;
@@ -11,17 +10,6 @@ class Manifest {
 
   Manifest(this.display, this.startUrl, this.shortName, this.name,
       this.backgroundColor, this.themeColor);
-
-  static empty() {
-    return Manifest(
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-    );
-  }
 
   String get baseUrl {
     int index = startUrl.indexOf("humhub.com");
@@ -42,12 +30,17 @@ class Manifest {
     );
   }
 
+  Map<String, dynamic> toJson() => {
+        'display': display,
+        'start_url': startUrl,
+        'short_name': shortName,
+        'name': name,
+        'background_color': backgroundColor,
+        'theme_color': themeColor,
+      };
+
   static Future<Manifest> Function(Dio dio) get(String url) => (dio) async {
         final res = await dio.get('$url/manifest.json');
         return Manifest.fromJson(res.data);
       };
 }
-
-final manifestStateProvider = StateProvider<Manifest>((ref) {
-  return Manifest.empty();
-});

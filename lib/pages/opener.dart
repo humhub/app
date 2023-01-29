@@ -2,9 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/util/api_provider.dart';
 import 'package:humhub/util/form_helper.dart';
-import 'package:humhub/util/manifest.dart';
+import 'package:humhub/models/manifest.dart';
+import 'package:humhub/util/providers.dart';
 import 'help.dart';
 import 'web_view.dart';
 
@@ -21,12 +23,6 @@ class OpenerState extends ConsumerState<Opener> {
   final String error404 = "404";
   late String? postcodeErrorMessage;
   TextEditingController urlTextController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    /*checkAndRequestPermissions();*/
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +109,7 @@ class OpenerState extends ConsumerState<Opener> {
     } else {
       Manifest manifest = asyncData.value!;
       // Set the manifestStateProvider with the manifest value so that it's globally accessible
-      ref.read(manifestStateProvider.notifier).state = manifest;
+      ref.read(humHubProvider).setInstance(HumHub(manifest: manifest, isHideDialog: true));
       redirect();
     }
   }
@@ -123,7 +119,7 @@ class OpenerState extends ConsumerState<Opener> {
       context,
       MaterialPageRoute(
           builder: (context) => WebViewApp(
-                manifest: ref.read(manifestStateProvider),
+                manifest: ref.read(humHubProvider).manifest!,
               )),
     );
   }
