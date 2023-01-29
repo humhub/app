@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:humhub/util/manifest.dart';
+import 'package:flutter/services.dart';
+import 'package:humhub/models/manifest.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 extension MyCookies on WebViewCookieManager {
@@ -32,7 +33,7 @@ extension MyWebViewController on WebViewController {
               child: const Text('No'),
             ),
             TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
+              onPressed: () => SystemNavigator.pop(),
               child: const Text('Yes'),
             ),
           ],

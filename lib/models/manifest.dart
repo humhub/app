@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Manifest {
   final String display;
@@ -11,17 +10,6 @@ class Manifest {
 
   Manifest(this.display, this.startUrl, this.shortName, this.name,
       this.backgroundColor, this.themeColor);
-
-  static empty() {
-    return Manifest(
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-    );
-  }
 
   String get baseUrl {
     int index = startUrl.indexOf("humhub.com");
@@ -56,7 +44,3 @@ class Manifest {
         return Manifest.fromJson(res.data);
       };
 }
-
-final manifestStateProvider = StateProvider<Manifest>((ref) {
-  return Manifest.empty();
-});

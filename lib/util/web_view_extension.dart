@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -6,7 +7,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import '../pages/web_view.dart';
 import 'providers.dart';
 
-extension WebViewPart on WebViewAppState {
+extension WebViewExtension on WebViewAppState {
   WebViewController get webViewControllerConfig => WebViewController()
     ..setJavaScriptMode(JavaScriptMode.unrestricted)
     ..setBackgroundColor(HexColor(widget.manifest.backgroundColor))
@@ -42,8 +43,11 @@ extension WebViewPart on WebViewAppState {
     ref
         .read(humHubProvider)
         .setIsHideDialog(message.message == "humhub.mobile.hideOpener");
-    if (ref.read(humHubProvider).isHideDialog) {
-      Navigator.of(context).popUntil((route) => route.isFirst);
+    if (!ref.read(humHubProvider).isHideDialog) {
+      ref.read(humHubProvider).clearSafeStorage();
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const Opener()),
+          (Route<dynamic> route) => false);
     }
   }
 }

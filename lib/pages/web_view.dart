@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/extensions.dart';
-import 'package:humhub/util/manifest.dart';
-import 'package:humhub/util/providers.dart';
-import 'package:humhub/util/web_view_mixin.dart';
+import 'package:humhub/models/manifest.dart';
+import 'package:humhub/util/web_view_extension.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
-import 'opener.dart';
 
 class WebViewApp extends ConsumerStatefulWidget {
   final Manifest manifest;

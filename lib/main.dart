@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/pages/opener.dart';
-import 'package:humhub/util/providers.dart';
+import 'package:humhub/util/redirect_handler.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -17,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: const Color(0xff21A1B3),
       ),
-      home: const Opener(),
+      home: const Redirector(),
     );
   }
 }
