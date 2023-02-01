@@ -1,4 +1,5 @@
 Milestone v0.1
+
 ✅ Read <url>/manifest.json and use theme_color before opening WebView Page [/issues/1](https://github.com/luke-/app/issues/1)
 ✅ If no manifest.json is found (404) then show error on URL Input Field [/issues/1](https://github.com/luke-/app/issues/1)
 ❓ Generated a random token $sessionToken and pass this to WebView [/issues/1](https://github.com/luke-/app/issues/1)
