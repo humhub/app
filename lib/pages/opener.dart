@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/util/api_provider.dart';
+import 'package:humhub/util/const.dart';
 import 'package:humhub/util/form_helper.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/providers.dart';
@@ -45,14 +46,23 @@ class OpenerState extends ConsumerState<Opener> {
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 15, vertical: 50),
-                child: TextFormField(
-                  controller: urlTextController,
-                  onSaved: helper.onSaved(formUrlKey),
-                  decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'URL',
-                      hintText: 'https://community.humhub.com'),
-                  validator: validateUrl,
+                child: FutureBuilder<String>(
+                  future: ref.read(humHubProvider).getLastUrl(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      urlTextController.text = snapshot.data!;
+                      return TextFormField(
+                        controller: urlTextController,
+                        onSaved: helper.onSaved(formUrlKey),
+                        decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'URL',
+                            hintText: 'https://community.humhub.com'),
+                        validator: validateUrl,
+                      );
+                    }
+                    return progress;
+                  },
                 ),
               ),
               Container(
@@ -109,7 +119,9 @@ class OpenerState extends ConsumerState<Opener> {
     } else {
       Manifest manifest = asyncData.value!;
       // Set the manifestStateProvider with the manifest value so that it's globally accessible
-      ref.read(humHubProvider).setInstance(HumHub(manifest: manifest, isHideDialog: true));
+      ref
+          .read(humHubProvider)
+          .setInstance(HumHub(manifest: manifest, isHideDialog: true));
       redirect();
     }
   }

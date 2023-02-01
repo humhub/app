@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/pages/web_view.dart';
+import 'package:humhub/util/const.dart';
 import 'package:humhub/util/providers.dart';
 
 class Redirector extends ConsumerStatefulWidget {
@@ -15,7 +16,6 @@ class Redirector extends ConsumerStatefulWidget {
 class RedirectorState extends ConsumerState<Redirector> {
   @override
   Widget build(BuildContext context) {
-    const progress = Center(child: CircularProgressIndicator());
     return Scaffold(
       backgroundColor: Colors.white,
       body: FutureBuilder<HumHub>(

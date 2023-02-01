@@ -36,7 +36,9 @@ class HumHubNotifier extends ChangeNotifier {
 
   _updateSafeStorage() async {
     final jsonString = json.encode(_humHubInstance.toJson());
+    String lastUrl = _humHubInstance.manifest != null ? _humHubInstance.manifest!.baseUrl : "";
     await _storage.write(key: "hum_hub", value: jsonString);
+    await _storage.write(key: "hum_hub_last_url", value: lastUrl);
   }
 
   clearSafeStorage() async {
@@ -49,6 +51,11 @@ class HumHubNotifier extends ChangeNotifier {
         ? HumHub.fromJson(json.decode(jsonStr))
         : _humHubInstance;
     return humHub;
+  }
+
+  Future<String> getLastUrl() async {
+    var lastUrl = await _storage.read(key: "hum_hub_last_url");
+    return lastUrl ?? "";
   }
 }
 
