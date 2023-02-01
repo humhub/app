@@ -71,8 +71,8 @@ jobs:
           channel: "beta"
       - run: flutter clean
       - run: flutter pub get
-      - run: flutter build apk --release --split-per-abi --build-name=${{ steps.gitversion.outputs.nuGetVersion  }}
-      - run: flutter build appbundle --release --build-name=${{ steps.gitversion.outputs.nuGetVersion  }}
+      - run: flutter build apk --release --split-per-abi --build-name=${{ steps.gitversion.outputs.nuGetVersion  }} --build-number=${{github.run_number}}
+      - run: flutter build appbundle --release --build-name=${{ steps.gitversion.outputs.nuGetVersion  }} --build-number=${{github.run_number}}
       - name: Create a Release in GitHub
         uses: ncipollo/release-action@v1
         with:
