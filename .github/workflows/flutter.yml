@@ -21,7 +21,7 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.7
       - name: Create version.txt with nuGetVersion
-        run: echo ${{ steps.gitversion.outputs.nuGetVersion  }} > version.txt
+        run: echo v${{ steps.gitversion.outputs.nuGetVersion  }} > version.txt
       - name: Upload version.txt
         uses: actions/upload-artifact@v2
         with:
@@ -99,7 +99,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAYSTORE_ACCOUNT_KEY }}
-          packageName: com.humhub.humhub
+          packageName: com.humhub.app
           releaseFiles: app-release.aab
           track: alpha
           status: completed
