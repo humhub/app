@@ -30,6 +30,7 @@ jobs:
   increment_version_code:
     name: Increment versionCode
     runs-on: ubuntu-latest
+    needs: [version]
     steps:
       - uses: actions/checkout@v2
       - name: set up JDK 1.8
@@ -44,7 +45,7 @@ jobs:
           versionName: 1.0.0
   build:
     name: Build APK and Create release
-    needs: [version]
+    needs: [increment_version_code]
     runs-on: ubuntu-latest
     permissions:
       contents: write
