@@ -1,4 +1,4 @@
-package com.humhub.humhub
+package com.humhub.app
 
 import io.flutter.embedding.android.FlutterActivity
 
