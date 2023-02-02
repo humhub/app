@@ -29,7 +29,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: WillPopScope(
-        onWillPop: () => webViewController.exitApp(context),
+        onWillPop: () => webViewController.exitApp(context, ref),
         child: Scaffold(
             key: scaffoldKey,
             body: WebViewWidget(controller: webViewController)),

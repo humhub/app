@@ -121,7 +121,7 @@ class OpenerState extends ConsumerState<Opener> {
       // Set the manifestStateProvider with the manifest value so that it's globally accessible
       ref
           .read(humHubProvider)
-          .setInstance(HumHub(manifest: manifest, isHideDialog: true));
+          .setInstance(HumHub(manifest: manifest));
       redirect();
     }
   }

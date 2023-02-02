@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/pages/opener.dart';
+import 'package:humhub/util/providers.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 extension MyCookies on WebViewCookieManager {
@@ -16,7 +19,7 @@ extension MyCookies on WebViewCookieManager {
 }
 
 extension MyWebViewController on WebViewController {
-  Future<bool> exitApp(BuildContext context) async {
+  Future<bool> exitApp(BuildContext context, ref) async {
     bool canGoBack = await this.canGoBack();
     if (canGoBack) {
       goBack();
@@ -33,7 +36,9 @@ extension MyWebViewController on WebViewController {
               child: const Text('No'),
             ),
             TextButton(
-              onPressed: () => SystemNavigator.pop(),
+              onPressed: () {
+                closeOrOpenDialog(context, ref);
+              },
               child: const Text('Yes'),
             ),
           ],
@@ -41,6 +46,15 @@ extension MyWebViewController on WebViewController {
       );
       return exitConfirmed ?? false;
     }
+  }
+
+  closeOrOpenDialog(BuildContext context, WidgetRef ref) {
+    var isHide = ref.read(humHubProvider).isHideDialog;
+    isHide
+        ? SystemNavigator.pop()
+        : Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const Opener()),
+            (Route<dynamic> route) => false);
   }
 }
 
