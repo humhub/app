@@ -27,13 +27,12 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: WillPopScope(
-        onWillPop: () => webViewController.exitApp(context, ref),
-        child: Scaffold(
-            key: scaffoldKey,
-            body: WebViewWidget(controller: webViewController)),
-      ),
+    return WillPopScope(
+      onWillPop: () => webViewController.exitApp(context, ref),
+      child: Scaffold(
+          key: scaffoldKey,
+          backgroundColor: HexColor(widget.manifest.themeColor),
+          body: SafeArea(child: WebViewWidget(controller: webViewController))),
     );
   }
 }
