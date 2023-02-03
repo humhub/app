@@ -73,7 +73,7 @@ jobs:
         with:
           gradlePath: android/app/build.gradle # or app/build.gradle.kts
           versionCode: ${{github.run_number}}
-          versionName: 1.0.0
+          versionName: ${{ steps.gitversion.outputs.nuGetVersion  }}
       - run: flutter clean
       - run: flutter pub get
       - run: flutter build apk --release --split-per-abi --build-name=${{ steps.gitversion.outputs.nuGetVersion  }} --build-number=${{github.run_number}}
