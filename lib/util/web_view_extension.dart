@@ -25,14 +25,14 @@ extension WebViewExtension on WebViewAppState {
           debugPrint('Page finished loading: $url');
         },
         onWebResourceError: (WebResourceError error) {},
-        onNavigationRequest: (NavigationRequest request) {
+       /* onNavigationRequest: (NavigationRequest request) {
           if (!request.url.startsWith(widget.manifest.baseUrl)) {
             launchUrl(Uri.parse(request.url),
                 mode: LaunchMode.externalApplication);
             return NavigationDecision.prevent;
           }
           return NavigationDecision.navigate;
-        },
+        },*/
       ),
     )
     ..loadRequest(
