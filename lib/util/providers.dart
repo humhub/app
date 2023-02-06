@@ -52,6 +52,7 @@ class HumHubNotifier extends ChangeNotifier {
     HumHub humHub = jsonStr != null
         ? HumHub.fromJson(json.decode(jsonStr))
         : _humHubInstance;
+    setInstance(humHub);
     return humHub;
   }
 
