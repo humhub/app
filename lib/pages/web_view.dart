@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/pages/opener.dart';
-import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/providers.dart';
@@ -39,17 +38,25 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
             initialOptions: InAppWebViewGroupOptions(
               crossPlatform: InAppWebViewOptions(
                 useShouldOverrideUrlLoading: true,
+                useShouldInterceptAjaxRequest: true,
                 javaScriptEnabled: true,
               ),
             ),
+
             shouldOverrideUrlLoading: (controller, action) async {
               final url = action.request.url!.origin;
+              // Open all other urls in browser or inApp.
               if (!url.startsWith(widget.manifest.baseUrl)) {
                 launchUrl(action.request.url!,
                     mode: LaunchMode.externalApplication);
                 return NavigationActionPolicy.CANCEL;
               }
               return NavigationActionPolicy.ALLOW;
+            },
+            shouldInterceptAjaxRequest: (controller, fetchReq) async{
+              // Append headers on every AJAX request
+              fetchReq.headers = AjaxRequestHeaders({'My-Custom-Header': 'custom_value=564hgf34'});
+              return fetchReq;
             },
             initialUrlRequest:
                 URLRequest(url: Uri.parse(widget.manifest.baseUrl)),
