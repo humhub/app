@@ -20,6 +20,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   late InAppWebViewController inAppWebViewController;
   final WebViewCookieManager cookieManager = WebViewCookieManager();
+  var customHeader = {'My-Custom-Header': 'custom_value=564hgf34'};
 
   @override
   void initState() {
@@ -39,13 +40,15 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               crossPlatform: InAppWebViewOptions(
                 useShouldOverrideUrlLoading: true,
                 useShouldInterceptAjaxRequest: true,
+                useShouldInterceptFetchRequest: true,
                 javaScriptEnabled: true,
               ),
             ),
-
             shouldOverrideUrlLoading: (controller, action) async {
-              final url = action.request.url!.origin;
+              action.request.headers?.addAll(customHeader);
+              controller.loadUrl(urlRequest: action.request);
               // Open all other urls in browser or inApp.
+              final url = action.request.url!.origin;
               if (!url.startsWith(widget.manifest.baseUrl)) {
                 launchUrl(action.request.url!,
                     mode: LaunchMode.externalApplication);
@@ -53,9 +56,13 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               }
               return NavigationActionPolicy.ALLOW;
             },
-            shouldInterceptAjaxRequest: (controller, fetchReq) async{
+            shouldInterceptAjaxRequest: (controller, ajaxReq) async {
               // Append headers on every AJAX request
-              fetchReq.headers = AjaxRequestHeaders({'My-Custom-Header': 'custom_value=564hgf34'});
+              ajaxReq.headers = AjaxRequestHeaders(customHeader);
+              return ajaxReq;
+            },
+            shouldInterceptFetchRequest: (controller, fetchReq) async {
+              fetchReq.headers?.addAll(customHeader);
               return fetchReq;
             },
             initialUrlRequest:
