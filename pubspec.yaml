@@ -43,6 +43,7 @@ dependencies:
   permission_handler: ^10.2.0
   flutter_secure_storage: ^7.0.1
   flutter_inappwebview: ^5.7.2+3
+  receive_sharing_intent: ^1.4.5
 
 dev_dependencies:
   flutter_test:
