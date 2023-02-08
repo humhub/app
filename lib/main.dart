@@ -5,7 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/redirect_handler.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
-void main() {
+main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProviderScope(child: MyApp()));
 }
 

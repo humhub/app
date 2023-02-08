@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 class FormHelper {
   final key = GlobalKey<FormState>();
-  final model = <String, String?>{};
+  final model = <String, dynamic>{};
 
   FormFieldSetter<String> onSaved(String name) => (value) => model[name] = value;
 
