@@ -10,6 +10,8 @@ import 'package:humhub/util/providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../models/hum_hub.dart';
+
 
 class WebViewApp extends ConsumerStatefulWidget {
   final Manifest manifest;
@@ -40,7 +42,9 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   @override
   Widget build(BuildContext context) {
     final initialRequest = URLRequest(
-        url: Uri.parse(widget.manifest.baseUrl), headers: customHeader);
+        url: Uri.parse(widget.manifest.baseUrl), headers: customHeaders);
+    //Append random hash to customHeaders in this state the header should always exist.
+    customHeaders.addAll({'x-humhub-app-token': ref.read(humHubProvider).randomHash!});
     return WillPopScope(
       onWillPop: () => inAppWebViewController.exitApp(context, ref),
       child: Scaffold(
@@ -71,7 +75,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         action.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED) {
       controller.loadUrl(
           urlRequest:
-              URLRequest(url: action.request.url, headers: customHeader));
+              URLRequest(url: action.request.url, headers: customHeaders));
       return NavigationActionPolicy.CANCEL;
     }
     return NavigationActionPolicy.ALLOW;
@@ -91,6 +95,9 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
                 MaterialPageRoute(builder: (context) => const Opener()),
                 (Route<dynamic> route) => false);
           }
+          else{
+            ref.read(humHubProvider).setHash(HumHub.generateHash(32));
+          }
         },
       ),
     );
@@ -100,13 +107,13 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   Future<AjaxRequest?> shouldInterceptAjaxRequest(
       InAppWebViewController controller, AjaxRequest ajaxReq) async {
     // Append headers on every AJAX request
-    ajaxReq.headers = AjaxRequestHeaders(customHeader);
+    ajaxReq.headers = AjaxRequestHeaders(customHeaders);
     return ajaxReq;
   }
 
   Future<FetchRequest?> shouldInterceptFetchRequest(
       InAppWebViewController controller, FetchRequest fetchReq) async {
-    fetchReq.headers?.addAll(customHeader);
+    fetchReq.headers?.addAll(customHeaders);
     return fetchReq;
   }
 }
