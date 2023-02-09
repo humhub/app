@@ -6,3 +6,5 @@ class StorageKeys{
   static String humhubInstance = "humHubInstance";
   static String lastInstanceUrl = "humHubLastUrl";
 }
+
+var customHeaders = {'my-header-value-01': '111111', 'my-header-value-02': '222222'};

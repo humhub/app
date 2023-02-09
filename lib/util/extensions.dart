@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -5,7 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
+import 'const.dart';
 
 extension MyCookies on WebViewCookieManager {
   Future<void> setMyCookies(Manifest manifest) async {
@@ -20,6 +25,7 @@ extension MyCookies on WebViewCookieManager {
 }
 
 extension MyWebViewController on InAppWebViewController {
+
   Future<bool> exitApp(BuildContext context, ref) async {
     bool canGoBack = await this.canGoBack();
     if (canGoBack) {
