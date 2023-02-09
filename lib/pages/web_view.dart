@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,7 +22,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   late InAppWebViewController inAppWebViewController;
   final WebViewCookieManager cookieManager = WebViewCookieManager();
-  var customHeader = {'My-Custom-Header': 'custom_value=564hgf34'};
+  var customHeader = {'my-header-value-01': '111111', 'my-header-value-02': '222222'};
 
   @override
   void initState() {
@@ -45,13 +47,20 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               ),
             ),
             shouldOverrideUrlLoading: (controller, action) async {
-              action.request.headers?.addAll(customHeader);
-              controller.loadUrl(urlRequest: action.request);
-              // Open all other urls in browser or inApp.
+              // 1st check if url is not def. app url and open it in a browser or inApp.
               final url = action.request.url!.origin;
               if (!url.startsWith(widget.manifest.baseUrl)) {
                 launchUrl(action.request.url!,
                     mode: LaunchMode.externalApplication);
+                return NavigationActionPolicy.CANCEL;
+              }
+              // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
+              if (Platform.isAndroid ||
+                  action.iosWKNavigationType ==
+                      IOSWKNavigationType.LINK_ACTIVATED) {
+                controller.loadUrl(
+                    urlRequest: URLRequest(
+                        url: action.request.url, headers: customHeader));
                 return NavigationActionPolicy.CANCEL;
               }
               return NavigationActionPolicy.ALLOW;
@@ -65,8 +74,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               fetchReq.headers?.addAll(customHeader);
               return fetchReq;
             },
-            initialUrlRequest:
-                URLRequest(url: Uri.parse(widget.manifest.baseUrl)),
+            initialUrlRequest: URLRequest(
+                url: Uri.parse(widget.manifest.baseUrl), headers: customHeader),
             onWebViewCreated: (controller) async {
               await controller.addWebMessageListener(
                 WebMessageListener(
