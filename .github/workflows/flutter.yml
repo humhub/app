@@ -26,7 +26,7 @@ jobs:
       - name: Create version.txt with nuGetVersion
         run: echo v${{ steps.gitversion.outputs.nuGetVersion  }} > version.txt
       - name: Upload version.txt
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: gitversion
           path: version.txt
@@ -37,9 +37,12 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Get version.txt
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: gitversion
       - name: Create new file without newline char from version.txt
@@ -99,7 +102,10 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Get appbundle from artifacts
         uses: actions/download-artifact@v2
         with:
