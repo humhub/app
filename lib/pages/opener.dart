@@ -119,9 +119,14 @@ class OpenerState extends ConsumerState<Opener> {
     } else {
       Manifest manifest = asyncData.value!;
       // Set the manifestStateProvider with the manifest value so that it's globally accessible
+      // Generate hash and save it to store
+      String lastUrl = await ref.read(humHubProvider).getLastUrl();
+      String currentUrl = urlTextController.text;
+      String hash = HumHub.generateHash(32);
+      if (lastUrl == currentUrl) hash = ref.read(humHubProvider).randomHash ?? hash;
       ref
           .read(humHubProvider)
-          .setInstance(HumHub(manifest: manifest));
+          .setInstance(HumHub(manifest: manifest, randomHash: hash));
       redirect();
     }
   }

@@ -16,6 +16,7 @@ class HumHubNotifier extends ChangeNotifier {
 
   bool get isHideDialog => _humHubInstance.isHideDialog;
   Manifest? get manifest => _humHubInstance.manifest;
+  String? get randomHash => _humHubInstance.randomHash;
 
   void setIsHideDialog(bool isHide) {
     _humHubInstance.isHideDialog = isHide;
@@ -32,6 +33,13 @@ class HumHubNotifier extends ChangeNotifier {
   void setInstance(HumHub instance) {
     _humHubInstance.manifest = instance.manifest;
     _humHubInstance.isHideDialog = instance.isHideDialog;
+    _humHubInstance.randomHash = instance.randomHash;
+    _updateSafeStorage();
+    notifyListeners();
+  }
+
+  void setHash(String hash) {
+    _humHubInstance.randomHash = hash;
     _updateSafeStorage();
     notifyListeners();
   }
