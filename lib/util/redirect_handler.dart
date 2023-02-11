@@ -15,6 +15,11 @@ class Redirector extends ConsumerStatefulWidget {
 
 class RedirectorState extends ConsumerState<Redirector> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,

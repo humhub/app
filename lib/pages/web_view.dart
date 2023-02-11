@@ -12,7 +12,6 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../models/hum_hub.dart';
 
-
 class WebViewApp extends ConsumerStatefulWidget {
   final Manifest manifest;
   const WebViewApp({super.key, required this.manifest});
@@ -41,10 +40,14 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
 
   @override
   Widget build(BuildContext context) {
+    //Append random hash to customHeaders in this state the header should always exist.
+    customHeaders.addAll({
+      'x-humhub-app-token': ref.read(humHubProvider).randomHash!,
+      'x-humhub-app': ref.read(humHubProvider).appVersion!
+    });
+
     final initialRequest = URLRequest(
         url: Uri.parse(widget.manifest.baseUrl), headers: customHeaders);
-    //Append random hash to customHeaders in this state the header should always exist.
-    customHeaders.addAll({'x-humhub-app-token': ref.read(humHubProvider).randomHash!});
     return WillPopScope(
       onWillPop: () => inAppWebViewController.exitApp(context, ref),
       child: Scaffold(
@@ -94,8 +97,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => const Opener()),
                 (Route<dynamic> route) => false);
-          }
-          else{
+          } else {
             ref.read(humHubProvider).setHash(HumHub.generateHash(32));
           }
         },
