@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'const.dart';
 
@@ -17,6 +18,7 @@ class HumHubNotifier extends ChangeNotifier {
   bool get isHideDialog => _humHubInstance.isHideDialog;
   Manifest? get manifest => _humHubInstance.manifest;
   String? get randomHash => _humHubInstance.randomHash;
+  String? get appVersion => _humHubInstance.appVersion;
 
   void setIsHideDialog(bool isHide) {
     _humHubInstance.isHideDialog = isHide;
@@ -30,10 +32,12 @@ class HumHubNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setInstance(HumHub instance) {
+  Future<void> setInstance(HumHub instance) async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
     _humHubInstance.manifest = instance.manifest;
     _humHubInstance.isHideDialog = instance.isHideDialog;
     _humHubInstance.randomHash = instance.randomHash;
+    _humHubInstance.appVersion = packageInfo.version;
     _updateSafeStorage();
     notifyListeners();
   }
@@ -46,7 +50,9 @@ class HumHubNotifier extends ChangeNotifier {
 
   _updateSafeStorage() async {
     final jsonString = json.encode(_humHubInstance.toJson());
-    String lastUrl = _humHubInstance.manifest != null ? _humHubInstance.manifest!.baseUrl : await getLastUrl();
+    String lastUrl = _humHubInstance.manifest != null
+        ? _humHubInstance.manifest!.baseUrl
+        : await getLastUrl();
     await _storage.write(key: StorageKeys.humhubInstance, value: jsonString);
     await _storage.write(key: StorageKeys.lastInstanceUrl, value: lastUrl);
   }
