@@ -9,12 +9,13 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:humhub/util/router.dart' as m;
 
 import '../models/hum_hub.dart';
 
 class WebViewApp extends ConsumerStatefulWidget {
-  final Manifest manifest;
-  const WebViewApp({super.key, required this.manifest});
+  const WebViewApp({super.key});
+  static const String path = '/web_view';
 
   @override
   WebViewAppState createState() => WebViewAppState();
@@ -35,7 +36,6 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   @override
   void initState() {
     super.initState();
-    cookieManager.setMyCookies(widget.manifest);
   }
 
   @override
@@ -51,7 +51,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     return WillPopScope(
       onWillPop: () => inAppWebViewController.exitApp(context, ref),
       child: Scaffold(
-        backgroundColor: HexColor(widget.manifest.themeColor),
+        backgroundColor: HexColor(manifest.themeColor),
         body: SafeArea(
           child: InAppWebView(
               initialUrlRequest: initialRequest,

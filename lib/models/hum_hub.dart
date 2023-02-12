@@ -28,7 +28,8 @@ class HumHub {
 
   factory HumHub.fromJson(Map<String, dynamic> json) {
     return HumHub(
-      manifest: Manifest.fromJson(json['manifest']),
+      manifest:
+          json['manifest'] != null ? Manifest.fromJson(json['manifest']) : null,
       isHideDialog: json['isHideDialog'] as bool,
       randomHash: json['randomHash'],
       appVersion: json['appVersion'],
