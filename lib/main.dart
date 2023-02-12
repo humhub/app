@@ -64,7 +64,9 @@ class MyAppState extends ConsumerState<MyApp>
           _err = null;
         });
       }, onError: (err) {
-        print(err);
+        if (kDebugMode) {
+          print(err);
+        }
       });
     }
   }
