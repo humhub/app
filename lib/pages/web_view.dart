@@ -54,8 +54,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       manifest = m.Router.initParams;
     }
 
-    final initialRequest = URLRequest(
-        url: Uri.parse(manifest.baseUrl), headers: customHeaders);
+    final initialRequest =
+        URLRequest(url: Uri.parse(manifest.baseUrl), headers: customHeaders);
     return WillPopScope(
       onWillPop: () => inAppWebViewController.exitApp(context, ref),
       child: Scaffold(
@@ -102,9 +102,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               .setIsHideDialog(message == "humhub.mobile.hideOpener");
           if (!ref.read(humHubProvider).isHideDialog) {
             ref.read(humHubProvider).clearSafeStorage();
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const Opener()),
-                (Route<dynamic> route) => false);
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                Opener.path, (Route<dynamic> route) => false);
           } else {
             ref.read(humHubProvider).setHash(HumHub.generateHash(32));
           }

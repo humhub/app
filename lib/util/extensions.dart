@@ -25,7 +25,6 @@ extension MyCookies on WebViewCookieManager {
 }
 
 extension MyWebViewController on InAppWebViewController {
-
   Future<bool> exitApp(BuildContext context, ref) async {
     bool canGoBack = await this.canGoBack();
     if (canGoBack) {
@@ -59,9 +58,8 @@ extension MyWebViewController on InAppWebViewController {
     var isHide = ref.read(humHubProvider).isHideDialog;
     isHide
         ? SystemNavigator.pop()
-        : Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const Opener()),
-            (Route<dynamic> route) => false);
+        : Navigator.of(context).pushNamedAndRemoveUntil(
+            Opener.path, (Route<dynamic> route) => false);
   }
 }
 
