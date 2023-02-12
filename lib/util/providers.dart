@@ -79,12 +79,3 @@ class HumHubNotifier extends ChangeNotifier {
 final humHubProvider = ChangeNotifierProvider<HumHubNotifier>((ref) {
   return HumHubNotifier(HumHub());
 });
-
-class DeepLinkObserver extends WidgetsBindingObserver {
-  @override
-  void didReceiveLocalNotification(int id, String title, String body, String payload) async {
-    // Handle the deep link payload here.
-    var ida = id;
-    var idb = title;
-  }
-}
