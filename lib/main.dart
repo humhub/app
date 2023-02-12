@@ -51,7 +51,7 @@ class MyAppState extends ConsumerState<MyApp>
         sharedFiles = value;
       });
     });
-    _handleInitialUri();
+    /*_handleInitialUri();*/
     _handleIncomingLinks();
   }
 
@@ -63,22 +63,12 @@ class MyAppState extends ConsumerState<MyApp>
       // the foreground or in the background.
       _sub = uriLinkStream.listen((Uri? uri) {
         if (!mounted) return;
-        print('got uri: $uri');
         setState(() {
           _latestUri = uri;
           _err = null;
         });
-      }, onError: (Object err) {
-        if (!mounted) return;
-        print('got err: $err');
-        setState(() {
-          _latestUri = null;
-          if (err is FormatException) {
-            _err = err;
-          } else {
-            _err = null;
-          }
-        });
+      }, onError: (err) {
+        print(err);
       });
     }
   }
@@ -90,7 +80,7 @@ class MyAppState extends ConsumerState<MyApp>
   /// throughout your app's life.
   ///
   /// We handle all exceptions, since it is called from initState.
-  Future<void> _handleInitialUri() async {
+  /*Future<void> _handleInitialUri() async {
     // In this example app this is an almost useless guard, but it is here to
     // show we are not going to call getInitialUri multiple times, even if this
     // was a weidget that will be disposed of (ex. a navigation route change).
@@ -115,7 +105,7 @@ class MyAppState extends ConsumerState<MyApp>
         setState(() => _err = err);
       }
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +124,7 @@ class MyAppState extends ConsumerState<MyApp>
     );
   }
 
-  void _showSnackBar(String msg) {
+  /*void _showSnackBar(String msg) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final context = _scaffoldKey.currentContext;
       if (context != null) {
@@ -143,5 +133,5 @@ class MyAppState extends ConsumerState<MyApp>
         ));
       }
     });
-  }
+  }*/
 }
