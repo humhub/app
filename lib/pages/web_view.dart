@@ -2,10 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
-import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -32,6 +32,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       javaScriptEnabled: true,
     ),
   );
+  late Manifest manifest;
 
   @override
   void initState() {
@@ -46,8 +47,15 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       'x-humhub-app': ref.read(humHubProvider).appVersion!
     });
 
+    final args = ModalRoute.of(context)!.settings.arguments;
+    if (args != null) {
+      manifest = args as Manifest;
+    } else {
+      manifest = m.Router.initParams;
+    }
+
     final initialRequest = URLRequest(
-        url: Uri.parse(widget.manifest.baseUrl), headers: customHeaders);
+        url: Uri.parse(manifest.baseUrl), headers: customHeaders);
     return WillPopScope(
       onWillPop: () => inAppWebViewController.exitApp(context, ref),
       child: Scaffold(
@@ -69,7 +77,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
     final url = action.request.url!.origin;
-    if (!url.startsWith(widget.manifest.baseUrl)) {
+    if (!url.startsWith(manifest.baseUrl)) {
       launchUrl(action.request.url!, mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
     }
