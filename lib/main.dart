@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/redirect_handler.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 main() {
   WidgetsFlutterBinding.ensureInitialized();
+  final DeepLinkObserver observer = DeepLinkObserver();
+  WidgetsBinding.instance.addObserver(observer);
   runApp(const ProviderScope(child: MyApp()));
 }
 
