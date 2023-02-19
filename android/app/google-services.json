@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "6061519658",
+    "project_id": "humhub-e73ea",
+    "storage_bucket": "humhub-e73ea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6061519658:android:4024444673704f7ad0e453",
+        "android_client_info": {
+          "package_name": "com.humhub.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "6061519658-gkktn36cllgfincb0ighink8iv4voaq0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAISISbwrpkPj1Qvrozq_35WDgZMQabuQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "6061519658-gkktn36cllgfincb0ighink8iv4voaq0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
