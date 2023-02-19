@@ -3,16 +3,17 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
+import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/api_provider.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/form_helper.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/providers.dart';
 import 'help.dart';
-import 'web_view.dart';
 
 class Opener extends ConsumerStatefulWidget {
   const Opener({Key? key}) : super(key: key);
+  static const String path = '/opener';
 
   @override
   OpenerState createState() => OpenerState();
@@ -127,17 +128,13 @@ class OpenerState extends ConsumerState<Opener> {
       ref
           .read(humHubProvider)
           .setInstance(HumHub(manifest: manifest, randomHash: hash));
-      redirect();
+      redirect(manifest);
     }
   }
 
-  redirect() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => WebViewApp(
-                manifest: ref.read(humHubProvider).manifest!,
-              )),
+  redirect(Manifest manifest) {
+    Navigator.pushNamed(
+      context, WebViewApp.path, arguments: manifest
     );
   }
 

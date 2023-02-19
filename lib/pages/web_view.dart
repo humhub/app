@@ -2,19 +2,20 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
-import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:humhub/util/router.dart' as m;
 
 import '../models/hum_hub.dart';
 
 class WebViewApp extends ConsumerStatefulWidget {
-  final Manifest manifest;
-  const WebViewApp({super.key, required this.manifest});
+  const WebViewApp({super.key});
+  static const String path = '/web_view';
 
   @override
   WebViewAppState createState() => WebViewAppState();
@@ -31,11 +32,11 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       javaScriptEnabled: true,
     ),
   );
+  late Manifest manifest;
 
   @override
   void initState() {
     super.initState();
-    cookieManager.setMyCookies(widget.manifest);
   }
 
   @override
@@ -46,12 +47,19 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       'x-humhub-app': ref.read(humHubProvider).appVersion!
     });
 
-    final initialRequest = URLRequest(
-        url: Uri.parse(widget.manifest.baseUrl), headers: customHeaders);
+    final args = ModalRoute.of(context)!.settings.arguments;
+    if (args != null) {
+      manifest = args as Manifest;
+    } else {
+      manifest = m.Router.initParams;
+    }
+
+    final initialRequest =
+        URLRequest(url: Uri.parse(manifest.baseUrl), headers: customHeaders);
     return WillPopScope(
       onWillPop: () => inAppWebViewController.exitApp(context, ref),
       child: Scaffold(
-        backgroundColor: HexColor(widget.manifest.themeColor),
+        backgroundColor: HexColor(manifest.themeColor),
         body: SafeArea(
           child: InAppWebView(
               initialUrlRequest: initialRequest,
@@ -69,7 +77,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
     final url = action.request.url!.origin;
-    if (!url.startsWith(widget.manifest.baseUrl)) {
+    if (!url.startsWith(manifest.baseUrl)) {
       launchUrl(action.request.url!, mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
     }
@@ -94,9 +102,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               .setIsHideDialog(message == "humhub.mobile.hideOpener");
           if (!ref.read(humHubProvider).isHideDialog) {
             ref.read(humHubProvider).clearSafeStorage();
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const Opener()),
-                (Route<dynamic> route) => false);
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                Opener.path, (Route<dynamic> route) => false);
           } else {
             ref.read(humHubProvider).setHash(HumHub.generateHash(32));
           }
