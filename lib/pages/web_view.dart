@@ -6,7 +6,10 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
+import 'package:humhub/util/notifications/plugin.dart';
+import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:loggy/loggy.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:humhub/util/router.dart' as m;
@@ -42,10 +45,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   @override
   Widget build(BuildContext context) {
     //Append random hash to customHeaders in this state the header should always exist.
-    customHeaders.addAll({
-      'x-humhub-app-token': ref.read(humHubProvider).randomHash!,
-      'x-humhub-app': ref.read(humHubProvider).appVersion!
-    });
+    customHeaders.addAll({'x-humhub-app-token': ref.read(humHubProvider).randomHash!, 'x-humhub-app': ref.read(humHubProvider).appVersion!});
 
     final args = ModalRoute.of(context)!.settings.arguments;
     if (args != null) {
@@ -54,27 +54,29 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       manifest = m.Router.initParams;
     }
 
-    final initialRequest =
-        URLRequest(url: Uri.parse(manifest.baseUrl), headers: customHeaders);
+    final initialRequest = URLRequest(url: Uri.parse(manifest.baseUrl), headers: customHeaders);
     return WillPopScope(
       onWillPop: () => inAppWebViewController.exitApp(context, ref),
       child: Scaffold(
         backgroundColor: HexColor(manifest.themeColor),
-        body: SafeArea(
-          child: InAppWebView(
-              initialUrlRequest: initialRequest,
-              initialOptions: options,
-              shouldOverrideUrlLoading: shouldOverrideUrlLoading,
-              onWebViewCreated: onWebViewCreated,
-              shouldInterceptAjaxRequest: shouldInterceptAjaxRequest,
-              shouldInterceptFetchRequest: shouldInterceptFetchRequest),
+        body: NotificationPlugin(
+          child: PushPlugin(
+            child: SafeArea(
+              child: InAppWebView(
+                  initialUrlRequest: initialRequest,
+                  initialOptions: options,
+                  shouldOverrideUrlLoading: shouldOverrideUrlLoading,
+                  onWebViewCreated: onWebViewCreated,
+                  shouldInterceptAjaxRequest: shouldInterceptAjaxRequest,
+                  shouldInterceptFetchRequest: shouldInterceptFetchRequest),
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Future<NavigationActionPolicy?> shouldOverrideUrlLoading(
-      InAppWebViewController controller, NavigationAction action) async {
+  Future<NavigationActionPolicy?> shouldOverrideUrlLoading(InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
     final url = action.request.url!.origin;
     if (!url.startsWith(manifest.baseUrl)) {
@@ -82,11 +84,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       return NavigationActionPolicy.CANCEL;
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
-    if (Platform.isAndroid ||
-        action.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED) {
-      controller.loadUrl(
-          urlRequest:
-              URLRequest(url: action.request.url, headers: customHeaders));
+    if (Platform.isAndroid || action.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED) {
+      controller.loadUrl(urlRequest: URLRequest(url: action.request.url, headers: customHeaders));
       return NavigationActionPolicy.CANCEL;
     }
     return NavigationActionPolicy.ALLOW;
@@ -97,13 +96,11 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       WebMessageListener(
         jsObjectName: "flutterChannel",
         onPostMessage: (message, sourceOrigin, isMainFrame, replyProxy) {
-          ref
-              .read(humHubProvider)
-              .setIsHideDialog(message == "humhub.mobile.hideOpener");
+          logInfo(message);
+          ref.read(humHubProvider).setIsHideDialog(message == "humhub.mobile.hideOpener");
           if (!ref.read(humHubProvider).isHideDialog) {
             ref.read(humHubProvider).clearSafeStorage();
-            Navigator.of(context).pushNamedAndRemoveUntil(
-                Opener.path, (Route<dynamic> route) => false);
+            Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
           } else {
             ref.read(humHubProvider).setHash(HumHub.generateHash(32));
           }
@@ -113,15 +110,13 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     inAppWebViewController = controller;
   }
 
-  Future<AjaxRequest?> shouldInterceptAjaxRequest(
-      InAppWebViewController controller, AjaxRequest ajaxReq) async {
+  Future<AjaxRequest?> shouldInterceptAjaxRequest(InAppWebViewController controller, AjaxRequest ajaxReq) async {
     // Append headers on every AJAX request
     ajaxReq.headers = AjaxRequestHeaders(customHeaders);
     return ajaxReq;
   }
 
-  Future<FetchRequest?> shouldInterceptFetchRequest(
-      InAppWebViewController controller, FetchRequest fetchReq) async {
+  Future<FetchRequest?> shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest fetchReq) async {
     fetchReq.headers?.addAll(customHeaders);
     return fetchReq;
   }

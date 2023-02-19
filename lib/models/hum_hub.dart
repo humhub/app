@@ -11,12 +11,14 @@ class HumHub {
   bool isHideDialog;
   String? randomHash;
   String? appVersion;
+  String? pushToken;
 
   HumHub({
     this.manifest,
     this.isHideDialog = false,
     this.randomHash,
     this.appVersion,
+    this.pushToken
   });
 
   Map<String, dynamic> toJson() => {
@@ -24,6 +26,7 @@ class HumHub {
         'isHideDialog': isHideDialog,
         'randomHash': randomHash,
         'appVersion': appVersion,
+        'pushToken': pushToken,
       };
 
   factory HumHub.fromJson(Map<String, dynamic> json) {
@@ -33,6 +36,7 @@ class HumHub {
       isHideDialog: json['isHideDialog'] as bool,
       randomHash: json['randomHash'],
       appVersion: json['appVersion'],
+      pushToken: json['pushToken'],
     );
   }
 
