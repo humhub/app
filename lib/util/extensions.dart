@@ -69,3 +69,22 @@ class HexColor extends Color {
 
   HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }
+
+extension AsyncValueX<T> on AsyncValue<T> {
+  bool get isLoading => asData == null;
+
+  bool get isLoaded => asData != null;
+
+  bool get isError => this is AsyncError;
+
+  AsyncError get asError => this as AsyncError;
+
+  T? get valueOrNull => asData?.value;
+}
+
+extension FutureAsyncValueX<T> on Future<AsyncValue<T>> {
+  Future<T?> get valueOrNull => then(
+        (asyncValue) => asyncValue.asData?.value,
+  );
+}
+
