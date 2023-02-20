@@ -28,7 +28,7 @@ class PushPluginState extends ConsumerState<PushPlugin> {
     // Init firebase without google-service.json
     /*FirebaseOptions options = const FirebaseOptions(apiKey: "AIzaSyAAISISbwrpkPj1Qvrozq_35WDgZMQabuQ", appId: "1:6061519658:android:4024444673704f7ad0e453", messagingSenderId: "6061519658", projectId: "humhub-e73ea");
     await Firebase.initializeApp(name: "DEFAULT", options: options);*/
-    Firebase.initializeApp();
+    await Firebase.initializeApp();
     final token = await FirebaseMessaging.instance.getToken();
     if (token != null) logDebug('PushPlugin with token: $token');
     FirebaseMessaging.onBackgroundMessage(_onBackgroundMessage);
