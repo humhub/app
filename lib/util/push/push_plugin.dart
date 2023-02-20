@@ -25,9 +25,10 @@ class PushPlugin extends ConsumerStatefulWidget {
 class PushPluginState extends ConsumerState<PushPlugin> {
   Future<void> _init() async {
     logDebug("Init PushPlugin");
-    // My token: ehJpVWWpQ0eCyDbjkTH6Wf:APA91bHhc49cIYDTkveiInENuONzjOeeF20bTNOMVYI6U_TZzL3_RVB16hWDY2xLIuVjOP_TCex6snur-7g6Bddwc89M2TQBR-mBlg_nKeRvwr9VvvC5hfaopfcbuaeOl9G1UwWci5v9
-    // My Emulator token: eezpU_KIRpG9t9f4ojlSJL:APA91bHkWfcqiXfLJsLmzVb8DS5nXCxH2AzZD6CPcB3tJuZwxTOVEeoQB3u7NaOxDdEx0bQCq-kSOK-vbs79A9GY1o-NssWPj0etr6T_KvEPMzLzIBrALv2F1WU26KbKuMrudZykFVqZ
-    await Firebase.initializeApp();
+    // Init firebase without google-service.json
+    /*FirebaseOptions options = const FirebaseOptions(apiKey: "AIzaSyAAISISbwrpkPj1Qvrozq_35WDgZMQabuQ", appId: "1:6061519658:android:4024444673704f7ad0e453", messagingSenderId: "6061519658", projectId: "humhub-e73ea");
+    await Firebase.initializeApp(name: "DEFAULT", options: options);*/
+    Firebase.initializeApp();
     final token = await FirebaseMessaging.instance.getToken();
     if (token != null) logDebug('PushPlugin with token: $token');
     FirebaseMessaging.onBackgroundMessage(_onBackgroundMessage);
