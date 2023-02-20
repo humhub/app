@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/models/register_fcm.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
@@ -95,14 +98,29 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     await controller.addWebMessageListener(
       WebMessageListener(
         jsObjectName: "flutterChannel",
-        onPostMessage: (message, sourceOrigin, isMainFrame, replyProxy) {
+        onPostMessage: (message, sourceOrigin, isMainFrame, replyProxy) async {
           logInfo(message);
-          ref.read(humHubProvider).setIsHideDialog(message == "humhub.mobile.hideOpener");
-          if (!ref.read(humHubProvider).isHideDialog) {
-            ref.read(humHubProvider).clearSafeStorage();
-            Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
-          } else {
-            ref.read(humHubProvider).setHash(HumHub.generateHash(32));
+          bool isJson = false;
+          try {
+            var decodedJSON = jsonDecode(message!) as Map<String, dynamic>;
+            RegisterFcm request = RegisterFcm.fromJson(decodedJSON);
+            String? token = ref.read(pushTokenProvider).value;
+            if (token != null) {
+              var postData = Uint8List.fromList(utf8.encode("token=$token"));
+              controller.postUrl(url: Uri.parse(request.url), postData: postData);
+            }
+            isJson = true;
+          } on FormatException catch (e) {
+            logInfo('The provided string is not valid JSON', e);
+          }
+          if (!isJson) {
+            ref.read(humHubProvider).setIsHideDialog(message == "humhub.mobile.hideOpener");
+            if (!ref.read(humHubProvider).isHideDialog) {
+              ref.read(humHubProvider).clearSafeStorage();
+              Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
+            } else {
+              ref.read(humHubProvider).setHash(HumHub.generateHash(32));
+            }
           }
         },
       ),

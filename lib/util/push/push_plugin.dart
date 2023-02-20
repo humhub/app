@@ -26,6 +26,7 @@ class PushPluginState extends ConsumerState<PushPlugin> {
   Future<void> _init() async {
     logDebug("Init PushPlugin");
     // My token: ehJpVWWpQ0eCyDbjkTH6Wf:APA91bHhc49cIYDTkveiInENuONzjOeeF20bTNOMVYI6U_TZzL3_RVB16hWDY2xLIuVjOP_TCex6snur-7g6Bddwc89M2TQBR-mBlg_nKeRvwr9VvvC5hfaopfcbuaeOl9G1UwWci5v9
+    // My Emulator token: eezpU_KIRpG9t9f4ojlSJL:APA91bHkWfcqiXfLJsLmzVb8DS5nXCxH2AzZD6CPcB3tJuZwxTOVEeoQB3u7NaOxDdEx0bQCq-kSOK-vbs79A9GY1o-NssWPj0etr6T_KvEPMzLzIBrALv2F1WU26KbKuMrudZykFVqZ
     await Firebase.initializeApp();
     final token = await FirebaseMessaging.instance.getToken();
     if (token != null) logDebug('PushPlugin with token: $token');
