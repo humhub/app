@@ -17,14 +17,14 @@ class HumHubNotifier extends ChangeNotifier {
 
   final _storage = const FlutterSecureStorage();
 
-  bool get isHideDialog => _humHubInstance.isHideDialog;
+  bool get isHideDialog => _humHubInstance.isHideOpener;
   Manifest? get manifest => _humHubInstance.manifest;
   String? get randomHash => _humHubInstance.randomHash;
   String? get appVersion => _humHubInstance.appVersion;
   String? get pushToken => _humHubInstance.pushToken;
 
-  void setIsHideDialog(bool isHide) {
-    _humHubInstance.isHideDialog = isHide;
+  void setIsHideOpener(bool isHide) {
+    _humHubInstance.isHideOpener = isHide;
     _updateSafeStorage();
     notifyListeners();
   }
@@ -38,7 +38,7 @@ class HumHubNotifier extends ChangeNotifier {
   Future<void> setInstance(HumHub instance) async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     _humHubInstance.manifest = instance.manifest;
-    _humHubInstance.isHideDialog = instance.isHideDialog;
+    _humHubInstance.isHideOpener = instance.isHideOpener;
     _humHubInstance.randomHash = instance.randomHash;
     _humHubInstance.appVersion = packageInfo.version;
     _updateSafeStorage();

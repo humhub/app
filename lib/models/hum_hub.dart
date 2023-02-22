@@ -8,14 +8,14 @@ enum RedirectAction { opener, webView }
 
 class HumHub {
   Manifest? manifest;
-  bool isHideDialog;
+  bool isHideOpener;
   String? randomHash;
   String? appVersion;
   String? pushToken;
 
   HumHub({
     this.manifest,
-    this.isHideDialog = false,
+    this.isHideOpener = false,
     this.randomHash,
     this.appVersion,
     this.pushToken
@@ -23,7 +23,7 @@ class HumHub {
 
   Map<String, dynamic> toJson() => {
         'manifest': manifest != null ? manifest!.toJson() : null,
-        'isHideDialog': isHideDialog,
+        'isHideDialog': isHideOpener,
         'randomHash': randomHash,
         'appVersion': appVersion,
         'pushToken': pushToken,
@@ -33,7 +33,7 @@ class HumHub {
     return HumHub(
       manifest:
           json['manifest'] != null ? Manifest.fromJson(json['manifest']) : null,
-      isHideDialog: json['isHideDialog'] as bool,
+      isHideOpener: json['isHideDialog'] as bool,
       randomHash: json['randomHash'],
       appVersion: json['appVersion'],
       pushToken: json['pushToken'],
@@ -41,7 +41,7 @@ class HumHub {
   }
 
   Future<RedirectAction> action(ref) async {
-    if (!isHideDialog) {
+    if (!isHideOpener) {
       return RedirectAction.opener;
     } else {
       if (manifest != null) {

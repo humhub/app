@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/models/register_fcm.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/plugin.dart';
@@ -88,29 +88,29 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     await controller.addWebMessageListener(
       WebMessageListener(
         jsObjectName: "flutterChannel",
-        onPostMessage: (message, sourceOrigin, isMainFrame, replyProxy) async {
-          logInfo(message);
-          bool isJson = false;
-          try {
-            var decodedJSON = jsonDecode(message!) as Map<String, dynamic>;
-            RegisterFcm request = RegisterFcm.fromJson(decodedJSON);
-            String? token = ref.read(pushTokenProvider).value;
-            if (token != null) {
-              var postData = Uint8List.fromList(utf8.encode("token=$token"));
-              controller.postUrl(url: Uri.parse(request.url), postData: postData);
-            }
-            isJson = true;
-          } on FormatException catch (e) {
-            logInfo('The provided string is not valid JSON', e);
-          }
-          if (!isJson) {
-            ref.read(humHubProvider).setIsHideDialog(message == "humhub.mobile.hideOpener");
-            if (!ref.read(humHubProvider).isHideDialog) {
+        onPostMessage: (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
+          logInfo(inMessage);
+          var json = jsonDecode(inMessage!) as Map<String, dynamic>;
+          ChannelMessage message = ChannelMessage.fromJson(json);
+          switch (message.action) {
+            case ChannelAction.showOpener:
+              ref.read(humHubProvider).setIsHideOpener(false);
               ref.read(humHubProvider).clearSafeStorage();
               Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
-            } else {
+              break;
+            case ChannelAction.hideOpener:
+              ref.read(humHubProvider).setIsHideOpener(true);
               ref.read(humHubProvider).setHash(HumHub.generateHash(32));
-            }
+              break;
+            case ChannelAction.registerFcmDevice:
+              String? token = ref.read(pushTokenProvider).value;
+              if (token != null) {
+                var postData = Uint8List.fromList(utf8.encode("token=$token"));
+                controller.postUrl(url: Uri.parse(message.url!), postData: postData);
+              }
+              break;
+            case ChannelAction.none:
+              break;
           }
         },
       ),
