@@ -1,17 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:app_settings/app_settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/models/register_fcm.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:humhub/util/router.dart' as m;
 
@@ -88,29 +90,33 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     await controller.addWebMessageListener(
       WebMessageListener(
         jsObjectName: "flutterChannel",
-        onPostMessage: (message, sourceOrigin, isMainFrame, replyProxy) async {
-          logInfo(message);
-          bool isJson = false;
-          try {
-            var decodedJSON = jsonDecode(message!) as Map<String, dynamic>;
-            RegisterFcm request = RegisterFcm.fromJson(decodedJSON);
-            String? token = ref.read(pushTokenProvider).value;
-            if (token != null) {
-              var postData = Uint8List.fromList(utf8.encode("token=$token"));
-              controller.postUrl(url: Uri.parse(request.url), postData: postData);
-            }
-            isJson = true;
-          } on FormatException catch (e) {
-            logInfo('The provided string is not valid JSON', e);
-          }
-          if (!isJson) {
-            ref.read(humHubProvider).setIsHideDialog(message == "humhub.mobile.hideOpener");
-            if (!ref.read(humHubProvider).isHideDialog) {
+        onPostMessage: (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
+          logInfo(inMessage);
+          var json = jsonDecode(inMessage!) as Map<String, dynamic>;
+          ChannelMessage message = ChannelMessage.fromJson(json);
+          switch (message.action) {
+            case ChannelAction.showOpener:
+              ref.read(humHubProvider).setIsHideOpener(false);
               ref.read(humHubProvider).clearSafeStorage();
               Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
-            } else {
+              break;
+            case ChannelAction.hideOpener:
+              ref.read(humHubProvider).setIsHideOpener(true);
               ref.read(humHubProvider).setHash(HumHub.generateHash(32));
-            }
+              break;
+            case ChannelAction.registerFcmDevice:
+              String? token = ref.read(pushTokenProvider).value;
+              if (token != null) {
+                var postData = Uint8List.fromList(utf8.encode("token=$token"));
+                controller.postUrl(url: Uri.parse(message.url!), postData: postData);
+              }
+              var status = await Permission.notification.status;
+              // status.isDenied: The user has previously denied the notification permission
+              // !status.isGranted: The user has never been asked for the notification permission
+              if (status.isDenied || !status.isGranted) askForNotificationPermissions();
+              break;
+            case ChannelAction.none:
+              break;
           }
         },
       ),
@@ -164,5 +170,30 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               }
             },
           );
+  }
+
+  askForNotificationPermissions() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Notification Permission"),
+        content: const Text("Please enable notifications for HumHub in the device settings"),
+        actions: <Widget>[
+          TextButton(
+            child: const Text("Enable"),
+            onPressed: () {
+              AppSettings.openAppSettings();
+              Navigator.pop(context);
+            },
+          ),
+          TextButton(
+            child: const Text("Skip"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
