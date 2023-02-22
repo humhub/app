@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:app_settings/app_settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -12,6 +13,7 @@ import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:humhub/util/router.dart' as m;
 
@@ -108,6 +110,10 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
                 var postData = Uint8List.fromList(utf8.encode("token=$token"));
                 controller.postUrl(url: Uri.parse(message.url!), postData: postData);
               }
+              var status = await Permission.notification.status;
+              // status.isDenied: The user has previously denied the notification permission
+              // !status.isGranted: The user has never been asked for the notification permission
+              if (status.isDenied || !status.isGranted) askForNotificationPermissions();
               break;
             case ChannelAction.none:
               break;
@@ -164,5 +170,30 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               }
             },
           );
+  }
+
+  askForNotificationPermissions() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Notification Permission"),
+        content: const Text("Please enable notifications for HumHub in the device settings"),
+        actions: <Widget>[
+          TextButton(
+            child: const Text("Enable"),
+            onPressed: () {
+              AppSettings.openAppSettings();
+              Navigator.pop(context);
+            },
+          ),
+          TextButton(
+            child: const Text("Skip"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
