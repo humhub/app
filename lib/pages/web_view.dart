@@ -1,20 +1,18 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/models/register_fcm.dart';
 import 'package:humhub/pages/opener.dart';
-import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:humhub/util/router.dart' as m;
 
 import '../models/hum_hub.dart';
@@ -28,9 +26,10 @@ class WebViewApp extends ConsumerStatefulWidget {
 }
 
 class WebViewAppState extends ConsumerState<WebViewApp> {
-  late InAppWebViewController inAppWebViewController;
-  final WebViewCookieManager cookieManager = WebViewCookieManager();
-  final options = InAppWebViewGroupOptions(
+  late InAppWebViewController webViewController;
+  late Manifest manifest;
+  late URLRequest _initialRequest;
+  final _options = InAppWebViewGroupOptions(
     crossPlatform: InAppWebViewOptions(
       useShouldOverrideUrlLoading: true,
       useShouldInterceptAjaxRequest: true,
@@ -38,40 +37,31 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       javaScriptEnabled: true,
     ),
   );
-  late Manifest manifest;
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  PullToRefreshController? _pullToRefreshController;
+  late PullToRefreshOptions _pullToRefreshOptions;
 
   @override
   Widget build(BuildContext context) {
-    //Append random hash to customHeaders in this state the header should always exist.
-    customHeaders.addAll({'x-humhub-app-token': ref.read(humHubProvider).randomHash!, 'x-humhub-app': ref.read(humHubProvider).appVersion!});
-
-    final args = ModalRoute.of(context)!.settings.arguments;
-    if (args != null) {
-      manifest = args as Manifest;
-    } else {
-      manifest = m.Router.initParams;
-    }
-
-    final initialRequest = URLRequest(url: Uri.parse(manifest.baseUrl), headers: customHeaders);
+    _initialRequest = getInitRequest(context);
+    _pullToRefreshController = initPullToRefreshController;
     return WillPopScope(
-      onWillPop: () => inAppWebViewController.exitApp(context, ref),
+      onWillPop: () => webViewController.exitApp(context, ref),
       child: Scaffold(
         backgroundColor: HexColor(manifest.themeColor),
         body: NotificationPlugin(
           child: PushPlugin(
             child: SafeArea(
               child: InAppWebView(
-                  initialUrlRequest: initialRequest,
-                  initialOptions: options,
-                  shouldOverrideUrlLoading: shouldOverrideUrlLoading,
-                  onWebViewCreated: onWebViewCreated,
-                  shouldInterceptAjaxRequest: shouldInterceptAjaxRequest,
-                  shouldInterceptFetchRequest: shouldInterceptFetchRequest),
+                initialUrlRequest: _initialRequest,
+                initialOptions: _options,
+                pullToRefreshController: _pullToRefreshController,
+                shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
+                onWebViewCreated: _onWebViewCreated,
+                shouldInterceptAjaxRequest: _shouldInterceptAjaxRequest,
+                shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
+                onLoadStop: _onLoadStop,
+                onProgressChanged: _onProgressChanged,
+              ),
             ),
           ),
         ),
@@ -79,7 +69,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     );
   }
 
-  Future<NavigationActionPolicy?> shouldOverrideUrlLoading(InAppWebViewController controller, NavigationAction action) async {
+  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
     final url = action.request.url!.origin;
     if (!url.startsWith(manifest.baseUrl)) {
@@ -88,13 +78,13 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
     if (Platform.isAndroid || action.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED) {
-      controller.loadUrl(urlRequest: URLRequest(url: action.request.url, headers: customHeaders));
+      controller.loadUrl(urlRequest: URLRequest(url: action.request.url, headers: _initialRequest.headers));
       return NavigationActionPolicy.CANCEL;
     }
     return NavigationActionPolicy.ALLOW;
   }
 
-  onWebViewCreated(InAppWebViewController controller) async {
+  _onWebViewCreated(InAppWebViewController controller) async {
     await controller.addWebMessageListener(
       WebMessageListener(
         jsObjectName: "flutterChannel",
@@ -125,17 +115,54 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         },
       ),
     );
-    inAppWebViewController = controller;
+    webViewController = controller;
   }
 
-  Future<AjaxRequest?> shouldInterceptAjaxRequest(InAppWebViewController controller, AjaxRequest ajaxReq) async {
+  Future<AjaxRequest?> _shouldInterceptAjaxRequest(InAppWebViewController controller, AjaxRequest ajaxReq) async {
     // Append headers on every AJAX request
-    ajaxReq.headers = AjaxRequestHeaders(customHeaders);
+    ajaxReq.headers = AjaxRequestHeaders(_initialRequest.headers!);
     return ajaxReq;
   }
 
-  Future<FetchRequest?> shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest fetchReq) async {
-    fetchReq.headers?.addAll(customHeaders);
+  Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest fetchReq) async {
+    fetchReq.headers?.addAll(_initialRequest.headers!);
     return fetchReq;
+  }
+
+  URLRequest getInitRequest(BuildContext context) {
+    //Append random hash to customHeaders in this state the header should always exist.
+    Map<String, String> customHeaders = {};
+    customHeaders.addAll({'x-humhub-app-token': ref.read(humHubProvider).randomHash!, 'x-humhub-app': ref.read(humHubProvider).appVersion!});
+    final args = ModalRoute.of(context)!.settings.arguments;
+    args != null ? manifest = args as Manifest : manifest = m.Router.initParams;
+    return URLRequest(url: Uri.parse(manifest.baseUrl), headers: customHeaders);
+  }
+
+  _onLoadStop(InAppWebViewController controller, Uri? url) {
+    _pullToRefreshController?.endRefreshing();
+  }
+
+  _onProgressChanged(InAppWebViewController controller, int progress) {
+    if (progress == 100) {
+      _pullToRefreshController?.endRefreshing();
+    }
+  }
+
+  PullToRefreshController? get initPullToRefreshController {
+    _pullToRefreshOptions = PullToRefreshOptions(
+      color: HexColor(manifest.themeColor),
+    );
+    return kIsWeb
+        ? null
+        : PullToRefreshController(
+            options: _pullToRefreshOptions,
+            onRefresh: () async {
+              if (defaultTargetPlatform == TargetPlatform.android) {
+                webViewController.reload();
+              } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+                webViewController.loadUrl(urlRequest: URLRequest(url: await webViewController.getUrl()));
+              }
+            },
+          );
   }
 }
