@@ -6,5 +6,3 @@ class StorageKeys{
   static String humhubInstance = "humHubInstance";
   static String lastInstanceUrl = "humHubLastUrl";
 }
-
-Map<String, String> customHeaders = {};
