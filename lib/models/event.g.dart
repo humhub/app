@@ -13,6 +13,7 @@ PushEventData _$PushEventDataFromJson(Map<String, dynamic> json) {
     json['channel'] as String?,
     PushEventData._storesFromJson(json['refresh_stores']),
     json['channel_payload'] as String?,
+    json['url'] as String?,
   );
 }
 

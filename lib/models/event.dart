@@ -31,6 +31,7 @@ class PushEventData {
   final String? channel;
   final String? channelPayload;
   final List<PushEventRefreshStore>? refreshStores;
+  final String? redirectUrl;
 
   PushEventData(
       this.notificationTitle,
@@ -38,6 +39,7 @@ class PushEventData {
       this.channel,
       this.refreshStores,
       this.channelPayload,
+      this.redirectUrl,
       );
 
   factory PushEventData.fromJson(Map<String, dynamic> json) => _$PushEventDataFromJson(json);

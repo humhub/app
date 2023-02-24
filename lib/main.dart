@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/log.dart';
 import 'package:humhub/util/router.dart' as my_router;
+import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 
 
@@ -34,6 +35,7 @@ class MyAppState extends ConsumerState<MyApp>{
             debugShowCheckedModeBanner: false,
             initialRoute: snap.data,
             routes: my_router.Router.routes,
+            navigatorKey: navigatorKey,
           );
         }
         return progress;

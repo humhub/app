@@ -92,6 +92,7 @@ Future<void> _handleNotification(RemoteMessage message, NotificationService noti
     title,
     body,
     payload: data.channelPayload,
+    redirectUrl: data.redirectUrl,
   );
 }
 

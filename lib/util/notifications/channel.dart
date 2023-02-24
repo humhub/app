@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 
@@ -61,6 +62,32 @@ class GeneralNotificationChannel extends NotificationChannel {
   Future<void> onTap(String? payload) async {
     if (payload != null) {
       logInfo("Here we do navigate to specific screen for channel");
+    }
+  }
+}
+
+class RedirectNotificationChannel extends NotificationChannel {
+  RedirectNotificationChannel()
+      : super(
+    'general',
+    'General app notifications',
+    'These notifications don\'t belong to any other category.',
+  );
+
+  @override
+  Future<void> onTap(String? payload) async {
+    if (payload != null && navigatorKey.currentState != null) {
+      bool isNewRouteSameAsCurrent = false;
+      navigatorKey.currentState!.popUntil((route) {
+        if (route.settings.name == WebViewApp.path) {
+          isNewRouteSameAsCurrent = true;
+        }
+        return true;
+      });
+      if (!isNewRouteSameAsCurrent) {
+        navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: payload);
+      }
+      navigatorKey.currentState!.popAndPushNamed(WebViewApp.path, arguments: payload);
     }
   }
 }
