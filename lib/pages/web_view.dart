@@ -143,8 +143,13 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
 
   URLRequest getInitRequest(BuildContext context) {
     //Append random hash to customHeaders in this state the header should always exist.
+    bool isHideDialog = ref.read(humHubProvider).isHideDialog;
     Map<String, String> customHeaders = {};
-    customHeaders.addAll({'x-humhub-app-token': ref.read(humHubProvider).randomHash!, 'x-humhub-app': ref.read(humHubProvider).appVersion!});
+    customHeaders.addAll({
+      'x-humhub-app-token': ref.read(humHubProvider).randomHash!,
+      'x-humhub-app': ref.read(humHubProvider).appVersion!,
+      'x-humhub-app-ostate': isHideDialog ? '1' : '0'
+    });
     final args = ModalRoute.of(context)!.settings.arguments;
     args != null ? manifest = args as Manifest : manifest = m.Router.initParams;
     return URLRequest(url: Uri.parse(manifest.baseUrl), headers: customHeaders);
@@ -152,9 +157,10 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
 
   _onLoadStop(InAppWebViewController controller, Uri? url) {
     // Disable remember me checkbox on login and set def. value to true: check if the page is actually login page, if it is inject JS that hides element
-    if(url!.path.contains('/user/auth/login')){
+    if (url!.path.contains('/user/auth/login')) {
       webViewController.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
-      webViewController.evaluateJavascript(source: "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+      webViewController.evaluateJavascript(
+          source: "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _pullToRefreshController?.endRefreshing();
   }
