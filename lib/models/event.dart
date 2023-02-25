@@ -29,7 +29,7 @@ class PushEventData {
   final String? channel;
   final String? channelPayload;
   final String? redirectUrl;
-  final int? notificationCount;
+  final String? notificationCount;
 
   PushEventData(
       this.notificationTitle,

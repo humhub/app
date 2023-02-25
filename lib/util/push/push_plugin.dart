@@ -86,8 +86,14 @@ Future<void> _handleNotification(RemoteMessage message, NotificationService noti
   } else {
     channel = GeneralNotificationChannel();
   }
+  int count = 0;
+  try {
+    count = int.parse(data.notificationCount!);
+  } catch (e) {
+    logError(e);
+  }
   // Set icon badge count if notificationCount exist in push.
-  if (data.notificationCount != null) FlutterAppBadger.updateBadgeCount(data.notificationCount!);
+  if (data.notificationCount != null) FlutterAppBadger.updateBadgeCount(count);
 
   logDebug("notificationService.showNotification name: PushPlugin");
   await notificationService.showNotification(
