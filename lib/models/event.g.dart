@@ -7,14 +7,8 @@ part of 'event.dart';
 // **************************************************************************
 
 PushEventData _$PushEventDataFromJson(Map<String, dynamic> json) {
-  return PushEventData(
-    json['notification_title'] as String?,
-    json['notification_body'] as String?,
-    json['channel'] as String?,
-    PushEventData._storesFromJson(json['refresh_stores']),
-    json['channel_payload'] as String?,
-    json['url'] as String?,
-  );
+  return PushEventData(json['notification_title'] as String?, json['notification_body'] as String?, json['channel'] as String?,
+      json['channel_payload'] as String?, json['url'] as String?, json['notificationCount'] as int?);
 }
 
 SimpleNotification _$SimpleNotificationFromJson(Map<String, dynamic> json) {

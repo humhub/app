@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/channel_message.dart';
@@ -115,6 +116,9 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               // !status.isGranted: The user has never been asked for the notification permission
               if (status.isDenied || !status.isGranted) askForNotificationPermissions();
               break;
+            case ChannelAction.updateNotificationCount:
+              if (message.count != null) FlutterAppBadger.updateBadgeCount(message.count!);
+              break;
             case ChannelAction.none:
               break;
           }
@@ -146,9 +150,10 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
 
   _onLoadStop(InAppWebViewController controller, Uri? url) {
     // Disable remember me checkbox on login and set def. value to true: check if the page is actually login page, if it is inject JS that hides element
-    if(url!.path.contains('/user/auth/login')){
+    if (url!.path.contains('/user/auth/login')) {
       webViewController.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
-      webViewController.evaluateJavascript(source: "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+      webViewController.evaluateJavascript(
+          source: "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _pullToRefreshController?.endRefreshing();
   }

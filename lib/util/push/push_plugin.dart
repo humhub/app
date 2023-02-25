@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/event.dart';
 import 'package:humhub/util/notifications/channel.dart';
@@ -85,6 +86,8 @@ Future<void> _handleNotification(RemoteMessage message, NotificationService noti
   } else {
     channel = GeneralNotificationChannel();
   }
+  // Set icon badge count if notificationCount exist in push.
+  if (data.notificationCount != null) FlutterAppBadger.updateBadgeCount(data.notificationCount!);
 
   logDebug("notificationService.showNotification name: PushPlugin");
   await notificationService.showNotification(
