@@ -144,8 +144,18 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     Map<String, String> customHeaders = {};
     customHeaders.addAll({'x-humhub-app-token': ref.read(humHubProvider).randomHash!, 'x-humhub-app': ref.read(humHubProvider).appVersion!});
     final args = ModalRoute.of(context)!.settings.arguments;
-    args != null ? manifest = args as Manifest : manifest = m.Router.initParams;
-    return URLRequest(url: Uri.parse(manifest.baseUrl), headers: customHeaders);
+    String? url;
+    if (args is Manifest) {
+      manifest = args;
+    }
+    if (args is String) {
+      manifest = m.Router.initParams;
+      url = args;
+    }
+    if (args == null) {
+      manifest = m.Router.initParams;
+    }
+    return URLRequest(url: Uri.parse(url ?? manifest.baseUrl), headers: customHeaders);
   }
 
   _onLoadStop(InAppWebViewController controller, Uri? url) {
