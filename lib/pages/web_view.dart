@@ -124,15 +124,21 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     webViewController = controller;
   }
 
-  Future<AjaxRequest?> _shouldInterceptAjaxRequest(InAppWebViewController controller, AjaxRequest ajaxReq) async {
+  Future<AjaxRequest?> _shouldInterceptAjaxRequest(InAppWebViewController controller, AjaxRequest request) async {
     // Append headers on every AJAX request
-    ajaxReq.headers = AjaxRequestHeaders(_initialRequest.headers!);
-    return ajaxReq;
+    Map<String, dynamic> headers = {};
+    if (request.headers != null) headers = request.headers!.getHeaders();
+    headers.addAll(_initialRequest.headers!);
+    request.headers = AjaxRequestHeaders(headers);
+    return request;
   }
 
-  Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest fetchReq) async {
-    fetchReq.headers?.addAll(_initialRequest.headers!);
-    return fetchReq;
+  Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest request) async {
+    Map<String, dynamic> headers = {};
+    if (request.headers != null) headers = request.headers!;
+    headers.addAll(_initialRequest.headers!);
+    request.headers = headers;
+    return request;
   }
 
   URLRequest getInitRequest(BuildContext context) {
