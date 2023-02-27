@@ -128,21 +128,32 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     webViewController = controller;
   }
 
-  Future<AjaxRequest?> _shouldInterceptAjaxRequest(InAppWebViewController controller, AjaxRequest ajaxReq) async {
+  Future<AjaxRequest?> _shouldInterceptAjaxRequest(InAppWebViewController controller, AjaxRequest request) async {
     // Append headers on every AJAX request
-    ajaxReq.headers = AjaxRequestHeaders(_initialRequest.headers!);
-    return ajaxReq;
+    Map<String, dynamic> headers = {};
+    if (request.headers != null) headers = request.headers!.getHeaders();
+    headers.addAll(_initialRequest.headers!);
+    request.headers = AjaxRequestHeaders(headers);
+    return request;
   }
 
-  Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest fetchReq) async {
-    fetchReq.headers?.addAll(_initialRequest.headers!);
-    return fetchReq;
+  Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest request) async {
+    Map<String, dynamic> headers = {};
+    if (request.headers != null) headers = request.headers!;
+    headers.addAll(_initialRequest.headers!);
+    request.headers = headers;
+    return request;
   }
 
   URLRequest getInitRequest(BuildContext context) {
     //Append random hash to customHeaders in this state the header should always exist.
+    bool isHideDialog = ref.read(humHubProvider).isHideDialog;
     Map<String, String> customHeaders = {};
-    customHeaders.addAll({'x-humhub-app-token': ref.read(humHubProvider).randomHash!, 'x-humhub-app': ref.read(humHubProvider).appVersion!});
+    customHeaders.addAll({
+      'x-humhub-app-token': ref.read(humHubProvider).randomHash!,
+      'x-humhub-app': ref.read(humHubProvider).appVersion!,
+      'x-humhub-app-ostate': isHideDialog ? '1' : '0'
+    });
     final args = ModalRoute.of(context)!.settings.arguments;
     String? url;
     if (args is Manifest) {
