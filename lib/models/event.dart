@@ -1,5 +1,3 @@
-import 'dart:convert' as convert;
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 part 'event.g.dart';
 
@@ -30,24 +28,19 @@ class PushEventData {
   final String? notificationBody;
   final String? channel;
   final String? channelPayload;
-  final List<PushEventRefreshStore>? refreshStores;
+  final String? redirectUrl;
+  final String? notificationCount;
 
   PushEventData(
       this.notificationTitle,
       this.notificationBody,
       this.channel,
-      this.refreshStores,
       this.channelPayload,
+      this.redirectUrl,
+      this.notificationCount,
       );
 
   factory PushEventData.fromJson(Map<String, dynamic> json) => _$PushEventDataFromJson(json);
-
-  static List<PushEventRefreshStore>? _storesFromJson(dynamic json) {
-    if (json is! String) {
-      return null;
-    }
-    return (convert.json.decode(json) as List<dynamic>?)?.map((e) => PushEventRefreshStore.fromJson(e as Map<String, dynamic>)).toList();
-  }
 }
 
 class SimpleNotification {

@@ -50,6 +50,10 @@ class NotificationService {
     logDebug('_handleNotification PushPlugin');
     final parsed = response.payload != null ? json.decode(response.payload!) : {};
     if (!NotificationChannel.canAcceptTap(parsed['channel_id'])) return;
+    if(parsed["redirectUrl"] != null){
+      await RedirectNotificationChannel().onTap(parsed['redirectUrl']);
+      return;
+    }
     await NotificationChannel.fromId(parsed['channel_id']).onTap(parsed['payload']);
   }
 
@@ -78,11 +82,13 @@ class NotificationService {
     String? title,
     String? description, {
     String? payload,
+    String? redirectUrl,
     ThemeData? theme,
   }) async {
     final newPayload = {
       'channel_id': channel.id,
       'payload': payload,
+      'redirectUrl': redirectUrl
     };
 
     await plugin.show(
