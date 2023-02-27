@@ -7,23 +7,23 @@ on:
 jobs:
   version:
     name: Create version number
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v2
-        - name: Extract tag name
-          id: extract_tag_name
-          run: echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/}
-        - name: Extract version from tag name
-          id: extract_version_from_tag
-          run: echo ::set-output name=version::${{ steps.extract_tag_name.outputs.tag_name | sed -e 's/^v//' }}
-        - name: Write version to file
-          run: echo ${{ steps.extract_version_from_tag.outputs.version }} > version.txt
-        - name: Upload version.txt
-          uses: actions/upload-artifact@v2
-          with:
-            name: gitversion
-            path: version.txt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Extract tag name
+        id: extract_tag_name
+        run: echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/}
+      - name: Extract version from tag name
+        id: extract_version_from_tag
+        run: echo ::set-output name=version::${{ steps.extract_tag_name.outputs.tag_name | sed -e 's/^v//' }}
+      - name: Write version to file
+        run: echo ${{ steps.extract_version_from_tag.outputs.version }} > version.txt
+      - name: Upload version.txt
+        uses: actions/upload-artifact@v2
+        with:
+          name: gitversion
+          path: version.txt
   build:
     name: Build APK and Create release
     needs: [version]
