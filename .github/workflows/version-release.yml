@@ -16,7 +16,7 @@ jobs:
         run: echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/}
       - name: Extract version from tag name
         id: extract_version_from_tag
-        run: echo ::set-output name=version::${{ steps.extract_tag_name.outputs.tag_name | sed -e 's/^v//' }}
+        run: echo ::set-output name=version::${{ steps.extract_tag_name.outputs.tag_name }} | sed -e 's/^v//'
       - name: Write version to file
         run: echo ${{ steps.extract_version_from_tag.outputs.version }} > version.txt
       - name: Upload version.txt
