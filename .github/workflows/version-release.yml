@@ -1,35 +1,29 @@
-name: Flutter CI
+name: version-release
 
 on:
   push:
-    branches: [master]
+    tags:
+      - "v*"
 jobs:
   version:
     name: Create version number
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Fetch all history for all tags and branches
-        run: |
-          git config remote.origin.url https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git fetch --prune --depth=10000
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.15
-        with:
-          versionSpec: "5.x"
-      - name: Use GitVersion
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.15
-      - name: Create version.txt with nuGetVersion
-        run: echo v${{ steps.gitversion.outputs.nuGetVersion  }} > version.txt
-      - name: Upload version.txt
-        uses: actions/upload-artifact@v3
-        with:
-          name: gitversion
-          path: version.txt
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+        - name: Extract tag name
+          id: extract_tag_name
+          run: echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/}
+        - name: Extract version from tag name
+          id: extract_version_from_tag
+          run: echo ::set-output name=version::${{ steps.extract_tag_name.outputs.tag_name | sed -e 's/^v//' }}
+        - name: Write version to file
+          run: echo ${{ steps.extract_version_from_tag.outputs.version }} > version.txt
+        - name: Upload version.txt
+          uses: actions/upload-artifact@v2
+          with:
+            name: gitversion
+            path: version.txt
   build:
     name: Build APK and Create release
     needs: [version]
