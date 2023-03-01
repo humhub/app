@@ -21,7 +21,7 @@ jobs:
         run: echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       - name: Extract version from tag name
         id: extract_version_from_tag
-        run: echo "version=$(echo $tag_name | sed -e 's/^v//')" >> $GITHUB_ENV
+        run: echo "version=$(echo ${{ github.ref }} | sed -e 's/^v//' -e 's/-.*//')" >> $GITHUB_ENV
       - name: Extract version code
         id: version_code
         run: echo "${{ github.ref }}" | cut -d '-' -f2
@@ -46,7 +46,7 @@ jobs:
         run: echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       - name: Extract version from tag name
         id: extract_version_from_tag
-        run: echo "version=$(echo $tag_name | sed -e 's/^v//')" >> $GITHUB_ENV
+        run: echo "version=$(echo ${{ github.ref }} | sed -e 's/^v//' -e 's/-.*//')" >> $GITHUB_ENV
       - name: Check Version code
         run: echo "Version Code $version_code"
       - name: Checkout
