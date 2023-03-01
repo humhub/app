@@ -80,6 +80,8 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos
       - run: flutter build apk --release --split-per-abi --build-name=${{ steps.gitversion.outputs.nuGetVersion  }} --build-number=${{github.run_number}}
+      - run: echo "nuGetVersion = ${{ steps.gitversion.outputs.nuGetVersion  }}"
+      - run: echo "version_From_version_job = $version"
       - run: flutter build appbundle --release --build-name=${{ steps.gitversion.outputs.nuGetVersion  }} --build-number=${{github.run_number}}
       - name: Create a Release in GitHub
         uses: ncipollo/release-action@v1
