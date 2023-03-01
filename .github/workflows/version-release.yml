@@ -10,15 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+          uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
       - name: Extract tag name
         id: extract_tag_name
-        run: echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/}
+        run: echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       - name: Extract version from tag name
         id: extract_version_from_tag
-        run: echo ::set-output name=version::${{ steps.extract_tag_name.outputs.tag_name }} | sed -e 's/^v//'
+        run: echo "version=$(echo $tag_name | sed -e 's/^v//')" >> $GITHUB_ENV
       - name: Write version to file
-        run: echo ${{ steps.extract_version_from_tag.outputs.version }} > version.txt
+        run: echo $version > version.txt
       - name: Upload version.txt
         uses: actions/upload-artifact@v2
         with:
