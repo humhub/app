@@ -75,15 +75,15 @@ jobs:
       - uses: chkfung/android-version-actions@v1.2.1
         with:
           gradlePath: android/app/build.gradle # or app/build.gradle.kts
-          versionCode: 43
+          versionCode: 47
           versionName: ${{ steps.gitversion.outputs.nuGetVersion  }}
       - run: flutter clean
       - run: flutter pub get
       - run: echo "nuGetVersion = ${{ steps.gitversion.outputs.nuGetVersion  }}"
       - run: echo "version_From_version_job = $version"
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos
-      - run: flutter build apk --release --split-per-abi --build-name=${{ steps.gitversion.outputs.nuGetVersion  }} --build-number=43
-      - run: flutter build appbundle --release --build-name=${{ steps.gitversion.outputs.nuGetVersion  }} --build-number=43
+      - run: flutter build apk --release --split-per-abi --build-name=${{ steps.gitversion.outputs.nuGetVersion  }} --build-number=47
+      - run: flutter build appbundle --release --build-name=${{ steps.gitversion.outputs.nuGetVersion  }} --build-number=47
       - name: Create a Release in GitHub
         uses: ncipollo/release-action@v1
         with:
