@@ -1,9 +1,7 @@
 name: version-release
 
-on:
-  push:
-    tags:
-      - "v*"
+on: push
+
 jobs:
   version:
     name: Create version number
