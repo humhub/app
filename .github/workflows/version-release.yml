@@ -1,6 +1,9 @@
 name: version-release
 
-on: push
+on:
+  push:
+    tags:
+      - "v*"
 
 jobs:
   version:

@@ -11,7 +11,7 @@ jobs:
       - name: Set build number
         run: |
           if [ -z "$BUILD_NUMBER" ]; then
-            echo "Build number is not set, initializing to 42"
+            echo "Build number is not set, initializing to just run"
             export BUILD_NUMBER=42
           else
             echo "Build number is $BUILD_NUMBER, incrementing by 1"
