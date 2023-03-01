@@ -67,7 +67,7 @@ jobs:
         with:
           path: version1.txt
       - name: Update version in YAML
-        run: sed -i 's/99.99.99+99/$version+$version_code/g' pubspec.yaml
+        run: sed -i 's/99.99.99+99/${{ version }}+${{ version_code }}/g' pubspec.yaml
       - name: Create key.properties file and write secrets to it
         run: |
           echo "storePassword=${{ secrets.STORE_PASSWORD }}" > android/key.properties
@@ -92,8 +92,8 @@ jobs:
       - uses: chkfung/android-version-actions@v1.2.1
         with:
           gradlePath: android/app/build.gradle # or app/build.gradle.kts
-          versionCode: $version_code
-          versionName: $version
+          versionCode: ${{ version_code }}
+          versionName: ${{ version }}
       - run: echo "Version Code $version_code"
       - run: echo "Version $version"
       - run: flutter clean
