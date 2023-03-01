@@ -92,6 +92,8 @@ jobs:
           gradlePath: android/app/build.gradle # or app/build.gradle.kts
           versionCode: $version_code
           versionName: $version
+      - run: echo "Version Code $version_code"
+      - run: echo "Version $version"
       - run: flutter clean
       - run: flutter pub get
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos
