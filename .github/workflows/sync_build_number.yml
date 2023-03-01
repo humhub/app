@@ -9,4 +9,4 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Set build number
-      - run: echo "Build number $GITHUB_RUN_NUMBER"
+        run: echo "Build number $GITHUB_RUN_NUMBER"
