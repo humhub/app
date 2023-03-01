@@ -19,6 +19,8 @@ jobs:
         run: echo "version=$(echo $tag_name | sed -e 's/^v//')" >> $GITHUB_ENV
       - name: Write version to file
         run: echo $version > version.txt
+      - name: Write version to file
+        run: echo "Build number ${{ github.run_number }}"
       - name: Upload version.txt
         uses: actions/upload-artifact@v2
         with:
