@@ -49,6 +49,8 @@ jobs:
         run: echo "version=$(echo $tag_name | sed -e 's/^v//')" >> $GITHUB_ENV
       - name: Check Version code
         run: echo "Version Code $version_code"
+      - name: Check Version
+        run: echo "Version $version"
       - name: Checkout
         uses: actions/checkout@v3
         with:
