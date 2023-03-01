@@ -92,10 +92,10 @@ jobs:
           gradlePath: android/app/build.gradle # or app/build.gradle.kts
           versionCode: $version_code
           versionName: $version
-      - run: flutter clean
-      - run: flutter pub get
       - run: echo "version_code = ${{ version_code  }}"
       - run: echo "version = ${{ version  }}"
+      - run: flutter clean
+      - run: flutter pub get
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos
       - run: flutter build apk --release --split-per-abi --build-name=$version --build-number=$version_code
       - run: flutter build appbundle --release --build-name=$version --build-number=$version_code
