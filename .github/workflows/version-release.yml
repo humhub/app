@@ -62,7 +62,7 @@ jobs:
         with:
           path: version1.txt
       - name: Update version in YAML
-        run: sed -i 's#99.99.99+99#refs/tags/${{ steps.extract_version.outputs.version }}+${{ steps.extract_version_code.outputs.version_code }}#g' pubspec.yaml
+        run: sed -i 's#99.99.99+99#refs/tags/${{ env.version }}+${{ env.version_code }}#g' pubspec.yaml
       - name: Create key.properties file and write secrets to it
         run: |
           echo "storePassword=${{ secrets.STORE_PASSWORD }}" > android/key.properties
@@ -87,13 +87,13 @@ jobs:
       - uses: chkfung/android-version-actions@v1.2.1
         with:
           gradlePath: android/app/build.gradle # or app/build.gradle.kts
-          versionCode: ${{ steps.extract_version_code.outputs.version_code }}
-          versionName: ${{ steps.extract_version.outputs.version }}
+          versionCode: ${{ env.version_code }}
+          versionName: ${{ env.version }}
       - run: flutter clean
       - run: flutter pub get
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos
-      - run: flutter build apk --release --split-per-abi --build-name="${{ steps.extract_version.outputs.version }}" --build-number=${{ steps.extract_version_code.outputs.version_code }}
-      - run: flutter build appbundle --release --build-name="${{ steps.extract_version.outputs.version }}" --build-number=${{ steps.extract_version_code.outputs.version_code }}
+      - run: flutter build apk --release --split-per-abi --build-name="${{ env.version }}" --build-number=${{ env.version_code }}
+      - run: flutter build appbundle --release --build-name="${{ env.version }}" --build-number=${{ env.version_code }}
       - name: Create a Release in GitHub
         uses: ncipollo/release-action@v1
         with:
