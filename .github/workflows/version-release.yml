@@ -83,7 +83,7 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: "beta"
-      - run: echo "Version $version"
+      - run: echo "Version code ${{ steps.extract_version_code.outputs.version_code }}, Version number ${{ steps.extract_version.outputs.version }}"
       - uses: chkfung/android-version-actions@v1.2.1
         with:
           gradlePath: android/app/build.gradle # or app/build.gradle.kts
