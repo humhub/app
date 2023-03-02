@@ -20,7 +20,7 @@ jobs:
         id: extract_tag_name
         run: echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       - name: Extract version from tag name
-        id: extract_version_from_tag
+        id: extract_version
         run: echo "version=$(echo ${{ github.ref }} | sed -e 's/^v//' -e 's/-.*//')" >> $GITHUB_ENV
       - name: Extract version code
         id: version_code
@@ -46,7 +46,7 @@ jobs:
         id: extract_tag_name
         run: echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       - name: Extract version from tag name
-        id: extract_version_from_tag
+        id: extract_version
         run: echo "version=$(echo ${{ github.ref }} | sed -e 's/^refs\/tags\/v//' -e 's/-.*//')" >> $GITHUB_ENV
       - name: Check Version code
         run: echo "Version Code $version_code"
@@ -68,7 +68,7 @@ jobs:
         with:
           path: version1.txt
       - name: Update version in YAML
-        run: sed -i 's#99.99.99+99#refs/tags/${{ steps.version.outputs.content }}+${{ github.run_number }}#g' pubspec.yaml
+        run: sed -i 's#99.99.99+99#refs/tags/${{ steps.extract_version.outputs.version }}+${{ steps.extract_version_code.outputs.version_code }}#g' pubspec.yaml
       - name: Create key.properties file and write secrets to it
         run: |
           echo "storePassword=${{ secrets.STORE_PASSWORD }}" > android/key.properties
@@ -94,8 +94,8 @@ jobs:
       - uses: chkfung/android-version-actions@v1.2.1
         with:
           gradlePath: android/app/build.gradle # or app/build.gradle.kts
-          versionCode: ${{ version_code }}
-          versionName: $version
+          versionCode: ${{ steps.extract_version_code.outputs.version_code }}
+          versionName: ${{ steps.extract_version.outputs.version }}
       - run: echo "Version Code $version_code"
       - run: flutter clean
       - run: flutter pub get
