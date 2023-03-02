@@ -42,16 +42,9 @@ jobs:
       - name: Extract version code
         id: extract_version_code
         run: echo "version_code=$(echo "${{ github.ref }}" | cut -d '-' -f2)" >> $GITHUB_ENV
-      - name: Extract tag name
-        id: extract_tag_name
-        run: echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-      - name: Extract version from tag name
+      - name: Extract version
         id: extract_version
         run: echo "version=$(echo ${{ github.ref }} | sed -e 's/^refs\/tags\/v//' -e 's/-.*//')" >> $GITHUB_ENV
-      - name: Check Version code
-        run: echo "Version Code $version_code"
-      - name: Check Version
-        run: echo "Version $version"
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -96,12 +89,11 @@ jobs:
           gradlePath: android/app/build.gradle # or app/build.gradle.kts
           versionCode: ${{ steps.extract_version_code.outputs.version_code }}
           versionName: ${{ steps.extract_version.outputs.version }}
-      - run: echo "Version Code $version_code"
       - run: flutter clean
       - run: flutter pub get
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos
-      - run: flutter build apk --release --split-per-abi --build-name="$version" --build-number=$version_code
-      - run: flutter build appbundle --release --build-name="$version" --build-number=$version_code
+      - run: flutter build apk --release --split-per-abi --build-name="${{ steps.extract_version.outputs.version }}" --build-number=${{ steps.extract_version_code.outputs.version_code }}
+      - run: flutter build appbundle --release --build-name="${{ steps.extract_version.outputs.version }}" --build-number=${{ steps.extract_version_code.outputs.version_code }}
       - name: Create a Release in GitHub
         uses: ncipollo/release-action@v1
         with:
