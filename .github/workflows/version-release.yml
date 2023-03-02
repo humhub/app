@@ -40,6 +40,7 @@ jobs:
       contents: write
     steps:
       - name: Extract version code
+        id: extract_version_code
         run: echo "version_code=$(echo "${{ github.ref }}" | cut -d '-' -f2)" >> $GITHUB_ENV
       - name: Extract tag name
         id: extract_tag_name
@@ -89,13 +90,13 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: "beta"
+      - run: echo "Version $version"
       - uses: chkfung/android-version-actions@v1.2.1
         with:
           gradlePath: android/app/build.gradle # or app/build.gradle.kts
           versionCode: $version_code
           versionName: $version
       - run: echo "Version Code $version_code"
-      - run: echo "Version $version"
       - run: flutter clean
       - run: flutter pub get
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos
