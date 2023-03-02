@@ -92,8 +92,8 @@ jobs:
       - uses: chkfung/android-version-actions@v1.2.1
         with:
           gradlePath: android/app/build.gradle # or app/build.gradle.kts
-          versionCode: ${{ version_code }}
-          versionName: ${{ version }}
+          versionCode: $version_code
+          versionName: $version
       - run: echo "Version Code $version_code"
       - run: echo "Version $version"
       - run: flutter clean
