@@ -99,8 +99,8 @@ jobs:
       - run: flutter clean
       - run: flutter pub get
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos
-      - run: flutter build apk --release --split-per-abi --build-name="${{ version }}" --build-number=$version_code
-      - run: flutter build appbundle --release --build-name="${{ version }}" --build-number=$version_code
+      - run: flutter build apk --release --split-per-abi --build-name="$version" --build-number=$version_code
+      - run: flutter build appbundle --release --build-name="$version" --build-number=$version_code
       - name: Create a Release in GitHub
         uses: ncipollo/release-action@v1
         with:
