@@ -45,6 +45,8 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: gitversion
+      - name: Count commits
+        run: echo "Number of commits $(git rev-list --count HEAD)"
       - name: Create new file without newline char from version.txt
         run: tr -d '\n' < version.txt > version1.txt
       - name: Read version
