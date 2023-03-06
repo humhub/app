@@ -76,7 +76,8 @@ jobs:
         uses: gittools/actions/gitversion/execute@v0.9.15
       - uses: actions/setup-java@v3
         with:
-          java-version: "12.x"
+          distribution: 'temurin'
+          java-version: '17'
       - uses: subosito/flutter-action@v1
         with:
           channel: "beta"
