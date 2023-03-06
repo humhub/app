@@ -46,7 +46,7 @@ jobs:
         with:
           name: gitversion
       - name: Count commits
-        run: echo "Number of commits ${{git rev-list --count HEAD}}"
+        run: echo "Number of commits ${{(git rev-list --count HEAD)}}"
       - name: Create new file without newline char from version.txt
         run: tr -d '\n' < version.txt > version1.txt
       - name: Read version
@@ -55,7 +55,7 @@ jobs:
         with:
           path: version1.txt
       - name: Update version in YAML
-        run: sed -i 's#99.99.99+99#refs/tags/${{ env.version }}+${{git rev-list --count HEAD}}#g' pubspec.yaml
+        run: sed -i 's#99.99.99+99#refs/tags/${{ env.version }}+${{(git rev-list --count HEAD)}}#g' pubspec.yaml
       - name: Create key.properties file and write secrets to it
         run: |
           echo "storePassword=${{ secrets.STORE_PASSWORD }}" > android/key.properties
@@ -80,13 +80,13 @@ jobs:
       - uses: chkfung/android-version-actions@v1.2.1
         with:
           gradlePath: android/app/build.gradle # or app/build.gradle.kts
-          versionCode: ${{git rev-list --count HEAD}}
+          versionCode: ${{(git rev-list --count HEAD)}}
           versionName: ${{ env.version }}
       - run: flutter clean
       - run: flutter pub get
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos
-      - run: flutter build apk --release --split-per-abi --build-name="${{ env.version }}" --build-number=${{git rev-list --count HEAD}}
-      - run: flutter build appbundle --release --build-name="${{ env.version }}" --build-number=${{git rev-list --count HEAD}}
+      - run: flutter build apk --release --split-per-abi --build-name="${{ env.version }}" --build-number=${{(git rev-list --count HEAD)}}
+      - run: flutter build appbundle --release --build-name="${{ env.version }}" --build-number=${{(git rev-list --count HEAD)}}
       - name: Create a Release in GitHub
         uses: ncipollo/release-action@v1
         with:
