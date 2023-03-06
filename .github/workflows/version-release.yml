@@ -9,8 +9,6 @@ jobs:
   version:
     name: Create version number
     runs-on: ubuntu-latest
-    outputs:
-      version_code: ${{ steps.version_code.outputs.version_code }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -22,9 +20,6 @@ jobs:
       - name: Extract version from tag name
         id: extract_version
         run: echo "version=$(echo ${{ github.ref }} | sed -e 's/^v//' -e 's/-.*//')" >> $GITHUB_ENV
-      - name: Extract version code
-        id: version_code
-        run: echo "${{ github.ref }}" | cut -d '-' -f2
       - name: Write version to file
         run: echo $version > version.txt
       - name: Upload version.txt
@@ -39,9 +34,6 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Extract version code
-        id: extract_version_code
-        run: echo "version_code=$(echo "${{ github.ref }}" | cut -d '-' -f2)" >> $GITHUB_ENV
       - name: Extract version
         id: extract_version
         run: echo "version=$(echo ${{ github.ref }} | sed -e 's/^refs\/tags\/v//' -e 's/-.*//')" >> $GITHUB_ENV
@@ -55,14 +47,13 @@ jobs:
           name: gitversion
       - name: Create new file without newline char from version.txt
         run: tr -d '\n' < version.txt > version1.txt
-      - run: echo "Version code ${{ env.version_code }}, Version number ${{ env.version }}"
       - name: Read version
         id: version
         uses: juliangruber/read-file-action@v1
         with:
           path: version1.txt
       - name: Update version in YAML
-        run: sed -i 's#99.99.99+99#refs/tags/${{ env.version }}+${{ env.version_code }}#g' pubspec.yaml
+        run: sed -i 's#99.99.99+99#refs/tags/${{ env.version }}+${{ github.event.commits.length }}#g' pubspec.yaml
       - name: Create key.properties file and write secrets to it
         run: |
           echo "storePassword=${{ secrets.STORE_PASSWORD }}" > android/key.properties
@@ -87,13 +78,13 @@ jobs:
       - uses: chkfung/android-version-actions@v1.2.1
         with:
           gradlePath: android/app/build.gradle # or app/build.gradle.kts
-          versionCode: ${{ env.version_code }}
+          versionCode: ${{ github.event.commits.length }}
           versionName: ${{ env.version }}
       - run: flutter clean
       - run: flutter pub get
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos
-      - run: flutter build apk --release --split-per-abi --build-name="${{ env.version }}" --build-number=${{ env.version_code }}
-      - run: flutter build appbundle --release --build-name="${{ env.version }}" --build-number=${{ env.version_code }}
+      - run: flutter build apk --release --split-per-abi --build-name="${{ env.version }}" --build-number=${{ github.event.commits.length }}
+      - run: flutter build appbundle --release --build-name="${{ env.version }}" --build-number=${{ github.event.commits.length }}
       - name: Create a Release in GitHub
         uses: ncipollo/release-action@v1
         with:
