@@ -81,7 +81,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
     if (Platform.isAndroid || action.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED) {
-      controller.loadUrl(urlRequest: URLRequest(url: action.request.url, headers: _initialRequest.headers));
+      action.request.headers?.addAll(_initialRequest.headers!);
+      controller.loadUrl(urlRequest: action.request);
       return NavigationActionPolicy.CANCEL;
     }
     return NavigationActionPolicy.ALLOW;
@@ -129,19 +130,14 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   }
 
   Future<AjaxRequest?> _shouldInterceptAjaxRequest(InAppWebViewController controller, AjaxRequest request) async {
-    // Append headers on every AJAX request
-    Map<String, dynamic> headers = {};
-    if (request.headers != null) headers = request.headers!.getHeaders();
-    headers.addAll(_initialRequest.headers!);
-    request.headers = AjaxRequestHeaders(headers);
+    _initialRequest.headers!.forEach((key, value) {
+      request.headers!.setRequestHeader(key, value);
+    });
     return request;
   }
 
   Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest request) async {
-    Map<String, dynamic> headers = {};
-    if (request.headers != null) headers = request.headers!;
-    headers.addAll(_initialRequest.headers!);
-    request.headers = headers;
+    request.headers!.addAll(_initialRequest.headers!);
     return request;
   }
 
