@@ -54,6 +54,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         body: NotificationPlugin(
           child: PushPlugin(
             child: SafeArea(
+              bottom: false,
               child: InAppWebView(
                 initialUrlRequest: _initialRequest,
                 initialOptions: _options,
