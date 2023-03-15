@@ -204,4 +204,4 @@ jobs:
           appId: ${{secrets.FIREBASE_IOS_APP_ID}}
           token: ${{secrets.FIREBASE_TOKEN}}
           groups: ios-developers
-          file: { your_app_name }.ipa
+          file: app.ipa
