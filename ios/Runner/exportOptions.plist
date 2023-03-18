@@ -1,0 +1,15 @@
+<?xml version=”1.0" encoding=”UTF-8"?>
+ <!DOCTYPE plist PUBLIC “-//Apple//DTD PLIST 1.0//EN” “http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+ <plist version=”1.0">
+ <dict>
+ <key>method</key>
+ <string>app-store</string>
+ <key>teamID</key>
+ <string>5439UTM27E</string>
+ <key>provisioningProfiles</key>
+ <dict>
+ <key>com.humhub.app</key>
+ <string>humhub_distribution_profile</string>
+ </dict>
+ </dict>
+ </plist>
