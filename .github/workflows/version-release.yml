@@ -163,7 +163,7 @@ jobs:
       - name: Flutter get
         uses: subosito/flutter-action@v1
         with:
-          flutter-version: '2.10.1'
+          flutter-version: '3.7.1'
 
       # Install your project's dependencies
       - run: flutter pub get
