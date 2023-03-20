@@ -8,8 +8,8 @@
  <string>5439UTM27E</string>
  <key>provisioningProfiles</key>
  <dict>
- <key>5439UTM27E.com.humhub.app</key>
- <string>humhub_distribution_profile_2</string>
+ <key>com.humhub.app</key>
+ <string>humhub_distribution_profile</string>
  </dict>
  </dict>
  </plist>
