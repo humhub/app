@@ -208,4 +208,5 @@ jobs:
 
       # Upload ipa file to Fiebase
       - name: Upload artifact
-        run: xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey $APP_API_PRIVATE_KEY --apiIssuer $ISSUER_ID
+        run: |
+          xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey $APP_API_PRIVATE_KEY --apiIssuer $ISSUER_ID
