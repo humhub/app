@@ -196,7 +196,7 @@ jobs:
   release_ios:
     name: Release ipa to Firebase
     needs: [ build_ios ]
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
 
       # Retrieve ipa file from GitHub artifacts
