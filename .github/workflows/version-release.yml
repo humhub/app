@@ -141,6 +141,8 @@ jobs:
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
           BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          ISSUER_ID: ${{ secrets.APP_API_ISSUER_ID }}
+          APP_API_PRIVATE_KEY: ${{ secrets.APP_API_PRIVATE_KEY }}
         run: |
           # create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
@@ -205,10 +207,5 @@ jobs:
           name: release-ipa
 
       # Upload ipa file to Fiebase
-      - name: Upload artifact to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{secrets.FIREBASE_IOS_APP_ID}}
-          token: ${{secrets.FIREBASE_TOKEN}}
-          groups: ios-developers
-          file: app.ipa
+      - name: Upload artifact
+        run: xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey $APP_API_PRIVATE_KEY --apiIssuer $ISSUER_ID
