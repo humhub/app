@@ -194,7 +194,7 @@ jobs:
         with:
           name: release-ipa
           # Path to the release files
-          path: build/ios/ipa/*.ipa
+          path: build/app/outputs/bundle/release/app-release.ipa
 
       # Important! Cleanup: remove the certificate and provisioning profile from the runner!
       - name: Clean up keychain and provisioning profile
@@ -219,4 +219,4 @@ jobs:
       # Upload ipa file to Fiebase
       - name: Upload artifact
         run: |
-          xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey $APP_API_PRIVATE_KEY --apiIssuer $ISSUER_ID
+          xcrun altool --upload-app --type ios -f build/app/outputs/bundle/release/app-release.ipa --apiKey "$APP_API_PRIVATE_KEY" --apiIssuer "$ISSUER_ID"
