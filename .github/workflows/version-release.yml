@@ -178,8 +178,16 @@ jobs:
       - name: Building IPA
         run: flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist
 
+      - name: Create a Release in GitHub
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "build/app/outputs/ipa/release/*.ipa,build/app/outputs/bundle/release/app-release.ipa"
+          token: ${{ github.token }}
+          commit: ${{ github.sha }}
+          allowUpdates: true
+
       # Collect the file and upload as artifact
-      - name: collect ipa artifacts
+      - name: Collect IPA artifacts
         uses: actions/upload-artifact@v2
         with:
           name: release-ipa
