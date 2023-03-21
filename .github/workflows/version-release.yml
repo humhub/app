@@ -129,6 +129,8 @@ jobs:
   build_ios:
     needs: [version]
     runs-on: macos-latest
+    permissions:
+      contents: write
     steps:
       # Checks-out our repository under $GITHUB_WORKSPACE, so our job can access it
       - name: Checkout repository
