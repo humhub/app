@@ -28,7 +28,7 @@ jobs:
           name: gitversion
           path: version.txt
   build_android:
-    name: Build APK and Create release
+    name: Build APK
     needs: [version]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/none'
@@ -105,7 +105,7 @@ jobs:
           name: appbundle
           path: build/app/outputs/bundle/release/app-release.aab
   release_android:
-    name: Release app to internal track
+    name: Release APK to Google Play
     needs: [build_android]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/none'
@@ -127,6 +127,7 @@ jobs:
           track: alpha
           status: completed
   build_ios:
+    name: Build IPA
     needs: [version]
     runs-on: macos-latest
     permissions:
@@ -175,7 +176,7 @@ jobs:
         uses: damienaicheh/update-ios-version-info-plist-action@v1.0.0
         with:
           info-plist-path: 'ios/Runner/Info.plist'
-          bundle-short-version-string: ${{ env.version }}
+          bundle-short-version-string: '${{ env.version }}'
           bundle-version: ${{ env.version_code }}
           print-file: true
 
@@ -204,7 +205,7 @@ jobs:
           rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
 
   release_ios:
-    name: Release app to TestFlight
+    name: Release IPA to TestFlight
     needs: [ build_ios ]
     runs-on: macos-latest
     steps:
