@@ -171,8 +171,16 @@ jobs:
       - name: Install pub dependencies
         run: flutter pub get
 
+      - name: Update Info.plist version and build number
+        uses: damienaicheh/update-ios-version-info-plist-action@v1.0.0
+        with:
+          info-plist-path: 'ios/Runner/Info.plist'
+          bundle-short-version-string: ${{ env.version }}
+          bundle-version: ${{ env.version_code }}
+          print-file: true
+
       - name: Build IPA
-        run: flutter build ipa --release --build-name="${{ env.version }}" --build-number=${{ env.version_code }} --export-options-plist=ios/Runner/ExportOptions.plist
+        run: flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist
 
       - name: Create release
         uses: ncipollo/release-action@v1
