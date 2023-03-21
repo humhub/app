@@ -192,7 +192,7 @@ jobs:
       - name: Collect IPA artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: release-ipa
+          name: releaseIpa
           # Path to the release files
           path: build/app/outputs/bundle/release/app-release.ipa
 
@@ -212,9 +212,9 @@ jobs:
       # Retrieve ipa file from GitHub artifacts
       - uses: actions/checkout@v2
       - name: Get release-ipa from artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
-          name: release-ipa
+          name: releaseIpa
 
       # Upload ipa file to Fiebase
       - name: Upload artifact
