@@ -212,6 +212,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: releaseipa
+          path: build/ios/ipa
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: build/ios/ipa
       # Upload ipa file to Fiebase
       - name: Upload app to TestFlight
         uses: apple-actions/upload-testflight-build@v1
