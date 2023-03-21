@@ -181,7 +181,7 @@ jobs:
       - name: Create a Release in GitHub
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/ipa/release/*.ipa,build/app/outputs/bundle/release/app-release.ipa"
+          artifacts: "build/ios/archive/Runner.ipa"
           token: ${{ github.token }}
           commit: ${{ github.sha }}
           allowUpdates: true
