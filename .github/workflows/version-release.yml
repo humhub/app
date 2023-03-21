@@ -135,16 +135,12 @@ jobs:
       # Checks-out our repository under $GITHUB_WORKSPACE, so our job can access it
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      # Install the Apple certificate and provisioning profile
-      - name: Install the Apple certificate and provisioning profile
+      - name: Configure secrets
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
           BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-          ISSUER_ID: ${{ secrets.APP_API_ISSUER_ID }}
-          APP_API_PRIVATE_KEY: ${{ secrets.APP_API_PRIVATE_KEY }}
         run: |
           # create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
@@ -192,7 +188,7 @@ jobs:
       - name: Collect IPA artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: releaseIpa
+          name: releaseipa
           # Path to the release files
           path: build/app/outputs/bundle/release/app-release.ipa
 
@@ -208,7 +204,11 @@ jobs:
     needs: [ build_ios ]
     runs-on: macos-latest
     steps:
-      # Retrieve ipa file from GitHub artifacts
+      - name: Configure secrets
+        env:
+          APP_API_ISSUER_ID: ${{ secrets.APP_API_ISSUER_ID }}
+          APP_API_PRIVATE_KEY: ${{ secrets.APP_API_PRIVATE_KEY }}
+          APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -216,8 +216,12 @@ jobs:
       - name: Get IPA from artifacts
         uses: actions/download-artifact@v3
         with:
-          name: releaseIpa
+          name: releaseipa
       # Upload ipa file to Fiebase
-      - name: Upload artifact
-        run: |
-          xcrun altool --upload-app --type ios -f build/app/outputs/bundle/release/app-release.ipa --apiKey "$APP_API_PRIVATE_KEY" --apiIssuer "$ISSUER_ID"
+      - name: Upload app to TestFlight
+        uses: apple-actions/upload-testflight-build@v1
+        with:
+          app-path: releaseipa
+          issuer-id: $APP_API_ISSUER_ID
+          api-key-id: $APPSTORE_API_KEY_ID
+          api-private-key: $APP_API_PRIVATE_KEY
