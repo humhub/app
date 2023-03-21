@@ -208,14 +208,11 @@ jobs:
     needs: [ build_ios ]
     runs-on: macos-latest
     steps:
-
       # Retrieve ipa file from GitHub artifacts
-      - uses: actions/checkout@v2
-      - name: Get release-ipa from artifacts
-        uses: actions/download-artifact@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          name: releaseIpa
-
+          fetch-depth: 0
       # Upload ipa file to Fiebase
       - name: Upload artifact
         run: |
