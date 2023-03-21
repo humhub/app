@@ -132,10 +132,9 @@ jobs:
     permissions:
       contents: write
     steps:
-      # Checks-out our repository under $GITHUB_WORKSPACE, so our job can access it
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Configure secrets
+      - name: Install the Apple certificate and provisioning profile
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
@@ -163,20 +162,19 @@ jobs:
           # apply provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
-      # Install flutter
-      - name: Flutter get
+
+      - name: Install Flutter
         uses: subosito/flutter-action@v1
         with:
           flutter-version: '3.7.1'
 
-      # Install your project's dependencies
-      - run: flutter pub get
+      - name: Install pub dependencies
+        run: flutter pub get
 
-      # Build and sign the ipa using a single flutter command
-      - name: Building IPA
-        run: flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist
+      - name: Build IPA
+        run: flutter build ipa --release --build-name="${{ env.version }}" --build-number=${{ env.version_code }} --export-options-plist=ios/Runner/ExportOptions.plist
 
-      - name: Create a Release in GitHub
+      - name: Create release
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/ios/ipa/*.ipa"
@@ -184,12 +182,10 @@ jobs:
           commit: ${{ github.sha }}
           allowUpdates: true
 
-      # Collect the file and upload as artifact
       - name: Collect IPA artifacts
         uses: actions/upload-artifact@v2
         with:
           name: releaseipa
-          # Path to the release files
           path: build/ios/ipa/*.ipa
 
       # Important! Cleanup: remove the certificate and provisioning profile from the runner!
@@ -198,9 +194,9 @@ jobs:
         run: |
           security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
           rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
-    # Release job, upload the ipa to Firebase App Distribution
+
   release_ios:
-    name: Release ipa to Firebase
+    name: Release app to TestFlight
     needs: [ build_ios ]
     runs-on: macos-latest
     steps:
@@ -213,10 +209,6 @@ jobs:
         with:
           name: releaseipa
           path: build/ios/ipa
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: build/ios/ipa
-      # Upload ipa file to Fiebase
       - name: Upload app to TestFlight
         uses: apple-actions/upload-testflight-build@v1
         with:
