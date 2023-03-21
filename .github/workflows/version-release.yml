@@ -172,6 +172,12 @@ jobs:
       - name: Install pub dependencies
         run: flutter pub get
 
+      - name: Check env version
+        run: echo ${{ env.version }}
+
+      - name: Check env version_code
+        run: echo ${{ env.version_code }}
+
       - name: Update Info.plist version and build number
         uses: damienaicheh/update-ios-version-info-plist-action@v1.0.0
         with:
