@@ -162,6 +162,9 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
+      - name: Print commit count
+        run: echo "Total number of commits ${{ steps.get_commit_count.outputs.commit_count }}"
+
       - name: Install Flutter
         uses: subosito/flutter-action@v1
         with:
