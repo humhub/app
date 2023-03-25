@@ -31,7 +31,6 @@ jobs:
     name: Build APK
     needs: [version]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/none'
     permissions:
       contents: write
     steps:
@@ -106,7 +105,6 @@ jobs:
     name: Release APK to Google Play
     needs: [build_android]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/none'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
