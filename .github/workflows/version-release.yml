@@ -136,10 +136,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract version code
-        id: extract_version_code
-        run: echo "version_code=$(git rev-list --count HEAD)" >> $GITHUB_ENV
-
       - name: Install the Apple certificate and provisioning profile
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
@@ -183,6 +179,10 @@ jobs:
       - name: Extract version
         id: extract_version
         run: echo "version=$(echo ${{ github.ref }} | sed -e 's/^refs\/tags\/v//' -e 's/-.*//')" >> $GITHUB_ENV
+
+      - name: Extract version code
+        id: extract_version_code
+        run: echo "version_code=$(git rev-list --count HEAD)-220" >> $GITHUB_ENV
 
       - name: Check env version_code
         run: echo ${{ env.version_code }}
