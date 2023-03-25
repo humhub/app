@@ -131,8 +131,15 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Extract version code
+        id: extract_version_code
+        run: echo "version_code=$(git rev-list --count HEAD)" >> $GITHUB_ENV
+
       - name: Install the Apple certificate and provisioning profile
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
@@ -172,10 +179,6 @@ jobs:
 
       - name: Install pub dependencies
         run: flutter pub get
-
-      - name: Extract version code
-        id: extract_version_code
-        run: echo "version_code=$(git rev-list --count HEAD)" >> $GITHUB_ENV
 
       - name: Extract version
         id: extract_version
