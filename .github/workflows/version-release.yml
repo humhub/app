@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - "v*"
+env:
+  version_test: $(echo ${{ github.ref }} | sed -e 's/^v//' -e 's/-.*//')
+
 
 jobs:
   version:
@@ -14,9 +17,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Extract tag name
-        id: extract_tag_name
-        run: echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Test version_test
+        run: echo $version_test
       - name: Extract version from tag name
         id: extract_version
         run: echo "version=$(echo ${{ github.ref }} | sed -e 's/^v//' -e 's/-.*//')" >> $GITHUB_ENV
@@ -177,7 +179,7 @@ jobs:
 
       - name: Extract version code
         id: extract_version_code
-        run: echo "version_code=$(($(git rev-list --count HEAD) - 200))" >> $GITHUB_ENV
+        run: echo "version_code=$(git rev-list --count HEAD)" >> $GITHUB_ENV
 
       - name: Check env version_code
         run: echo ${{ env.version_code }}
