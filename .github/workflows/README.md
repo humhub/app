@@ -26,7 +26,7 @@ This job handles the creation of a `version.txt` file for a project by extractin
 
 This job generates an APK and app bundle files for Google Play Store, then creates a GitHub release with the built artifacts.
 
-### P**rerequisite**
+### **Prerequisite**
 
 To publish the app to the Play Store, we need to give your app a digital signature using a keystore. Follow [this official Flutter Doc](https://docs.flutter.dev/deployment/android#create-an-upload-keystore). on how to do that depending upon your machine:
 
@@ -80,7 +80,7 @@ openssl base64 -in keystore.jks -out keystore_base64.txt
 
 This job handles the automation of the release process of an Android app to the Google Play Store.
 
-### P**rerequisite**
+### **Prerequisite**
 
 This job requires a Google service account with `PLAYSTORE_ACCOUNT_KEY` which will be used in GitHub Actions to publish the Android build to the Play Store, so to create a project in GCP, [create a service account](https://console.cloud.google.com/iam-admin/serviceaccounts/project) and select your created project.
 
@@ -112,11 +112,11 @@ Once the service account has been granted the "Release Manager" role, it will ha
 
 This step uses the **`r0adkll/upload-google-play@v1`** action to release the app to the internal track on the Google Play Store. The following parameters are provided for the action:
 
-- **`serviceAccountJsonPlainText`**is a secret value that is retrieved from the GitHub repository secrets. It contains the JSON file of the service account key that grants the action access to the Google Play Console.
-- **`packageName`**is the package name of the app to be released.
+- **`serviceAccountJsonPlainText`** is a secret value that is retrieved from the GitHub repository secrets. It contains the JSON file of the service account key that grants the action access to the Google Play Console.
+- **`packageName`** is the package name of the app to be released.
 - **`releaseFiles`** is the name of the app bundle file to be uploaded. In our case, it is **`app-release.aab`**.
-- **`track`**specifies the release track of the app. In our case, it’s set to **`internal`**.
-- **`status`**specifies the status of the release. In our case, it’s set to **`completed`**.
+- **`track`** specifies the release track of the app. In our case, it’s set to **`internal`**.
+- **`status`** specifies the status of the release. In our case, it’s set to **`completed`**.
 
 ## Build IPA
 
@@ -171,7 +171,7 @@ KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
 
 The **`checkout`** step uses the **`actions/checkout@v3`** action to checkout the repository to the runner's file system.
 
-**`Install the Apple certificate and provisioning profile`I**mport the necessary Apple certificate and provisioning profile for building the app. The step creates a temporary keychain, imports the certificate to the keychain, applies the provisioning profile, and copies it to the required location.
+**`Install the Apple certificate and provisioning profile`** imports the necessary Apple certificate and provisioning profile for building the app. The step creates a temporary keychain, imports the certificate to the keychain, applies the provisioning profile, and copies it to the required location.
 
 **`Install Flutter`** step uses the **`subosito/flutter-action@v1`** action to install the required version of Flutter.
 
@@ -189,7 +189,7 @@ The **`checkout`** step uses the **`actions/checkout@v3`** action to checkout th
 
 This job releases an iOS app to TestFlight for beta testing. It downloads the IPA file as an artifact from GitHub Release and uploads it to TestFlight for distribution.
 
-### P**rerequisite**
+### **Prerequisite**
 
 First, you will need to set up the App Store Publishing Key
 
@@ -210,7 +210,7 @@ Now the values we need to define in Github Secrets are as folows:
 
 ### Job
 
-1. **`Get IPA from artifacts`**step downloads the IPA file produced by the **`build_ios`** job from the artifacts and stores it in the **`build/ios/ipa`** directory.
+1. **`Get IPA from artifacts`** step downloads the IPA file produced by the **`build_ios`** job from the artifacts and stores it in the **`build/ios/ipa`** directory.
 2. **`Upload app to TestFlight`** step uses the **`apple-actions/upload-testflight-build`** action to upload the IPA file to TestFlight for beta testing. The **`app-path`** field specifies the path to the IPA file, while the **`issuer-id`**, **`api-key-id`**, and **`api-private-key`** fields are authentication credentials required to access the App Store Connect API.
 
 ### Play Console status
