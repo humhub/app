@@ -173,7 +173,7 @@ The **`checkout`** step uses the **`actions/checkout@v3`** action to checkout th
 
 **`Install the Apple certificate and provisioning profile`I**mport the necessary Apple certificate and provisioning profile for building the app. The step creates a temporary keychain, imports the certificate to the keychain, applies the provisioning profile, and copies it to the required location.
 
-**`Install Flutter`**step uses the **`subosito/flutter-action@v1`** action to install the required version of Flutter.
+**`Install Flutter`** step uses the **`subosito/flutter-action@v1`** action to install the required version of Flutter.
 
 **`Install pub dependencies`** step installs the dependencies required by the app.
 
