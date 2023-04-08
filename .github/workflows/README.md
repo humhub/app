@@ -206,7 +206,7 @@ Now the values we need to define in Github Secrets are as folows:
 
 `APP_API_ISSUER_ID` (Blue) and `APPSTORE_API_KEY_ID` (Brown) the last `APP_API_PRIVATE_KEY` is a content of a file you downloaded in 8th step.
 
-![Untitled](Deployment%20process%202a4bebc773f843b5979d692c92ad7a62/Untitled.png)
+![image](https://user-images.githubusercontent.com/10835179/230738230-e3773cac-deb8-4f35-be12-ec2c81598b22.png)
 
 ### Job
 
@@ -217,13 +217,13 @@ Now the values we need to define in Github Secrets are as folows:
 
 Once the Google Play pipeline succeeds, the latest app bundle build will undergo internal testing before potentially advancing to Closed Open testing or Production. Our decision to deploy new builds to the internal testing track is due to the fact that it does not require review from the Google Play store, making it immediately accessible to testers.
 
-![Untitled](Deployment%20process%202a4bebc773f843b5979d692c92ad7a62/Untitled%201.png)
+![image](https://user-images.githubusercontent.com/10835179/230738268-3af39978-a7a4-4fcd-ad24-0c155be7804b.png)
 
 ### App Store status
 
 In order to push your app to internal testing on the app store, there are some additional steps you must follow. First, you need to agree to the necessary compliances. Then, click on `Manage` and select `None` for the mentioned algorithms before saving. If the `Track Alpha` option is not visible, you must manually add it by clicking on the `+` and creating a new column called `Groups` under the selected build.
 
-![Untitled](Deployment%20process%202a4bebc773f843b5979d692c92ad7a62/Untitled%202.png)
+![image](https://user-images.githubusercontent.com/10835179/230738293-400eeb4c-ce86-4677-9843-a75a1fe823e2.png)
 
 ## The End
 
