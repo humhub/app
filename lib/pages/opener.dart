@@ -9,6 +9,7 @@ import 'package:humhub/util/form_helper.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
+import 'package:rive/rive.dart';
 import 'help.dart';
 
 class Opener extends ConsumerStatefulWidget {
@@ -27,65 +28,101 @@ class OpenerState extends ConsumerState<Opener> {
   TextEditingController urlTextController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Form(
-          key: helper.key,
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(top: 60.0),
-                child: Center(
-                  child: Container(margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 20), child: Image.asset('assets/images/logo.png')),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 50),
-                child: FutureBuilder<String>(
-                  future: ref.read(humHubProvider).getLastUrl(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      urlTextController.text = snapshot.data!;
-                      return TextFormField(
-                        controller: urlTextController,
-                        onSaved: helper.onSaved(formUrlKey),
-                        decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'URL', hintText: 'https://community.humhub.com'),
-                        validator: validateUrl,
-                      );
-                    }
-                    return progress;
-                  },
-                ),
-              ),
-              Container(
-                height: 50,
-                width: 250,
-                decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(20)),
-                child: TextButton(
-                  onPressed: onPressed,
-                  child: const Text(
-                    'Connect',
-                    style: TextStyle(color: Colors.white, fontSize: 25),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 130,
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Help()),
-                  );
-                },
-                child: const Text("Need Help?"),
-              ),
-            ],
+    InputDecoration openerDecoration = InputDecoration(
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.grey,
+            width: 1.0,
           ),
         ),
+        border: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.grey,
+            width: 1.0,
+          ),
+        ),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        labelText: 'URL',
+        labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color),
+        hintText: 'https://community.humhub.com');
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Form(
+              key: helper.key,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(top: 120.0),
+                    child: Center(
+                      child: SizedBox(height: 100, width: 230, child: Image.asset('assets/images/logo.png')),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 35, right: 35, top: 80, bottom: 8),
+                    child: FutureBuilder<String>(
+                      future: ref.read(humHubProvider).getLastUrl(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          urlTextController.text = snapshot.data!;
+                          return TextFormField(
+                            controller: urlTextController,
+                            cursorColor: Theme.of(context).textTheme.bodySmall?.color,
+                            onSaved: helper.onSaved(formUrlKey),
+                            style: const TextStyle(
+                              decoration: TextDecoration.none,
+                            ),
+                            decoration: openerDecoration,
+                            validator: validateUrl,
+                          );
+                        }
+                        return progress;
+                      },
+                    ),
+                  ),
+                  const Text(
+                    'Enter your url and log in to your network.',
+                    style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13),
+                  ),
+                  const SizedBox(
+                    height: 250,
+                  ),
+                  Container(
+                    height: 50,
+                    width: 250,
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
+                    child: TextButton(
+                      onPressed: onPressed,
+                      child: Text(
+                        'Connect',
+                        style: TextStyle(color: openerColor, fontSize: 20),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Help()),
+                      );
+                    },
+                    child: const Text("Need Help?"),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

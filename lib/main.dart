@@ -36,6 +36,9 @@ class MyAppState extends ConsumerState<MyApp>{
             initialRoute: snap.data,
             routes: my_router.Router.routes,
             navigatorKey: navigatorKey,
+            theme: ThemeData(
+              fontFamily: 'Roboto',
+            ),
           );
         }
         return progress;

@@ -13,3 +13,5 @@ class Locales {
   static String helpThirdPar = 'The HumHub app is intuitive to use and allows you to access your network from anywhere. When notifications are enabled, you will also receive push notifications about important information within your network and can use the app to keep up to date with any relevant news at any time.';
   static String helpForthPar = 'HumHub networks are basically private (internal to the organization) communication platforms. It is only possible to log in to existing networks for which you have corresponding login data. Organizations or companies can of course set up and run their own HumHub network at any time. All information can be found at';
 }
+
+Color openerColor = const Color(0xFF21a1b3);
