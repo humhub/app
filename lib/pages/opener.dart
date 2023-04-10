@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/pages/web_view.dart';
@@ -26,10 +27,30 @@ class OpenerState extends ConsumerState<Opener> {
   final String error404 = "404";
   late String? postcodeErrorMessage;
   TextEditingController urlTextController = TextEditingController();
+  late RiveAnimationController?  riveController;
+  Artboard? _riveArtboard;
+
+  void _togglePlay() {
+    if (riveController == null) {
+      return;
+    }
+    setState(() => riveController!.isActive = !riveController!.isActive);
+  }
 
   @override
   void initState() {
     super.initState();
+    rootBundle.load('assets/opener_animation.riv').then(
+          (data) async {
+        // Load the RiveFile from the binary data.
+        final file = RiveFile.import(data);
+        final artboard = file.mainArtboard;
+        // ignore: cascade_invocations
+        artboard.addController(riveController = SimpleAnimation('animation'));
+        setState(() => _riveArtboard = artboard);
+
+      },
+    );
   }
 
   @override
@@ -52,14 +73,14 @@ class OpenerState extends ConsumerState<Opener> {
         labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color),
         hintText: 'https://community.humhub.com');
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Form(
-              key: helper.key,
-              child: Column(
+    return SafeArea(
+      child: Scaffold(
+        body: Form(
+          key: helper.key,
+          child: Stack(
+            children: [
+              Rive(artboard: _riveArtboard!),
+              Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Padding(
@@ -94,9 +115,6 @@ class OpenerState extends ConsumerState<Opener> {
                     'Enter your url and log in to your network.',
                     style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13),
                   ),
-                  const SizedBox(
-                    height: 250,
-                  ),
                   Container(
                     height: 50,
                     width: 250,
@@ -111,18 +129,19 @@ class OpenerState extends ConsumerState<Opener> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
+                      _togglePlay();
+                      /*Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const Help()),
-                      );
+                      );*/
                     },
                     child: const Text("Need Help?"),
                   ),
                 ],
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
