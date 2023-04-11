@@ -27,30 +27,17 @@ class OpenerState extends ConsumerState<Opener> {
   final String error404 = "404";
   late String? postcodeErrorMessage;
   TextEditingController urlTextController = TextEditingController();
-  late RiveAnimationController?  riveController;
-  Artboard? _riveArtboard;
-
-  void _togglePlay() {
-    if (riveController == null) {
-      return;
-    }
-    setState(() => riveController!.isActive = !riveController!.isActive);
-  }
+  late RiveAnimationController _controller;
+  late SimpleAnimation _animation;
+  // Fade out Logo and opener when redirecting
+  bool _visible = true;
+  bool _isConnectVissible = true;
 
   @override
   void initState() {
     super.initState();
-    rootBundle.load('assets/opener_animation.riv').then(
-          (data) async {
-        // Load the RiveFile from the binary data.
-        final file = RiveFile.import(data);
-        final artboard = file.mainArtboard;
-        // ignore: cascade_invocations
-        artboard.addController(riveController = SimpleAnimation('animation'));
-        setState(() => _riveArtboard = artboard);
-
-      },
-    );
+    _animation = SimpleAnimation('animation', autoplay: false);
+    _controller = _animation;
   }
 
   @override
@@ -73,69 +60,126 @@ class OpenerState extends ConsumerState<Opener> {
         labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color),
         hintText: 'https://community.humhub.com');
 
-    return SafeArea(
-      child: Scaffold(
-        body: Form(
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: Form(
           key: helper.key,
           child: Stack(
+            fit: StackFit.expand,
             children: [
-              Rive(artboard: _riveArtboard!),
+              RiveAnimation.asset(
+                fit: BoxFit.fill,
+                'assets/opener_animation.riv',
+                controllers: [_controller],
+              ),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 120.0),
-                    child: Center(
-                      child: SizedBox(height: 100, width: 230, child: Image.asset('assets/images/logo.png')),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 35, right: 35, top: 80, bottom: 8),
-                    child: FutureBuilder<String>(
-                      future: ref.read(humHubProvider).getLastUrl(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          urlTextController.text = snapshot.data!;
-                          return TextFormField(
-                            controller: urlTextController,
-                            cursorColor: Theme.of(context).textTheme.bodySmall?.color,
-                            onSaved: helper.onSaved(formUrlKey),
-                            style: const TextStyle(
-                              decoration: TextDecoration.none,
-                            ),
-                            decoration: openerDecoration,
-                            validator: validateUrl,
-                          );
-                        }
-                        return progress;
-                      },
-                    ),
-                  ),
-                  const Text(
-                    'Enter your url and log in to your network.',
-                    style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13),
-                  ),
-                  Container(
-                    height: 50,
-                    width: 250,
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
-                    child: TextButton(
-                      onPressed: onPressed,
-                      child: Text(
-                        'Connect',
-                        style: TextStyle(color: openerColor, fontSize: 20),
+                  Expanded(
+                    flex: 2,
+                    child: AnimatedOpacity(
+                      opacity: _visible ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: SizedBox(
+                        height: 100,
+                        width: 230,
+                        child: Image.asset('assets/images/logo.png'),
                       ),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      _togglePlay();
-                      /*Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Help()),
-                      );*/
-                    },
-                    child: const Text("Need Help?"),
+                  Expanded(
+                    flex: 3,
+                    child: AnimatedOpacity(
+                      opacity: _visible ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 35),
+                        child: Column(
+                          children: [
+                            FutureBuilder<String>(
+                              future: ref.read(humHubProvider).getLastUrl(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  urlTextController.text = snapshot.data!;
+                                  return TextFormField(
+                                    controller: urlTextController,
+                                    cursorColor: Theme.of(context).textTheme.bodySmall?.color,
+                                    onSaved: helper.onSaved(formUrlKey),
+                                    style: const TextStyle(
+                                      decoration: TextDecoration.none,
+                                    ),
+                                    decoration: openerDecoration,
+                                    validator: validateUrl,
+                                  );
+                                }
+                                return progress;
+                              },
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(top: 5),
+                              child: Text('Enter your url and log in to your network.',
+                                  style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Center(
+                      child: Container(
+                        width: 140,
+                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
+                        child: AnimatedOpacity(
+                          opacity: _isConnectVissible ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 300),
+                          child: TextButton(
+                            onPressed: onPressed,
+                            child: Text(
+                              'Connect',
+                              style: TextStyle(color: openerColor, fontSize: 20),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: GestureDetector(
+                      onTap: () {
+                        _controller.isActive = true;
+                        setState(() {
+                          _visible = false;
+                        });
+                        Future.delayed(const Duration(milliseconds: 700)).then((value) => {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const Help()),
+                              ).then((value) {
+                                setState(() {
+                                  _controller.isActive = true;
+                                  _animation.reset();
+                                  _visible = true;
+                                });
+                              })
+                            });
+                      },
+                      child: AnimatedOpacity(
+                        opacity: _visible ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 300),
+                        child: const Text(
+                          "Need Help?",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
