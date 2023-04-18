@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
+import 'package:humhub/pages/help.dart';
 import 'package:humhub/util/providers.dart';
 import '../pages/opener.dart';
 import '../pages/web_view.dart';
@@ -30,6 +31,7 @@ class Router{
   static var routes = {
     Opener.path: (context) => const Opener(),
     WebViewApp.path: (context) => const WebViewApp(),
+    Help.path: (context) => const Help(),
   };
 
   static Future<String> getInitialRoute(WidgetRef ref) async {

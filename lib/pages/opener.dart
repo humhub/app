@@ -157,7 +157,7 @@ class OpenerState extends ConsumerState<Opener> {
                       builder: (BuildContext context, bool isVisible, Widget? widget) {
                         return AnimatedOpacity(
                           opacity: isVisible ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 500),
+                          duration: const Duration(milliseconds: 600),
                           child: Center(
                             child: Container(
                               width: 140,
@@ -182,11 +182,21 @@ class OpenerState extends ConsumerState<Opener> {
                         _controller.isActive = true;
                         setState(() {
                           _visible = false;
+                          _isConnectVisible.value = false;
                         });
                         Future.delayed(const Duration(milliseconds: 700)).then((value) => {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const Help()),
+                                PageRouteBuilder(
+                                  transitionDuration: const Duration(milliseconds: 500),
+                                  pageBuilder: (context, animation, secondaryAnimation) => const Help(),
+                                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
+                                ),
                               ).then((value) {
                                 setState(() {
                                   _controller.isActive = true;
