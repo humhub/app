@@ -15,12 +15,24 @@ class HelpState extends State<Help> {
   int _selectedIndex = 0;
   final _pageController = PageController(initialPage: 0);
 
+  Widget _buildPageIndicator(int index) {
+    bool isActive = index == _selectedIndex;
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      width: isActive ? 16.0 : 8.0,
+      height: 8.0,
+      decoration: BoxDecoration(
+        color: isActive ? Colors.blue : Colors.grey.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(4.0),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar: BottomNavigationBar(
+      /*bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.transparent,
         elevation: 0.0,
         selectedItemColor: Colors.grey,
@@ -41,6 +53,54 @@ class HelpState extends State<Help> {
         ],
         onTap: _onTappedBar,
         currentIndex: _selectedIndex,
+      ),*/
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              blurRadius: 10,
+              offset: Offset(0, -3),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            IconButton(
+              icon: Icon(Icons.arrow_back_ios),
+              onPressed: _selectedIndex == 0
+                  ? null
+                  : () {
+                      setState(() {
+                        _selectedIndex--;
+                      });
+                    },
+            ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildPageIndicator(0),
+                  SizedBox(width: 8.0),
+                  _buildPageIndicator(1),
+                  SizedBox(width: 8.0),
+                  _buildPageIndicator(2),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.arrow_forward_ios),
+              onPressed: _selectedIndex == 3 - 1
+                  ? null
+                  : () {
+                      setState(() {
+                        _selectedIndex++;
+                      });
+                    },
+            ),
+          ],
+        ),
       ),
       body: SafeArea(
         child: Column(
