@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:humhub/components/hatch_image.dart';
 
 import '../../../util/const.dart';
 
@@ -37,7 +38,7 @@ class FirstPage extends StatelessWidget {
               style: const TextStyle(letterSpacing: 0.5),
             ),
           ),
-          /*HatchImage()*/
+          const HatchImage(imageUrl: 'assets/images/help.png',)
         ],
       ),
     );

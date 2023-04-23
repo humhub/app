@@ -1,64 +1,41 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 class HatchImage extends StatefulWidget {
-  const HatchImage({super.key});
+  final String imageUrl;
+
+  const HatchImage({Key? key, required this.imageUrl}) : super(key: key);
 
   @override
   State<HatchImage> createState() => _HatchImageState();
 }
 
-class _HatchImageState extends State<HatchImage> with TickerProviderStateMixin {
-  late AnimationController _animationControllerAppear;
-  late AnimationController _animationControllerDisappear;
+class _HatchImageState extends State<HatchImage> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<Offset> _animation;
 
   @override
   void initState() {
     super.initState();
-    _animationControllerAppear = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
-    _animationControllerDisappear = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
-    _animationControllerAppear.forward();
+    _animationController = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
+    _animation = Tween<Offset>(
+      begin: const Offset(1.0, 1.0),
+      end: const Offset(0.0, 0.0),
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+    _animationController.forward();
   }
 
   @override
   void dispose() {
-    _animationControllerAppear.dispose();
-    _animationControllerDisappear.dispose();
-    super.dispose();
+    _animationController.reverse().then((_) {
+      super.dispose();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        SizedBox(
-          height: 300,
-          child: Positioned(
-            bottom: 0,
-            left: Tween(begin: -100.0, end: 0.0).animate(_animationControllerAppear).value,
-            child: RotationTransition(
-              turns: Tween(begin: 1.0, end: 0.0).animate(_animationControllerAppear),
-              child: Image.asset('assets/images/help.png'),
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 300,
-          child: Positioned(
-            bottom: Tween(begin: -100.0, end: 0.0).animate(_animationControllerDisappear).value,
-            left: Tween(begin: 0.0, end: -100.0).animate(_animationControllerDisappear).value,
-            child: RotationTransition(
-              turns: Tween(begin: 0.0, end: -1.0).animate(_animationControllerDisappear),
-              child: Image.asset('assets/images/help.png'),
-            ),
-          ),
-        ),
-      ],
-    );
+    return SlideTransition(position: _animation, child: Expanded(child: Image.asset('assets/images/help.png', fit: BoxFit.cover)));
   }
 }
