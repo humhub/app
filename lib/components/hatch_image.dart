@@ -1,8 +1,10 @@
 import 'package:flutter/widgets.dart';
 
 class HatchImage extends StatefulWidget {
+  const HatchImage({super.key});
+
   @override
-  _HatchImageState createState() => _HatchImageState();
+  State<HatchImage> createState() => _HatchImageState();
 }
 
 class _HatchImageState extends State<HatchImage> with TickerProviderStateMixin {
@@ -33,11 +35,8 @@ class _HatchImageState extends State<HatchImage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      /*alignment: Alignment.bottomCenter,
-      fit: StackFit.expand,
-      clipBehavior: Clip.none,*/
       children: [
-        Container(
+        SizedBox(
           height: 300,
           child: Positioned(
             bottom: 0,
@@ -48,7 +47,7 @@ class _HatchImageState extends State<HatchImage> with TickerProviderStateMixin {
             ),
           ),
         ),
-        Container(
+        SizedBox(
           height: 300,
           child: Positioned(
             bottom: Tween(begin: -100.0, end: 0.0).animate(_animationControllerDisappear).value,

@@ -10,7 +10,7 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
 import 'package:rive/rive.dart';
-import 'help.dart';
+import 'help/help.dart';
 
 class Opener extends ConsumerStatefulWidget {
   const Opener({Key? key}) : super(key: key);
@@ -263,7 +263,7 @@ class OpenerState extends ConsumerState<Opener> {
       String hash = HumHub.generateHash(32);
       if (lastUrl == currentUrl) hash = ref.read(humHubProvider).randomHash ?? hash;
       ref.read(humHubProvider).setInstance(HumHub(manifest: manifest, randomHash: hash));
-      Navigator.pushNamed(context, WebViewApp.path, arguments: manifest);
+      if (context.mounted) Navigator.pushNamed(context, WebViewApp.path, arguments: manifest);
     }
   }
 

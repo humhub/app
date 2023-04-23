@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
-import 'package:humhub/pages/help.dart';
+import 'package:humhub/pages/help/help.dart';
 import 'package:humhub/util/providers.dart';
 import '../pages/opener.dart';
 import '../pages/web_view.dart';
