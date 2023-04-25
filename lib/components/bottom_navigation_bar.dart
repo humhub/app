@@ -69,8 +69,8 @@ class _BottomNavigationState extends State<BottomNavigation> with TickerProvider
     bool isActive = index == _selectedIndex;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      width: isActive ? 16.0 : 8.0,
-      height: isActive ? 16.0 : 8.0,
+      width: isActive ? 13.0 : 8.0,
+      height: isActive ? 13.0 : 8.0,
       decoration: const BoxDecoration(
         color: Colors.grey,
         shape: BoxShape.circle,

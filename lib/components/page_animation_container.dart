@@ -63,15 +63,18 @@ class PageAnimationContainerState extends State<PageAnimationContainer> with Tic
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        FadeTransition(
-          opacity: Tween<double>(
-            begin: 1,
-            end: 0,
-          ).animate(CurvedAnimation(
-            parent: _animationController,
-            curve: widget.fadeCurve,
-          )),
-          child: widget.children[_previousIndex],
+        IgnorePointer(
+          ignoring: true,
+          child: FadeTransition(
+            opacity: Tween<double>(
+              begin: 1,
+              end: 0,
+            ).animate(CurvedAnimation(
+              parent: _animationController,
+              curve: widget.fadeCurve,
+            )),
+            child: widget.children[_previousIndex],
+          ),
         ),
         FadeTransition(
           opacity: _fadeAnimation,

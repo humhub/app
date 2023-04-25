@@ -34,11 +34,14 @@ class SecondPage extends StatelessWidget {
             child: Container(
               height: 30,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10.0),
+                borderRadius: BorderRadius.circular(20.0),
                 color: Colors.grey[300],
               ),
               child: Row(
                 children: [
+                  const SizedBox(
+                    width: 4,
+                  ),
                   const Icon(
                     Icons.public,
                     color: Colors.grey,

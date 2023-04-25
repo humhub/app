@@ -4,7 +4,8 @@ import 'package:humhub/components/hatch_image.dart';
 import '../../../util/const.dart';
 
 class FirstPage extends StatelessWidget {
-  const FirstPage({Key? key}) : super(key: key);
+  final bool fadeIn;
+  const FirstPage({Key? key, required this.fadeIn}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +39,13 @@ class FirstPage extends StatelessWidget {
               style: const TextStyle(letterSpacing: 0.5),
             ),
           ),
-          const SizedBox(
-              height: 270,
-              child: HatchImage(
-                imageUrl: 'assets/images/help.png',
-              ))
+          SizedBox(
+            height: 315,
+            child: HatchImage(
+              fadeIn: fadeIn,
+              imageUrl: 'assets/images/help.png',
+            ),
+          ),
         ],
       ),
     );

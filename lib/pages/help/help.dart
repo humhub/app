@@ -15,41 +15,62 @@ class Help extends StatefulWidget {
 }
 
 class HelpState extends State<Help> {
+  final ValueNotifier<bool> fadeIn = ValueNotifier<bool>(false);
+  final ValueNotifier<int> currentPage = ValueNotifier<int>(0);
   @override
   Widget build(BuildContext context) {
     GlobalKey<PageAnimationContainerState> statePagesKey = GlobalKey<PageAnimationContainerState>();
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      bottomNavigationBar: BottomNavigation(
-        pageCount: 3,
-        onPageChange: (index) {
-          // print(index);
-          statePagesKey.currentState?.navigateTo(index);
-        },
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const EaseOutImage(
-              imagePath: 'assets/images/logo.png',
-            ),
-            PageAnimationContainer(
-              key: statePagesKey,
-              fadeDuration: const Duration(milliseconds: 500),
-              fadeCurve: Curves.easeInOut,
-              navigationCallback: (currentIndex, previousIndex){
-                if(currentIndex == 0){
-
-                }
-              },
-              children: const [
-                FirstPage(),
-                SecondPage(),
-                ThirdPage(),
-              ],
-            ),
-          ],
+    return WillPopScope(
+      onWillPop: () async {
+        if (currentPage.value != 0) {
+          statePagesKey.currentState?.navigateTo(currentPage.value - 1);
+        } else {
+          return true;
+        }
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        extendBody: true,
+        bottomNavigationBar: BottomNavigation(
+          pageCount: 3,
+          onPageChange: (index) {
+            currentPage.value = index;
+            statePagesKey.currentState?.navigateTo(index);
+          },
+        ),
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              const EaseOutImage(
+                imagePath: 'assets/images/logo.png',
+              ),
+              PageAnimationContainer(
+                key: statePagesKey,
+                fadeDuration: const Duration(milliseconds: 500),
+                fadeCurve: Curves.easeInOut,
+                navigationCallback: (currentIndex, nextIndex) {
+                  if (currentIndex == 0) {
+                    fadeIn.value = true;
+                  } else {
+                    fadeIn.value = false;
+                  }
+                },
+                children: [
+                  ValueListenableBuilder<bool>(
+                    valueListenable: fadeIn,
+                    builder: (BuildContext context, value, Widget? child) {
+                      return FirstPage(fadeIn: fadeIn.value);
+                    },
+                  ),
+                  const SecondPage(),
+                  const ThirdPage(),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

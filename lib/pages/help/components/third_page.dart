@@ -52,7 +52,7 @@ class ThirdPage extends StatelessWidget {
             child: Center(
               child: GestureDetector(
                 onTap: () {
-                  Navigator.pop(context);
+                  /*Navigator.pop(context);*/
                 },
                 child: Container(
                   width: MediaQuery.of(context).size.width / 1.5,
