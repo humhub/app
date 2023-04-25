@@ -38,7 +38,11 @@ class FirstPage extends StatelessWidget {
               style: const TextStyle(letterSpacing: 0.5),
             ),
           ),
-          const HatchImage(imageUrl: 'assets/images/help.png',)
+          const SizedBox(
+              height: 270,
+              child: HatchImage(
+                imageUrl: 'assets/images/help.png',
+              ))
         ],
       ),
     );

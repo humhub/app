@@ -4,24 +4,26 @@ class PageAnimationContainer extends StatefulWidget {
   final List<Widget> children;
   final Duration fadeDuration;
   final Curve fadeCurve;
+  final Function(int, int)? navigationCallback;
 
   const PageAnimationContainer({
     Key? key,
     required this.children,
     this.fadeDuration = const Duration(milliseconds: 500),
     this.fadeCurve = Curves.easeInOut,
+    this.navigationCallback,
   }) : super(key: key);
 
   @override
   PageAnimationContainerState createState() => PageAnimationContainerState();
 }
 
-class PageAnimationContainerState extends State<PageAnimationContainer>
-    with TickerProviderStateMixin {
+class PageAnimationContainerState extends State<PageAnimationContainer> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
   int _currentIndex = 0;
+  int _previousIndex = 0;
 
   @override
   void initState() {
@@ -59,9 +61,23 @@ class PageAnimationContainerState extends State<PageAnimationContainer>
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: widget.children[_currentIndex],
+    return Stack(
+      children: [
+        FadeTransition(
+          opacity: Tween<double>(
+            begin: 1,
+            end: 0,
+          ).animate(CurvedAnimation(
+            parent: _animationController,
+            curve: widget.fadeCurve,
+          )),
+          child: widget.children[_previousIndex],
+        ),
+        FadeTransition(
+          opacity: _fadeAnimation,
+          child: widget.children[_currentIndex],
+        ),
+      ],
     );
   }
 
@@ -72,7 +88,11 @@ class PageAnimationContainerState extends State<PageAnimationContainer>
   }
 
   void navigateTo(int index) {
+    if (widget.navigationCallback != null) {
+      widget.navigationCallback!(_currentIndex, index);
+    }
     setState(() {
+      _previousIndex = _currentIndex;
       _currentIndex = index;
       _animationController.reset();
       _animationController.forward();

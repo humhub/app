@@ -13,6 +13,8 @@ class _HatchImageState extends State<HatchImage> with SingleTickerProviderStateM
   late AnimationController _animationController;
   late Animation<Offset> _animation;
 
+  bool _hasAnimated = false;
+
   @override
   void initState() {
     super.initState();
@@ -24,18 +26,19 @@ class _HatchImageState extends State<HatchImage> with SingleTickerProviderStateM
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
-    _animationController.forward();
   }
 
   @override
-  void dispose() {
-    _animationController.reverse().then((_) {
-      super.dispose();
-    });
+  dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SlideTransition(position: _animation, child: Expanded(child: Image.asset('assets/images/help.png', fit: BoxFit.cover)));
+    if (!_hasAnimated) {
+      _animationController.forward();
+      _hasAnimated = true;
+    }
+    return SlideTransition(position: _animation, child: Image.asset(widget.imageUrl, fit: BoxFit.cover));
   }
 }

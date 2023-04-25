@@ -157,11 +157,11 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       manifest = args;
     }
     if (args is String) {
-      manifest = m.Router.initParams;
+      manifest = m.MyRouter.initParams;
       url = args;
     }
     if (args == null) {
-      manifest = m.Router.initParams;
+      manifest = m.MyRouter.initParams;
     }
     return URLRequest(url: Uri.parse(url ?? manifest.baseUrl), headers: customHeaders);
   }

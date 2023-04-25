@@ -24,7 +24,7 @@ void queueRoute(
   });
 }
 
-class Router{
+class MyRouter{
   static String? initRoute;
   static dynamic initParams;
 

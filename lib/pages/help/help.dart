@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:humhub/pages/help/components/first_page.dart';
 import 'package:humhub/pages/help/components/third_page.dart';
-
 import '../../components/page_animation_container.dart';
 import '../../components/bottom_navigation_bar.dart';
 import '../../components/ease_out_image.dart';
@@ -39,6 +38,11 @@ class HelpState extends State<Help> {
               key: statePagesKey,
               fadeDuration: const Duration(milliseconds: 500),
               fadeCurve: Curves.easeInOut,
+              navigationCallback: (currentIndex, previousIndex){
+                if(currentIndex == 0){
+
+                }
+              },
               children: const [
                 FirstPage(),
                 SecondPage(),
