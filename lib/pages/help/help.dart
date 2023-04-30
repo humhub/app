@@ -15,7 +15,8 @@ class Help extends StatefulWidget {
 }
 
 class HelpState extends State<Help> {
-  final ValueNotifier<bool> fadeIn = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> fadeInFirst = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> fadeInSecond = ValueNotifier<bool>(false);
   final ValueNotifier<int> currentPage = ValueNotifier<int>(0);
   @override
   Widget build(BuildContext context) {
@@ -44,8 +45,14 @@ class HelpState extends State<Help> {
           bottom: false,
           child: Column(
             children: [
-              EaseOutContainer(
-                child: Image.asset('assets/images/logo.png'),
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 40),
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  child: EaseOutContainer(
+                    child: Image.asset('assets/images/logo.png'),
+                  ),
+                ),
               ),
               PageAnimationContainer(
                 key: statePagesKey,
@@ -53,19 +60,30 @@ class HelpState extends State<Help> {
                 fadeCurve: Curves.easeInOut,
                 navigationCallback: (currentIndex, nextIndex) {
                   if (currentIndex == 0) {
-                    fadeIn.value = true;
+                    fadeInFirst.value = true;
                   } else {
-                    fadeIn.value = false;
+                    fadeInFirst.value = false;
+                  }
+                  if (currentIndex == 1) {
+                    fadeInSecond.value = true;
+                  } else {
+                    fadeInSecond.value = false;
                   }
                 },
                 children: [
                   ValueListenableBuilder<bool>(
-                    valueListenable: fadeIn,
+                    valueListenable: fadeInFirst,
                     builder: (BuildContext context, value, Widget? child) {
-                      return FirstPage(fadeIn: fadeIn.value);
+                      return FirstPage(fadeIn: fadeInFirst.value);
                     },
                   ),
-                  const SecondPage(),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: fadeInSecond,
+                    builder: (BuildContext context, value, Widget? child) {
+                      return SecondPage(fadeIn: fadeInSecond.value);
+                    },
+                  ),
+                  /*const SecondPage(),*/
                   const ThirdPage(),
                 ],
               ),

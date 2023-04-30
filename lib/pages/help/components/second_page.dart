@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:humhub/components/ease_out_container.dart';
 import 'package:humhub/util/const.dart';
 
 class SecondPage extends StatelessWidget {
-  const SecondPage({Key? key}) : super(key: key);
+  final bool fadeIn;
+  const SecondPage({Key? key, required this.fadeIn}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,45 +31,48 @@ class SecondPage extends StatelessWidget {
               style: const TextStyle(letterSpacing: 0.5),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Container(
-              height: 30,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20.0),
-                color: Colors.grey[200],
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(
-                    width: 4,
-                  ),
-                  Icon(
-                    Icons.public,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(
-                    width: 8,
-                  ),
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        const TextSpan(
-                          text: 'https://',
-                          style: TextStyle(
-                            color: Colors.grey,
-                          ),
-                        ),
-                        TextSpan(
-                          text: 'nameofnetwork.humhub.com',
-                          style: TextStyle(
-                            color: Colors.grey.shade800,
-                          ),
-                        ),
-                      ],
+          EaseOutContainer(
+            fadeIn: fadeIn,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Container(
+                height: 30,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.0),
+                  color: Colors.grey[200],
+                ),
+                child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 4,
                     ),
-                  ),
-                ],
+                    Icon(
+                      Icons.public,
+                      color: Colors.grey.shade600,
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'https://',
+                            style: TextStyle(
+                              color: Colors.grey,
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'nameofnetwork.humhub.com',
+                            style: TextStyle(
+                              color: Colors.grey.shade800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -78,21 +83,24 @@ class SecondPage extends StatelessWidget {
               style: const TextStyle(letterSpacing: 0.5),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Center(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width / 2,
-                  height: 50,
-                  decoration: BoxDecoration(color: openerColor, borderRadius: BorderRadius.circular(5)),
-                  child: const Center(
-                    child: Text(
-                      'Connect',
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+          EaseOutContainer(
+            fadeIn: fadeIn,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Center(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width / 2,
+                    height: 50,
+                    decoration: BoxDecoration(color: openerColor, borderRadius: BorderRadius.circular(5)),
+                    child: const Center(
+                      child: Text(
+                        'Connect',
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
                     ),
                   ),
                 ),
