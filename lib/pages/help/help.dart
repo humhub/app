@@ -3,7 +3,7 @@ import 'package:humhub/pages/help/components/first_page.dart';
 import 'package:humhub/pages/help/components/third_page.dart';
 import '../../components/page_animation_container.dart';
 import '../../components/bottom_navigation_bar.dart';
-import '../../components/ease_out_image.dart';
+import '../../components/ease_out_container.dart';
 import 'components/second_page.dart';
 
 class Help extends StatefulWidget {
@@ -44,8 +44,8 @@ class HelpState extends State<Help> {
           bottom: false,
           child: Column(
             children: [
-              const EaseOutImage(
-                imagePath: 'assets/images/logo.png',
+              EaseOutContainer(
+                child: Image.asset('assets/images/logo.png'),
               ),
               PageAnimationContainer(
                 key: statePagesKey,

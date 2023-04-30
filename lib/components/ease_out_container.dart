@@ -1,14 +1,14 @@
 import 'package:flutter/widgets.dart';
 
-class EaseOutImage extends StatefulWidget {
-  final String imagePath;
-  const EaseOutImage({super.key, required this.imagePath});
+class EaseOutContainer extends StatefulWidget {
+  final Widget child;
+  const EaseOutContainer({super.key, required this.child, });
 
   @override
-  State<EaseOutImage> createState() => _EaseOutImageState();
+  State<EaseOutContainer> createState() => _EaseOutContainerState();
 }
 
-class _EaseOutImageState extends State<EaseOutImage> with TickerProviderStateMixin {
+class _EaseOutContainerState extends State<EaseOutContainer> with TickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<Offset> _animation;
 
@@ -43,7 +43,7 @@ class _EaseOutImageState extends State<EaseOutImage> with TickerProviderStateMix
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 40),
           width: MediaQuery.of(context).size.width * 0.6,
-          child: Image.asset(widget.imagePath),
+          child: widget.child,
         ),
       ),
     );

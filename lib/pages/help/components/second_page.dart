@@ -35,16 +35,16 @@ class SecondPage extends StatelessWidget {
               height: 30,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20.0),
-                color: Colors.grey[300],
+                color: Colors.grey[200],
               ),
               child: Row(
                 children: [
                   const SizedBox(
                     width: 4,
                   ),
-                  const Icon(
+                  Icon(
                     Icons.public,
-                    color: Colors.grey,
+                    color: Colors.grey.shade600,
                   ),
                   const SizedBox(
                     width: 8,
@@ -61,7 +61,7 @@ class SecondPage extends StatelessWidget {
                         TextSpan(
                           text: 'nameofnetwork.humhub.com',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            color: Colors.grey.shade800,
                           ),
                         ),
                       ],
