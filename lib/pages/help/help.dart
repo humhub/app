@@ -21,74 +21,65 @@ class HelpState extends State<Help> {
   @override
   Widget build(BuildContext context) {
     GlobalKey<PageAnimationContainerState> statePagesKey = GlobalKey<PageAnimationContainerState>();
+    GlobalKey<BottomNavigationState> bottomNavigationStateKey = GlobalKey<BottomNavigationState>();
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (currentPage.value != 0) {
-          statePagesKey.currentState?.navigateTo(currentPage.value - 1);
-        } else {
-          return true;
-        }
-        return false;
-      },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        extendBody: true,
-        bottomNavigationBar: BottomNavigation(
-          pageCount: 3,
-          onPageChange: (index) {
-            currentPage.value = index;
-            statePagesKey.currentState?.navigateTo(index);
-          },
-        ),
-        body: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 40),
-                  width: MediaQuery.of(context).size.width * 0.6,
-                  child: EaseOutContainer(
-                    child: Image.asset('assets/images/logo.png'),
-                  ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      extendBody: true,
+      bottomNavigationBar: BottomNavigation(
+        key: bottomNavigationStateKey,
+        pageCount: 3,
+        onPageChange: (index) {
+          currentPage.value = index;
+          statePagesKey.currentState?.navigateTo(index);
+        },
+      ),
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 40),
+                width: MediaQuery.of(context).size.width * 0.6,
+                child: EaseOutContainer(
+                  child: Image.asset('assets/images/logo.png'),
                 ),
               ),
-              PageAnimationContainer(
-                key: statePagesKey,
-                fadeDuration: const Duration(milliseconds: 500),
-                fadeCurve: Curves.easeInOut,
-                navigationCallback: (currentIndex, nextIndex) {
-                  if (currentIndex == 0) {
-                    fadeInFirst.value = true;
-                  } else {
-                    fadeInFirst.value = false;
-                  }
-                  if (currentIndex == 1) {
-                    fadeInSecond.value = true;
-                  } else {
-                    fadeInSecond.value = false;
-                  }
-                },
-                children: [
-                  ValueListenableBuilder<bool>(
-                    valueListenable: fadeInFirst,
-                    builder: (BuildContext context, value, Widget? child) {
-                      return FirstPage(fadeIn: fadeInFirst.value);
-                    },
-                  ),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: fadeInSecond,
-                    builder: (BuildContext context, value, Widget? child) {
-                      return SecondPage(fadeIn: fadeInSecond.value);
-                    },
-                  ),
-                  /*const SecondPage(),*/
-                  const ThirdPage(),
-                ],
-              ),
-            ],
-          ),
+            ),
+            PageAnimationContainer(
+              key: statePagesKey,
+              fadeDuration: const Duration(milliseconds: 500),
+              fadeCurve: Curves.easeInOut,
+              navigationCallback: (currentIndex, nextIndex) {
+                if (currentIndex == 0) {
+                  fadeInFirst.value = true;
+                } else {
+                  fadeInFirst.value = false;
+                }
+                if (currentIndex == 1) {
+                  fadeInSecond.value = true;
+                } else {
+                  fadeInSecond.value = false;
+                }
+              },
+              children: [
+                ValueListenableBuilder<bool>(
+                  valueListenable: fadeInFirst,
+                  builder: (BuildContext context, value, Widget? child) {
+                    return FirstPage(fadeIn: fadeInFirst.value);
+                  },
+                ),
+                ValueListenableBuilder<bool>(
+                  valueListenable: fadeInSecond,
+                  builder: (BuildContext context, value, Widget? child) {
+                    return SecondPage(fadeIn: fadeInSecond.value);
+                  },
+                ),
+                const ThirdPage(),
+              ],
+            ),
+          ],
         ),
       ),
     );
