@@ -26,6 +26,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
         return false;
       },
       child: Container(
+        height: 50,
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
