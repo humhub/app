@@ -24,6 +24,7 @@ class Locales {
   static String moreInfoSecPar = 'Organizations or companies can of course set up and operate their own HumHub network at any time.';
   static String moreInfoThirdPar = 'All information can be found here:';
   static String moreInfoProEdition = "Professional Edition";
+  static String moreInfoProEditionUrl = "https://www.humhub.com/en/professional-edition";
 }
 
 Color openerColor = const Color(0xFF21a1b3);

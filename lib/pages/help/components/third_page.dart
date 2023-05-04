@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../util/const.dart';
 
@@ -52,7 +53,7 @@ class ThirdPage extends StatelessWidget {
             child: Center(
               child: GestureDetector(
                 onTap: () {
-                  /*Navigator.pop(context);*/
+                  launchUrl(Uri.parse(Locales.moreInfoProEditionUrl), mode: LaunchMode.externalApplication);
                 },
                 child: Container(
                   width: MediaQuery.of(context).size.width / 1.5,
