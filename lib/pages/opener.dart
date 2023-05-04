@@ -30,36 +30,12 @@ class OpenerState extends ConsumerState<Opener> {
   late SimpleAnimation _animation;
   // Fade out Logo and opener when redirecting
   bool _visible = true;
-  final ValueNotifier<bool> _isConnectVisible = ValueNotifier<bool>(false);
-  /*bool _isConnectVisible = false;*/
 
   @override
   void initState() {
     super.initState();
     _animation = SimpleAnimation('animation', autoplay: false);
     _controller = _animation;
-  }
-
-  Future<void> validateUrlOnChange(value) async {
-    if (value.isEmpty) {
-      _isConnectVisible.value = false;
-      return;
-    }
-
-    if (!value.startsWith('http://') && !value.startsWith('https://')) {
-      value = 'https://$value';
-    }
-
-    final pattern = RegExp(r'^(https?|ftp)://' // protocol
-        r'((([a-zA-Z0-9_\-]+)\.)+[a-zA-Z]{2,})' // domain name
-        r'(:[0-9]+)?' // port number
-        r'(/[a-zA-Z0-9_\-./]+)*$'); // path
-
-    if (!pattern.hasMatch(value)) {
-      _isConnectVisible.value = false;
-      return;
-    }
-    _isConnectVisible.value = true;
   }
 
   @override
@@ -131,7 +107,6 @@ class OpenerState extends ConsumerState<Opener> {
                                     style: const TextStyle(
                                       decoration: TextDecoration.none,
                                     ),
-                                    onChanged: validateUrlOnChange,
                                     decoration: openerDecoration,
                                     validator: validateUrl,
                                   );
@@ -151,27 +126,22 @@ class OpenerState extends ConsumerState<Opener> {
                   ),
                   Expanded(
                     flex: 1,
-                    child: ValueListenableBuilder<bool>(
-                      valueListenable: _isConnectVisible,
-                      builder: (BuildContext context, bool isVisible, Widget? widget) {
-                        return AnimatedOpacity(
-                          opacity: isVisible ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 600),
-                          child: Center(
-                            child: Container(
-                              width: 140,
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
-                              child: TextButton(
-                                onPressed: isVisible ? onPressed : () {},
-                                child: Text(
-                                  'Connect',
-                                  style: TextStyle(color: openerColor, fontSize: 20),
-                                ),
-                              ),
+                    child: AnimatedOpacity(
+                      opacity: _visible ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: Center(
+                        child: Container(
+                          width: 140,
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
+                          child: TextButton(
+                            onPressed: onPressed,
+                            child: Text(
+                              'Connect',
+                              style: TextStyle(color: openerColor, fontSize: 20),
                             ),
                           ),
-                        );
-                      },
+                        ),
+                      ),
                     ),
                   ),
                   Expanded(
@@ -181,7 +151,6 @@ class OpenerState extends ConsumerState<Opener> {
                         _controller.isActive = true;
                         setState(() {
                           _visible = false;
-                          _isConnectVisible.value = false;
                         });
                         Future.delayed(const Duration(milliseconds: 700)).then((value) => {
                               Navigator.push(
