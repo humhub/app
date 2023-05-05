@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/log.dart';
-import 'package:humhub/util/router.dart' as my_router;
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 
@@ -28,14 +27,17 @@ class MyAppState extends ConsumerState<MyApp>{
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
-      future: my_router.Router.getInitialRoute(ref),
+      future: MyRouter.getInitialRoute(ref),
       builder: (context, snap) {
         if (snap.hasData) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             initialRoute: snap.data,
-            routes: my_router.Router.routes,
+            routes: MyRouter.routes,
             navigatorKey: navigatorKey,
+            theme: ThemeData(
+              fontFamily: 'Roboto',
+            ),
           );
         }
         return progress;

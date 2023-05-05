@@ -9,7 +9,8 @@ import 'package:humhub/util/form_helper.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
-import 'help.dart';
+import 'package:rive/rive.dart';
+import 'help/help.dart';
 
 class Opener extends ConsumerStatefulWidget {
   const Opener({Key? key}) : super(key: key);
@@ -25,63 +26,169 @@ class OpenerState extends ConsumerState<Opener> {
   final String error404 = "404";
   late String? postcodeErrorMessage;
   TextEditingController urlTextController = TextEditingController();
+  late RiveAnimationController _controller;
+  late SimpleAnimation _animation;
+  // Fade out Logo and opener when redirecting
+  bool _visible = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _animation = SimpleAnimation('animation', autoplay: false);
+    _controller = _animation;
+  }
 
   @override
   Widget build(BuildContext context) {
+    InputDecoration openerDecoration = InputDecoration(
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.grey,
+            width: 1.0,
+          ),
+        ),
+        border: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.grey,
+            width: 1.0,
+          ),
+        ),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        labelText: 'URL',
+        labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color),
+        hintText: 'https://community.humhub.com');
+
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
         child: Form(
           key: helper.key,
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(top: 60.0),
-                child: Center(
-                  child: Container(margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 20), child: Image.asset('assets/images/logo.png')),
-                ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              RiveAnimation.asset(
+                fit: BoxFit.fill,
+                'assets/opener_animation.riv',
+                controllers: [_controller],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 50),
-                child: FutureBuilder<String>(
-                  future: ref.read(humHubProvider).getLastUrl(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      urlTextController.text = snapshot.data!;
-                      return TextFormField(
-                        controller: urlTextController,
-                        onSaved: helper.onSaved(formUrlKey),
-                        decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'URL', hintText: 'https://community.humhub.com'),
-                        validator: validateUrl,
-                      );
-                    }
-                    return progress;
-                  },
-                ),
-              ),
-              Container(
-                height: 50,
-                width: 250,
-                decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(20)),
-                child: TextButton(
-                  onPressed: onPressed,
-                  child: const Text(
-                    'Connect',
-                    style: TextStyle(color: Colors.white, fontSize: 25),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Expanded(
+                    flex: 2,
+                    child: AnimatedOpacity(
+                      opacity: _visible ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: SizedBox(
+                        height: 100,
+                        width: 230,
+                        child: Image.asset('assets/images/logo.png'),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(
-                height: 130,
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Help()),
-                  );
-                },
-                child: const Text("Need Help?"),
+                  Expanded(
+                    flex: 3,
+                    child: AnimatedOpacity(
+                      opacity: _visible ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 35),
+                        child: Column(
+                          children: [
+                            FutureBuilder<String>(
+                              future: ref.read(humHubProvider).getLastUrl(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  urlTextController.text = snapshot.data!;
+                                  return TextFormField(
+                                    controller: urlTextController,
+                                    cursorColor: Theme.of(context).textTheme.bodySmall?.color,
+                                    onSaved: helper.onSaved(formUrlKey),
+                                    style: const TextStyle(
+                                      decoration: TextDecoration.none,
+                                    ),
+                                    decoration: openerDecoration,
+                                    validator: validateUrl,
+                                  );
+                                }
+                                return progress;
+                              },
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(top: 5),
+                              child: Text('Enter your url and log in to your network.',
+                                  style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: AnimatedOpacity(
+                      opacity: _visible ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: Center(
+                        child: Container(
+                          width: 140,
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
+                          child: TextButton(
+                            onPressed: onPressed,
+                            child: Text(
+                              'Connect',
+                              style: TextStyle(color: openerColor, fontSize: 20),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: GestureDetector(
+                      onTap: () {
+                        _controller.isActive = true;
+                        setState(() {
+                          _visible = false;
+                        });
+                        Future.delayed(const Duration(milliseconds: 700)).then((value) => {
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  transitionDuration: const Duration(milliseconds: 500),
+                                  pageBuilder: (context, animation, secondaryAnimation) => const Help(),
+                                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
+                                ),
+                              ).then((value) {
+                                setState(() {
+                                  _controller.isActive = true;
+                                  _animation.reset();
+                                  _visible = true;
+                                });
+                              })
+                            });
+                      },
+                      child: AnimatedOpacity(
+                        opacity: _visible ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 300),
+                        child: const Text(
+                          "Need Help?",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -125,12 +232,8 @@ class OpenerState extends ConsumerState<Opener> {
       String hash = HumHub.generateHash(32);
       if (lastUrl == currentUrl) hash = ref.read(humHubProvider).randomHash ?? hash;
       ref.read(humHubProvider).setInstance(HumHub(manifest: manifest, randomHash: hash));
-      redirect(manifest);
+      if (context.mounted) Navigator.pushNamed(context, WebViewApp.path, arguments: manifest);
     }
-  }
-
-  redirect(Manifest manifest) {
-    Navigator.pushNamed(context, WebViewApp.path, arguments: manifest);
   }
 
   Uri assumeUrl(String url) {
