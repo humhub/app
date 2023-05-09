@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'animated_padding_component.dart';
+
 class BottomNavigation extends StatefulWidget {
   final int pageCount;
   final Function(int) onPageChange;
@@ -61,20 +63,23 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
               ),
             ),
             Expanded(
-              flex: 1,
+              flex: 3,
               child: Align(
-                alignment: Alignment.bottomCenter,
+                alignment: Alignment.center,
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildPageIndicator(0),
-                      const SizedBox(width: 8.0),
-                      _buildPageIndicator(1),
-                      const SizedBox(width: 8.0),
-                      _buildPageIndicator(2),
-                    ],
+                  padding: const EdgeInsets.only(left: 26),
+                  child: AnimatedPaddingComponent(
+                    padding: getPadding(_selectedIndex),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildPageIndicator(0),
+                        const SizedBox(width: 8.0),
+                        _buildPageIndicator(1),
+                        const SizedBox(width: 8.0),
+                        _buildPageIndicator(2),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -102,6 +107,17 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
         ),
       ),
     );
+  }
+
+  getPadding(int selectedIndex) {
+    if (selectedIndex == 0) {
+      return const EdgeInsets.only(left: 26);
+    }
+    if (selectedIndex == 2) {
+      return const EdgeInsets.only(right: 26);
+    } else {
+      return const EdgeInsets.only();
+    }
   }
 
   Widget _buildPageIndicator(int index) {
