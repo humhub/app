@@ -40,7 +40,7 @@ class FirstPage extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: 300,
+            height: 250,
             child: Center(
               child: HatchImage(
                 fadeIn: fadeIn,
