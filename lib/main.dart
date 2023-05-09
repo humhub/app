@@ -36,7 +36,7 @@ class MyAppState extends ConsumerState<MyApp>{
             routes: MyRouter.routes,
             navigatorKey: navigatorKey,
             theme: ThemeData(
-              fontFamily: 'Roboto',
+              fontFamily: 'OpenSans',
             ),
           );
         }

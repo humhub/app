@@ -40,10 +40,12 @@ class FirstPage extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: 315,
-            child: HatchImage(
-              fadeIn: fadeIn,
-              imageUrl: 'assets/images/help.png',
+            height: 300,
+            child: Center(
+              child: HatchImage(
+                fadeIn: fadeIn,
+                imageUrl: 'assets/images/help.png',
+              ),
             ),
           ),
         ],
