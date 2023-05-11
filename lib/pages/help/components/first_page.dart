@@ -21,7 +21,7 @@ class FirstPage extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 Locales.helpTitle,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                style: getHeaderStyle(context),
               ),
             ),
           ),
@@ -29,14 +29,14 @@ class FirstPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               Locales.helpFirstPar,
-              style: const TextStyle(letterSpacing: 0.5),
+              style: getParagraphStyle(context),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               Locales.helpSecPar,
-              style: const TextStyle(letterSpacing: 0.5),
+              style: getParagraphStyle(context),
             ),
           ),
           SizedBox(

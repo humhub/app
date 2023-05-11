@@ -20,7 +20,7 @@ class SecondPage extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 Locales.howToConnectTitle,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                style: getHeaderStyle(context),
               ),
             ),
           ),
@@ -28,7 +28,7 @@ class SecondPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               Locales.howToConnectFirstPar,
-              style: const TextStyle(letterSpacing: 0.5),
+              style: getParagraphStyle(context),
             ),
           ),
           EaseOutContainer(
@@ -80,7 +80,7 @@ class SecondPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               Locales.howToConnectSecPar,
-              style: const TextStyle(letterSpacing: 0.5),
+              style: getParagraphStyle(context),
             ),
           ),
           EaseOutContainer(
@@ -111,7 +111,7 @@ class SecondPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 20),
             child: Text(
               Locales.howToConnectThirdPar,
-              style: const TextStyle(letterSpacing: 0.5),
+              style: getParagraphStyle(context),
             ),
           )
         ],
