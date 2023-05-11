@@ -20,7 +20,7 @@ class ThirdPage extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 Locales.moreInfoTitle,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w500),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
           ),
