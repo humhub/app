@@ -28,7 +28,7 @@ class SecondPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               Locales.howToConnectFirstPar,
-              style: getParagraphStyle(context),
+              style: paragraphStyle
             ),
           ),
           EaseOutContainer(
@@ -80,7 +80,7 @@ class SecondPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               Locales.howToConnectSecPar,
-              style: getParagraphStyle(context),
+              style: paragraphStyle
             ),
           ),
           EaseOutContainer(
@@ -111,7 +111,7 @@ class SecondPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 20),
             child: Text(
               Locales.howToConnectThirdPar,
-              style: getParagraphStyle(context),
+              style: paragraphStyle
             ),
           )
         ],

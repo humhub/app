@@ -28,21 +28,21 @@ class ThirdPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               Locales.moreInfoFirstPar,
-              style: getParagraphStyle(context),
+              style: paragraphStyle
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               Locales.moreInfoSecPar,
-              style: getParagraphStyle(context),
+              style: paragraphStyle
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               Locales.moreInfoThirdPar,
-              style: getParagraphStyle(context),
+              style: paragraphStyle
             ),
           ),
           const SizedBox(

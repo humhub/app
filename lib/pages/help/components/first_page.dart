@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:humhub/components/hatch_image.dart';
 import 'package:humhub/components/rotating_globe.dart';
 
 import '../../../util/const.dart';
@@ -30,23 +29,17 @@ class FirstPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               Locales.helpFirstPar,
-              style: getParagraphStyle(context),
+              style: paragraphStyle,
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(
-              Locales.helpSecPar,
-              style: getParagraphStyle(context),
-            ),
+            child: Text(Locales.helpSecPar, style: paragraphStyle),
           ),
-          SizedBox(
-            height: 320,
-            child: Center(
-              child: RotatingGlobe(
-                rotationDirection: fadeIn ? Direction.left : Direction.right,
-                imagePath: 'assets/images/help.png',
-              ),
+          Center(
+            child: RotatingGlobe(
+              rotationDirection: fadeIn ? Direction.left : Direction.right,
+              imagePath: 'assets/images/help.png',
             ),
           ),
         ],

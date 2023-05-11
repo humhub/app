@@ -39,6 +39,4 @@ TextStyle? getHeaderStyle(context) {
   return Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600);
 }
 
-TextStyle getParagraphStyle(context) {
-  return TextStyle(letterSpacing: 0.5, fontWeight: FontWeight.normal, color: Theme.of(context).textTheme.bodySmall?.color);
-}
+TextStyle paragraphStyle = const TextStyle(letterSpacing: 0.5, fontWeight: FontWeight.normal, color: Colors.black);
