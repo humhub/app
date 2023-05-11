@@ -55,8 +55,7 @@ class OpenerState extends ConsumerState<Opener> {
         ),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         labelText: 'URL',
-        labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color),
-        hintText: 'https://community.humhub.com');
+        labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color));
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
