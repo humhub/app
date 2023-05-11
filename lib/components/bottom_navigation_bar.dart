@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
@@ -30,6 +32,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
       },
       child: Container(
         height: 50,
+        padding: Platform.isIOS ? const EdgeInsets.only(bottom: 20) : null,
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
