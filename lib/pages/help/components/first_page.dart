@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:humhub/components/hatch_image.dart';
+import 'package:humhub/components/rotating_globe.dart';
 
 import '../../../util/const.dart';
 
@@ -40,11 +41,11 @@ class FirstPage extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: 250,
+            height: 320,
             child: Center(
-              child: HatchImage(
-                fadeIn: fadeIn,
-                imageUrl: 'assets/images/help.png',
+              child: RotatingGlobe(
+                rotationDirection: fadeIn ? Direction.left : Direction.right,
+                imagePath: 'assets/images/help.png',
               ),
             ),
           ),
