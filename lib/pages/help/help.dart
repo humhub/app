@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:humhub/components/help_safe_area.dart';
 import 'package:humhub/pages/help/components/first_page.dart';
 import 'package:humhub/pages/help/components/third_page.dart';
 import '../../components/page_animation_container.dart';
@@ -34,7 +35,7 @@ class HelpState extends State<Help> {
           statePagesKey.currentState?.navigateTo(index);
         },
       ),
-      body: SafeArea(
+      body: HelpSafeArea(
         child: Column(
           children: [
             Center(

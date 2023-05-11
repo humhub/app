@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:math' as math;
 
-class CustomSafeArea extends StatelessWidget {
-  const CustomSafeArea({
+class HelpSafeArea extends StatelessWidget {
+  const HelpSafeArea({
     super.key,
     this.left = true,
     this.top = true,
@@ -30,14 +30,15 @@ class CustomSafeArea extends StatelessWidget {
       padding = padding.copyWith(bottom: data.viewPadding.bottom);
     }
 
-    return OverflowBox(
-      maxHeight: double.infinity,
-      child: Container(
-        padding: EdgeInsets.only(
-          left: math.max(left ? padding.left : 0.0, minimum.left),
-          top: math.max(top ? padding.top : 0.0, minimum.top),
-          right: math.max(right ? padding.right : 0.0, minimum.right),
-        ),
+    return Container(
+      padding: EdgeInsets.only(
+        left: math.max(left ? padding.left : 0.0, minimum.left),
+        top: math.max(top ? padding.top : 0.0, minimum.top),
+        right: math.max(right ? padding.right : 0.0, minimum.right),
+      ),
+      child: OverflowBox(
+        maxHeight: MediaQuery.of(context).size.height,
+        minHeight: MediaQuery.of(context).size.height,
         child: MediaQuery.removePadding(
           context: context,
           removeLeft: left,
