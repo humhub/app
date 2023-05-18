@@ -20,7 +20,7 @@ class ThirdPage extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 Locales.moreInfoTitle,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w500),
+                style: getHeaderStyle(context),
               ),
             ),
           ),
@@ -28,21 +28,21 @@ class ThirdPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               Locales.moreInfoFirstPar,
-              style: const TextStyle(letterSpacing: 0.5),
+              style: paragraphStyle
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               Locales.moreInfoSecPar,
-              style: const TextStyle(letterSpacing: 0.5),
+              style: paragraphStyle
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               Locales.moreInfoThirdPar,
-              style: const TextStyle(letterSpacing: 0.5),
+              style: paragraphStyle
             ),
           ),
           const SizedBox(
@@ -62,7 +62,7 @@ class ThirdPage extends StatelessWidget {
                   child: Center(
                     child: Text(
                       Locales.moreInfoProEdition,
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.normal),
                     ),
                   ),
                 ),
