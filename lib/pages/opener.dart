@@ -60,6 +60,7 @@ class OpenerState extends ConsumerState<Opener> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
+        bottom: false,
         child: Form(
           key: helper.key,
           child: Stack(

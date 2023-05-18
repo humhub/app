@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:humhub/components/help_safe_area.dart';
 import 'package:humhub/pages/help/components/first_page.dart';
@@ -21,26 +23,34 @@ class HelpState extends State<Help> {
   final ValueNotifier<int> currentPage = ValueNotifier<int>(0);
   @override
   Widget build(BuildContext context) {
-    GlobalKey<PageAnimationContainerState> statePagesKey = GlobalKey<PageAnimationContainerState>();
-    GlobalKey<BottomNavigationState> bottomNavigationStateKey = GlobalKey<BottomNavigationState>();
+    GlobalKey<PageAnimationContainerState> statePagesKey =
+        GlobalKey<PageAnimationContainerState>();
+    GlobalKey<BottomNavigationState> bottomNavigationStateKey =
+        GlobalKey<BottomNavigationState>();
 
     return Scaffold(
       backgroundColor: Colors.white,
       extendBody: true,
-      bottomNavigationBar: BottomNavigation(
-        key: bottomNavigationStateKey,
-        pageCount: 3,
-        onPageChange: (index) {
-          currentPage.value = index;
-          statePagesKey.currentState?.navigateTo(index);
-        },
+      bottomNavigationBar: Container(
+        padding: Platform.isIOS
+            ? const EdgeInsets.only(bottom: 20)
+            : const EdgeInsets.only(bottom: 5),
+        margin: const EdgeInsets.symmetric(horizontal: 10),
+        child: BottomNavigation(
+          key: bottomNavigationStateKey,
+          pageCount: 3,
+          onPageChange: (index) {
+            currentPage.value = index;
+            statePagesKey.currentState?.navigateTo(index);
+          },
+        ),
       ),
       body: HelpSafeArea(
         child: Column(
           children: [
             Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 40),
+                padding: const EdgeInsets.only(top: 60, bottom: 40),
                 width: MediaQuery.of(context).size.width * 0.6,
                 child: EaseOutContainer(
                   child: Image.asset('assets/images/logo.png'),
