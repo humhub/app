@@ -12,12 +12,11 @@ class Manifest {
   Manifest(this.display, this.startUrl, this.shortName, this.name, this.backgroundColor, this.themeColor);
 
   String get baseUrl {
-    // int index = startUrl.indexOf("humhub.com");
-    // if (index != -1) {
-    //   return startUrl.substring(0, index + "humhub.com".length);
-    // }
-    // throw Exception("Can't define base url");
-    return startUrl;
+    int index = startUrl.indexOf("index.php");
+    if (index != -1) {
+      return startUrl.substring(0, index + "index.php".length);
+    }
+    throw Exception("Can't define base url");
   }
 
   factory Manifest.fromJson(Map<String, dynamic> json) {

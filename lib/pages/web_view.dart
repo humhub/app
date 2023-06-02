@@ -76,10 +76,10 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
     final url = action.request.url!.origin;
-    if (!url.startsWith(manifest.baseUrl)) {
-      launchUrl(action.request.url!, mode: LaunchMode.externalApplication);
-      return NavigationActionPolicy.CANCEL;
-    }
+    // if (!url.startsWith(manifest.baseUrl)) {
+    //   launchUrl(action.request.url!, mode: LaunchMode.externalApplication);
+    //   return NavigationActionPolicy.CANCEL;
+    // }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
     if (Platform.isAndroid || action.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED) {
       action.request.headers?.addAll(_initialRequest.headers!);
