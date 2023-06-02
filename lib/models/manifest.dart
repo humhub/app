@@ -1,3 +1,4 @@
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 
 class Manifest {
@@ -8,15 +9,15 @@ class Manifest {
   final String backgroundColor;
   final String themeColor;
 
-  Manifest(this.display, this.startUrl, this.shortName, this.name,
-      this.backgroundColor, this.themeColor);
+  Manifest(this.display, this.startUrl, this.shortName, this.name, this.backgroundColor, this.themeColor);
 
   String get baseUrl {
-    int index = startUrl.indexOf("humhub.com");
-    if (index != -1) {
-      return startUrl.substring(0, index + "humhub.com".length);
-    }
-    throw Exception("Can't define base url");
+    // int index = startUrl.indexOf("humhub.com");
+    // if (index != -1) {
+    //   return startUrl.substring(0, index + "humhub.com".length);
+    // }
+    // throw Exception("Can't define base url");
+    return startUrl;
   }
 
   factory Manifest.fromJson(Map<String, dynamic> json) {

@@ -131,6 +131,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   }
 
   Future<AjaxRequest?> _shouldInterceptAjaxRequest(InAppWebViewController controller, AjaxRequest request) async {
+    request.isAsync = false;
     _initialRequest.headers!.forEach((key, value) {
       request.headers!.setRequestHeader(key, value);
     });
