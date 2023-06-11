@@ -75,8 +75,11 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
 
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
+
     final url = action.request.url!.origin;
-    if (!url.startsWith(manifest.baseUrl)) {
+
+    HumHub instance = await ref.read(humHubProvider).getInstance();
+    if (!url.startsWith(manifest.baseUrl) && instance.isHideOpener && whitelistRedirects(url)) {
       launchUrl(action.request.url!, mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
     }
@@ -223,5 +226,18 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         ],
       ),
     );
+  }
+
+  bool whitelistRedirects(String url) {
+    for (var element in [
+      "https://github.com/login/oauth/authorize",
+      "https://login.live.com/oauth20_authorize",
+      "https://www.facebook.com/dialog/oauth",
+      "https://discord.com/api/oauth2/authorize",
+      "https://www.linkedin.com/oauth/v2/authorization"
+    ]) {
+      if(url.contains(element)) return true;
+    }
+    return false;
   }
 }
