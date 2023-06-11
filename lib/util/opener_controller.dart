@@ -46,7 +46,7 @@ class OpenerController {
     if (!helper.validate()) return;
     helper.save();
     // Get the manifest.json for given url.
-    findManifest(helper.model[formUrlKey]!);
+    await findManifest(helper.model[formUrlKey]!);
     // If manifest.json does not exist the url is incorrect.
     // This is a temp. fix the validator expect sync. function this is some established workaround.
     // In the future we could define our own TextFormField that would also validate the API responses.

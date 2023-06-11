@@ -126,8 +126,8 @@ class OpenerState extends ConsumerState<Opener> {
                           width: 140,
                           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
                           child: TextButton(
-                            onPressed: () {
-                              controlLer.initHumHub();
+                            onPressed: () async {
+                              await controlLer.initHumHub();
                               ref.read(humHubProvider).getInstance().then((value) {
                                 Navigator.pushNamed(ref.context, WebViewApp.path, arguments: value.manifest);
                               });
