@@ -12,11 +12,8 @@ class Manifest {
       this.backgroundColor, this.themeColor);
 
   String get baseUrl {
-    int index = startUrl.indexOf("humhub.com");
-    if (index != -1) {
-      return startUrl.substring(0, index + "humhub.com".length);
-    }
-    throw Exception("Can't define base url");
+    Uri url = Uri.parse(startUrl);
+    return url.origin;
   }
 
   factory Manifest.fromJson(Map<String, dynamic> json) {

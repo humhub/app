@@ -73,7 +73,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     );
   }
 
-  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(InAppWebViewController controller, NavigationAction action) async {
+  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
+      InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
     final url = action.request.url!.origin;
     if (!url.startsWith(manifest.baseUrl)) {
@@ -171,7 +172,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     if (url!.path.contains('/user/auth/login')) {
       webViewController.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
       webViewController.evaluateJavascript(
-          source: "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+          source:
+              "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _pullToRefreshController?.endRefreshing();
   }

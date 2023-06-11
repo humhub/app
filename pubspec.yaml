@@ -56,6 +56,7 @@ dependencies:
   flutter_app_badger: ^1.5.0
   rive: 0.9.0
   auto_size_text: ^3.0.0
+  mockito: ^5.4.0
 
 dev_dependencies:
   flutter_test:
