@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/foundation.dart';
@@ -65,6 +66,10 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
                 shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
                 onLoadStop: _onLoadStop,
                 onProgressChanged: _onProgressChanged,
+                onConsoleMessage: (controller, msg) {
+                  // Handle the web resource error here
+                  log('Console msg: $msg');
+                },
               ),
             ),
           ),

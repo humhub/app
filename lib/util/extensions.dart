@@ -6,6 +6,7 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
 // ignore_for_file: use_build_context_synchronously
 extension MyCookies on WebViewCookieManager {
   Future<void> setMyCookies(Manifest manifest) async {
