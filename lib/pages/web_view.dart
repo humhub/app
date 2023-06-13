@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -94,7 +93,6 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
-    final url = action.request.url!.origin;
     if (action.request.url!.path.contains("bluebird")) return NavigationActionPolicy.ALLOW;
     // if (!url.startsWith(manifest.baseUrl)) {
     //   launchUrl(action.request.url!, mode: LaunchMode.externalApplication);
