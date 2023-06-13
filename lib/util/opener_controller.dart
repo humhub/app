@@ -31,12 +31,14 @@ class OpenerController {
     if (uri.pathSegments.isEmpty) {
       asyncData = await APIProvider.of(ref).request(Manifest.get(uri.origin));
     }
-    checkHumHubModuleView(uri);
+    await checkHumHubModuleView(uri);
   }
 
   checkHumHubModuleView(Uri uri) async {
     Response? response;
-    response = await http.Client().get(uri).catchError((err) {return Response("Found manifest but not humhub.modules.ui.view tag", 404);});
+    response = await http.Client().get(Uri.parse(uri.origin)).catchError((err) {
+      return Response("Found manifest but not humhub.modules.ui.view tag", 404);
+    });
 
     doesViewExist = response.statusCode == 200 && response.body.contains('humhub.modules.ui.view');
   }
@@ -51,7 +53,7 @@ class OpenerController {
     // This is a temp. fix the validator expect sync. function this is some established workaround.
     // In the future we could define our own TextFormField that would also validate the API responses.
     // But it this is not acceptable I can suggest simple popup or tempPopup.
-    if (asyncData!.hasError || doesViewExist) {
+    if (asyncData!.hasError || !doesViewExist) {
       log("Open URL error: $asyncData");
       String value = urlTextController.text;
       urlTextController.text = error404;
@@ -66,11 +68,11 @@ class OpenerController {
       String currentUrl = urlTextController.text;
       String hash = HumHub.generateHash(32);
       if (lastUrl == currentUrl) hash = ref.read(humHubProvider).randomHash ?? hash;
-      ref.read(humHubProvider).setInstance(HumHub(manifest: manifest, randomHash: hash));
+      await ref.read(humHubProvider).setInstance(HumHub(manifest: manifest, randomHash: hash));
     }
   }
 
-
+  bool get allOk => !(asyncData!.hasError || !doesViewExist);
 
   Uri assumeUrl(String url) {
     if (url.startsWith("https://") || url.startsWith("http://")) return Uri.parse(url);

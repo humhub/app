@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/foundation.dart';
@@ -65,6 +66,17 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
                 shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
                 onLoadStop: _onLoadStop,
                 onProgressChanged: _onProgressChanged,
+                onConsoleMessage: (controller, msg) {
+                  // Handle the web resource error here
+                  log('Console Message: $msg');
+                },
+                onLoadHttpError: (InAppWebViewController controller, Uri? url, int statusCode, String description) {
+                  // Handle the web resource error here
+                  log('Http Error: $description');
+                },
+                onLoadError: (InAppWebViewController controller, Uri? url, int code, String message) {
+                  log('Load Error: $message');
+                },
               ),
             ),
           ),
@@ -96,8 +108,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         jsObjectName: "flutterChannel",
         onPostMessage: (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
           logInfo(inMessage);
-          var json = jsonDecode(inMessage!) as Map<String, dynamic>;
-          ChannelMessage message = ChannelMessage.fromJson(json);
+          ChannelMessage message = ChannelMessage.fromJson(inMessage!);
           switch (message.action) {
             case ChannelAction.showOpener:
               ref.read(humHubProvider).setIsHideOpener(false);

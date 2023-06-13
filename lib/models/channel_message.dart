@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 part 'channel_message.g.dart';
 
 enum ChannelAction { showOpener, hideOpener, registerFcmDevice, updateNotificationCount, none }
@@ -17,5 +19,5 @@ class ChannelMessage {
 
   ChannelMessage(this.type, this.url, this.count);
 
-  factory ChannelMessage.fromJson(Map<String, dynamic> json) => _$ChannelMessageFromJson(json);
+  factory ChannelMessage.fromJson(String json) => _$ChannelMessageFromJson(json);
 }
