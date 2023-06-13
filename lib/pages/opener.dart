@@ -128,9 +128,12 @@ class OpenerState extends ConsumerState<Opener> {
                           child: TextButton(
                             onPressed: () async {
                               await controlLer.initHumHub();
-                              ref.read(humHubProvider).getInstance().then((value) {
-                                Navigator.pushNamed(ref.context, WebViewApp.path, arguments: value.manifest);
-                              });
+                              setState(() {});
+                              if (controlLer.allOk) {
+                                ref.read(humHubProvider).getInstance().then((value) {
+                                  Navigator.pushNamed(ref.context, WebViewApp.path, arguments: value.manifest);
+                                });
+                              }
                             },
                             child: Text(
                               'Connect',
