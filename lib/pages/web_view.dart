@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +17,6 @@ import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:humhub/util/router.dart' as m;
 
 import '../models/hum_hub.dart';
@@ -38,6 +39,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       useShouldInterceptAjaxRequest: true,
       useShouldInterceptFetchRequest: true,
       javaScriptEnabled: true,
+      javaScriptCanOpenWindowsAutomatically: true,
+      preferredContentMode: UserPreferredContentMode.DESKTOP,
     ),
   );
   PullToRefreshController? _pullToRefreshController;
@@ -65,6 +68,17 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
                 shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
                 onLoadStop: _onLoadStop,
                 onProgressChanged: _onProgressChanged,
+                onConsoleMessage: (controller, msg) {
+                  // Handle the web resource error here
+                  log('Console msg: $msg');
+                },
+                onLoadHttpError: (InAppWebViewController controller, Uri? url, int statusCode, String description) {
+                  // Handle the web resource error here
+                  log('Console msg: $description');
+                },
+                onLoadError: (InAppWebViewController controller, Uri? url, int code, String message) {
+                  log('Console msg: $message');
+                },
               ),
             ),
           ),
@@ -73,9 +87,15 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     );
   }
 
-  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(InAppWebViewController controller, NavigationAction action) async {
+  void _injectLibrary(InAppWebViewController controller) async {
+    controller.injectJavascriptFileFromUrl(urlFile: Uri.parse("https://cdn.jsdelivr.net/bluebird/latest/bluebird.min.js"));
+  }
+
+  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
+      InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
     final url = action.request.url!.origin;
+    if (action.request.url!.path.contains("bluebird")) return NavigationActionPolicy.ALLOW;
     // if (!url.startsWith(manifest.baseUrl)) {
     //   launchUrl(action.request.url!, mode: LaunchMode.externalApplication);
     //   return NavigationActionPolicy.CANCEL;
@@ -127,6 +147,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         },
       ),
     );
+    _injectLibrary(controller);
     webViewController = controller;
   }
 
@@ -172,7 +193,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     if (url!.path.contains('/user/auth/login')) {
       webViewController.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
       webViewController.evaluateJavascript(
-          source: "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+          source:
+              "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _pullToRefreshController?.endRefreshing();
   }
