@@ -12,7 +12,7 @@ class RotatingGlobe extends StatefulWidget {
   State<RotatingGlobe> createState() => _RotatingGlobeState();
 }
 
-class _RotatingGlobeState extends State<RotatingGlobe> with SingleTickerProviderStateMixin {
+class _RotatingGlobeState extends State<RotatingGlobe> with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
   late Animation<double> _animationFir;
@@ -29,7 +29,12 @@ class _RotatingGlobeState extends State<RotatingGlobe> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    if(_controller.isCompleted){
+      _animation = widget.rotationDirection == Direction.left ? _animationSec : _animationFir;
+      _controller.reset();
+    }
     _controller.forward();
+
     return RotationTransition(
       alignment: Alignment.bottomCenter,
       turns: _animation,

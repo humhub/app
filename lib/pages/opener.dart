@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
+import 'package:humhub/util/form_helper.dart';
 import 'package:humhub/util/opener_controller.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:rive/rive.dart';
@@ -18,6 +19,7 @@ class Opener extends ConsumerStatefulWidget {
 class OpenerState extends ConsumerState<Opener> {
   late OpenerController controlLer;
   late RiveAnimationController _controller;
+  final FormHelper helper = FormHelper();
   late SimpleAnimation _animation;
   // Fade out Logo and opener when redirecting
   bool _visible = true;
@@ -31,7 +33,7 @@ class OpenerState extends ConsumerState<Opener> {
 
   @override
   Widget build(BuildContext context) {
-    controlLer = OpenerController(ref: ref);
+    controlLer = OpenerController(ref: ref, helper: helper);
     InputDecoration openerDecoration = InputDecoration(
         focusedBorder: const OutlineInputBorder(
           borderSide: BorderSide(
@@ -54,7 +56,7 @@ class OpenerState extends ConsumerState<Opener> {
       body: SafeArea(
         bottom: false,
         child: Form(
-          key: controlLer.helper.key,
+          key: helper.key,
           child: Stack(
             fit: StackFit.expand,
             children: [

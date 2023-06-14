@@ -5,7 +5,7 @@ import '../../../util/const.dart';
 
 class FirstPage extends StatelessWidget {
   final bool fadeIn;
-  const FirstPage({Key? key, required this.fadeIn}) : super(key: key);
+  const FirstPage({Key? key, required this.fadeIn,}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

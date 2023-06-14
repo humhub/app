@@ -34,7 +34,7 @@ class SecondPage extends StatelessWidget {
           EaseOutContainer(
             fadeIn: fadeIn,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              padding: const EdgeInsets.only(top: 20, bottom: 20, left: 4),
               child: Container(
                 height: 30,
                 decoration: BoxDecoration(
@@ -51,7 +51,7 @@ class SecondPage extends StatelessWidget {
                       color: Colors.grey.shade600,
                     ),
                     const SizedBox(
-                      width: 8,
+                      width: 10,
                     ),
                     RichText(
                       text: TextSpan(
@@ -99,7 +99,7 @@ class SecondPage extends StatelessWidget {
                     child: const Center(
                       child: Text(
                         'Connect',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
+                        style: TextStyle(color: Colors.white, fontSize: 18),
                       ),
                     ),
                   ),
