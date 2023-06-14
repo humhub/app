@@ -12,14 +12,14 @@ import 'dart:developer';
 class OpenerController {
   late AsyncValue<Manifest>? asyncData;
   bool doesViewExist = false;
-  final helper = FormHelper();
+  final FormHelper helper;
   TextEditingController urlTextController = TextEditingController();
   late String? postcodeErrorMessage;
   final String formUrlKey = "redirect_url";
   final String error404 = "404";
   final WidgetRef ref;
 
-  OpenerController({required this.ref});
+  OpenerController({required this.ref, required this.helper});
 
   findManifest(String url) async {
     Uri uri = assumeUrl(url);
