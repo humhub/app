@@ -62,7 +62,7 @@ class ThirdPage extends StatelessWidget {
                   child: Center(
                     child: Text(
                       Locales.moreInfoProEdition,
-                      style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.normal),
+                      style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.normal),
                     ),
                   ),
                 ),
