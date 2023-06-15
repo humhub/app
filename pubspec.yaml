@@ -89,6 +89,7 @@ flutter:
     - assets/images/logo.png
     - assets/opener_animation.riv
     - assets/images/help.png
+    - assets/js/bluebird.min.js
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

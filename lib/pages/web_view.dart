@@ -1,9 +1,11 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,6 +46,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   );
   PullToRefreshController? _pullToRefreshController;
   late PullToRefreshOptions _pullToRefreshOptions;
+  late List<UserScript> scripts = [];
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +62,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               bottom: false,
               child: InAppWebView(
                 initialUrlRequest: _initialRequest,
+                initialUserScripts: UnmodifiableListView<UserScript>(scripts),
                 initialOptions: _options,
                 pullToRefreshController: _pullToRefreshController,
                 shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
@@ -108,6 +112,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   }
 
   _onWebViewCreated(InAppWebViewController controller) async {
+    loadScripts(['assets/js/bluebird.min.js']);
     await controller.addWebMessageListener(
       WebMessageListener(
         jsObjectName: "flutterChannel",
@@ -192,7 +197,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       webViewController.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
       webViewController.evaluateJavascript(
           source:
-              "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+          "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _pullToRefreshController?.endRefreshing();
   }
@@ -210,15 +215,15 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     return kIsWeb
         ? null
         : PullToRefreshController(
-            options: _pullToRefreshOptions,
-            onRefresh: () async {
-              if (defaultTargetPlatform == TargetPlatform.android) {
-                webViewController.reload();
-              } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-                webViewController.loadUrl(urlRequest: URLRequest(url: await webViewController.getUrl()));
-              }
-            },
-          );
+      options: _pullToRefreshOptions,
+      onRefresh: () async {
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          webViewController.reload();
+        } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+          webViewController.loadUrl(urlRequest: URLRequest(url: await webViewController.getUrl()));
+        }
+      },
+    );
   }
 
   askForNotificationPermissions() {
@@ -245,4 +250,13 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       ),
     );
   }
+
+  loadScripts(List<String> list) async {
+    for (var filePath in list) {
+      String jsString = await rootBundle.loadString(filePath);
+      scripts.add(UserScript(
+          source: jsString,
+          injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START));
+    }}
 }
+
