@@ -18,6 +18,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:humhub/util/router.dart' as m;
 
+import '../components/in_app_browser.dart';
 import '../models/hum_hub.dart';
 
 class WebViewApp extends ConsumerStatefulWidget {
@@ -30,6 +31,7 @@ class WebViewApp extends ConsumerStatefulWidget {
 
 class WebViewAppState extends ConsumerState<WebViewApp> {
   late InAppWebViewController webViewController;
+  late MyInAppBrowser authBrowser;
   late Manifest manifest;
   late URLRequest _initialRequest;
   final _options = InAppWebViewGroupOptions(
@@ -40,13 +42,29 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       javaScriptEnabled: true,
     ),
   );
+
   PullToRefreshController? _pullToRefreshController;
   late PullToRefreshOptions _pullToRefreshOptions;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<NavigationActionPolicy> shouldOverride(NavigationAction navigationAction) async {
+    return NavigationActionPolicy.ALLOW;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    _initialRequest = getInitRequest(context);
+    _initialRequest = _initRequest;
     _pullToRefreshController = initPullToRefreshController;
+    authBrowser = MyInAppBrowser(
+      manifest: manifest,
+      concludeAuth: (URLRequest request) {
+        _concludeAuth(request);
+      },
+    );
     return WillPopScope(
       onWillPop: () => webViewController.exitApp(context, ref),
       child: Scaffold(
@@ -73,14 +91,13 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     );
   }
 
-  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(InAppWebViewController controller, NavigationAction action) async {
+  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
+      InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
-
     final url = action.request.url!.origin;
-
-    HumHub instance = await ref.read(humHubProvider).getInstance();
-    if (!url.startsWith(manifest.baseUrl) && instance.isHideOpener && whitelistRedirects(url)) {
-      launchUrl(action.request.url!, mode: LaunchMode.externalApplication);
+    if (!url.startsWith(manifest.baseUrl)) {
+      authBrowser.launchUrl(action.request);
+      /*launchUrl(action.request.url!, mode: LaunchMode.inAppWebView);*/
       return NavigationActionPolicy.CANCEL;
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
@@ -90,6 +107,11 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       return NavigationActionPolicy.CANCEL;
     }
     return NavigationActionPolicy.ALLOW;
+  }
+
+  _concludeAuth(URLRequest request) {
+    authBrowser.close();
+    webViewController.loadUrl(urlRequest: request);
   }
 
   _onWebViewCreated(InAppWebViewController controller) async {
@@ -145,7 +167,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     return request;
   }
 
-  URLRequest getInitRequest(BuildContext context) {
+  URLRequest get _initRequest {
     //Append random hash to customHeaders in this state the header should always exist.
     bool isHideDialog = ref.read(humHubProvider).isHideDialog;
     Map<String, String> customHeaders = {};
@@ -174,7 +196,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     if (url!.path.contains('/user/auth/login')) {
       webViewController.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
       webViewController.evaluateJavascript(
-          source: "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+          source:
+              "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _pullToRefreshController?.endRefreshing();
   }
@@ -226,18 +249,5 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         ],
       ),
     );
-  }
-
-  bool whitelistRedirects(String url) {
-    for (var element in [
-      "https://github.com/login/oauth/authorize",
-      "https://login.live.com/oauth20_authorize",
-      "https://www.facebook.com/dialog/oauth",
-      "https://discord.com/api/oauth2/authorize",
-      "https://www.linkedin.com/oauth/v2/authorization"
-    ]) {
-      if(url.contains(element)) return true;
-    }
-    return false;
   }
 }
