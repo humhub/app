@@ -1,22 +1,22 @@
 import 'dart:async';
 import 'dart:developer';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/util/extensions.dart';
 
 class MyInAppBrowser extends InAppBrowser {
   final Manifest manifest;
-  final InAppBrowserClassOptions options = InAppBrowserClassOptions(
-    crossPlatform: InAppBrowserOptions(hideUrlBar: false, toolbarTopBackgroundColor: Colors.grey),
-    inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-      crossPlatform: InAppWebViewOptions(javaScriptEnabled: true, useShouldOverrideUrlLoading: true),
-    ),
-  );
-
+  late InAppBrowserClassOptions options;
   final Function concludeAuth;
 
-  MyInAppBrowser({required this.manifest, required this.concludeAuth});
+  MyInAppBrowser({required this.manifest, required this.concludeAuth}) {
+    options = InAppBrowserClassOptions(
+      crossPlatform: InAppBrowserOptions(hideUrlBar: false, toolbarTopBackgroundColor: HexColor(manifest.themeColor)),
+      inAppWebViewGroupOptions: InAppWebViewGroupOptions(
+        crossPlatform: InAppWebViewOptions(javaScriptEnabled: true, useShouldOverrideUrlLoading: true),
+      ),
+    );
+  }
 
   @override
   Future<NavigationActionPolicy?>? shouldOverrideUrlLoading(NavigationAction navigationAction) async {
