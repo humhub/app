@@ -34,12 +34,22 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   late URLRequest _initialRequest;
   final _options = InAppWebViewGroupOptions(
     crossPlatform: InAppWebViewOptions(
-      useShouldOverrideUrlLoading: true,
-      useShouldInterceptAjaxRequest: true,
-      useShouldInterceptFetchRequest: true,
-      javaScriptEnabled: true,
-      javaScriptCanOpenWindowsAutomatically: true,
-      preferredContentMode: UserPreferredContentMode.DESKTOP,
+        useShouldOverrideUrlLoading: true,
+        //useShouldInterceptAjaxRequest: true,
+        useShouldInterceptFetchRequest: true,
+        javaScriptEnabled: true,
+        useOnLoadResource: true,
+        javaScriptCanOpenWindowsAutomatically: true,
+        supportZoom: false,
+        allowFileAccessFromFileURLs: true,
+        preferredContentMode: UserPreferredContentMode.MOBILE,
+        allowUniversalAccessFromFileURLs: true),
+    android: AndroidInAppWebViewOptions(
+      mixedContentMode: AndroidMixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+      domStorageEnabled: true,
+    ),
+    ios: IOSInAppWebViewOptions(
+      sharedCookiesEnabled: true,
     ),
   );
   PullToRefreshController? _pullToRefreshController;
@@ -63,9 +73,22 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
                 pullToRefreshController: _pullToRefreshController,
                 shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
                 onWebViewCreated: _onWebViewCreated,
-                shouldInterceptAjaxRequest: _shouldInterceptAjaxRequest,
+                // shouldInterceptAjaxRequest: _shouldInterceptAjaxRequest,
+                /*onAjaxReadyStateChange: (controller, request) async {
+                  //log(request.toJson().toString());
+                  return AjaxRequestAction.PROCEED;
+                },*/
+                /*onAjaxProgress: (controller, request) async {
+                  //log(request.toJson().toString());
+                  return AjaxRequestAction.PROCEED;
+                },*/
                 shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
                 onLoadStop: _onLoadStop,
+                onLoadStart: (InAppWebViewController controller, Uri? uri) async {
+                  String jsCode = "\$.ajaxSetup({headers: { 'x-my-custom-header': 'some value' }});";
+                  var some = await controller.evaluateJavascript(source: jsCode);
+                  print(some);
+                },
                 onProgressChanged: _onProgressChanged,
                 onConsoleMessage: (controller, msg) {
                   // Handle the web resource error here
@@ -78,6 +101,19 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
                 onLoadError: (InAppWebViewController controller, Uri? url, int code, String message) {
                   log('Console msg: $message');
                 },
+                onLoadResource: (controller, resource) {
+                  log(resource.toJson().toString());
+                },
+                onJsAlert: (c, alert) async {
+                  log(alert.toJson().toString());
+                  return JsAlertResponse();
+                },
+                onJsConfirm: (c, confirm) async {
+                  return JsConfirmResponse();
+                },
+                onJsPrompt: (c, prom) async {
+                  return JsPromptResponse();
+                },
               ),
             ),
           ),
@@ -87,11 +123,15 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   }
 
   void _injectLibrary(InAppWebViewController controller) async {
-    controller.injectJavascriptFileFromUrl(urlFile: Uri.parse("https://cdn.jsdelivr.net/bluebird/latest/bluebird.min.js"));
+    controller.injectJavascriptFileFromUrl(
+        urlFile: Uri.parse("https://cdn.jsdelivr.net/bluebird/latest/bluebird.min.js"));
   }
 
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
+    String jsCode = "\$.ajaxSetup({headers: { 'x-my-custom-header': 'some value' }});";
+    var some = await controller.evaluateJavascript(source: jsCode);
+    print(some);
     // 1st check if url is not def. app url and open it in a browser or inApp.
     if (action.request.url!.path.contains("bluebird")) return NavigationActionPolicy.ALLOW;
     // if (!url.startsWith(manifest.baseUrl)) {
@@ -104,6 +144,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       controller.loadUrl(urlRequest: action.request);
       return NavigationActionPolicy.CANCEL;
     }
+
     return NavigationActionPolicy.ALLOW;
   }
 
@@ -145,7 +186,6 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         },
       ),
     );
-    _injectLibrary(controller);
     webViewController = controller;
   }
 
@@ -154,6 +194,10 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     _initialRequest.headers!.forEach((key, value) {
       request.headers!.setRequestHeader(key, value);
     });
+    /*if (!request.url!.path.contains(manifest.baseUrl)) {
+      request.url = Uri.parse(manifest.baseUrl + request.url!.path);
+    }*/
+    request.readyState = AjaxRequestReadyState.UNSENT;
     return request;
   }
 
@@ -186,7 +230,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     return URLRequest(url: Uri.parse(url ?? manifest.baseUrl), headers: customHeaders);
   }
 
-  _onLoadStop(InAppWebViewController controller, Uri? url) {
+  _onLoadStop(InAppWebViewController controller, Uri? url) async {
     // Disable remember me checkbox on login and set def. value to true: check if the page is actually login page, if it is inject JS that hides element
     if (url!.path.contains('/user/auth/login')) {
       webViewController.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
@@ -194,6 +238,9 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
           source:
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
+    String jsCode = "\$.ajaxSetup({headers: { 'x-my-custom-header': 'some value' }});";
+    var some = await controller.evaluateJavascript(source: jsCode);
+    print(some);
     _pullToRefreshController?.endRefreshing();
   }
 
@@ -212,8 +259,11 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         : PullToRefreshController(
             options: _pullToRefreshOptions,
             onRefresh: () async {
+              String jsCode = "\$.ajaxSetup({headers: { 'x-my-custom-header': 'some value' }});";
+              var some = await webViewController.evaluateJavascript(source: jsCode);
+              print(some);
               if (defaultTargetPlatform == TargetPlatform.android) {
-                webViewController.reload();
+                webViewController.loadUrl(urlRequest: URLRequest(url: await webViewController.getUrl()));
               } else if (defaultTargetPlatform == TargetPlatform.iOS) {
                 webViewController.loadUrl(urlRequest: URLRequest(url: await webViewController.getUrl()));
               }
@@ -245,4 +295,13 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       ),
     );
   }
+
+  String javascriptCode =
+      "\$(document).ajaxSend(function(event, xhr, settings) {xhr.setRequestHeader('Custom-Header', 'YourCustomHeaderValue');});";
+
+  /* Future<void> _injectJavaScript() async {
+    String jsCode = "\$.ajaxSetup({headers: { 'x-my-custom-header': 'some value' }});";
+    var some = await webViewController.evaluateJavascript(source: jsCode);
+    print(some);
+  }*/
 }
