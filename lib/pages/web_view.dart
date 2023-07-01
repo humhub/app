@@ -73,21 +73,11 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
                 pullToRefreshController: _pullToRefreshController,
                 shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
                 onWebViewCreated: _onWebViewCreated,
-                // shouldInterceptAjaxRequest: _shouldInterceptAjaxRequest,
-                /*onAjaxReadyStateChange: (controller, request) async {
-                  //log(request.toJson().toString());
-                  return AjaxRequestAction.PROCEED;
-                },*/
-                /*onAjaxProgress: (controller, request) async {
-                  //log(request.toJson().toString());
-                  return AjaxRequestAction.PROCEED;
-                },*/
                 shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
                 onLoadStop: _onLoadStop,
                 onLoadStart: (InAppWebViewController controller, Uri? uri) async {
                   String jsCode = "\$.ajaxSetup({headers: { 'x-my-custom-header': 'some value' }});";
                   var some = await controller.evaluateJavascript(source: jsCode);
-                  print(some);
                 },
                 onProgressChanged: _onProgressChanged,
                 onConsoleMessage: (controller, msg) {
@@ -122,10 +112,6 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     );
   }
 
-  void _injectLibrary(InAppWebViewController controller) async {
-    controller.injectJavascriptFileFromUrl(
-        urlFile: Uri.parse("https://cdn.jsdelivr.net/bluebird/latest/bluebird.min.js"));
-  }
 
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
@@ -189,32 +175,12 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     webViewController = controller;
   }
 
-  Future<AjaxRequest?> _shouldInterceptAjaxRequest(InAppWebViewController controller, AjaxRequest request) async {
-    request.isAsync = false;
-    _initialRequest.headers!.forEach((key, value) {
-      request.headers!.setRequestHeader(key, value);
-    });
-    /*if (!request.url!.path.contains(manifest.baseUrl)) {
-      request.url = Uri.parse(manifest.baseUrl + request.url!.path);
-    }*/
-    request.readyState = AjaxRequestReadyState.UNSENT;
-    return request;
-  }
-
   Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest request) async {
     request.headers!.addAll(_initialRequest.headers!);
     return request;
   }
 
   URLRequest getInitRequest(BuildContext context) {
-    //Append random hash to customHeaders in this state the header should always exist.
-    bool isHideDialog = ref.read(humHubProvider).isHideDialog;
-    Map<String, String> customHeaders = {};
-    customHeaders.addAll({
-      'x-humhub-app-token': ref.read(humHubProvider).randomHash!,
-      'x-humhub-app': ref.read(humHubProvider).appVersion!,
-      'x-humhub-app-ostate': isHideDialog ? '1' : '0'
-    });
     final args = ModalRoute.of(context)!.settings.arguments;
     String? url;
     if (args is Manifest) {
@@ -227,7 +193,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     if (args == null) {
       manifest = m.MyRouter.initParams;
     }
-    return URLRequest(url: Uri.parse(url ?? manifest.baseUrl), headers: customHeaders);
+    return URLRequest(url: Uri.parse(url ?? manifest.baseUrl), headers: ref.read(humHubProvider).customHeaders);
   }
 
   _onLoadStop(InAppWebViewController controller, Uri? url) async {
@@ -295,13 +261,4 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       ),
     );
   }
-
-  String javascriptCode =
-      "\$(document).ajaxSend(function(event, xhr, settings) {xhr.setRequestHeader('Custom-Header', 'YourCustomHeaderValue');});";
-
-  /* Future<void> _injectJavaScript() async {
-    String jsCode = "\$.ajaxSetup({headers: { 'x-my-custom-header': 'some value' }});";
-    var some = await webViewController.evaluateJavascript(source: jsCode);
-    print(some);
-  }*/
 }
