@@ -198,4 +198,10 @@ class OpenerState extends ConsumerState<Opener> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    controlLer.urlTextController.dispose();
+    super.dispose();
+  }
 }
