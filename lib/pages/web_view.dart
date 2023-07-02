@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:app_settings/app_settings.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
@@ -12,6 +13,7 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/plugin.dart';
+import 'package:humhub/util/opener_controller.dart';
 import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
@@ -20,6 +22,7 @@ import 'package:humhub/util/router.dart' as m;
 
 import '../components/in_app_browser.dart';
 import '../models/hum_hub.dart';
+import '../util/connectivity_plugin.dart';
 
 class WebViewApp extends ConsumerStatefulWidget {
   const WebViewApp({super.key});
@@ -80,7 +83,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
                 onWebViewCreated: _onWebViewCreated,
                 shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
                 onLoadStop: _onLoadStop,
-                onLoadStart: (controller, uri) {
+                onLoadStart: (controller, uri) async {
+                  bool isConnected = await ConnectivityPlugin.hasConnectivity;
                   _setAjaxHeadersJQuery(controller);
                 },
                 onProgressChanged: _onProgressChanged,
@@ -93,6 +97,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
                   log('Http Error: $description');
                 },
                 onLoadError: (InAppWebViewController controller, Uri? url, int code, String message) {
+                  if(code== -1009) NoConnectionDialog.show(context);
                   log('Load Error: $message');
                 },
               ),
