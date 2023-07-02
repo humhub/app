@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
@@ -6,6 +7,7 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:http/http.dart' as http;
 import 'api_provider.dart';
+import 'connectivity_plugin.dart';
 import 'form_helper.dart';
 import 'dart:developer';
 
@@ -17,6 +19,7 @@ class OpenerController {
   late String? postcodeErrorMessage;
   final String formUrlKey = "redirect_url";
   final String error404 = "404";
+  final String noConnection = "no_connection";
   final WidgetRef ref;
 
   OpenerController({required this.ref, required this.helper});
@@ -47,6 +50,16 @@ class OpenerController {
     // Validate the URL format and if !value.isEmpty
     if (!helper.validate()) return;
     helper.save();
+
+    var hasConnection = await ConnectivityPlugin.hasConnectivity;
+    if (!hasConnection) {
+      String value = urlTextController.text;
+      urlTextController.text = noConnection;
+      helper.validate();
+      urlTextController.text = value;
+      asyncData = null;
+      return;
+    }
     // Get the manifest.json for given url.
     await findManifest(helper.model[formUrlKey]!);
     // If manifest.json does not exist the url is incorrect.
@@ -72,7 +85,7 @@ class OpenerController {
     }
   }
 
-  bool get allOk => !(asyncData!.hasError || !doesViewExist);
+  bool get allOk => !(asyncData == null || asyncData!.hasError || !doesViewExist);
 
   Uri assumeUrl(String url) {
     if (url.startsWith("https://") || url.startsWith("http://")) return Uri.parse(url);
@@ -81,7 +94,7 @@ class OpenerController {
 
   String? validateUrl(String? value) {
     if (value == error404) return 'Your HumHub installation does not exist';
-
+    if (value == noConnection) return 'Please check your internet connection.';
     if (value == null || value.isEmpty) {
       return 'Specify you HumHub location';
     }

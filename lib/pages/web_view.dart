@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:app_settings/app_settings.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
@@ -12,15 +13,16 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/plugin.dart';
+import 'package:humhub/util/opener_controller.dart';
 import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:humhub/util/router.dart' as m;
 
 import '../components/in_app_browser.dart';
 import '../models/hum_hub.dart';
+import '../util/connectivity_plugin.dart';
 
 class WebViewApp extends ConsumerStatefulWidget {
   const WebViewApp({super.key});
@@ -38,7 +40,6 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   final _options = InAppWebViewGroupOptions(
     crossPlatform: InAppWebViewOptions(
       useShouldOverrideUrlLoading: true,
-      useShouldInterceptAjaxRequest: true,
       useShouldInterceptFetchRequest: true,
       javaScriptEnabled: true,
     ),
@@ -80,9 +81,12 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
                 pullToRefreshController: _pullToRefreshController,
                 shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
                 onWebViewCreated: _onWebViewCreated,
-                shouldInterceptAjaxRequest: _shouldInterceptAjaxRequest,
                 shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
                 onLoadStop: _onLoadStop,
+                onLoadStart: (controller, uri) async {
+                  bool isConnected = await ConnectivityPlugin.hasConnectivity;
+                  _setAjaxHeadersJQuery(controller);
+                },
                 onProgressChanged: _onProgressChanged,
                 onConsoleMessage: (controller, msg) {
                   // Handle the web resource error here
@@ -93,6 +97,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
                   log('Http Error: $description');
                 },
                 onLoadError: (InAppWebViewController controller, Uri? url, int code, String message) {
+                  if(code== -1009) NoConnectionDialog.show(context);
                   log('Load Error: $message');
                 },
               ),
@@ -106,6 +111,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
+    _setAjaxHeadersJQuery(controller);
     final url = action.request.url!.origin;
     if (!url.startsWith(manifest.baseUrl)) {
       authBrowser.launchUrl(action.request);
@@ -166,27 +172,12 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     webViewController = controller;
   }
 
-  Future<AjaxRequest?> _shouldInterceptAjaxRequest(InAppWebViewController controller, AjaxRequest request) async {
-    _initialRequest.headers!.forEach((key, value) {
-      request.headers!.setRequestHeader(key, value);
-    });
-    return request;
-  }
-
   Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest request) async {
     request.headers!.addAll(_initialRequest.headers!);
     return request;
   }
 
   URLRequest get _initRequest {
-    //Append random hash to customHeaders in this state the header should always exist.
-    bool isHideDialog = ref.read(humHubProvider).isHideDialog;
-    Map<String, String> customHeaders = {};
-    customHeaders.addAll({
-      'x-humhub-app-token': ref.read(humHubProvider).randomHash!,
-      'x-humhub-app': ref.read(humHubProvider).appVersion!,
-      'x-humhub-app-ostate': isHideDialog ? '1' : '0'
-    });
     final args = ModalRoute.of(context)!.settings.arguments;
     String? url;
     if (args is Manifest) {
@@ -199,7 +190,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     if (args == null) {
       manifest = m.MyRouter.initParams;
     }
-    return URLRequest(url: Uri.parse(url ?? manifest.baseUrl), headers: customHeaders);
+    return URLRequest(url: Uri.parse(url ?? manifest.baseUrl), headers: ref.read(humHubProvider).customHeaders);
   }
 
   _onLoadStop(InAppWebViewController controller, Uri? url) {
@@ -210,6 +201,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
           source:
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
+    _setAjaxHeadersJQuery(controller);
     _pullToRefreshController?.endRefreshing();
   }
 
@@ -228,10 +220,14 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         : PullToRefreshController(
             options: _pullToRefreshOptions,
             onRefresh: () async {
-              if (defaultTargetPlatform == TargetPlatform.android) {
+              Uri? url = await webViewController.getUrl();
+              if (url != null) {
+                webViewController.loadUrl(
+                  urlRequest: URLRequest(
+                      url: await webViewController.getUrl(), headers: ref.read(humHubProvider).customHeaders),
+                );
+              } else {
                 webViewController.reload();
-              } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-                webViewController.loadUrl(urlRequest: URLRequest(url: await webViewController.getUrl()));
               }
             },
           );
@@ -260,5 +256,11 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         ],
       ),
     );
+  }
+
+  Future<void> _setAjaxHeadersJQuery(InAppWebViewController controller) async {
+    String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(ref.read(humHubProvider).customHeaders).toString()}});";
+    dynamic jsResponse = await controller.evaluateJavascript(source: jsCode);
+    log(jsResponse != null ? jsResponse.toString() : "Script returned null value");
   }
 }
