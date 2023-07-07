@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:app_settings/app_settings.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
@@ -13,7 +12,6 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/plugin.dart';
-import 'package:humhub/util/opener_controller.dart';
 import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
@@ -43,6 +41,10 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       useShouldInterceptFetchRequest: true,
       javaScriptEnabled: true,
     ),
+    ios: IOSInAppWebViewOptions(),
+    android: AndroidInAppWebViewOptions(
+      domStorageEnabled: true,
+    ),
   );
 
   PullToRefreshController? _pullToRefreshController;
@@ -51,10 +53,6 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   @override
   void initState() {
     super.initState();
-  }
-
-  Future<NavigationActionPolicy> shouldOverride(NavigationAction navigationAction) async {
-    return NavigationActionPolicy.ALLOW;
   }
 
   @override
@@ -84,7 +82,6 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
                 shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
                 onLoadStop: _onLoadStop,
                 onLoadStart: (controller, uri) async {
-                  bool isConnected = await ConnectivityPlugin.hasConnectivity;
                   _setAjaxHeadersJQuery(controller);
                 },
                 onProgressChanged: _onProgressChanged,
@@ -97,7 +94,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
                   log('Http Error: $description');
                 },
                 onLoadError: (InAppWebViewController controller, Uri? url, int code, String message) {
-                  if(code== -1009) NoConnectionDialog.show(context);
+                  if (code == -1009) NoConnectionDialog.show(context);
                   log('Load Error: $message');
                 },
               ),
@@ -111,11 +108,11 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
+
     _setAjaxHeadersJQuery(controller);
     final url = action.request.url!.origin;
     if (!url.startsWith(manifest.baseUrl)) {
       authBrowser.launchUrl(action.request);
-      /*launchUrl(action.request.url!, mode: LaunchMode.inAppWebView);*/
       return NavigationActionPolicy.CANCEL;
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
@@ -153,7 +150,9 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               String? token = ref.read(pushTokenProvider).value;
               if (token != null) {
                 var postData = Uint8List.fromList(utf8.encode("token=$token"));
-                controller.postUrl(url: Uri.parse(message.url!), postData: postData);
+                controller
+                    .postUrl(url: Uri.parse(message.url!), postData: postData)
+                    .then((value) => controller.reload());
               }
               var status = await Permission.notification.status;
               // status.isDenied: The user has previously denied the notification permission
