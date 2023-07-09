@@ -40,10 +40,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       useShouldOverrideUrlLoading: true,
       useShouldInterceptFetchRequest: true,
       javaScriptEnabled: true,
-    ),
-    ios: IOSInAppWebViewOptions(),
-    android: AndroidInAppWebViewOptions(
-      domStorageEnabled: true,
+      supportZoom: false,
     ),
   );
 
