@@ -151,8 +151,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               if (token != null) {
                 var postData = Uint8List.fromList(utf8.encode("token=$token"));
                 controller
-                    .postUrl(url: Uri.parse(message.url!), postData: postData)
-                    .then((value) => controller.reload());
+                    .postUrl(url: Uri.parse(message.url!), postData: postData).whenComplete(() => controller.reload());
               }
               var status = await Permission.notification.status;
               // status.isDenied: The user has previously denied the notification permission
