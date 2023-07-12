@@ -149,9 +149,11 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
             case ChannelAction.registerFcmDevice:
               String? token = ref.read(pushTokenProvider).value;
               if (token != null) {
+                Uri? beforePostUrl = await controller.getUrl();
                 var postData = Uint8List.fromList(utf8.encode("token=$token"));
-                controller
-                    .postUrl(url: Uri.parse(message.url!), postData: postData).whenComplete(() => controller.reload());
+                await controller.postUrl(url: Uri.parse(message.url!), postData: postData);
+                await Future.delayed(const Duration(milliseconds: 200));
+                await controller.loadUrl(urlRequest: URLRequest(url: beforePostUrl));
               }
               var status = await Permission.notification.status;
               // status.isDenied: The user has previously denied the notification permission
