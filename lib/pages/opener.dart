@@ -95,6 +95,7 @@ class OpenerState extends ConsumerState<Opener> {
                                 if (snapshot.hasData) {
                                   controlLer.urlTextController.text = snapshot.data!;
                                   return TextFormField(
+                                    keyboardType: TextInputType.url,
                                     controller: controlLer.urlTextController,
                                     cursorColor: Theme.of(context).textTheme.bodySmall?.color,
                                     onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
