@@ -5,8 +5,6 @@ import 'package:humhub/util/log.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 
-
-
 main() {
   Loggy.initLoggy(
     logPrinter: const GlobalLog(),
