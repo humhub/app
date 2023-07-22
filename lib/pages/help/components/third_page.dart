@@ -55,7 +55,7 @@ class ThirdPage extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    launchUrl(Uri.parse(Locales.moreInfoProEditionUrl), mode: LaunchMode.externalApplication);
+                    launchUrl(Uri.parse(Locales.moreInfoProEditionUrl), mode: LaunchMode.platformDefault);
                   },
                   child: Center(
                     child: Text(
