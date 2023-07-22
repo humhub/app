@@ -26,10 +26,7 @@ class SecondPage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(
-              Locales.howToConnectFirstPar,
-              style: paragraphStyle
-            ),
+            child: Text(Locales.howToConnectFirstPar, style: paragraphStyle),
           ),
           EaseOutContainer(
             fadeIn: fadeIn,
@@ -81,24 +78,28 @@ class SecondPage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(
-              Locales.howToConnectSecPar,
-              style: paragraphStyle
-            ),
+            child: Text(Locales.howToConnectSecPar, style: paragraphStyle),
           ),
           EaseOutContainer(
             fadeIn: fadeIn,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: Center(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    width: MediaQuery.of(context).size.width / 2,
-                    height: 50,
-                    decoration: BoxDecoration(color: openerColor, borderRadius: BorderRadius.circular(5)),
+                child: Container(
+                  width: MediaQuery.of(context).size.width / 2,
+                  height: 50,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
+                  child: TextButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                          return openerColor;
+                        },
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                     child: const Center(
                       child: Text(
                         'Connect',
@@ -112,10 +113,7 @@ class SecondPage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Text(
-              Locales.howToConnectThirdPar,
-              style: paragraphStyle
-            ),
+            child: Text(Locales.howToConnectThirdPar, style: paragraphStyle),
           )
         ],
       ),

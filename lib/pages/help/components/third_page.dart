@@ -26,24 +26,15 @@ class ThirdPage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(
-              Locales.moreInfoFirstPar,
-              style: paragraphStyle
-            ),
+            child: Text(Locales.moreInfoFirstPar, style: paragraphStyle),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(
-              Locales.moreInfoSecPar,
-              style: paragraphStyle
-            ),
+            child: Text(Locales.moreInfoSecPar, style: paragraphStyle),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(
-              Locales.moreInfoThirdPar,
-              style: paragraphStyle
-            ),
+            child: Text(Locales.moreInfoThirdPar, style: paragraphStyle),
           ),
           const SizedBox(
             height: 40,
@@ -51,14 +42,21 @@ class ThirdPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
             child: Center(
-              child: GestureDetector(
-                onTap: () {
-                  launchUrl(Uri.parse(Locales.moreInfoProEditionUrl), mode: LaunchMode.externalApplication);
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width / 1.5,
-                  height: 50,
-                  decoration: BoxDecoration(color: openerColor, borderRadius: BorderRadius.circular(5)),
+              child: Container(
+                width: MediaQuery.of(context).size.width / 1.5,
+                height: 50,
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
+                child: TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                      (Set<MaterialState> states) {
+                        return openerColor;
+                      },
+                    ),
+                  ),
+                  onPressed: () {
+                    launchUrl(Uri.parse(Locales.moreInfoProEditionUrl), mode: LaunchMode.externalApplication);
+                  },
                   child: Center(
                     child: Text(
                       Locales.moreInfoProEdition,
