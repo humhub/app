@@ -53,22 +53,25 @@ class SecondPage extends StatelessWidget {
                     const SizedBox(
                       width: 10,
                     ),
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'https://',
-                            style: TextStyle(
-                              color: Colors.grey,
+                    Expanded(
+                      child: RichText(
+                        maxLines: 1,
+                        text: TextSpan(
+                          children: [
+                            const TextSpan(
+                              text: 'https://',
+                              style: TextStyle(
+                                color: Colors.grey,
+                              ),
                             ),
-                          ),
-                          TextSpan(
-                            text: 'nameofnetwork.humhub.com',
-                            style: TextStyle(
-                              color: Colors.grey.shade800,
+                            TextSpan(
+                              text: 'example.humhub.com',
+                              style: TextStyle(
+                                color: Colors.grey.shade800,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
