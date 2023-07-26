@@ -55,6 +55,7 @@ class OpenerState extends ConsumerState<Opener> {
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         bottom: false,
+        top: false,
         child: Form(
           key: helper.key,
           child: Stack(
@@ -65,133 +66,141 @@ class OpenerState extends ConsumerState<Opener> {
                 'assets/opener_animation.riv',
                 controllers: [_controller],
               ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Expanded(
-                    flex: 2,
-                    child: AnimatedOpacity(
-                      opacity: _visible ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 300),
-                      child: SizedBox(
-                        height: 100,
-                        width: 230,
-                        child: Image.asset('assets/images/logo.png'),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: AnimatedOpacity(
-                      opacity: _visible ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 300),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 35),
-                        child: Column(
-                          children: [
-                            FutureBuilder<String>(
-                              future: ref.read(humHubProvider).getLastUrl(),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  controlLer.urlTextController.text = snapshot.data!;
-                                  return TextFormField(
-                                    keyboardType: TextInputType.url,
-                                    controller: controlLer.urlTextController,
-                                    cursorColor: Theme.of(context).textTheme.bodySmall?.color,
-                                    onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
-                                    style: const TextStyle(
-                                      decoration: TextDecoration.none,
-                                    ),
-                                    decoration: openerDecoration,
-                                    validator: controlLer.validateUrl,
-                                  );
-                                }
-                                return progress;
-                              },
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.only(top: 5),
-                              child: Text('Enter your url and log in to your network.',
-                                  style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13)),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: AnimatedOpacity(
-                      opacity: _visible ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 300),
-                      child: Center(
-                        child: Container(
-                          width: 140,
-                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
-                          child: TextButton(
-                            onPressed: () async {
-                              await controlLer.initHumHub();
-                              setState(() {});
-                              if (controlLer.allOk) {
-                                ref.read(humHubProvider).getInstance().then((value) {
-                                  Navigator.pushNamed(ref.context, WebViewApp.path, arguments: value.manifest);
-                                });
-                              }
-                            },
-                            child: Text(
-                              'Connect',
-                              style: TextStyle(color: openerColor, fontSize: 20),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: GestureDetector(
-                      onTap: () {
-                        _controller.isActive = true;
-                        setState(() {
-                          _visible = false;
-                        });
-                        Future.delayed(const Duration(milliseconds: 700)).then((value) => {
-                              Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  transitionDuration: const Duration(milliseconds: 500),
-                                  pageBuilder: (context, animation, secondaryAnimation) => const Help(),
-                                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                    return FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    );
-                                  },
-                                ),
-                              ).then((value) {
-                                setState(() {
-                                  _controller.isActive = true;
-                                  _animation.reset();
-                                  _visible = true;
-                                });
-                              })
-                            });
-                      },
+              RiveAnimation.asset(
+                fit: BoxFit.fill,
+                'assets/opener_animation_reverse.riv',
+                controllers: [_controller],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 50),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Expanded(
+                      flex: 2,
                       child: AnimatedOpacity(
                         opacity: _visible ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 300),
-                        child: const Text(
-                          "Need Help?",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline,
+                        child: SizedBox(
+                          height: 100,
+                          width: 230,
+                          child: Image.asset('assets/images/logo.png'),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: AnimatedOpacity(
+                        opacity: _visible ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 300),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 35),
+                          child: Column(
+                            children: [
+                              FutureBuilder<String>(
+                                future: ref.read(humHubProvider).getLastUrl(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    controlLer.urlTextController.text = snapshot.data!;
+                                    return TextFormField(
+                                      keyboardType: TextInputType.url,
+                                      controller: controlLer.urlTextController,
+                                      cursorColor: Theme.of(context).textTheme.bodySmall?.color,
+                                      onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
+                                      style: const TextStyle(
+                                        decoration: TextDecoration.none,
+                                      ),
+                                      decoration: openerDecoration,
+                                      validator: controlLer.validateUrl,
+                                    );
+                                  }
+                                  return progress;
+                                },
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.only(top: 5),
+                                child: Text('Enter your url and log in to your network.',
+                                    style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13)),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    Expanded(
+                      flex: 1,
+                      child: AnimatedOpacity(
+                        opacity: _visible ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 300),
+                        child: Center(
+                          child: Container(
+                            width: 140,
+                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
+                            child: TextButton(
+                              onPressed: () async {
+                                await controlLer.initHumHub();
+                                setState(() {});
+                                if (controlLer.allOk) {
+                                  ref.read(humHubProvider).getInstance().then((value) {
+                                    Navigator.pushNamed(ref.context, WebViewApp.path, arguments: value.manifest);
+                                  });
+                                }
+                              },
+                              child: Text(
+                                'Connect',
+                                style: TextStyle(color: openerColor, fontSize: 20),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: GestureDetector(
+                        onTap: () {
+                          _controller.isActive = true;
+                          setState(() {
+                            _visible = false;
+                          });
+                          Future.delayed(const Duration(milliseconds: 700)).then((value) => {
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    transitionDuration: const Duration(milliseconds: 500),
+                                    pageBuilder: (context, animation, secondaryAnimation) => const Help(),
+                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                ).then((value) {
+                                  setState(() {
+                                    _controller.isActive = true;
+                                    _animation.reset();
+                                    _visible = true;
+                                  });
+                                })
+                              });
+                        },
+                        child: AnimatedOpacity(
+                          opacity: _visible ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 300),
+                          child: const Text(
+                            "Need Help?",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
