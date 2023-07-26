@@ -19,8 +19,10 @@ class Opener extends ConsumerStatefulWidget {
 class OpenerState extends ConsumerState<Opener> {
   late OpenerController controlLer;
   late RiveAnimationController _controller;
+  late RiveAnimationController _controllerReverse;
   final FormHelper helper = FormHelper();
   late SimpleAnimation _animation;
+  late SimpleAnimation _animationReverse;
   // Fade out Logo and opener when redirecting
   bool _visible = true;
 
@@ -28,11 +30,15 @@ class OpenerState extends ConsumerState<Opener> {
   void initState() {
     super.initState();
     _animation = SimpleAnimation('animation', autoplay: false);
+    _animationReverse = SimpleAnimation('animation', autoplay: false);
     _controller = _animation;
+    _controllerReverse = _animationReverse;
   }
 
   @override
   Widget build(BuildContext context) {
+    // Next step split top and button to take only half of the screen top widget aligned to the top and bottom to the bottom
+    _controllerReverse.isActive = true;
     controlLer = OpenerController(ref: ref, helper: helper);
     InputDecoration openerDecoration = InputDecoration(
         focusedBorder: const OutlineInputBorder(
@@ -61,20 +67,11 @@ class OpenerState extends ConsumerState<Opener> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              RiveAnimation.asset(
-                fit: BoxFit.fill,
-                'assets/opener_animation.riv',
-                controllers: [_controller],
-              ),
-              RiveAnimation.asset(
-                fit: BoxFit.fill,
-                'assets/opener_animation_reverse.riv',
-                controllers: [_controller],
-              ),
               Padding(
                 padding: const EdgeInsets.only(top: 50),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Expanded(
                       flex: 2,
@@ -92,7 +89,7 @@ class OpenerState extends ConsumerState<Opener> {
                       flex: 3,
                       child: AnimatedOpacity(
                         opacity: _visible ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 300),
+                        duration: const Duration(milliseconds: 500),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 35),
                           child: Column(
@@ -127,6 +124,26 @@ class OpenerState extends ConsumerState<Opener> {
                         ),
                       ),
                     ),
+                    const Expanded(flex: 2, child: SizedBox.shrink(),)
+                  ],
+                ),
+              ),
+              RiveAnimation.asset(
+                fit: BoxFit.fill,
+                'assets/opener_animation.riv',
+                controllers: [_controller],
+              ),
+              RiveAnimation.asset(
+                fit: BoxFit.fill,
+                'assets/opener_animation_reverse.riv',
+                controllers: [_controllerReverse],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 50),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    const Expanded(flex: 5, child: SizedBox.shrink(),),
                     Expanded(
                       flex: 1,
                       child: AnimatedOpacity(
@@ -180,6 +197,7 @@ class OpenerState extends ConsumerState<Opener> {
                                   setState(() {
                                     _controller.isActive = true;
                                     _animation.reset();
+                                    _animationReverse.reset();
                                     _visible = true;
                                   });
                                 })
