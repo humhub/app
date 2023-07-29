@@ -5,6 +5,7 @@ import 'package:humhub/util/const.dart';
 import 'package:humhub/util/form_helper.dart';
 import 'package:humhub/util/opener_controller.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:loggy/loggy.dart';
 import 'package:rive/rive.dart';
 import 'help/help.dart';
 
@@ -18,11 +19,13 @@ class Opener extends ConsumerStatefulWidget {
 
 class OpenerState extends ConsumerState<Opener> {
   late OpenerController controlLer;
+
   late RiveAnimationController _controller;
-  late RiveAnimationController _controllerReverse;
-  final FormHelper helper = FormHelper();
   late SimpleAnimation _animation;
+  late RiveAnimationController _controllerReverse;
   late SimpleAnimation _animationReverse;
+
+  final FormHelper helper = FormHelper();
   // Fade out Logo and opener when redirecting
   bool _visible = true;
 
@@ -30,33 +33,17 @@ class OpenerState extends ConsumerState<Opener> {
   void initState() {
     super.initState();
     _animation = SimpleAnimation('animation', autoplay: false);
-    _animationReverse = SimpleAnimation('animation', autoplay: false);
     _controller = _animation;
+
+    _animationReverse = SimpleAnimation('animation', autoplay: false);
     _controllerReverse = _animationReverse;
   }
 
   @override
   Widget build(BuildContext context) {
-    // Next step split top and button to take only half of the screen top widget aligned to the top and bottom to the bottom
-    _controllerReverse.isActive = true;
     controlLer = OpenerController(ref: ref, helper: helper);
-    InputDecoration openerDecoration = InputDecoration(
-        focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.grey,
-            width: 1.0,
-          ),
-        ),
-        border: const OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.grey,
-            width: 1.0,
-          ),
-        ),
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        labelText: 'URL',
-        labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color));
-
+    logInfo("Original: ${_controller.isActive ? "true" : "false"}");
+    logInfo("Reverse: ${_controllerReverse.isActive ? "true" : "false"}");
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -67,11 +54,20 @@ class OpenerState extends ConsumerState<Opener> {
           child: Stack(
             fit: StackFit.expand,
             children: [
+              RiveAnimation.asset(
+                'assets/opener_animation.riv',
+                fit: BoxFit.fill,
+                controllers: [_controller],
+              ),
+              RiveAnimation.asset(
+                'assets/opener_animation_reverse_test.riv',
+                fit: BoxFit.fill,
+                controllers: [_controllerReverse],
+              ),
               Padding(
                 padding: const EdgeInsets.only(top: 50),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Expanded(
                       flex: 2,
@@ -89,7 +85,7 @@ class OpenerState extends ConsumerState<Opener> {
                       flex: 3,
                       child: AnimatedOpacity(
                         opacity: _visible ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 500),
+                        duration: const Duration(milliseconds: 300),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 35),
                           child: Column(
@@ -107,7 +103,7 @@ class OpenerState extends ConsumerState<Opener> {
                                       style: const TextStyle(
                                         decoration: TextDecoration.none,
                                       ),
-                                      decoration: openerDecoration,
+                                      decoration: openerDecoration(context),
                                       validator: controlLer.validateUrl,
                                     );
                                   }
@@ -124,26 +120,6 @@ class OpenerState extends ConsumerState<Opener> {
                         ),
                       ),
                     ),
-                    const Expanded(flex: 2, child: SizedBox.shrink(),)
-                  ],
-                ),
-              ),
-              RiveAnimation.asset(
-                fit: BoxFit.fill,
-                'assets/opener_animation.riv',
-                controllers: [_controller],
-              ),
-              RiveAnimation.asset(
-                fit: BoxFit.fill,
-                'assets/opener_animation_reverse.riv',
-                controllers: [_controllerReverse],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 50),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const Expanded(flex: 5, child: SizedBox.shrink(),),
                     Expanded(
                       flex: 1,
                       child: AnimatedOpacity(
@@ -176,9 +152,10 @@ class OpenerState extends ConsumerState<Opener> {
                       flex: 1,
                       child: GestureDetector(
                         onTap: () {
-                          _controller.isActive = true;
                           setState(() {
                             _visible = false;
+                            _controller.isActive = true;
+                            _animationReverse.reset();
                           });
                           Future.delayed(const Duration(milliseconds: 700)).then((value) => {
                                 Navigator.push(
@@ -193,12 +170,11 @@ class OpenerState extends ConsumerState<Opener> {
                                       );
                                     },
                                   ),
-                                ).then((value) {
+                                ).whenComplete(() {
                                   setState(() {
-                                    _controller.isActive = true;
-                                    _animation.reset();
-                                    _animationReverse.reset();
                                     _visible = true;
+                                    //_animation.reset();
+                                    _controllerReverse.isActive = true;
                                   });
                                 })
                               });
@@ -227,9 +203,30 @@ class OpenerState extends ConsumerState<Opener> {
     );
   }
 
+  InputDecoration openerDecoration(context) => InputDecoration(
+      focusedBorder: const OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Colors.grey,
+          width: 1.0,
+        ),
+      ),
+      border: const OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Colors.grey,
+          width: 1.0,
+        ),
+      ),
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      labelText: 'URL',
+      labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color));
+
   @override
   void dispose() {
     controlLer.urlTextController.dispose();
+    _controller.dispose();
+    _controllerReverse.dispose();
+    _animation.dispose();
+    _animationReverse.dispose();
     super.dispose();
   }
 }
