@@ -38,7 +38,7 @@ class MyAppState extends ConsumerState<MyApp>{
             ),
           );
         }
-        return splash;
+        return const SizedBox.shrink();
       },
     );
   }

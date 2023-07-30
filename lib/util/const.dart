@@ -2,13 +2,6 @@ import 'package:flutter/material.dart';
 
 const progress = Center(child: CircularProgressIndicator());
 
-Widget splash = Expanded(
-  child:   Container(
-    color: Colors.white,
-    child: const SizedBox.shrink(),
-  ),
-);
-
 class StorageKeys {
   static String humhubInstance = "humHubInstance";
   static String lastInstanceUrl = "humHubLastUrl";
