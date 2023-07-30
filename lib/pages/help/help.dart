@@ -20,6 +20,7 @@ class Help extends StatefulWidget {
 class HelpState extends State<Help> {
   final ValueNotifier<bool> fadeInFirst = ValueNotifier<bool>(false);
   final ValueNotifier<bool> fadeInSecond = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> fadeInThird = ValueNotifier<bool>(false);
   final ValueNotifier<int> currentPage = ValueNotifier<int>(0);
   @override
   Widget build(BuildContext context) {
@@ -72,6 +73,11 @@ class HelpState extends State<Help> {
                 } else {
                   fadeInSecond.value = false;
                 }
+                if (currentIndex == 2) {
+                  fadeInThird.value = true;
+                } else {
+                  fadeInThird.value = false;
+                }
               },
               children: [
                 ValueListenableBuilder<bool>(
@@ -86,7 +92,12 @@ class HelpState extends State<Help> {
                     return SecondPage(fadeIn: fadeInSecond.value);
                   },
                 ),
-                const ThirdPage(),
+                ValueListenableBuilder<bool>(
+                  valueListenable: fadeInThird,
+                  builder: (BuildContext context, value, Widget? child) {
+                    return ThirdPage(fadeIn: fadeInThird.value);
+                  },
+                ),
               ],
             ),
           ],

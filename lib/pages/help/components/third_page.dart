@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:humhub/components/ease_out_container.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../util/const.dart';
 
 class ThirdPage extends StatelessWidget {
-  const ThirdPage({Key? key}) : super(key: key);
+  final bool fadeIn;
+  const ThirdPage({Key? key, required this.fadeIn}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -39,28 +41,31 @@ class ThirdPage extends StatelessWidget {
           const SizedBox(
             height: 40,
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Center(
-              child: Container(
-                width: MediaQuery.of(context).size.width / 1.5,
-                height: 50,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
-                child: TextButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                      (Set<MaterialState> states) {
-                        return openerColor;
-                      },
+          EaseOutContainer(
+            fadeIn: fadeIn,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width / 1.5,
+                  height: 50,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
+                  child: TextButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                          return openerColor;
+                        },
+                      ),
                     ),
-                  ),
-                  onPressed: () {
-                    launchUrl(Uri.parse(Locales.moreInfoProEditionUrl), mode: LaunchMode.platformDefault);
-                  },
-                  child: Center(
-                    child: Text(
-                      Locales.moreInfoProEdition,
-                      style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.normal),
+                    onPressed: () {
+                      launchUrl(Uri.parse(Locales.moreInfoProEditionUrl), mode: LaunchMode.platformDefault);
+                    },
+                    child: Center(
+                      child: Text(
+                        Locales.moreInfoProEdition,
+                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.normal),
+                      ),
                     ),
                   ),
                 ),
