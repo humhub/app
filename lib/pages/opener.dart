@@ -26,7 +26,8 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
 
   final FormHelper helper = FormHelper();
   // Fade out Logo and opener when redirecting
-  bool _visible = false;
+  bool _visible = true;
+  bool _textFieldAddInfoVisibility = false;
 
   @override
   void initState() {
@@ -38,8 +39,10 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
     _controllerReverse = _animationReverse;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _visible = true;
+      Future.delayed(const Duration(milliseconds: 700), (){
+        setState(() {
+          _textFieldAddInfoVisibility = true;
+        });
       });
     });
   }
@@ -87,7 +90,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                     Expanded(
                         flex: 3,
                         child: AnimatedOpacity(
-                          opacity: _visible ? 1.0 : 0.0,
+                          opacity: _textFieldAddInfoVisibility ? 1.0 : 0.0,
                           duration: const Duration(milliseconds: 500),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 35),
@@ -157,6 +160,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                           _controller.isActive = true;
                           setState(() {
                             _visible = false;
+                            _textFieldAddInfoVisibility = false;
                           });
                           Future.delayed(const Duration(milliseconds: 700)).then((value) {
                             Navigator.push(
@@ -176,6 +180,11 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                                 _controller.isActive = true;
                                 _animation.reset();
                                 _visible = true;
+                                Future.delayed(const Duration(milliseconds: 700), (){
+                                  setState(() {
+                                    _textFieldAddInfoVisibility = true;
+                                  });
+                                });
                                 _controllerReverse.isActive = true;
                               });
                             });
