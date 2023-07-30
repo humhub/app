@@ -5,7 +5,6 @@ import 'package:humhub/util/const.dart';
 import 'package:humhub/util/form_helper.dart';
 import 'package:humhub/util/opener_controller.dart';
 import 'package:humhub/util/providers.dart';
-import 'package:loggy/loggy.dart';
 import 'package:rive/rive.dart';
 import 'help/help.dart';
 
@@ -17,7 +16,7 @@ class Opener extends ConsumerStatefulWidget {
   OpenerState createState() => OpenerState();
 }
 
-class OpenerState extends ConsumerState<Opener> {
+class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMixin {
   late OpenerController controlLer;
 
   late RiveAnimationController _controller;
@@ -27,7 +26,7 @@ class OpenerState extends ConsumerState<Opener> {
 
   final FormHelper helper = FormHelper();
   // Fade out Logo and opener when redirecting
-  bool _visible = true;
+  bool _visible = false;
 
   @override
   void initState() {
@@ -35,15 +34,19 @@ class OpenerState extends ConsumerState<Opener> {
     _animation = SimpleAnimation('animation', autoplay: false);
     _controller = _animation;
 
-    _animationReverse = SimpleAnimation('animation', autoplay: false);
+    _animationReverse = SimpleAnimation('animation', autoplay: true);
     _controllerReverse = _animationReverse;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _visible = true;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     controlLer = OpenerController(ref: ref, helper: helper);
-    logInfo("Original: ${_controller.isActive ? "true" : "false"}");
-    logInfo("Reverse: ${_controllerReverse.isActive ? "true" : "false"}");
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -60,7 +63,7 @@ class OpenerState extends ConsumerState<Opener> {
                 controllers: [_controller],
               ),
               RiveAnimation.asset(
-                'assets/opener_animation_reverse_test.riv',
+                'assets/opener_animation_reverse.riv',
                 fit: BoxFit.fill,
                 controllers: [_controllerReverse],
               ),
@@ -82,44 +85,43 @@ class OpenerState extends ConsumerState<Opener> {
                       ),
                     ),
                     Expanded(
-                      flex: 3,
-                      child: AnimatedOpacity(
-                        opacity: _visible ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 300),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 35),
-                          child: Column(
-                            children: [
-                              FutureBuilder<String>(
-                                future: ref.read(humHubProvider).getLastUrl(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData) {
-                                    controlLer.urlTextController.text = snapshot.data!;
-                                    return TextFormField(
-                                      keyboardType: TextInputType.url,
-                                      controller: controlLer.urlTextController,
-                                      cursorColor: Theme.of(context).textTheme.bodySmall?.color,
-                                      onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
-                                      style: const TextStyle(
-                                        decoration: TextDecoration.none,
-                                      ),
-                                      decoration: openerDecoration(context),
-                                      validator: controlLer.validateUrl,
-                                    );
-                                  }
-                                  return progress;
-                                },
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.only(top: 5),
-                                child: Text('Enter your url and log in to your network.',
-                                    style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13)),
-                              ),
-                            ],
+                        flex: 3,
+                        child: AnimatedOpacity(
+                          opacity: _visible ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 500),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 35),
+                            child: Column(
+                              children: [
+                                FutureBuilder<String>(
+                                  future: ref.read(humHubProvider).getLastUrl(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      controlLer.urlTextController.text = snapshot.data!;
+                                      return TextFormField(
+                                        keyboardType: TextInputType.url,
+                                        controller: controlLer.urlTextController,
+                                        cursorColor: Theme.of(context).textTheme.bodySmall?.color,
+                                        onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
+                                        style: const TextStyle(
+                                          decoration: TextDecoration.none,
+                                        ),
+                                        decoration: openerDecoration(context),
+                                        validator: controlLer.validateUrl,
+                                      );
+                                    }
+                                    return progress;
+                                  },
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 5),
+                                  child: Text('Enter your url and log in to your network.',
+                                      style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13)),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
+                        )),
                     Expanded(
                       flex: 1,
                       child: AnimatedOpacity(
@@ -152,32 +154,34 @@ class OpenerState extends ConsumerState<Opener> {
                       flex: 1,
                       child: GestureDetector(
                         onTap: () {
+                          _controller.isActive = true;
                           setState(() {
                             _visible = false;
-                            _controller.isActive = true;
+                          });
+                          Future.delayed(const Duration(milliseconds: 700)).then((value) {
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                transitionDuration: const Duration(milliseconds: 500),
+                                pageBuilder: (context, animation, secondaryAnimation) => const Help(),
+                                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            ).then((value) {
+                              setState(() {
+                                _controller.isActive = true;
+                                _animation.reset();
+                                _visible = true;
+                                _controllerReverse.isActive = true;
+                              });
+                            });
+                            _controllerReverse.isActive = true;
                             _animationReverse.reset();
                           });
-                          Future.delayed(const Duration(milliseconds: 700)).then((value) => {
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    transitionDuration: const Duration(milliseconds: 500),
-                                    pageBuilder: (context, animation, secondaryAnimation) => const Help(),
-                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                      return FadeTransition(
-                                        opacity: animation,
-                                        child: child,
-                                      );
-                                    },
-                                  ),
-                                ).whenComplete(() {
-                                  setState(() {
-                                    _visible = true;
-                                    //_animation.reset();
-                                    _controllerReverse.isActive = true;
-                                  });
-                                })
-                              });
                         },
                         child: AnimatedOpacity(
                           opacity: _visible ? 1.0 : 0.0,
