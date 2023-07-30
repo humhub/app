@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 
 const progress = Center(child: CircularProgressIndicator());
 
+Widget splash = Expanded(
+  child:   Container(
+    color: Colors.white,
+    child: const SizedBox.shrink(),
+  ),
+);
+
 class StorageKeys {
   static String humhubInstance = "humHubInstance";
   static String lastInstanceUrl = "humHubLastUrl";
@@ -21,13 +28,16 @@ class Locales {
   static String howToConnectTitle = "How can I connect my network?";
   static String howToConnectFirstPar =
       "There are many thousands of networks worldwide. Therefore, to log into your existing network, you need the exact URL of your individual network.";
-  static String howToConnectSecPar = "Your URL can be found in the address bar of your browser in the login area of your network.";
-  static String howToConnectThirdPar = "Please contact your administrator or network operator if you do not know your URL or login details.";
+  static String howToConnectSecPar =
+      "Your URL can be found in the address bar of your browser in the login area of your network.";
+  static String howToConnectThirdPar =
+      "Please contact your administrator or network operator if you do not know your URL or login details.";
 
   static String moreInfoTitle = "What is HumHub?";
   static String moreInfoFirstPar =
       'HumHub networks are basically closed communication platforms (internal to the organization). It is only possible to log into existing networks.';
-  static String moreInfoSecPar = 'Organizations or companies can of course set up and operate their own HumHub network at any time.';
+  static String moreInfoSecPar =
+      'Organizations or companies can of course set up and operate their own HumHub network at any time.';
   static String moreInfoThirdPar = 'All information can be found here:';
   static String moreInfoProEdition = "Professional Edition";
   static String moreInfoProEditionUrl = "https://www.humhub.com/en/professional-edition";
@@ -39,4 +49,5 @@ TextStyle? getHeaderStyle(context) {
   return Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600);
 }
 
-TextStyle paragraphStyle = const TextStyle(letterSpacing: 0.5, fontWeight: FontWeight.normal, color: Colors.black, fontSize: 15);
+TextStyle paragraphStyle =
+    const TextStyle(letterSpacing: 0.5, fontWeight: FontWeight.normal, color: Colors.black, fontSize: 15);
