@@ -1,6 +1,3 @@
-
-
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 import 'animated_padding_component.dart';
@@ -41,30 +38,36 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Expanded(
-              flex: 3,
-              child: TextButton(
-                onPressed: _selectedIndex == 0
-                    ? () {
-                        Navigator.pop(context);
-                      }
-                    : () {
-                        setState(() {
-                          _selectedIndex--;
-                          widget.onPageChange(_selectedIndex);
-                        });
-                      },
-                child: const AutoSizeText(
-                  "Back",
-                  style: TextStyle(color: Colors.grey),
-                  maxLines: 1,
+              flex: 5,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 6),
+                  child: TextButton(
+                    onPressed: _selectedIndex == 0
+                        ? () {
+                            Navigator.pop(context);
+                          }
+                        : () {
+                            setState(() {
+                              _selectedIndex--;
+                              widget.onPageChange(_selectedIndex);
+                            });
+                          },
+                    child: const Text(
+                      "Back",
+                      style: TextStyle(color: Colors.grey),
+                      maxLines: 1,
+                    ),
+                  ),
                 ),
               ),
             ),
             Expanded(
-              flex: 7,
+              flex: 5,
               child: AnimatedPaddingComponent(
                 padding: getPadding(_selectedIndex),
                 child: Row(
@@ -80,22 +83,27 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
               ),
             ),
             Expanded(
-              flex: 3,
-              child: TextButton(
-                onPressed: _selectedIndex == widget.pageCount - 1
-                    ? () {
-                        Navigator.pop(context);
-                      }
-                    : () {
-                        setState(() {
-                          _selectedIndex++;
-                          widget.onPageChange(_selectedIndex);
-                        });
-                      },
-                child: AutoSizeText(
-                  _selectedIndex != 2 ? "Next" : "Connect now",
-                  style: const TextStyle(color: Colors.grey),
-                  maxLines: 1,
+              flex: 5,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: TextButton(
+                    onPressed: _selectedIndex == widget.pageCount - 1
+                        ? () {
+                            Navigator.pop(context);
+                          }
+                        : () {
+                            setState(() {
+                              _selectedIndex++;
+                              widget.onPageChange(_selectedIndex);
+                            });
+                          },
+                    child: Text(
+                      _selectedIndex != 2 ? "Next" : "Connect now",
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ),
                 ),
               ),
             ),

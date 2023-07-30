@@ -90,6 +90,8 @@ flutter:
   assets:
     - assets/images/logo.png
     - assets/opener_animation.riv
+    - assets/opener_animation_reverse.riv
+    - assets/opener_animation_reverse_test.riv
     - assets/images/help.png
   # To add assets to your application, add an assets section, like this:
   # assets:
