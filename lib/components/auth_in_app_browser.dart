@@ -4,12 +4,12 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/extensions.dart';
 
-class MyInAppBrowser extends InAppBrowser {
+class AuthInAppBrowser extends InAppBrowser {
   final Manifest manifest;
   late InAppBrowserClassOptions options;
   final Function concludeAuth;
 
-  MyInAppBrowser({required this.manifest, required this.concludeAuth}) {
+  AuthInAppBrowser({required this.manifest, required this.concludeAuth}) {
     options = InAppBrowserClassOptions(
       crossPlatform: InAppBrowserOptions(hideUrlBar: false, toolbarTopBackgroundColor: HexColor(manifest.themeColor)),
       inAppWebViewGroupOptions: InAppWebViewGroupOptions(
@@ -32,4 +32,6 @@ class MyInAppBrowser extends InAppBrowser {
   launchUrl(URLRequest urlRequest) {
     openUrlRequest(urlRequest: urlRequest, options: options);
   }
+
+
 }

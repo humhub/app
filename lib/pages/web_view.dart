@@ -18,7 +18,7 @@ import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:humhub/util/router.dart' as m;
 
-import '../components/in_app_browser.dart';
+import '../components/auth_in_app_browser.dart';
 import '../models/hum_hub.dart';
 import '../util/connectivity_plugin.dart';
 
@@ -32,7 +32,7 @@ class WebViewApp extends ConsumerStatefulWidget {
 
 class WebViewAppState extends ConsumerState<WebViewApp> {
   late InAppWebViewController webViewController;
-  late MyInAppBrowser authBrowser;
+  late AuthInAppBrowser authBrowser;
   late Manifest manifest;
   late URLRequest _initialRequest;
   final _options = InAppWebViewGroupOptions(
@@ -46,6 +46,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
 
   PullToRefreshController? _pullToRefreshController;
   late PullToRefreshOptions _pullToRefreshOptions;
+  late HeadlessInAppWebView? headlessWebView;
 
   @override
   void initState() {
@@ -56,7 +57,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   Widget build(BuildContext context) {
     _initialRequest = _initRequest;
     _pullToRefreshController = initPullToRefreshController;
-    authBrowser = MyInAppBrowser(
+    authBrowser = AuthInAppBrowser(
       manifest: manifest,
       concludeAuth: (URLRequest request) {
         _concludeAuth(request);
@@ -146,11 +147,16 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
             case ChannelAction.registerFcmDevice:
               String? token = ref.read(pushTokenProvider).value;
               if (token != null) {
-                Uri? beforePostUrl = await controller.getUrl();
                 var postData = Uint8List.fromList(utf8.encode("token=$token"));
-                await controller.postUrl(url: Uri.parse(message.url!), postData: postData);
-                await Future.delayed(const Duration(milliseconds: 200));
-                await controller.loadUrl(urlRequest: URLRequest(url: beforePostUrl));
+                URLRequest request = URLRequest(url: Uri.parse(message.url!), method: "POST", body: postData);
+                // Works but it blinks because new navigation request is called on dart level.
+                /*RegisterPushInAppBrowser(request: request).register();*/
+
+                // Works but for admin to see the changes it need to reload a page because a request is called on separate instance.
+                headlessWebView = HeadlessInAppWebView(onWebViewCreated: (controller) {
+                  controller.postUrl(url: request.url!, postData: postData);
+                });
+                headlessWebView!.run();
               }
               var status = await Permission.notification.status;
               // status.isDenied: The user has previously denied the notification permission
@@ -259,5 +265,13 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(ref.read(humHubProvider).customHeaders).toString()}});";
     dynamic jsResponse = await controller.evaluateJavascript(source: jsCode);
     log(jsResponse != null ? jsResponse.toString() : "Script returned null value");
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (headlessWebView != null) {
+      headlessWebView!.dispose();
+    }
   }
 }

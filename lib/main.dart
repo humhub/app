@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/util/const.dart';
 import 'package:humhub/util/log.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
