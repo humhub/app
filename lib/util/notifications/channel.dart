@@ -1,5 +1,7 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/pages/web_view.dart';
+import 'package:humhub/util/push_opener_controller.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 
@@ -69,11 +71,13 @@ class GeneralNotificationChannel extends NotificationChannel {
 class RedirectNotificationChannel extends NotificationChannel {
   RedirectNotificationChannel()
       : super(
-    'general',
-    'General app notifications',
-    'These notifications don\'t belong to any other category.',
-  );
+          'general',
+          'General app notifications',
+          'These notifications don\'t belong to any other category.',
+        );
 
+  /// If the WebView is not opened yet or the app is not running the onTap will wake up the app or redirect to the WebView.
+  /// If app is already running in WebView mode then the state of [WebViewApp] will be updated with new url.
   @override
   Future<void> onTap(String? payload) async {
     if (payload != null && navigatorKey.currentState != null) {
@@ -84,10 +88,14 @@ class RedirectNotificationChannel extends NotificationChannel {
         }
         return true;
       });
-      if (!isNewRouteSameAsCurrent) {
-        navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: payload);
+      PushOpenerController opener = PushOpenerController(url: payload);
+      await opener.initHumHub();
+      if (isNewRouteSameAsCurrent) {
+        WebViewGlobalController.value!
+            .loadUrl(urlRequest: URLRequest(url: Uri.parse(opener.url), headers: opener.humhub.customHeaders));
+        return;
       }
-      navigatorKey.currentState!.popAndPushNamed(WebViewApp.path, arguments: payload);
+      navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
     }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/log.dart';
+import 'package:humhub/util/notifications/plugin.dart';
+import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 
@@ -19,8 +21,7 @@ class MyApp extends ConsumerStatefulWidget {
   MyAppState createState() => MyAppState();
 }
 
-class MyAppState extends ConsumerState<MyApp>{
-
+class MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
@@ -28,14 +29,18 @@ class MyAppState extends ConsumerState<MyApp>{
       builder: (context, snap) {
         if (snap.hasData) {
           return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            initialRoute: snap.data,
-            routes: MyRouter.routes,
-            navigatorKey: navigatorKey,
-            theme: ThemeData(
-              fontFamily: 'OpenSans',
-            ),
-          );
+              debugShowCheckedModeBanner: false,
+              initialRoute: snap.data,
+              routes: MyRouter.routes,
+              navigatorKey: navigatorKey,
+              theme: ThemeData(
+                fontFamily: 'OpenSans',
+              ),
+              builder: (context, child) {
+                return NotificationPlugin(
+                  child: PushPlugin(child: child!),
+                );
+              });
         }
         return const SizedBox.shrink();
       },

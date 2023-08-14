@@ -15,16 +15,16 @@ List<Map> _pendingRoutes = [];
 /// Queue any route, this route is pushed on stack after app has initialized.
 /// This usually means after user is logged in and assets are downloaded
 void queueRoute(
-    String routeName, {
-      Object? arguments,
-    }) {
+  String routeName, {
+  Object? arguments,
+}) {
   _pendingRoutes.add({
     'route': routeName,
     'arguments': arguments,
   });
 }
 
-class MyRouter{
+class MyRouter {
   static String? initRoute;
   static dynamic initParams;
 

@@ -22,18 +22,15 @@ class HumHubNotifier extends ChangeNotifier {
   String? get randomHash => _humHubInstance.randomHash;
   String? get appVersion => _humHubInstance.appVersion;
   String? get pushToken => _humHubInstance.pushToken;
-
-  Map<String, String> get customHeaders =>{
-    'x-humhub-app-token': randomHash!,
-    'x-humhub-app': appVersion!,
-    'x-humhub-app-ostate': isHideDialog ? '1' : '0'
-  };
+  Map<String, String> get customHeaders => _humHubInstance.customHeaders;
 
   void setIsHideOpener(bool isHide) {
     _humHubInstance.isHideOpener = isHide;
     _updateSafeStorage();
     notifyListeners();
   }
+
+
 
   void setManifest(Manifest manifest) {
     _humHubInstance.manifest = manifest;

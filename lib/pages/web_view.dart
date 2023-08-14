@@ -11,16 +11,24 @@ import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/extensions.dart';
-import 'package:humhub/util/notifications/plugin.dart';
-import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:humhub/util/push_opener_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:humhub/util/router.dart' as m;
-
 import '../components/auth_in_app_browser.dart';
 import '../models/hum_hub.dart';
 import '../util/connectivity_plugin.dart';
+
+class WebViewGlobalController {
+  static InAppWebViewController? _value;
+
+  static InAppWebViewController? get value => _value;
+
+  static void setValue(InAppWebViewController newValue) {
+    _value = newValue;
+  }
+}
 
 class WebViewApp extends ConsumerStatefulWidget {
   const WebViewApp({super.key});
@@ -46,7 +54,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
 
   PullToRefreshController? _pullToRefreshController;
   late PullToRefreshOptions _pullToRefreshOptions;
-  late HeadlessInAppWebView? headlessWebView;
+  HeadlessInAppWebView? headlessWebView;
 
   @override
   void initState() {
@@ -67,36 +75,23 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       onWillPop: () => webViewController.exitApp(context, ref),
       child: Scaffold(
         backgroundColor: HexColor(manifest.themeColor),
-        body: NotificationPlugin(
-          child: PushPlugin(
-            child: SafeArea(
-              bottom: false,
-              child: InAppWebView(
-                initialUrlRequest: _initialRequest,
-                initialOptions: _options,
-                pullToRefreshController: _pullToRefreshController,
-                shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
-                onWebViewCreated: _onWebViewCreated,
-                shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
-                onLoadStop: _onLoadStop,
-                onLoadStart: (controller, uri) async {
-                  _setAjaxHeadersJQuery(controller);
-                },
-                onProgressChanged: _onProgressChanged,
-                onConsoleMessage: (controller, msg) {
-                  // Handle the web resource error here
-                  log('Console Message: $msg');
-                },
-                onLoadHttpError: (InAppWebViewController controller, Uri? url, int statusCode, String description) {
-                  // Handle the web resource error here
-                  log('Http Error: $description');
-                },
-                onLoadError: (InAppWebViewController controller, Uri? url, int code, String message) {
-                  if (code == -1009) NoConnectionDialog.show(context);
-                  log('Load Error: $message');
-                },
-              ),
-            ),
+        body: SafeArea(
+          bottom: false,
+          child: InAppWebView(
+            initialUrlRequest: _initialRequest,
+            initialOptions: _options,
+            pullToRefreshController: _pullToRefreshController,
+            shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
+            onWebViewCreated: _onWebViewCreated,
+            shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
+            onLoadStop: _onLoadStop,
+            onLoadStart: (controller, uri) async {
+              _setAjaxHeadersJQuery(controller);
+            },
+            onProgressChanged: _onProgressChanged,
+            onLoadError: (InAppWebViewController controller, Uri? url, int code, String message) {
+              if (code == -1009) NoConnectionDialog.show(context);
+            },
           ),
         ),
       ),
@@ -173,6 +168,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       ),
     );
     webViewController = controller;
+    WebViewGlobalController.setValue(controller);
   }
 
   Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest request) async {
@@ -186,9 +182,11 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     if (args is Manifest) {
       manifest = args;
     }
-    if (args is String) {
-      manifest = m.MyRouter.initParams;
-      url = args;
+    if (args is PushOpenerController) {
+      PushOpenerController controller = args;
+      ref.read(humHubProvider).setInstance(controller.humhub);
+      manifest = controller.humhub.manifest!;
+      url = controller.url;
     }
     if (args == null) {
       manifest = m.MyRouter.initParams;

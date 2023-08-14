@@ -64,4 +64,10 @@ class HumHub {
     return List.generate(
         length, (_) => characters[random.nextInt(characters.length)]).join();
   }
+
+  Map<String, String> get customHeaders =>{
+    'x-humhub-app-token': randomHash!,
+    'x-humhub-app': appVersion ?? '1.0.0',
+    'x-humhub-app-ostate': isHideOpener ? '1' : '0'
+  };
 }
