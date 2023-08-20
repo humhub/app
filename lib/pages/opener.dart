@@ -137,7 +137,6 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                             child: TextButton(
                               onPressed: () async {
                                 await controlLer.initHumHub();
-                                setState(() {});
                                 if (controlLer.allOk) {
                                   ref.read(humHubProvider).getInstance().then((value) {
                                     Navigator.pushNamed(ref.context, WebViewApp.path, arguments: value.manifest);
