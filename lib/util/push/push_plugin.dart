@@ -27,15 +27,23 @@ class PushPluginState extends ConsumerState<PushPlugin> {
   Future<void> _init() async {
     logDebug("Init PushPlugin");
     // Init firebase without google-service.json
-    /*FirebaseOptions options = const FirebaseOptions(apiKey: "AIzaSyAAISISbwrpkPj1Qvrozq_35WDgZMQabuQ", appId: "1:6061519658:android:4024444673704f7ad0e453", messagingSenderId: "6061519658", projectId: "humhub-e73ea");
-    await Firebase.initializeApp(name: "DEFAULT", options: options);*/
     await Firebase.initializeApp();
     final token = await FirebaseMessaging.instance.getToken();
+    logDebug('PushPluginState getInitialMessage ${await FirebaseMessaging.instance.getInitialMessage()}');
     if (token != null) logDebug('PushPlugin with token: $token');
     FirebaseMessaging.onBackgroundMessage(_onBackgroundMessage);
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       logDebug("OnMessage PushPlugin");
+      _handleNotification(
+        message,
+        NotificationPlugin.of(ref),
+      );
+      _handleData(message, context, ref);
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      logDebug("onMessageOpenedApp PushPlugin");
       _handleNotification(
         message,
         NotificationPlugin.of(ref),
@@ -73,6 +81,7 @@ Future<void> _onBackgroundMessage(RemoteMessage message) async {
 }
 
 Future<void> _handleNotification(RemoteMessage message, NotificationService notificationService) async {
+  FirebaseMessaging.instance.getInitialMessage();
   final data = PushEvent(message).parsedData;
   if (message.notification == null) return;
   final title = message.notification?.title;
