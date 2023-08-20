@@ -23,7 +23,7 @@ abstract class NotificationChannel {
 
   static bool canAcceptTap(String? channelId) {
     final result = _knownChannels.any((element) => element.id == channelId);
-
+    logDebug("canAcceptTap: $channelId");
     if (!result) {
       logError("Error on channelId: $channelId");
     }
@@ -38,6 +38,7 @@ abstract class NotificationChannel {
 
   @protected
   Future<void> navigate(String route, {Object? arguments}) async {
+    logDebug('navigate: $route');
     if (navigatorKey.currentState?.mounted ?? false) {
       await navigatorKey.currentState?.pushNamed(
         route,
@@ -62,6 +63,7 @@ class GeneralNotificationChannel extends NotificationChannel {
 
   @override
   Future<void> onTap(String? payload) async {
+    logInfo("onTap Before");
     if (payload != null) {
       logInfo("Here we do navigate to specific screen for channel");
     }
@@ -80,6 +82,7 @@ class RedirectNotificationChannel extends NotificationChannel {
   /// If app is already running in WebView mode then the state of [WebViewApp] will be updated with new url.
   @override
   Future<void> onTap(String? payload) async {
+    logDebug('RedirectNotificationChannel onTap: $payload');
     if (payload != null && navigatorKey.currentState != null) {
       bool isNewRouteSameAsCurrent = false;
       navigatorKey.currentState!.popUntil((route) {
