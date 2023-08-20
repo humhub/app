@@ -1,6 +1,8 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
+import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/help/help.dart';
 import 'package:humhub/util/providers.dart';
 import '../pages/opener.dart';
@@ -36,6 +38,7 @@ class MyRouter {
 
   static Future<String> getInitialRoute(WidgetRef ref) async {
     HumHub humhub = await ref.read(humHubProvider).getInstance();
+    RemoteMessage? remoteMessage = await FirebaseMessaging.instance.getInitialMessage();
     RedirectAction action = await humhub.action(ref);
     switch (action) {
       case RedirectAction.opener:
@@ -43,8 +46,18 @@ class MyRouter {
         return Opener.path;
       case RedirectAction.webView:
         initRoute = WebViewApp.path;
-        initParams = humhub.manifest;
+        initParams = remoteMessage == null ? humhub.manifest : ManifestWithRemoteMsg(humhub.manifest!, remoteMessage);
         return WebViewApp.path;
     }
   }
+}
+
+class ManifestWithRemoteMsg {
+  final Manifest _manifest;
+  final RemoteMessage _remoteMessage;
+
+  RemoteMessage get remoteMessage => _remoteMessage;
+  Manifest get manifest => _manifest;
+
+  ManifestWithRemoteMsg(this._manifest, this._remoteMessage);
 }
