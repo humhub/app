@@ -7,18 +7,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/components/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
+import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
+import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/push_opener_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:humhub/util/router.dart' as m;
-import '../components/auth_in_app_browser.dart';
-import '../models/hum_hub.dart';
-import '../util/connectivity_plugin.dart';
 
 class WebViewGlobalController {
   static InAppWebViewController? _value;
@@ -49,6 +49,10 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       useShouldInterceptFetchRequest: true,
       javaScriptEnabled: true,
       supportZoom: false,
+      javaScriptCanOpenWindowsAutomatically: true,
+    ),
+    android: AndroidInAppWebViewOptions(
+      supportMultipleWindows: true,
     ),
   );
 
