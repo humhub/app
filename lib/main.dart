@@ -24,26 +24,26 @@ class MyApp extends ConsumerStatefulWidget {
 class MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-      future: MyRouter.getInitialRoute(ref),
-      builder: (context, snap) {
-        if (snap.hasData) {
-          return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              initialRoute: snap.data,
-              routes: MyRouter.routes,
-              navigatorKey: navigatorKey,
-              theme: ThemeData(
-                fontFamily: 'OpenSans',
-              ),
-              builder: (context, child) {
-                return NotificationPlugin(
-                  child: PushPlugin(child: child!),
-                );
-              });
-        }
-        return const SizedBox.shrink();
-      },
+    return NotificationPlugin(
+      child: PushPlugin(
+        child: FutureBuilder<String>(
+          future: MyRouter.getInitialRoute(ref),
+          builder: (context, snap) {
+            if (snap.hasData) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                initialRoute: snap.data,
+                routes: MyRouter.routes,
+                navigatorKey: navigatorKey,
+                theme: ThemeData(
+                  fontFamily: 'OpenSans',
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
     );
   }
 }
