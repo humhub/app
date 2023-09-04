@@ -76,7 +76,8 @@ jobs:
           java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
-          channel: "beta"
+          flutter-version: '3.7.1'
+          channel: 'stable'
       - uses: chkfung/android-version-actions@v1.2.1
         with:
           gradlePath: android/app/build.gradle # or app/build.gradle.kts
@@ -166,6 +167,7 @@ jobs:
         uses: subosito/flutter-action@v1
         with:
           flutter-version: '3.7.1'
+          channel: 'stable'
 
       - name: Install pub dependencies
         run: flutter pub get
