@@ -26,8 +26,6 @@ class PushPlugin extends ConsumerStatefulWidget {
 class PushPluginState extends ConsumerState<PushPlugin> {
   Future<void> _init() async {
     logDebug("Init PushPlugin");
-    // Init firebase without google-service.json
-    await Firebase.initializeApp();
     final token = await FirebaseMessaging.instance.getToken();
     logDebug('PushPluginState getInitialMessage ${await FirebaseMessaging.instance.getInitialMessage()}');
     if (token != null) logDebug('PushPlugin with token: $token');

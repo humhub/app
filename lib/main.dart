@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/log.dart';
@@ -6,11 +7,12 @@ import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 
-main() {
+main() async {
   Loggy.initLoggy(
     logPrinter: const GlobalLog(),
   );
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const ProviderScope(child: MyApp()));
 }
 

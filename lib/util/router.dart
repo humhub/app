@@ -5,6 +5,7 @@ import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/help/help.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:loggy/loggy.dart';
 import '../pages/opener.dart';
 import '../pages/web_view.dart';
 
@@ -39,16 +40,19 @@ class MyRouter {
   static Future<String> getInitialRoute(WidgetRef ref) async {
     HumHub humhub = await ref.read(humHubProvider).getInstance();
     RemoteMessage? remoteMessage = await FirebaseMessaging.instance.getInitialMessage();
-    RedirectAction action = await humhub.action(ref);
-    switch (action) {
-      case RedirectAction.opener:
-        initRoute = Opener.path;
-        return Opener.path;
-      case RedirectAction.webView:
-        initRoute = WebViewApp.path;
-        initParams = remoteMessage == null ? humhub.manifest : ManifestWithRemoteMsg(humhub.manifest!, remoteMessage);
-        return WebViewApp.path;
-    }
+    return FirebaseMessaging.instance.getInitialMessage().then((value) async {
+      logDebug('GA13245 rm12 after .then getInitialRoute getInitialMessage: $remoteMessage');
+      RedirectAction action = await humhub.action(ref);
+      switch (action) {
+        case RedirectAction.opener:
+          initRoute = Opener.path;
+          return Opener.path;
+        case RedirectAction.webView:
+          initRoute = WebViewApp.path;
+          initParams = remoteMessage == null ? humhub.manifest : ManifestWithRemoteMsg(humhub.manifest!, remoteMessage);
+          return WebViewApp.path;
+      }
+    });
   }
 }
 
