@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
@@ -47,6 +46,18 @@ class PushPluginState extends ConsumerState<PushPlugin> {
         NotificationPlugin.of(ref),
       );
       _handleData(message, context, ref);
+    });
+
+    //When the app is terminated, i.e., app is neither in foreground or background.
+    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
+      logDebug("getInitialMessage PushPlugin: $message");
+      if (message != null) {
+        _handleNotification(
+          message,
+          NotificationPlugin.of(ref),
+        );
+        _handleData(message, context, ref);
+      }
     });
 
     ref.read(firebaseInitialized.notifier).state = const AsyncValue.data(true);

@@ -68,7 +68,9 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
 
   @override
   Widget build(BuildContext context) {
+    logDebug("GA13245 - build 01");
     _initialRequest = _initRequest;
+    logDebug("GA13245 - build 02");
     _pullToRefreshController = initPullToRefreshController;
     authBrowser = AuthInAppBrowser(
       manifest: manifest,
@@ -182,24 +184,29 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   }
 
   URLRequest get _initRequest {
+    logDebug("GA13245 - 1");
     final args = ModalRoute.of(context)!.settings.arguments;
     String? url;
     if (args is Manifest) {
+      logDebug("GA13245 - 2");
       manifest = args;
     }
-    if (args is PushOpenerController) {
+    else if (args is PushOpenerController) {
+      logDebug("GA13245 - 3");
       PushOpenerController controller = args;
       ref.read(humHubProvider).setInstance(controller.humhub);
       manifest = controller.humhub.manifest!;
       url = controller.url;
     }
-    if (args == null) {
-      manifest = m.MyRouter.initParams;
-    }
-    if(args is ManifestWithRemoteMsg){
+    else if(args is ManifestWithRemoteMsg){
+      logDebug("GA13245 - 5");
       ManifestWithRemoteMsg manifestPush = args;
       manifest = manifestPush.manifest;
       url = manifestPush.remoteMessage.data['url'];
+    }
+    else if (args == null) {
+      logDebug("GA13245 - 4");
+      manifest = m.MyRouter.initParams;
     }
     return URLRequest(url: Uri.parse(url ?? manifest.baseUrl), headers: ref.read(humHubProvider).customHeaders);
   }

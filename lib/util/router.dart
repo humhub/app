@@ -43,13 +43,20 @@ class MyRouter {
     return FirebaseMessaging.instance.getInitialMessage().then((value) async {
       logDebug('GA13245 rm12 after .then getInitialRoute getInitialMessage: $remoteMessage');
       RedirectAction action = await humhub.action(ref);
+      if (remoteMessage == null) {
+        logDebug('GA13245 in IF');
+        initParams = humhub.manifest;
+      } else {
+        logDebug('GA13245 in ELSE');
+        initParams = ManifestWithRemoteMsg(humhub.manifest!, remoteMessage);
+      }
       switch (action) {
         case RedirectAction.opener:
           initRoute = Opener.path;
           return Opener.path;
         case RedirectAction.webView:
           initRoute = WebViewApp.path;
-          initParams = remoteMessage == null ? humhub.manifest : ManifestWithRemoteMsg(humhub.manifest!, remoteMessage);
+
           return WebViewApp.path;
       }
     });
