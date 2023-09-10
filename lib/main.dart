@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/log.dart';
@@ -12,7 +11,6 @@ main() async {
     logPrinter: const GlobalLog(),
   );
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
   runApp(const ProviderScope(child: MyApp()));
 }
 
