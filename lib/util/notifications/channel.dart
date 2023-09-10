@@ -71,6 +71,8 @@ class GeneralNotificationChannel extends NotificationChannel {
 }
 
 class RedirectNotificationChannel extends NotificationChannel {
+  static String? _redirectUrlFromInit;
+
   RedirectNotificationChannel()
       : super(
           'general',
@@ -83,6 +85,7 @@ class RedirectNotificationChannel extends NotificationChannel {
   @override
   Future<void> onTap(String? payload) async {
     logDebug('RedirectNotificationChannel onTap: $payload');
+    logDebug('payload onTap IF: ${payload != null && navigatorKey.currentState != null}');
     if (payload != null && navigatorKey.currentState != null) {
       bool isNewRouteSameAsCurrent = false;
       navigatorKey.currentState!.popUntil((route) {
@@ -99,6 +102,20 @@ class RedirectNotificationChannel extends NotificationChannel {
         return;
       }
       navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
+    } else {
+      if (payload != null) {
+        setPayloadForInit(payload);
+      }
     }
+  }
+
+  static setPayloadForInit(String payload) {
+    _redirectUrlFromInit = payload;
+  }
+
+  static String? usePayloadForInit() {
+    String? payload = _redirectUrlFromInit;
+    _redirectUrlFromInit = null;
+    return payload;
   }
 }

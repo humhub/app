@@ -49,6 +49,14 @@ class PushPluginState extends ConsumerState<PushPlugin> {
       _handleData(message, context, ref);
     });
 
+    //When the app is terminated, i.e., app is neither in foreground or background.
+    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
+      if (message != null) {
+        logDebug("getInitialMessage PushPlugin: $message");
+        _handleInitialMsg(message);
+      }
+    });
+
     ref.read(firebaseInitialized.notifier).state = const AsyncValue.data(true);
 
     /// We do this to create provider and read Firebase token
@@ -74,8 +82,14 @@ class PushPluginState extends ConsumerState<PushPlugin> {
 Future<void> _onBackgroundMessage(RemoteMessage message) async {
   logDebug("_onBackgroundMessage PushPlugin");
   final service = await NotificationService.create();
-
   await _handleNotification(message, service);
+}
+
+_handleInitialMsg(RemoteMessage message) {
+  final data = PushEvent(message).parsedData;
+  if (data.redirectUrl != null) {
+    RedirectNotificationChannel().onTap(data.redirectUrl);
+  }
 }
 
 Future<void> _handleNotification(RemoteMessage message, NotificationService notificationService) async {
