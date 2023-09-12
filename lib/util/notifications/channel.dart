@@ -5,11 +5,6 @@ import 'package:humhub/util/push_opener_controller.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 
-/// Used to group notifications by Android channels
-///
-/// How to use: subclass this abstract class and override onTap method. Then
-/// pass instance of this subclass to [NotificationService.scheduleNotification]
-/// which will take care of calling [onTap] on correct channel.
 abstract class NotificationChannel {
   final String id;
   final String name;
@@ -17,27 +12,11 @@ abstract class NotificationChannel {
 
   NotificationChannel(this.id, this.name, this.description);
 
-  static final List<NotificationChannel> _knownChannels = [
-    GeneralNotificationChannel(),
-  ];
-
-  static bool canAcceptTap(String? channelId) {
-    final result = _knownChannels.any((element) => element.id == channelId);
-
-    if (!result) {
-      logError("Error on channelId: $channelId");
-    }
-    return result;
-  }
-
-  factory NotificationChannel.fromId(String? id) => _knownChannels.firstWhere(
-        (channel) => id == channel.id,
-      );
-
   Future<void> onTap(String? payload);
 
   @protected
   Future<void> navigate(String route, {Object? arguments}) async {
+    logDebug('navigate: $route');
     if (navigatorKey.currentState?.mounted ?? false) {
       await navigatorKey.currentState?.pushNamed(
         route,
@@ -52,28 +31,14 @@ abstract class NotificationChannel {
   }
 }
 
-class GeneralNotificationChannel extends NotificationChannel {
-  GeneralNotificationChannel()
-      : super(
-          'general',
-          'General app notifications',
-          'These notifications don\'t belong to any other category.',
-        );
-
-  @override
-  Future<void> onTap(String? payload) async {
-    if (payload != null) {
-      logInfo("Here we do navigate to specific screen for channel");
-    }
-  }
-}
-
 class RedirectNotificationChannel extends NotificationChannel {
+  static String? _redirectUrlFromInit;
+
   RedirectNotificationChannel()
       : super(
-          'general',
-          'General app notifications',
-          'These notifications don\'t belong to any other category.',
+          'redirect',
+          'Redirect app notifications',
+          'These notifications are redirect the user to specific url in a payload.',
         );
 
   /// If the WebView is not opened yet or the app is not running the onTap will wake up the app or redirect to the WebView.
@@ -96,6 +61,20 @@ class RedirectNotificationChannel extends NotificationChannel {
         return;
       }
       navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
+    } else {
+      if (payload != null) {
+        setPayloadForInit(payload);
+      }
     }
+  }
+
+  static setPayloadForInit(String payload) {
+    _redirectUrlFromInit = payload;
+  }
+
+  static String? usePayloadForInit() {
+    String? payload = _redirectUrlFromInit;
+    _redirectUrlFromInit = null;
+    return payload;
   }
 }

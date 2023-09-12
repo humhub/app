@@ -49,12 +49,28 @@ class NotificationService {
   static void handleNotification(NotificationResponse response) async {
     logDebug('_handleNotification PushPlugin');
     final parsed = response.payload != null ? json.decode(response.payload!) : {};
-    if (!NotificationChannel.canAcceptTap(parsed['channel_id'])) return;
-    if(parsed["redirectUrl"] != null){
+    if (parsed["redirectUrl"] != null) {
       await RedirectNotificationChannel().onTap(parsed['redirectUrl']);
       return;
     }
-    await NotificationChannel.fromId(parsed['channel_id']).onTap(parsed['payload']);
+  }
+
+  Future<void> showNotification(
+    NotificationChannel channel,
+    String? title,
+    String? description, {
+    String? payload,
+    String? redirectUrl,
+    ThemeData? theme,
+  }) async {
+    final newPayload = {'channel_id': channel.id, 'payload': payload, 'redirectUrl': redirectUrl};
+    await plugin.show(
+      int.parse(DateTime.now().microsecondsSinceEpoch.toString().replaceRange(0, 7, '')),
+      title,
+      description,
+      _details(theme?.primaryColor, channel),
+      payload: json.encode(newPayload),
+    );
   }
 
   NotificationDetails _details(
@@ -72,63 +88,6 @@ class NotificationService {
           color: color,
         ),
       );
-
-  /// Example:
-  /// ```dart
-  ///await NotificationPlugin.of(context).showNotification(...);
-  /// ```
-  Future<void> showNotification(
-    NotificationChannel channel,
-    String? title,
-    String? description, {
-    String? payload,
-    String? redirectUrl,
-    ThemeData? theme,
-  }) async {
-    final newPayload = {
-      'channel_id': channel.id,
-      'payload': payload,
-      'redirectUrl': redirectUrl
-    };
-
-    await plugin.show(
-      int.parse(DateTime.now().microsecondsSinceEpoch.toString().replaceRange(0, 7, '')),
-      title,
-      description,
-      _details(theme?.primaryColor, channel),
-      payload: json.encode(newPayload),
-    );
-  }
-
-  /// Example:
-  /// ```dart
-  ///await NotificationPlugin.of(context).scheduleNotification(...);
-  /// ```
-  /// Make sure you call [initializeTimeZone] beforehand!
-  Future<void> scheduleNotification(
-    NotificationChannel channel,
-    String? title,
-    String? description,
-    Duration duration, {
-    String? payload,
-    ThemeData? theme,
-  }) async {
-    final newPayload = {
-      'channel_id': channel.id,
-      'payload': payload,
-    };
-
-    await plugin.zonedSchedule(
-      0,
-      title,
-      description,
-      TZDateTime.now(local).add(duration),
-      _details(theme?.primaryColor, channel),
-      payload: jsonEncode(newPayload),
-      androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.wallClockTime,
-    );
-  }
 }
 
 final notificationProvider = StateProvider<NotificationService?>(

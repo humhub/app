@@ -46,8 +46,8 @@ dependencies:
   receive_sharing_intent: ^1.4.5
   package_info_plus: ^3.0.3
   uni_links: ^0.5.1
-  firebase_messaging: ^14.2.4
-  firebase_core: ^2.6.1
+  firebase_messaging: ^14.6.7
+  firebase_core: ^2.15.1
   timezone: ^0.9.1
   flutter_native_timezone: ^2.0.0
   flutter_local_notifications: ^13.0.0
