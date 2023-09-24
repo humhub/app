@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/util/push/register_token_plugin.dart';
 import 'package:loggy/loggy.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uni_links/uni_links.dart';
@@ -54,9 +53,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
 
   @override
   Widget build(BuildContext context) {
-    return RegisterToken(
-      child: widget.child,
-    );
+    return widget.child;
   }
 
   /// Handle incoming links - the ones that the app will recieve from the OS
@@ -114,13 +111,17 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   }
 
   void _showSnackBar(String msg) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final context = _scaffoldKey.currentContext;
-      if (context != null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(msg),
-        ));
-      }
-    });
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        final context = _scaffoldKey.currentContext;
+        if (context != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(msg),
+            ),
+          );
+        }
+      },
+    );
   }
 }
