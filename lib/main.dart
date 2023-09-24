@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/util/intent/intent_plugin.dart';
 import 'package:humhub/util/log.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/push/push_plugin.dart';
@@ -24,24 +25,26 @@ class MyApp extends ConsumerStatefulWidget {
 class MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return NotificationPlugin(
-      child: PushPlugin(
-        child: FutureBuilder<String>(
-          future: MyRouter.getInitialRoute(ref),
-          builder: (context, snap) {
-            if (snap.hasData) {
-              return MaterialApp(
-                debugShowCheckedModeBanner: false,
-                initialRoute: snap.data,
-                routes: MyRouter.routes,
-                navigatorKey: navigatorKey,
-                theme: ThemeData(
-                  fontFamily: 'OpenSans',
-                ),
-              );
-            }
-            return const SizedBox.shrink();
-          },
+    return IntentPlugin(
+      child: NotificationPlugin(
+        child: PushPlugin(
+          child: FutureBuilder<String>(
+            future: MyRouter.getInitialRoute(ref),
+            builder: (context, snap) {
+              if (snap.hasData) {
+                return MaterialApp(
+                  debugShowCheckedModeBanner: false,
+                  initialRoute: snap.data,
+                  routes: MyRouter.routes,
+                  navigatorKey: navigatorKey,
+                  theme: ThemeData(
+                    fontFamily: 'OpenSans',
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
         ),
       ),
     );
