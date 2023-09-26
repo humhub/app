@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/pages/web_view.dart';
-import 'package:humhub/util/push_opener_controller.dart';
+import 'package:humhub/util/universal_opener_controller.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 
@@ -53,7 +53,7 @@ class RedirectNotificationChannel extends NotificationChannel {
         }
         return true;
       });
-      PushOpenerController opener = PushOpenerController(url: payload);
+      UniversalOpenerController opener = UniversalOpenerController(url: payload);
       await opener.initHumHub();
       if (isNewRouteSameAsCurrent) {
         WebViewGlobalController.value!

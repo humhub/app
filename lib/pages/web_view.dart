@@ -16,7 +16,7 @@ import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/providers.dart';
-import 'package:humhub/util/push_opener_controller.dart';
+import 'package:humhub/util/universal_opener_controller.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -188,8 +188,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     if (args is Manifest) {
       manifest = args;
     }
-    if (args is PushOpenerController) {
-      PushOpenerController controller = args;
+    if (args is UniversalOpenerController) {
+      UniversalOpenerController controller = args;
       ref.read(humHubProvider).setInstance(controller.humhub);
       manifest = controller.humhub.manifest!;
       url = controller.url;

@@ -3,7 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/pages/web_view.dart';
+import 'package:humhub/util/router.dart';
+import 'package:humhub/util/universal_opener_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uni_links/uni_links.dart';
@@ -62,12 +66,28 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     if (!kIsWeb) {
       // It will handle app links while the app is already started - be it in
       // the foreground or in the background.
-      _sub = uriLinkStream.listen((Uri? uri) {
+      _sub = uriLinkStream.listen((Uri? uri) async {
         if (!mounted) return;
-        setState(() {
-          _latestUri = uri;
-          _err = null;
-        });
+        _latestUri = uri;
+        String? redirectUrl = uri!.queryParameters['url'];
+        if (redirectUrl != null && navigatorKey.currentState != null) {
+          bool isNewRouteSameAsCurrent = false;
+          navigatorKey.currentState!.popUntil((route) {
+            if (route.settings.name == WebViewApp.path) {
+              isNewRouteSameAsCurrent = true;
+            }
+            return true;
+          });
+          UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
+          await opener.initHumHub();
+          if (isNewRouteSameAsCurrent) {
+            WebViewGlobalController.value!
+                .loadUrl(urlRequest: URLRequest(url: Uri.parse(opener.url), headers: opener.humhub.customHeaders));
+            return;
+          }
+          navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
+        }
+        _err = null;
       }, onError: (err) {
         if (kDebugMode) {
           print(err);
@@ -86,19 +106,33 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   Future<void> _handleInitialUri() async {
     // In this example app this is an almost useless guard, but it is here to
     // show we are not going to call getInitialUri multiple times, even if this
-    // was a weidget that will be disposed of (ex. a navigation route change).
+    // was a widget that will be disposed of (ex. a navigation route change).
     if (!_initialUriIsHandled) {
       _initialUriIsHandled = true;
-      _showSnackBar('_handleInitialUri called');
       try {
         final uri = await getInitialUri();
-        if (uri == null) {
-          logWarning('no initial uri');
-        } else {
-          logInfo('got initial uri: $uri');
-        }
-        if (!mounted) return;
+        if (uri == null || !mounted) return;
         setState(() => _initialUri = uri);
+        if (!mounted) return;
+        _latestUri = uri;
+        String? redirectUrl = uri.queryParameters['url'];
+        if (redirectUrl != null && navigatorKey.currentState != null) {
+          bool isNewRouteSameAsCurrent = false;
+          navigatorKey.currentState!.popUntil((route) {
+            if (route.settings.name == WebViewApp.path) {
+              isNewRouteSameAsCurrent = true;
+            }
+            return true;
+          });
+          UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
+          await opener.initHumHub();
+          if (isNewRouteSameAsCurrent) {
+            WebViewGlobalController.value!
+                .loadUrl(urlRequest: URLRequest(url: Uri.parse(opener.url), headers: opener.humhub.customHeaders));
+            return;
+          }
+          navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
+        }
       } on PlatformException {
         // Platform messages may fail but we ignore the exception
         logError('falied to get initial uri');
@@ -108,20 +142,5 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         setState(() => _err = err);
       }
     }
-  }
-
-  void _showSnackBar(String msg) {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        final context = _scaffoldKey.currentContext;
-        if (context != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(msg),
-            ),
-          );
-        }
-      },
-    );
   }
 }
