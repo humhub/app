@@ -193,6 +193,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       ref.read(humHubProvider).setInstance(controller.humhub);
       manifest = controller.humhub.manifest!;
       url = controller.url;
+      logInfo("HR123 66" + url);
     }
     if (args == null) {
       manifest = m.MyRouter.initParams;

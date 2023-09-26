@@ -39,7 +39,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="go.humhub.com"
+                    android:host="a029-46-123-248-197.ngrok-free.app"
                     android:scheme="https" />
             </intent-filter>
 

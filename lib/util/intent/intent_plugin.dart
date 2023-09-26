@@ -113,24 +113,34 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         final uri = await getInitialUri();
         if (uri == null || !mounted) return;
         setState(() => _initialUri = uri);
+        logInfo("HR123 01");
         if (!mounted) return;
+        logInfo("HR123 02");
         _latestUri = uri;
         String? redirectUrl = uri.queryParameters['url'];
+        logInfo("HR123 04 ${redirectUrl ?? "null"}");
+        // TODO: current state here is null await it or pass it to the screen from a provider.
+        logInfo("HR123 04 current state ${navigatorKey.currentState ?? "null"}");
         if (redirectUrl != null && navigatorKey.currentState != null) {
           bool isNewRouteSameAsCurrent = false;
+          logInfo("HR123 05");
           navigatorKey.currentState!.popUntil((route) {
             if (route.settings.name == WebViewApp.path) {
               isNewRouteSameAsCurrent = true;
             }
+            logInfo("HR123 06");
             return true;
           });
+          logInfo("HR123 07");
           UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
           await opener.initHumHub();
           if (isNewRouteSameAsCurrent) {
+            logInfo("HR123 001");
             WebViewGlobalController.value!
                 .loadUrl(urlRequest: URLRequest(url: Uri.parse(opener.url), headers: opener.humhub.customHeaders));
             return;
           }
+          logInfo("HR123 002");
           navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
         }
       } on PlatformException {
