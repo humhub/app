@@ -6,7 +6,7 @@
 	<string>development</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:a029-46-123-248-197.ngrok-free.app</string>
+		<string>applinks:go.humhub.com</string>
 	</array>
 </dict>
 </plist>
