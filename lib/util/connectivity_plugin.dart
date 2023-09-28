@@ -1,43 +1,10 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ConnectivityPlugin extends ConsumerStatefulWidget {
-  final Widget child;
-
-  const ConnectivityPlugin({
-    Key? key,
-    required this.child,
-  }) : super(key: key);
-
-  @override
-  ConnectivityPluginState createState() => ConnectivityPluginState();
-
+class ConnectivityPlugin {
   static Future<bool> get hasConnectivity async {
     ConnectivityResult connectivityResult = await Connectivity().checkConnectivity();
     return connectivityResult != ConnectivityResult.none;
-  }
-}
-
-class ConnectivityPluginState extends ConsumerState<ConnectivityPlugin> {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<ConnectivityResult?>(
-      stream: Connectivity().onConnectivityChanged,
-      builder: (context, snap) {
-        if (snap.hasData) {
-          // Process the data from the stream
-          ConnectivityResult result = snap.data!;
-          if (result == ConnectivityResult.none) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              // Use a small delay to show the dialog after the build phase
-              NoConnectionDialog.show(context);
-            });
-          }
-        }
-        return widget.child;
-      },
-    );
   }
 }
 

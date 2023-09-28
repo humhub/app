@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/pages/web_view.dart';
+import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/router.dart';
 import 'package:humhub/util/universal_opener_controller.dart';
 import 'package:loggy/loggy.dart';
@@ -29,7 +30,6 @@ class IntentPlugin extends ConsumerStatefulWidget {
 class IntentPluginState extends ConsumerState<IntentPlugin> {
   StreamSubscription? intentDataStreamSubscription;
   List<SharedMediaFile>? sharedFiles;
-  final _scaffoldKey = GlobalKey();
   Object? _err;
   Uri? _initialUri;
   Uri? _latestUri;
@@ -37,7 +37,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
 
   @override
   void initState() {
-    logDebug([_err, _initialUri, _latestUri, _sub]);
+    logInfo([_err, _initialUri, _latestUri, _sub]);
     super.initState();
     intentDataStreamSubscription = ReceiveSharingIntent.getMediaStream().listen((List<SharedMediaFile> value) {
       setState(() {
@@ -71,21 +71,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         _latestUri = uri;
         String? redirectUrl = uri!.queryParameters['url'];
         if (redirectUrl != null && navigatorKey.currentState != null) {
-          bool isNewRouteSameAsCurrent = false;
-          navigatorKey.currentState!.popUntil((route) {
-            if (route.settings.name == WebViewApp.path) {
-              isNewRouteSameAsCurrent = true;
-            }
-            return true;
-          });
-          UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
-          await opener.initHumHub();
-          if (isNewRouteSameAsCurrent) {
-            WebViewGlobalController.value!
-                .loadUrl(urlRequest: URLRequest(url: Uri.parse(opener.url), headers: opener.humhub.customHeaders));
-            return;
-          }
-          navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
+          tryNavigateWithOpener(redirectUrl);
         }
         _err = null;
       }, onError: (err) {
@@ -113,44 +99,43 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         final uri = await getInitialUri();
         if (uri == null || !mounted) return;
         setState(() => _initialUri = uri);
-        logInfo("HR123 01");
         if (!mounted) return;
-        logInfo("HR123 02");
         _latestUri = uri;
         String? redirectUrl = uri.queryParameters['url'];
-        logInfo("HR123 04 ${redirectUrl ?? "null"}");
-        // TODO: current state here is null await it or pass it to the screen from a provider.
-        logInfo("HR123 04 current state ${navigatorKey.currentState ?? "null"}");
         if (redirectUrl != null && navigatorKey.currentState != null) {
-          bool isNewRouteSameAsCurrent = false;
-          logInfo("HR123 05");
-          navigatorKey.currentState!.popUntil((route) {
-            if (route.settings.name == WebViewApp.path) {
-              isNewRouteSameAsCurrent = true;
-            }
-            logInfo("HR123 06");
-            return true;
-          });
-          logInfo("HR123 07");
-          UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
-          await opener.initHumHub();
-          if (isNewRouteSameAsCurrent) {
-            logInfo("HR123 001");
-            WebViewGlobalController.value!
-                .loadUrl(urlRequest: URLRequest(url: Uri.parse(opener.url), headers: opener.humhub.customHeaders));
-            return;
+          tryNavigateWithOpener(redirectUrl);
+        } else {
+          if (redirectUrl != null) {
+            RedirectUrlFromInit.setPayloadForInit(redirectUrl);
           }
-          logInfo("HR123 002");
-          navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
         }
       } on PlatformException {
         // Platform messages may fail but we ignore the exception
-        logError('falied to get initial uri');
+        logError('Failed to get initial uri');
       } on FormatException catch (err) {
         if (!mounted) return;
-        logError('malformed initial uri');
+        logError('Malformed initial uri');
         setState(() => _err = err);
       }
     }
+  }
+
+  Future<bool> tryNavigateWithOpener(String redirectUrl) async {
+    bool isNewRouteSameAsCurrent = false;
+    navigatorKey.currentState!.popUntil((route) {
+      if (route.settings.name == WebViewApp.path) {
+        isNewRouteSameAsCurrent = true;
+      }
+      return true;
+    });
+    UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
+    await opener.initHumHub();
+    if (isNewRouteSameAsCurrent) {
+      WebViewGlobalController.value!
+          .loadUrl(urlRequest: URLRequest(url: Uri.parse(opener.url), headers: opener.humhub.customHeaders));
+      return false;
+    }
+    navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
+    return true;
   }
 }

@@ -30,8 +30,6 @@ class HumHubNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-
-
   void setManifest(Manifest manifest) {
     _humHubInstance.manifest = manifest;
     _updateSafeStorage();
@@ -62,9 +60,7 @@ class HumHubNotifier extends ChangeNotifier {
 
   _updateSafeStorage() async {
     final jsonString = json.encode(_humHubInstance.toJson());
-    String lastUrl = _humHubInstance.manifest != null
-        ? _humHubInstance.manifest!.baseUrl
-        : await getLastUrl();
+    String lastUrl = _humHubInstance.manifest != null ? _humHubInstance.manifest!.baseUrl : await getLastUrl();
     await _storage.write(key: StorageKeys.humhubInstance, value: jsonString);
     await _storage.write(key: StorageKeys.lastInstanceUrl, value: lastUrl);
   }
@@ -75,9 +71,7 @@ class HumHubNotifier extends ChangeNotifier {
 
   Future<HumHub> getInstance() async {
     var jsonStr = await _storage.read(key: StorageKeys.humhubInstance);
-    HumHub humHub = jsonStr != null
-        ? HumHub.fromJson(json.decode(jsonStr))
-        : _humHubInstance;
+    HumHub humHub = jsonStr != null ? HumHub.fromJson(json.decode(jsonStr)) : _humHubInstance;
     setInstance(humHub);
     return humHub;
   }
@@ -94,11 +88,11 @@ final humHubProvider = ChangeNotifierProvider<HumHubNotifier>((ref) {
 
 /// Remembers whether current FirebaseApp is initialized.
 final firebaseInitialized = StateProvider<AsyncValue<bool>>(
-      (ref) => const AsyncValue.loading(),
+  (ref) => const AsyncValue.loading(),
 );
 
 final _pushTokenProvider = FutureProvider<AsyncValue<String?>>(
-      (ref) async {
+  (ref) async {
     var initialized = ref.watch(firebaseInitialized.notifier).state;
     if (initialized.isLoaded) {
       return AsyncValue.guard(FirebaseMessaging.instance.getToken);
@@ -112,7 +106,7 @@ final _pushTokenProvider = FutureProvider<AsyncValue<String?>>(
 /// See also:
 /// * [_PushPluginState._init]
 final pushTokenProvider = Provider<AsyncValue<String?>>(
-      (ref) {
+  (ref) {
     var provider = ref.watch(_pushTokenProvider);
     return provider.when(
       data: (value) => value,

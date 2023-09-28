@@ -25,13 +25,13 @@ class PushPlugin extends ConsumerStatefulWidget {
 
 class PushPluginState extends ConsumerState<PushPlugin> {
   Future<void> _init() async {
-    logDebug("Init PushPlugin");
+    logInfo("Init PushPlugin");
     await Firebase.initializeApp();
     final token = await FirebaseMessaging.instance.getToken();
-    if (token != null) logDebug('PushPlugin with token: $token');
+    if (token != null) logInfo('PushPlugin with token: $token');
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      logDebug("OnMessage PushPlugin");
+      logInfo("Firebase messaging onMessage");
       _handleNotification(
         message,
         NotificationPlugin.of(ref),
@@ -40,16 +40,15 @@ class PushPluginState extends ConsumerState<PushPlugin> {
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      logDebug("onMessageOpenedApp PushPlugin");
+      logInfo("Firebase messaging onMessageOpenedApp");
       final data = PushEvent(message).parsedData;
       RedirectNotificationChannel().onTap(data.redirectUrl);
     });
 
     //When the app is terminated, i.e., app is neither in foreground or background.
     FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
-      logDebug("getInitialMessage PushPlugin: $message");
       if (message != null) {
-        logDebug("getInitialMessage PushPlugin: $message");
+        logInfo("Firebase messaging getInitialMessage message: $message");
         _handleInitialMsg(message);
       }
     });

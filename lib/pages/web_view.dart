@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/foundation.dart';
@@ -193,7 +192,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       ref.read(humHubProvider).setInstance(controller.humhub);
       manifest = controller.humhub.manifest!;
       url = controller.url;
-      logInfo("HR123 66" + url);
+      logInfo("HR123 66 $url");
     }
     if (args == null) {
       manifest = m.MyRouter.initParams;
@@ -203,7 +202,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       manifest = manifestPush.manifest;
       url = manifestPush.remoteMessage.data['url'];
     }
-    String? payloadFromPush = RedirectNotificationChannel.usePayloadForInit();
+    String? payloadFromPush = RedirectUrlFromInit.usePayloadForInit();
     if (payloadFromPush != null) url = payloadFromPush;
     return URLRequest(url: Uri.parse(url ?? manifest.baseUrl), headers: ref.read(humHubProvider).customHeaders);
   }
@@ -276,7 +275,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   Future<void> _setAjaxHeadersJQuery(InAppWebViewController controller) async {
     String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(ref.read(humHubProvider).customHeaders).toString()}});";
     dynamic jsResponse = await controller.evaluateJavascript(source: jsCode);
-    log(jsResponse != null ? jsResponse.toString() : "Script returned null value");
+    logInfo(jsResponse != null ? jsResponse.toString() : "Script returned null value");
   }
 
   @override

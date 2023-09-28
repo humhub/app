@@ -113,7 +113,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                                         validator: controlLer.validateUrl,
                                       );
                                     }
-                                    return progress;
+                                    return const Center(child: CircularProgressIndicator());
                                   },
                                 ),
                                 const Padding(

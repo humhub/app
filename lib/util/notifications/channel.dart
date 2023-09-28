@@ -16,7 +16,7 @@ abstract class NotificationChannel {
 
   @protected
   Future<void> navigate(String route, {Object? arguments}) async {
-    logDebug('navigate: $route');
+    logInfo('NotificationChannel navigate: $route');
     if (navigatorKey.currentState?.mounted ?? false) {
       await navigatorKey.currentState?.pushNamed(
         route,
@@ -32,8 +32,6 @@ abstract class NotificationChannel {
 }
 
 class RedirectNotificationChannel extends NotificationChannel {
-  static String? _redirectUrlFromInit;
-
   RedirectNotificationChannel()
       : super(
           'redirect',
@@ -63,10 +61,14 @@ class RedirectNotificationChannel extends NotificationChannel {
       navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
     } else {
       if (payload != null) {
-        setPayloadForInit(payload);
+        RedirectUrlFromInit.setPayloadForInit(payload);
       }
     }
   }
+}
+
+class RedirectUrlFromInit {
+  static String? _redirectUrlFromInit;
 
   static setPayloadForInit(String payload) {
     _redirectUrlFromInit = payload;

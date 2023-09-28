@@ -5,10 +5,10 @@ import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:http/http.dart' as http;
+import 'package:loggy/loggy.dart';
 import 'api_provider.dart';
 import 'connectivity_plugin.dart';
 import 'form_helper.dart';
-import 'dart:developer';
 
 class OpenerController {
   late AsyncValue<Manifest>? asyncData;
@@ -66,7 +66,7 @@ class OpenerController {
     // In the future we could define our own TextFormField that would also validate the API responses.
     // But it this is not acceptable I can suggest simple popup or tempPopup.
     if (asyncData!.hasError || !doesViewExist) {
-      log("Open URL error: $asyncData");
+      logError("Open URL error: $asyncData");
       String value = urlTextController.text;
       urlTextController.text = error404;
       helper.validate();
