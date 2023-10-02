@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:humhub/components/rotating_globe.dart';
+import 'package:humhub/util/const.dart';
 
-import '../../../util/const.dart';
 
 class FirstPage extends StatelessWidget {
   final bool fadeIn;

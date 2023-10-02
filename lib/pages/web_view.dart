@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/foundation.dart';
@@ -16,7 +15,7 @@ import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/providers.dart';
-import 'package:humhub/util/push_opener_controller.dart';
+import 'package:humhub/util/universal_opener_controller.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -188,11 +187,12 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     if (args is Manifest) {
       manifest = args;
     }
-    if (args is PushOpenerController) {
-      PushOpenerController controller = args;
+    if (args is UniversalOpenerController) {
+      UniversalOpenerController controller = args;
       ref.read(humHubProvider).setInstance(controller.humhub);
       manifest = controller.humhub.manifest!;
       url = controller.url;
+      logInfo("HR123 66 $url");
     }
     if (args == null) {
       manifest = m.MyRouter.initParams;
@@ -202,7 +202,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       manifest = manifestPush.manifest;
       url = manifestPush.remoteMessage.data['url'];
     }
-    String? payloadFromPush = RedirectNotificationChannel.usePayloadForInit();
+    String? payloadFromPush = RedirectUrlFromInit.usePayloadForInit();
     if (payloadFromPush != null) url = payloadFromPush;
     return URLRequest(url: Uri.parse(url ?? manifest.baseUrl), headers: ref.read(humHubProvider).customHeaders);
   }
@@ -275,7 +275,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   Future<void> _setAjaxHeadersJQuery(InAppWebViewController controller) async {
     String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(ref.read(humHubProvider).customHeaders).toString()}});";
     dynamic jsResponse = await controller.evaluateJavascript(source: jsCode);
-    log(jsResponse != null ? jsResponse.toString() : "Script returned null value");
+    logInfo(jsResponse != null ? jsResponse.toString() : "Script returned null value");
   }
 
   @override

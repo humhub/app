@@ -6,13 +6,13 @@ import 'package:http/http.dart' as http;
 import 'api_provider.dart';
 import 'connectivity_plugin.dart';
 
-class PushOpenerController {
+class UniversalOpenerController {
   late AsyncValue<Manifest>? asyncData;
   bool doesViewExist = false;
   final String url;
   late HumHub humhub;
 
-  PushOpenerController({required this.url});
+  UniversalOpenerController({required this.url});
 
   findManifest(String url) async {
     Uri uri = assumeUrl(url);

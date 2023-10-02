@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/notifications/channel.dart';
-import 'package:loggy/loggy.dart';
 import 'package:timezone/data/latest.dart';
 import 'package:timezone/timezone.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
@@ -47,7 +46,6 @@ class NotificationService {
   }
 
   static void handleNotification(NotificationResponse response) async {
-    logDebug('_handleNotification PushPlugin');
     final parsed = response.payload != null ? json.decode(response.payload!) : {};
     if (parsed["redirectUrl"] != null) {
       await RedirectNotificationChannel().onTap(parsed['redirectUrl']);

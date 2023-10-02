@@ -46,14 +46,14 @@ class _RegisterTokenState extends ConsumerState<_RegisterToken>{
   Future<void> _maybeRegisterToken() async {
     final token = await FirebaseMessaging.instance.getToken();
     if (token == null) {
-      logDebug('Firebase reported null token.');
+      logInfo('Firebase reported null token.');
       return;
     }
 
     final cachedToken = ref.read(humHubProvider).pushToken;
-    logDebug('Firebase token is $token name: PushPlugin');
+    logInfo('Firebase token is $token name: PushPlugin');
     if (cachedToken == token) {
-      logDebug('Firebase token already registered name: PushPlugin');
+      logInfo('Firebase token already registered name: PushPlugin');
       return;
     }
     final result = await APIProvider.of(ref).request(

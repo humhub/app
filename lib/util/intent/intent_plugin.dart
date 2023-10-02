@@ -3,8 +3,12 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/util/push/register_token_plugin.dart';
+import 'package:humhub/pages/web_view.dart';
+import 'package:humhub/util/notifications/channel.dart';
+import 'package:humhub/util/router.dart';
+import 'package:humhub/util/universal_opener_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uni_links/uni_links.dart';
@@ -26,7 +30,6 @@ class IntentPlugin extends ConsumerStatefulWidget {
 class IntentPluginState extends ConsumerState<IntentPlugin> {
   StreamSubscription? intentDataStreamSubscription;
   List<SharedMediaFile>? sharedFiles;
-  final _scaffoldKey = GlobalKey();
   Object? _err;
   Uri? _initialUri;
   Uri? _latestUri;
@@ -34,7 +37,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
 
   @override
   void initState() {
-    logDebug([_err, _initialUri, _latestUri, _sub]);
+    logInfo([_err, _initialUri, _latestUri, _sub]);
     super.initState();
     intentDataStreamSubscription = ReceiveSharingIntent.getMediaStream().listen((List<SharedMediaFile> value) {
       setState(() {
@@ -54,9 +57,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
 
   @override
   Widget build(BuildContext context) {
-    return RegisterToken(
-      child: widget.child,
-    );
+    return widget.child;
   }
 
   /// Handle incoming links - the ones that the app will recieve from the OS
@@ -65,12 +66,14 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     if (!kIsWeb) {
       // It will handle app links while the app is already started - be it in
       // the foreground or in the background.
-      _sub = uriLinkStream.listen((Uri? uri) {
+      _sub = uriLinkStream.listen((Uri? uri) async {
         if (!mounted) return;
-        setState(() {
-          _latestUri = uri;
-          _err = null;
-        });
+        _latestUri = uri;
+        String? redirectUrl = uri!.queryParameters['url'];
+        if (redirectUrl != null && navigatorKey.currentState != null) {
+          tryNavigateWithOpener(redirectUrl);
+        }
+        _err = null;
       }, onError: (err) {
         if (kDebugMode) {
           print(err);
@@ -89,38 +92,50 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   Future<void> _handleInitialUri() async {
     // In this example app this is an almost useless guard, but it is here to
     // show we are not going to call getInitialUri multiple times, even if this
-    // was a weidget that will be disposed of (ex. a navigation route change).
+    // was a widget that will be disposed of (ex. a navigation route change).
     if (!_initialUriIsHandled) {
       _initialUriIsHandled = true;
-      _showSnackBar('_handleInitialUri called');
       try {
         final uri = await getInitialUri();
-        if (uri == null) {
-          logWarning('no initial uri');
-        } else {
-          logInfo('got initial uri: $uri');
-        }
-        if (!mounted) return;
+        if (uri == null || !mounted) return;
         setState(() => _initialUri = uri);
+        if (!mounted) return;
+        _latestUri = uri;
+        String? redirectUrl = uri.queryParameters['url'];
+        if (redirectUrl != null && navigatorKey.currentState != null) {
+          tryNavigateWithOpener(redirectUrl);
+        } else {
+          if (redirectUrl != null) {
+            RedirectUrlFromInit.setPayloadForInit(redirectUrl);
+          }
+        }
       } on PlatformException {
         // Platform messages may fail but we ignore the exception
-        logError('falied to get initial uri');
+        logError('Failed to get initial uri');
       } on FormatException catch (err) {
         if (!mounted) return;
-        logError('malformed initial uri');
+        logError('Malformed initial uri');
         setState(() => _err = err);
       }
     }
   }
 
-  void _showSnackBar(String msg) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final context = _scaffoldKey.currentContext;
-      if (context != null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(msg),
-        ));
+  Future<bool> tryNavigateWithOpener(String redirectUrl) async {
+    bool isNewRouteSameAsCurrent = false;
+    navigatorKey.currentState!.popUntil((route) {
+      if (route.settings.name == WebViewApp.path) {
+        isNewRouteSameAsCurrent = true;
       }
+      return true;
     });
+    UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
+    await opener.initHumHub();
+    if (isNewRouteSameAsCurrent) {
+      WebViewGlobalController.value!
+          .loadUrl(urlRequest: URLRequest(url: Uri.parse(opener.url), headers: opener.humhub.customHeaders));
+      return false;
+    }
+    navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
+    return true;
   }
 }
