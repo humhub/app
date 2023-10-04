@@ -1,4 +1,3 @@
-# HumHub App
+# HumHub Mobile App
 
 In development 
-Test
