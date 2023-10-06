@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:app_settings/app_settings.dart';
@@ -128,47 +129,15 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   }
 
   _onWebViewCreated(InAppWebViewController controller) async {
+    headlessWebView = HeadlessInAppWebView();
+    headlessWebView!.run();
     await controller.addWebMessageListener(
       WebMessageListener(
         jsObjectName: "flutterChannel",
         onPostMessage: (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
           logInfo(inMessage);
           ChannelMessage message = ChannelMessage.fromJson(inMessage!);
-          switch (message.action) {
-            case ChannelAction.showOpener:
-              ref.read(humHubProvider).setIsHideOpener(false);
-              ref.read(humHubProvider).clearSafeStorage();
-              Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
-              break;
-            case ChannelAction.hideOpener:
-              ref.read(humHubProvider).setIsHideOpener(true);
-              ref.read(humHubProvider).setHash(HumHub.generateHash(32));
-              break;
-            case ChannelAction.registerFcmDevice:
-              String? token = ref.read(pushTokenProvider).value;
-              if (token != null) {
-                var postData = Uint8List.fromList(utf8.encode("token=$token"));
-                URLRequest request = URLRequest(url: Uri.parse(message.url!), method: "POST", body: postData);
-                // Works but it blinks because new navigation request is called on dart level.
-                /*RegisterPushInAppBrowser(request: request).register();*/
-
-                // Works but for admin to see the changes it need to reload a page because a request is called on separate instance.
-                headlessWebView = HeadlessInAppWebView(onWebViewCreated: (controller) {
-                  controller.postUrl(url: request.url!, postData: postData);
-                });
-                headlessWebView!.run();
-              }
-              var status = await Permission.notification.status;
-              // status.isDenied: The user has previously denied the notification permission
-              // !status.isGranted: The user has never been asked for the notification permission
-              if (status.isDenied || !status.isGranted) askForNotificationPermissions();
-              break;
-            case ChannelAction.updateNotificationCount:
-              if (message.count != null) FlutterAppBadger.updateBadgeCount(message.count!);
-              break;
-            case ChannelAction.none:
-              break;
-          }
+          await _handleJSMessage(message, headlessWebView!);
         },
       ),
     );
@@ -276,6 +245,46 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(ref.read(humHubProvider).customHeaders).toString()}});";
     dynamic jsResponse = await controller.evaluateJavascript(source: jsCode);
     logInfo(jsResponse != null ? jsResponse.toString() : "Script returned null value");
+  }
+
+  Future<void> _handleJSMessage(ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
+    switch (message.action) {
+      case ChannelAction.showOpener:
+        ref.read(humHubProvider).setIsHideOpener(false);
+        ref.read(humHubProvider).clearSafeStorage();
+        Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
+        break;
+      case ChannelAction.hideOpener:
+        ref.read(humHubProvider).setIsHideOpener(true);
+        ref.read(humHubProvider).setHash(HumHub.generateHash(32));
+        break;
+      case ChannelAction.registerFcmDevice:
+        String? token = ref.read(pushTokenProvider).value;
+        if (token != null) {
+          var postData = Uint8List.fromList(utf8.encode("token=$token"));
+          URLRequest request = URLRequest(url: Uri.parse(message.url!), method: "POST", body: postData);
+          await headlessWebView.webViewController.loadUrl(urlRequest: request);
+        }
+        var status = await Permission.notification.status;
+        // status.isDenied: The user has previously denied the notification permission
+        // !status.isGranted: The user has never been asked for the notification permission
+        if (status.isDenied || !status.isGranted) askForNotificationPermissions();
+        break;
+      case ChannelAction.updateNotificationCount:
+        if (message.count != null) FlutterAppBadger.updateBadgeCount(message.count!);
+        break;
+      case ChannelAction.unregisterFcmDevice:
+        String? token = ref.read(pushTokenProvider).value;
+        if (token != null) {
+          var postData = Uint8List.fromList(utf8.encode("token=$token"));
+          URLRequest request = URLRequest(url: Uri.parse(message.url!), method: "POST", body: postData);
+          // Works but for admin to see the changes it need to reload a page because a request is called on separate instance.
+          await headlessWebView.webViewController.loadUrl(urlRequest: request);
+        }
+        break;
+      case ChannelAction.none:
+        break;
+    }
   }
 
   @override
