@@ -145,7 +145,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                               },
                               child: Text(
                                 'Connect',
-                                style: TextStyle(color: openerColor, fontSize: 20),
+                                style: TextStyle(color: primaryColor, fontSize: 20),
                               ),
                             ),
                           ),
