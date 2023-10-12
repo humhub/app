@@ -34,7 +34,7 @@ class Locales {
   static String moreInfoProEditionUrl = "https://www.humhub.com/en/professional-edition";
 }
 
-Color openerColor = const Color(0xFF21a1b3);
+Color primaryColor = const Color(0xFF21a1b3);
 
 TextStyle? getHeaderStyle(context) {
   return Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600);

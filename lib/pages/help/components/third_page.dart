@@ -53,7 +53,7 @@ class ThirdPage extends StatelessWidget {
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.resolveWith<Color>(
                         (Set<MaterialState> states) {
-                          return openerColor;
+                          return primaryColor;
                         },
                       ),
                     ),

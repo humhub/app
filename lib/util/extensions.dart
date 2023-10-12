@@ -4,7 +4,9 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
+import 'package:humhub/util/const.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:loggy/loggy.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 // ignore_for_file: use_build_context_synchronously
 extension MyCookies on WebViewCookieManager {
@@ -60,11 +62,17 @@ extension MyWebViewController on InAppWebViewController {
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
-    hexColor = hexColor.toUpperCase().replaceAll("#", "");
-    if (hexColor.length == 6) {
-      hexColor = "FF$hexColor";
+    try{
+      hexColor = hexColor.toUpperCase().replaceAll("#", "");
+      if (hexColor.length == 6) {
+        hexColor = "FF$hexColor";
+      }
+      return int.parse(hexColor, radix: 16);
     }
-    return int.parse(hexColor, radix: 16);
+    catch(e){
+      logError("Color from manifest is not valid use primary color");
+      return primaryColor.value;
+    }
   }
 
   HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
