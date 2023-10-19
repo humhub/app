@@ -252,6 +252,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       case ChannelAction.showOpener:
         ref.read(humHubProvider).setIsHideOpener(false);
         ref.read(humHubProvider).clearSafeStorage();
+        FlutterAppBadger.updateBadgeCount(0);
         Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
         break;
       case ChannelAction.hideOpener:
