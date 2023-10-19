@@ -33,12 +33,13 @@ class OpenerController {
     if (uri.pathSegments.isEmpty) {
       asyncData = await APIProvider.of(ref).request(Manifest.get(uri.origin));
     }
-    await checkHumHubModuleView(uri);
+    if(asyncData!.hasError) return;
+    await checkHumHubModuleView(asyncData!.value!.startUrl);
   }
 
-  checkHumHubModuleView(Uri uri) async {
+  checkHumHubModuleView(String url) async {
     Response? response;
-    response = await http.Client().get(Uri.parse(uri.origin)).catchError((err) {
+    response = await http.Client().get(Uri.parse(url)).catchError((err) {
       return Response("Found manifest but not humhub.modules.ui.view tag", 404);
     });
 

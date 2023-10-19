@@ -60,7 +60,7 @@ class HumHubNotifier extends ChangeNotifier {
 
   _updateSafeStorage() async {
     final jsonString = json.encode(_humHubInstance.toJson());
-    String lastUrl = _humHubInstance.manifest != null ? _humHubInstance.manifest!.baseUrl : await getLastUrl();
+    String lastUrl = _humHubInstance.manifest != null ? _humHubInstance.manifest!.startUrl : await getLastUrl();
     await _storage.write(key: StorageKeys.humhubInstance, value: jsonString);
     await _storage.write(key: StorageKeys.lastInstanceUrl, value: lastUrl);
   }
