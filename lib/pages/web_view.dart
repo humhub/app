@@ -21,6 +21,7 @@ import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:humhub/util/router.dart' as m;
+import 'package:url_launcher/url_launcher.dart';
 
 class WebViewGlobalController {
   static InAppWebViewController? _value;
@@ -90,6 +91,20 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
             shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
             onWebViewCreated: _onWebViewCreated,
             shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
+            onCreateWindow: (inAppWebViewController, createWindowAction) async {
+              final urlToOpen = createWindowAction.request.url;
+
+              if (urlToOpen == null) return Future.value(false); // Don't create a new window.
+
+              if (await canLaunchUrl(urlToOpen)) {
+                await launchUrl(urlToOpen,
+                    mode: LaunchMode.externalApplication); // Open the URL in the default browser.
+              } else {
+                logError('Could not launch $urlToOpen');
+              }
+
+              return Future.value(true); // Allow creating a new window.
+            },
             onLoadStop: _onLoadStop,
             onLoadStart: (controller, uri) async {
               _setAjaxHeadersJQuery(controller);
@@ -107,7 +122,6 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
-
     _setAjaxHeadersJQuery(controller);
     final url = action.request.url!.origin;
     if (!url.startsWith(manifest.baseUrl)) {
