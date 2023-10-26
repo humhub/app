@@ -58,6 +58,7 @@ dependencies:
   auto_size_text: ^3.0.0
   mockito: ^5.4.0
   connectivity_plus: ^4.0.1
+  swipe_to: ^1.0.2
 
 dev_dependencies:
   flutter_test:

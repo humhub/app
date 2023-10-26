@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'animated_padding_component.dart';
 
 class BottomNavigation extends StatefulWidget {
@@ -12,18 +11,17 @@ class BottomNavigation extends StatefulWidget {
 }
 
 class BottomNavigationState extends State<BottomNavigation> with TickerProviderStateMixin {
-  int _selectedIndex = 0;
-
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (_selectedIndex == 0) {
+        if (selectedIndex == 0) {
           return true;
         }
         setState(() {
-          _selectedIndex--;
-          widget.onPageChange(_selectedIndex);
+          selectedIndex--;
+          widget.onPageChange(selectedIndex);
         });
         return false;
       },
@@ -47,16 +45,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
                 child: Padding(
                   padding: const EdgeInsets.only(left: 6),
                   child: TextButton(
-                    onPressed: _selectedIndex == 0
-                        ? () {
-                            Navigator.pop(context);
-                          }
-                        : () {
-                            setState(() {
-                              _selectedIndex--;
-                              widget.onPageChange(_selectedIndex);
-                            });
-                          },
+                    onPressed: () => navigateBack(),
                     child: const Text(
                       "Back",
                       style: TextStyle(color: Colors.grey),
@@ -69,7 +58,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
             Expanded(
               flex: 5,
               child: AnimatedPaddingComponent(
-                padding: getPadding(_selectedIndex),
+                padding: _getPadding(selectedIndex),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -89,18 +78,9 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
                 child: Padding(
                   padding: const EdgeInsets.only(right: 6),
                   child: TextButton(
-                    onPressed: _selectedIndex == widget.pageCount - 1
-                        ? () {
-                            Navigator.pop(context);
-                          }
-                        : () {
-                            setState(() {
-                              _selectedIndex++;
-                              widget.onPageChange(_selectedIndex);
-                            });
-                          },
+                    onPressed: () => navigateForth(),
                     child: Text(
-                      _selectedIndex != 2 ? "Next" : "Connect now",
+                      selectedIndex != 2 ? "Next" : "Connect now",
                       style: const TextStyle(color: Colors.grey),
                     ),
                   ),
@@ -113,7 +93,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
     );
   }
 
-  getPadding(int selectedIndex) {
+  _getPadding(int selectedIndex) {
     if (selectedIndex == 0) {
       return const EdgeInsets.only(left: 34);
     }
@@ -125,7 +105,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
   }
 
   Widget _buildPageIndicator(int index) {
-    bool isActive = index == _selectedIndex;
+    bool isActive = index == selectedIndex;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       width: isActive ? 13.0 : 8.0,
@@ -135,5 +115,27 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
         shape: BoxShape.circle,
       ),
     );
+  }
+
+  navigateBack() {
+    if (selectedIndex == 0) {
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        selectedIndex--;
+        widget.onPageChange(selectedIndex);
+      });
+    }
+  }
+
+  navigateForth() {
+    if (selectedIndex == widget.pageCount - 1) {
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        selectedIndex++;
+        widget.onPageChange(selectedIndex);
+      });
+    }
   }
 }
