@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:humhub/components/bottom_navigation_bar.dart';
+import 'package:humhub/components/ease_out_container.dart';
 import 'package:humhub/components/help_safe_area.dart';
+import 'package:humhub/components/page_animation_container.dart';
 import 'package:humhub/pages/help/components/first_page.dart';
 import 'package:humhub/pages/help/components/third_page.dart';
 import 'package:swipe_to/swipe_to.dart';
-import '../../components/page_animation_container.dart';
-import '../../components/bottom_navigation_bar.dart';
-import '../../components/ease_out_container.dart';
 import 'components/second_page.dart';
 
 class Help extends StatefulWidget {
@@ -29,16 +29,9 @@ class HelpState extends State<Help> {
   Widget build(BuildContext context) {
     return SwipeTo(
       offsetDx: 0,
-      onRightSwipe: () {
-        if (currentPage.value <= 0) return;
-        currentPage.value = currentPage.value - 1;
-        statePagesKey.currentState?.navigateTo(currentPage.value);
-      },
-      onLeftSwipe: () {
-        if (currentPage.value >= 2) return;
-        currentPage.value = currentPage.value + 1;
-        statePagesKey.currentState?.navigateTo(currentPage.value);
-      },
+      animationDuration: const Duration(milliseconds: 100),
+      onRightSwipe: () => bottomNavigationStateKey.currentState?.navigateBack(),
+      onLeftSwipe: () => bottomNavigationStateKey.currentState?.navigateForth(),
       child: Scaffold(
         backgroundColor: Colors.white,
         extendBody: true,
@@ -47,7 +40,6 @@ class HelpState extends State<Help> {
           margin: const EdgeInsets.symmetric(horizontal: 10),
           child: BottomNavigation(
             key: bottomNavigationStateKey,
-            selectedPage: currentPage,
             pageCount: 3,
             onPageChange: (index) {
               currentPage.value = index;

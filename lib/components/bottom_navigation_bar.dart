@@ -1,28 +1,27 @@
 import 'package:flutter/material.dart';
-
 import 'animated_padding_component.dart';
 
 class BottomNavigation extends StatefulWidget {
   final int pageCount;
-  ValueNotifier<int> selectedPage;
   final Function(int) onPageChange;
-  BottomNavigation({super.key, required this.onPageChange, required this.selectedPage, required this.pageCount});
+  const BottomNavigation({super.key, required this.onPageChange, required this.pageCount});
 
   @override
   State<BottomNavigation> createState() => BottomNavigationState();
 }
 
 class BottomNavigationState extends State<BottomNavigation> with TickerProviderStateMixin {
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (widget.selectedPage.value == 0) {
+        if (selectedIndex == 0) {
           return true;
         }
         setState(() {
-          widget.selectedPage.value--;
-          widget.onPageChange(widget.selectedPage.value);
+          selectedIndex--;
+          widget.onPageChange(selectedIndex);
         });
         return false;
       },
@@ -46,16 +45,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
                 child: Padding(
                   padding: const EdgeInsets.only(left: 6),
                   child: TextButton(
-                    onPressed: widget.selectedPage.value == 0
-                        ? () {
-                            Navigator.pop(context);
-                          }
-                        : () {
-                            setState(() {
-                              widget.selectedPage.value--;
-                              widget.onPageChange(widget.selectedPage.value);
-                            });
-                          },
+                    onPressed: () => navigateBack(),
                     child: const Text(
                       "Back",
                       style: TextStyle(color: Colors.grey),
@@ -68,7 +58,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
             Expanded(
               flex: 5,
               child: AnimatedPaddingComponent(
-                padding: getPadding(widget.selectedPage.value),
+                padding: _getPadding(selectedIndex),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -88,18 +78,9 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
                 child: Padding(
                   padding: const EdgeInsets.only(right: 6),
                   child: TextButton(
-                    onPressed: widget.selectedPage.value == widget.pageCount - 1
-                        ? () {
-                            Navigator.pop(context);
-                          }
-                        : () {
-                            setState(() {
-                              widget.selectedPage.value++;
-                              widget.onPageChange(widget.selectedPage.value);
-                            });
-                          },
+                    onPressed: () => navigateForth(),
                     child: Text(
-                      widget.selectedPage.value != 2 ? "Next" : "Connect now",
+                      selectedIndex != 2 ? "Next" : "Connect now",
                       style: const TextStyle(color: Colors.grey),
                     ),
                   ),
@@ -112,7 +93,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
     );
   }
 
-  getPadding(int selectedIndex) {
+  _getPadding(int selectedIndex) {
     if (selectedIndex == 0) {
       return const EdgeInsets.only(left: 34);
     }
@@ -124,7 +105,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
   }
 
   Widget _buildPageIndicator(int index) {
-    bool isActive = index == widget.selectedPage.value;
+    bool isActive = index == selectedIndex;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       width: isActive ? 13.0 : 8.0,
@@ -134,5 +115,27 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
         shape: BoxShape.circle,
       ),
     );
+  }
+
+  navigateBack() {
+    if (selectedIndex == 0) {
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        selectedIndex--;
+        widget.onPageChange(selectedIndex);
+      });
+    }
+  }
+
+  navigateForth() {
+    if (selectedIndex == widget.pageCount - 1) {
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        selectedIndex++;
+        widget.onPageChange(selectedIndex);
+      });
+    }
   }
 }
