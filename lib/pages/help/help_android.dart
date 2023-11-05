@@ -9,15 +9,15 @@ import 'package:humhub/pages/help/components/third_page.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'components/second_page.dart';
 
-class Help extends StatefulWidget {
+class HelpAndroid extends StatefulWidget {
   static const String path = '/help';
-  const Help({Key? key}) : super(key: key);
+  const HelpAndroid({Key? key}) : super(key: key);
 
   @override
-  HelpState createState() => HelpState();
+  HelpAndroidState createState() => HelpAndroidState();
 }
 
-class HelpState extends State<Help> {
+class HelpAndroidState extends State<HelpAndroid> {
   final ValueNotifier<bool> fadeInFirst = ValueNotifier<bool>(false);
   final ValueNotifier<bool> fadeInSecond = ValueNotifier<bool>(false);
   final ValueNotifier<bool> fadeInThird = ValueNotifier<bool>(false);

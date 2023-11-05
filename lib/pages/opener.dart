@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/pages/web_view.dart';
@@ -6,7 +8,8 @@ import 'package:humhub/util/form_helper.dart';
 import 'package:humhub/util/opener_controller.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:rive/rive.dart';
-import 'help/help.dart';
+import 'help/help_android.dart';
+import 'help/help_ios.dart';
 
 class Opener extends ConsumerStatefulWidget {
   const Opener({Key? key}) : super(key: key);
@@ -39,7 +42,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
     _controllerReverse = _animationReverse;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 700), (){
+      Future.delayed(const Duration(milliseconds: 700), () {
         setState(() {
           _textFieldAddInfoVisibility = true;
         });
@@ -166,7 +169,8 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                               context,
                               PageRouteBuilder(
                                 transitionDuration: const Duration(milliseconds: 500),
-                                pageBuilder: (context, animation, secondaryAnimation) => const Help(),
+                                pageBuilder: (context, animation, secondaryAnimation) =>
+                                    Platform.isAndroid ? const HelpAndroid() : const HelpIos(),
                                 transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                   return FadeTransition(
                                     opacity: animation,
@@ -179,7 +183,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                                 _controller.isActive = true;
                                 _animation.reset();
                                 _visible = true;
-                                Future.delayed(const Duration(milliseconds: 700), (){
+                                Future.delayed(const Duration(milliseconds: 700), () {
                                   setState(() {
                                     _textFieldAddInfoVisibility = true;
                                   });

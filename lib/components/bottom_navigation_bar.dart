@@ -61,13 +61,19 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
                 padding: _getPadding(selectedIndex),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildPageIndicator(0),
-                    const SizedBox(width: 8),
-                    _buildPageIndicator(1),
-                    const SizedBox(width: 8),
-                    _buildPageIndicator(2),
-                  ],
+                  children: List.generate(
+                    widget.pageCount,
+                    (index) {
+                      return index < widget.pageCount - 1
+                          ? Row(
+                              children: [
+                                _buildPageIndicator(index),
+                                const SizedBox(width: 8),
+                              ],
+                            )
+                          : _buildPageIndicator(index);
+                    },
+                  ),
                 ),
               ),
             ),
@@ -80,7 +86,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
                   child: TextButton(
                     onPressed: () => navigateForth(),
                     child: Text(
-                      selectedIndex != 2 ? "Next" : "Connect now",
+                      selectedIndex != widget.pageCount - 1 ? "Next" : "Connect now",
                       style: const TextStyle(color: Colors.grey),
                     ),
                   ),

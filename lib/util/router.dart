@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/pages/help/help.dart';
+import 'package:humhub/pages/help/help_android.dart';
+import 'package:humhub/pages/help/help_ios.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/providers.dart';
@@ -33,7 +35,7 @@ class MyRouter {
   static var routes = {
     Opener.path: (context) => const Opener(),
     WebViewApp.path: (context) => const WebViewApp(),
-    Help.path: (context) => const Help(),
+    '/help': (context) => Platform.isAndroid ? const HelpAndroid() : const HelpIos(),
   };
 
   static Future<String> getInitialRoute(WidgetRef ref) async {
