@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/form_helper.dart';
@@ -26,6 +27,8 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
   late SimpleAnimation _animation;
   late RiveAnimationController _controllerReverse;
   late SimpleAnimation _animationReverse;
+  final TextEditingController _typeAheadController = TextEditingController();
+  SuggestionsBoxController suggestionBoxController = SuggestionsBoxController();
 
   final FormHelper helper = FormHelper();
   // Fade out Logo and opener when redirecting
@@ -104,16 +107,31 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                                   builder: (context, snapshot) {
                                     if (snapshot.hasData) {
                                       controlLer.urlTextController.text = snapshot.data!;
-                                      return TextFormField(
-                                        keyboardType: TextInputType.url,
-                                        controller: controlLer.urlTextController,
-                                        cursorColor: Theme.of(context).textTheme.bodySmall?.color,
-                                        onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
-                                        style: const TextStyle(
-                                          decoration: TextDecoration.none,
+                                      return TypeAheadFormField(
+                                        textFieldConfiguration: TextFieldConfiguration(
+                                          keyboardType: TextInputType.url,
+                                          controller: controlLer.urlTextController,
+                                          cursorColor: Theme.of(context).textTheme.bodySmall?.color,
+                                          style: const TextStyle(
+                                            decoration: TextDecoration.none,
+                                          ),
+                                          decoration: openerDecoration(context),
                                         ),
-                                        decoration: openerDecoration(context),
+                                        onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
                                         validator: controlLer.validateUrl,
+                                        suggestionsCallback: (pattern) => CitiesService.getSuggestions(pattern),
+                                        itemBuilder: (context, suggestion) => ListTile(
+                                          title: Text(suggestion),
+                                        ),
+                                        itemSeparatorBuilder: (context, index) => const Divider(),
+                                        transitionBuilder: (context, suggestionsBox, controller) => suggestionsBox,
+                                        onSuggestionSelected: (suggestion) {
+                                          setState(() {
+                                            _typeAheadController.text = suggestion;
+                                            controlLer.urlTextController.text = suggestion;
+                                          });
+                                        },
+                                        suggestionsBoxController: suggestionBoxController,
                                       );
                                     }
                                     return const Center(child: CircularProgressIndicator());
@@ -170,7 +188,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                               PageRouteBuilder(
                                 transitionDuration: const Duration(milliseconds: 500),
                                 pageBuilder: (context, animation, secondaryAnimation) =>
-                                    Platform.isAndroid ? const HelpAndroid() : const HelpIos(),
+                                Platform.isAndroid ? const HelpAndroid() : const HelpIos(),
                                 transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                   return FadeTransition(
                                     opacity: animation,
@@ -244,5 +262,23 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
     _animation.dispose();
     _animationReverse.dispose();
     super.dispose();
+  }
+}
+
+/// A fake service to filter cities based on a query.
+///
+class CitiesService {
+  static final List<String> cities = [
+    'https://community.humhub.com/',
+    'https://sometestproject12345.humhub.com/',
+    'https://demo.cuzy.app/',
+  ];
+
+  static List<String> getSuggestions(String query) {
+    List<String> matches = <String>[];
+    matches.addAll(cities);
+
+    matches.retainWhere((s) => s.toLowerCase().contains(query.toLowerCase()));
+    return matches;
   }
 }

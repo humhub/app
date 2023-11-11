@@ -59,6 +59,7 @@ dependencies:
   mockito: ^5.4.0
   connectivity_plus: ^4.0.1
   swipe_to: ^1.0.2
+  flutter_typeahead: ^4.8.0
 
 dev_dependencies:
   flutter_test:

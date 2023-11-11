@@ -13,6 +13,7 @@ import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
+import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/providers.dart';
@@ -70,6 +71,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
 
   @override
   Widget build(BuildContext context) {
+    //ref.read(humHubProvider).clearSafeStorage();
     _initialRequest = _initRequest;
     _pullToRefreshController = initPullToRefreshController;
     authBrowser = AuthInAppBrowser(
@@ -82,6 +84,43 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       onWillPop: () => webViewController.exitApp(context, ref),
       child: Scaffold(
         backgroundColor: HexColor(manifest.themeColor),
+        drawerScrimColor: Colors.transparent,
+        endDrawer: Drawer(
+          width: MediaQuery.of(context).size.width * 0.2,
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Column(
+              verticalDirection: VerticalDirection.up,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 40),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: FloatingActionButton(
+                      backgroundColor: primaryColor,
+                      onPressed: () {
+                        Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
+                      },
+                      child: const Center(
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                          size: 40,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         body: SafeArea(
           bottom: false,
           child: InAppWebView(
@@ -196,7 +235,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       webViewController.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
       webViewController.evaluateJavascript(
           source:
-              "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+          "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _setAjaxHeadersJQuery(controller);
     _pullToRefreshController?.endRefreshing();
@@ -215,19 +254,19 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     return kIsWeb
         ? null
         : PullToRefreshController(
-            options: _pullToRefreshOptions,
-            onRefresh: () async {
-              Uri? url = await webViewController.getUrl();
-              if (url != null) {
-                webViewController.loadUrl(
-                  urlRequest: URLRequest(
-                      url: await webViewController.getUrl(), headers: ref.read(humHubProvider).customHeaders),
-                );
-              } else {
-                webViewController.reload();
-              }
-            },
+      options: _pullToRefreshOptions,
+      onRefresh: () async {
+        Uri? url = await webViewController.getUrl();
+        if (url != null) {
+          webViewController.loadUrl(
+            urlRequest: URLRequest(
+                url: await webViewController.getUrl(), headers: ref.read(humHubProvider).customHeaders),
           );
+        } else {
+          webViewController.reload();
+        }
+      },
+    );
   }
 
   askForNotificationPermissions() {
