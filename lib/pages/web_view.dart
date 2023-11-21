@@ -42,7 +42,6 @@ class WebViewApp extends ConsumerStatefulWidget {
 }
 
 class WebViewAppState extends ConsumerState<WebViewApp> {
-  late InAppWebViewController webViewController;
   late AuthInAppBrowser authBrowser;
   late Manifest manifest;
   late URLRequest _initialRequest;
@@ -79,7 +78,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       },
     );
     return WillPopScope(
-      onWillPop: () => webViewController.exitApp(context, ref),
+      onWillPop: () => WebViewGlobalController.value!.exitApp(context, ref),
       child: Scaffold(
         backgroundColor: HexColor(manifest.themeColor),
         body: SafeArea(
@@ -139,7 +138,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
 
   _concludeAuth(URLRequest request) {
     authBrowser.close();
-    webViewController.loadUrl(urlRequest: request);
+    WebViewGlobalController.value!.loadUrl(urlRequest: request);
   }
 
   _onWebViewCreated(InAppWebViewController controller) async {
@@ -155,7 +154,6 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         },
       ),
     );
-    webViewController = controller;
     WebViewGlobalController.setValue(controller);
   }
 
@@ -193,8 +191,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   _onLoadStop(InAppWebViewController controller, Uri? url) {
     // Disable remember me checkbox on login and set def. value to true: check if the page is actually login page, if it is inject JS that hides element
     if (url!.path.contains('/user/auth/login')) {
-      webViewController.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
-      webViewController.evaluateJavascript(
+      WebViewGlobalController.value!.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
+      WebViewGlobalController.value!.evaluateJavascript(
           source:
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
@@ -217,14 +215,14 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         : PullToRefreshController(
             options: _pullToRefreshOptions,
             onRefresh: () async {
-              Uri? url = await webViewController.getUrl();
+              Uri? url = await WebViewGlobalController.value!.getUrl();
               if (url != null) {
-                webViewController.loadUrl(
+                WebViewGlobalController.value!.loadUrl(
                   urlRequest: URLRequest(
-                      url: await webViewController.getUrl(), headers: ref.read(humHubProvider).customHeaders),
+                      url: await WebViewGlobalController.value!.getUrl(), headers: ref.read(humHubProvider).customHeaders),
                 );
               } else {
-                webViewController.reload();
+                WebViewGlobalController.value!.reload();
               }
             },
           );

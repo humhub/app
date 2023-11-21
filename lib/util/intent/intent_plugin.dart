@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/notifications/channel.dart';
@@ -130,12 +129,8 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     });
     UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
     await opener.initHumHub();
-    if (isNewRouteSameAsCurrent) {
-      WebViewGlobalController.value!
-          .loadUrl(urlRequest: URLRequest(url: Uri.parse(opener.url), headers: opener.humhub.customHeaders));
-      return false;
-    }
+    // Always pop the current instance and init the new one.
     navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
-    return true;
+    return isNewRouteSameAsCurrent;
   }
 }
