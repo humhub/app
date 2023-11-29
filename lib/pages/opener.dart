@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/pages/test_wv.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/form_helper.dart';
@@ -89,6 +90,12 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                           child: Image.asset('assets/images/logo.png'),
                         ),
                       ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: TextButton(onPressed: (){
+                        Navigator.pushNamed(ref.context, WebViewTestPrettyUrls.path);
+                      }, child: Text("Test Pretty Urls")),
                     ),
                     Expanded(
                         flex: 3,

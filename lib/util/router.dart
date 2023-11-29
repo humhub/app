@@ -10,6 +10,8 @@ import 'package:humhub/pages/opener.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/providers.dart';
 
+import '../pages/test_wv.dart';
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 NavigatorState? get navigator => navigatorKey.currentState;
@@ -36,6 +38,7 @@ class MyRouter {
     Opener.path: (context) => const Opener(),
     WebViewApp.path: (context) => const WebViewApp(),
     '/help': (context) => Platform.isAndroid ? const HelpAndroid() : const HelpIos(),
+    WebViewTestPrettyUrls.path: (context) => const WebViewTestPrettyUrls(),
   };
 
   static Future<String> getInitialRoute(WidgetRef ref) async {
