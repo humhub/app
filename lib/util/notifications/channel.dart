@@ -54,8 +54,7 @@ class RedirectNotificationChannel extends NotificationChannel {
       UniversalOpenerController opener = UniversalOpenerController(url: payload);
       await opener.initHumHub();
       if (isNewRouteSameAsCurrent) {
-        WebViewGlobalController.value!
-            .loadUrl(urlRequest: URLRequest(url: Uri.parse(opener.url), headers: opener.humhub.customHeaders));
+        navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
         return;
       }
       navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
