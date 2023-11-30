@@ -8,6 +8,7 @@ import 'package:humhub/util/const.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
 // ignore_for_file: use_build_context_synchronously
 extension MyCookies on WebViewCookieManager {
   Future<void> setMyCookies(Manifest manifest) async {
@@ -55,21 +56,19 @@ extension MyWebViewController on InAppWebViewController {
     var isHide = ref.read(humHubProvider).isHideDialog;
     isHide
         ? SystemNavigator.pop()
-        : Navigator.of(context).pushNamedAndRemoveUntil(
-            Opener.path, (Route<dynamic> route) => false);
+        : Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
   }
 }
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
-    try{
+    try {
       hexColor = hexColor.toUpperCase().replaceAll("#", "");
       if (hexColor.length == 6) {
         hexColor = "FF$hexColor";
       }
       return int.parse(hexColor, radix: 16);
-    }
-    catch(e){
+    } catch (e) {
       logError("Color from manifest is not valid use primary color");
       return primaryColor.value;
     }
@@ -93,6 +92,13 @@ extension AsyncValueX<T> on AsyncValue<T> {
 extension FutureAsyncValueX<T> on Future<AsyncValue<T>> {
   Future<T?> get valueOrNull => then(
         (asyncValue) => asyncValue.asData?.value,
-  );
+      );
 }
 
+extension PrettyUri on Uri {
+  bool isUriPretty() {
+    RegExp regex = RegExp(r'index\.php.*[?&]r=');
+    String path = Uri.decodeComponent(toString());
+    return !regex.hasMatch(path);
+  }
+}
