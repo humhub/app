@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/universal_opener_controller.dart';
 import 'package:humhub/util/router.dart';
