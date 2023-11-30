@@ -8,8 +8,7 @@ class Manifest {
   final String backgroundColor;
   final String themeColor;
 
-  Manifest(this.display, this.startUrl, this.shortName, this.name,
-      this.backgroundColor, this.themeColor);
+  Manifest(this.display, this.startUrl, this.shortName, this.name, this.backgroundColor, this.themeColor);
 
   String get baseUrl {
     Uri url = Uri.parse(startUrl);
@@ -36,8 +35,10 @@ class Manifest {
         'theme_color': themeColor,
       };
 
-  static Future<Manifest> Function(Dio dio) get(String url) => (dio) async {
-        final res = await dio.get('$url/manifest.json');
+  static Future<Manifest> Function(Dio dio) get(String url, {bool isUriPretty = true}) => (dio) async {
+        Response<dynamic> res = !isUriPretty
+            ? await dio.get('$url/index.php?r=web%2Fpwa-manifest%2Findex')
+            : await dio.get('$url/manifest.json');
         return Manifest.fromJson(res.data);
       };
 }

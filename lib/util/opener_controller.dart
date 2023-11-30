@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:http/http.dart' as http;
 import 'package:loggy/loggy.dart';
@@ -25,15 +26,19 @@ class OpenerController {
 
   findManifest(String url) async {
     Uri uri = assumeUrl(url);
-    for (var i = uri.pathSegments.length - 1; i >= 0; i--) {
-      String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
-      asyncData = await APIProvider.of(ref).request(Manifest.get(i != 0 ? urlIn : uri.origin));
-      if (!asyncData!.hasError) break;
+    if (!uri.isUriPretty()) {
+      asyncData = await APIProvider.of(ref).request(Manifest.get(uri.origin, isUriPretty: false));
+    } else {
+      for (var i = uri.pathSegments.length - 1; i >= 0; i--) {
+        String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
+        asyncData = await APIProvider.of(ref).request(Manifest.get(i != 0 ? urlIn : uri.origin));
+        if (!asyncData!.hasError) break;
+      }
+      if (uri.pathSegments.isEmpty) {
+        asyncData = await APIProvider.of(ref).request(Manifest.get(uri.origin));
+      }
     }
-    if (uri.pathSegments.isEmpty) {
-      asyncData = await APIProvider.of(ref).request(Manifest.get(uri.origin));
-    }
-    if(asyncData!.hasError) return;
+    if (asyncData!.hasError) return;
     await checkHumHubModuleView(asyncData!.value!.startUrl);
   }
 
