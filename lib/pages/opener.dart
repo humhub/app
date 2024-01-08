@@ -54,7 +54,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
   Widget build(BuildContext context) {
     controlLer = OpenerController(ref: ref, helper: helper);
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         bottom: false,
         top: false,
@@ -109,6 +109,10 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                                         controller: controlLer.urlTextController,
                                         cursorColor: Theme.of(context).textTheme.bodySmall?.color,
                                         onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
+                                        onEditingComplete: () {
+                                          controlLer.helper.onSaved(controlLer.formUrlKey);
+                                          _connectInstance();
+                                        },
                                         style: const TextStyle(
                                           decoration: TextDecoration.none,
                                         ),
@@ -138,14 +142,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                             width: 140,
                             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
                             child: TextButton(
-                              onPressed: () async {
-                                await controlLer.initHumHub();
-                                if (controlLer.allOk) {
-                                  ref.read(humHubProvider).getInstance().then((value) {
-                                    Navigator.pushNamed(ref.context, WebViewApp.path, arguments: value.manifest);
-                                  });
-                                }
-                              },
+                              onPressed: _connectInstance,
                               child: Text(
                                 'Connect',
                                 style: TextStyle(color: primaryColor, fontSize: 20),
@@ -217,6 +214,15 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
         ),
       ),
     );
+  }
+
+  _connectInstance() async {
+    await controlLer.initHumHub();
+    if (controlLer.allOk) {
+      ref.read(humHubProvider).getInstance().then((value) {
+        Navigator.pushNamed(ref.context, WebViewApp.path, arguments: value.manifest);
+      });
+    }
   }
 
   InputDecoration openerDecoration(context) => InputDecoration(
