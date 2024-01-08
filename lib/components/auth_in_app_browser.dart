@@ -8,12 +8,21 @@ class AuthInAppBrowser extends InAppBrowser {
   final Manifest manifest;
   late InAppBrowserClassOptions options;
   final Function concludeAuth;
+  static const String userAgent =
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
   AuthInAppBrowser({required this.manifest, required this.concludeAuth}) {
     options = InAppBrowserClassOptions(
-      crossPlatform: InAppBrowserOptions(hideUrlBar: false, toolbarTopBackgroundColor: HexColor(manifest.themeColor)),
+      crossPlatform: InAppBrowserOptions(
+        hideUrlBar: false,
+        toolbarTopBackgroundColor: HexColor(manifest.themeColor),
+      ),
       inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-        crossPlatform: InAppWebViewOptions(javaScriptEnabled: true, useShouldOverrideUrlLoading: true),
+        crossPlatform: InAppWebViewOptions(
+            javaScriptEnabled: true,
+            useShouldOverrideUrlLoading: true,
+            userAgent: userAgent,
+            applicationNameForUserAgent: 'HumHub-Mobile'),
       ),
     );
   }
@@ -32,6 +41,4 @@ class AuthInAppBrowser extends InAppBrowser {
   launchUrl(URLRequest urlRequest) {
     openUrlRequest(urlRequest: urlRequest, options: options);
   }
-
-
 }
