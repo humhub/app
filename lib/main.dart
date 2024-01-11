@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:humhub/util/intent/intent_plugin.dart';
 import 'package:humhub/util/log.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 main() async {
   Loggy.initLoggy(
     logPrinter: const GlobalLog(),
   );
   WidgetsFlutterBinding.ensureInitialized();
+  await clearSecureStorageOnReinstall();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
     runApp(const ProviderScope(child: MyApp()));
   });
@@ -28,6 +31,7 @@ class MyApp extends ConsumerStatefulWidget {
 class MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
+    clearSecureStorageOnReinstall();
     return IntentPlugin(
       child: NotificationPlugin(
         child: PushPlugin(
@@ -51,5 +55,16 @@ class MyAppState extends ConsumerState<MyApp> {
         ),
       ),
     );
+  }
+}
+
+clearSecureStorageOnReinstall() async {
+  String key = 'hasRunBefore';
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool hasRunBefore = prefs.getBool(key) ?? false;
+  if(!hasRunBefore) {
+    FlutterSecureStorage storage = const FlutterSecureStorage();
+    await storage.deleteAll();
+    prefs.setBool(key, true);
   }
 }
