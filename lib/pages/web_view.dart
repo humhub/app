@@ -128,7 +128,9 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       return NavigationActionPolicy.CANCEL;
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
-    if (Platform.isAndroid || action.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED) {
+    if (Platform.isAndroid ||
+        action.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED ||
+        action.iosWKNavigationType == IOSWKNavigationType.FORM_SUBMITTED) {
       action.request.headers?.addAll(_initialRequest.headers!);
       controller.loadUrl(urlRequest: action.request);
       return NavigationActionPolicy.CANCEL;
@@ -191,7 +193,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   _onLoadStop(InAppWebViewController controller, Uri? url) {
     // Disable remember me checkbox on login and set def. value to true: check if the page is actually login page, if it is inject JS that hides element
     if (url!.path.contains('/user/auth/login')) {
-      WebViewGlobalController.value!.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
+      WebViewGlobalController.value!
+          .evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
       WebViewGlobalController.value!.evaluateJavascript(
           source:
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
@@ -219,7 +222,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               if (url != null) {
                 WebViewGlobalController.value!.loadUrl(
                   urlRequest: URLRequest(
-                      url: await WebViewGlobalController.value!.getUrl(), headers: ref.read(humHubProvider).customHeaders),
+                      url: await WebViewGlobalController.value!.getUrl(),
+                      headers: ref.read(humHubProvider).customHeaders),
                 );
               } else {
                 WebViewGlobalController.value!.reload();
