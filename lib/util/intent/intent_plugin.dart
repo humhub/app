@@ -105,7 +105,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
           tryNavigateWithOpener(redirectUrl);
         } else {
           if (redirectUrl != null) {
-            RedirectUrlFromInit.setPayloadForInit(redirectUrl);
+            InitFromPush.setPayload(redirectUrl);
           }
         }
       } on PlatformException {
@@ -132,5 +132,19 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     // Always pop the current instance and init the new one.
     navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
     return isNewRouteSameAsCurrent;
+  }
+}
+
+class InitFromIntent {
+  static String? _redirectUrl;
+
+  static setPayloadForInit(String payload) {
+    _redirectUrl = payload;
+  }
+
+  static String? usePayloadForInit() {
+    String? payload = _redirectUrl;
+    _redirectUrl = null;
+    return payload;
   }
 }
