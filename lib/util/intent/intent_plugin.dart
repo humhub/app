@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/pages/web_view.dart';
-import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/router.dart';
 import 'package:humhub/util/universal_opener_controller.dart';
 import 'package:loggy/loggy.dart';
@@ -92,6 +91,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     // In this example app this is an almost useless guard, but it is here to
     // show we are not going to call getInitialUri multiple times, even if this
     // was a widget that will be disposed of (ex. a navigation route change).
+
     if (!_initialUriIsHandled) {
       _initialUriIsHandled = true;
       try {
@@ -102,10 +102,14 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         _latestUri = uri;
         String? redirectUrl = uri.queryParameters['url'];
         if (redirectUrl != null && navigatorKey.currentState != null) {
+          logInfo('MD22 IF open: $_initialUriIsHandled');
           tryNavigateWithOpener(redirectUrl);
         } else {
           if (redirectUrl != null) {
-            RedirectUrlFromInit.setPayloadForInit(redirectUrl);
+            UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
+            await opener.initHumHub();
+            navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
+            return;
           }
         }
       } on PlatformException {
@@ -120,6 +124,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   }
 
   Future<bool> tryNavigateWithOpener(String redirectUrl) async {
+    logInfo('MD initHumHub payload: $redirectUrl');
     bool isNewRouteSameAsCurrent = false;
     navigatorKey.currentState!.popUntil((route) {
       if (route.settings.name == WebViewApp.path) {
@@ -132,5 +137,19 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     // Always pop the current instance and init the new one.
     navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
     return isNewRouteSameAsCurrent;
+  }
+}
+
+class InitFromIntent {
+  static String? _redirectUrl;
+
+  static setPayloadForInit(String payload) {
+    _redirectUrl = payload;
+  }
+
+  static String? usePayloadForInit() {
+    String? payload = _redirectUrl;
+    _redirectUrl = null;
+    return payload;
   }
 }

@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/form_helper.dart';
+import 'package:humhub/util/intent/intent_plugin.dart';
+import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/opener_controller.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:rive/rive.dart';
@@ -41,12 +43,17 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
     _animationReverse = SimpleAnimation('animation', autoplay: true);
     _controllerReverse = _animationReverse;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       Future.delayed(const Duration(milliseconds: 700), () {
         setState(() {
           _textFieldAddInfoVisibility = true;
         });
       });
+
+      String? urlIntent = InitFromIntent.usePayloadForInit();
+      if(urlIntent != null){
+        await RedirectNotificationChannel().onTap(urlIntent);
+      }
     });
   }
 

@@ -185,7 +185,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       manifest = manifestPush.manifest;
       url = manifestPush.remoteMessage.data['url'];
     }
-    String? payloadFromPush = RedirectUrlFromInit.usePayloadForInit();
+    String? payloadFromPush = InitFromPush.usePayload();
     if (payloadFromPush != null) url = payloadFromPush;
     return URLRequest(url: Uri.parse(url ?? manifest.baseUrl), headers: ref.read(humHubProvider).customHeaders);
   }

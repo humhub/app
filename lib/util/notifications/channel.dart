@@ -50,6 +50,7 @@ class RedirectNotificationChannel extends NotificationChannel {
         }
         return true;
       });
+      // TODO: Check here what does it happen if the WebView and Manifest is not init and we want to open it from the opener.
       UniversalOpenerController opener = UniversalOpenerController(url: payload);
       await opener.initHumHub();
       if (isNewRouteSameAsCurrent) {
@@ -59,20 +60,20 @@ class RedirectNotificationChannel extends NotificationChannel {
       navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
     } else {
       if (payload != null) {
-        RedirectUrlFromInit.setPayloadForInit(payload);
+        InitFromPush.setPayload(payload);
       }
     }
   }
 }
 
-class RedirectUrlFromInit {
+class InitFromPush {
   static String? _redirectUrlFromInit;
 
-  static setPayloadForInit(String payload) {
+  static setPayload(String payload) {
     _redirectUrlFromInit = payload;
   }
 
-  static String? usePayloadForInit() {
+  static String? usePayload() {
     String? payload = _redirectUrlFromInit;
     _redirectUrlFromInit = null;
     return payload;
