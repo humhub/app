@@ -80,6 +80,15 @@ android {
             }
         }
     }
+
+    flavorDimensions "flavor"
+    productFlavors {
+        somedemoproject12345 {
+            dimension "flavor"
+            applicationId "com.humhub.somedemo12345.app"
+        }
+
+    }
 }
 
 flutter {
