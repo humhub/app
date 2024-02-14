@@ -1,3 +1,4 @@
+import 'package:flavor_getter/flavor_getter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,6 +16,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 main() async {
   // Retrieve flavor argument
   //String? flavor = appFlavor;
+  String flavor = 'Unknown';
+  final flavorGetterPlugin = FlavorGetter();
+  try {
+    flavor = await flavorGetterPlugin.getFlavor() ?? 'Unknown flavor';
+  } on PlatformException {
+    flavor = 'Failed to get flavor';
+  }
 
   Loggy.initLoggy(
     logPrinter: const GlobalLog(),
