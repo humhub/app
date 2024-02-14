@@ -13,6 +13,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 main() async {
+  // Retrieve flavor argument
+  //String? flavor = appFlavor;
+
   Loggy.initLoggy(
     logPrinter: const GlobalLog(),
   );
