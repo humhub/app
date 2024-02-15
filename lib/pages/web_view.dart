@@ -123,7 +123,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     // 1st check if url is not def. app url and open it in a browser or inApp.
     _setAjaxHeadersJQuery(controller);
     final url = action.request.url!.origin;
-    if (!url.startsWith(manifest.baseUrl)) {
+    if (!url.startsWith(manifest.baseUrl) && action.isForMainFrame) {
       authBrowser.launchUrl(action.request);
       return NavigationActionPolicy.CANCEL;
     }
