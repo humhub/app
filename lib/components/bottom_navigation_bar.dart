@@ -14,16 +14,13 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
   int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (selectedIndex == 0) {
-          return true;
-        }
+    return PopScope(
+      canPop: selectedIndex == 0,
+      onPopInvoked: (didPop) {
         setState(() {
           selectedIndex--;
           widget.onPageChange(selectedIndex);
         });
-        return false;
       },
       child: Container(
         height: 50,
@@ -143,5 +140,16 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
         widget.onPageChange(selectedIndex);
       });
     }
+  }
+
+  bool get canPop {
+    if (selectedIndex == 0) {
+      return true;
+    }
+    setState(() {
+      selectedIndex--;
+      widget.onPageChange(selectedIndex);
+    });
+    return false;
   }
 }
