@@ -22,7 +22,7 @@ class HumHub {
   });
 
   Map<String, dynamic> toJson() => {
-        'manifest': manifest != null ? manifest!.toJson() : null,
+        'manifest': manifest?.toJson(),
         'isHideDialog': isHideOpener,
         'randomHash': randomHash,
         'appVersion': appVersion,

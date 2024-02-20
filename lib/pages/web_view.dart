@@ -23,6 +23,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
 
+
 class WebViewGlobalController {
   static InAppWebViewController? _value;
 
@@ -77,6 +78,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         _concludeAuth(request);
       },
     );
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () => WebViewGlobalController.value!.exitApp(context, ref),
       child: Scaffold(
