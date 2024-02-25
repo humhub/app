@@ -11,6 +11,8 @@ import 'package:loggy/loggy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'flavored_app.dart';
+
 main() async {
   Loggy.initLoggy(
     logPrinter: const GlobalLog(),
@@ -27,7 +29,7 @@ main() async {
           break;
         default:
           logDebug("Package Name: ${packageInfo.packageName}");
-          runApp(const ProviderScope(child: OpenerApp()));
+          runApp(const ProviderScope(child: FlavoredApp()));
       }
     });
   });

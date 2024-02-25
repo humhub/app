@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/flavored/flavored_web_view.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/help/help_android.dart';
@@ -35,12 +36,13 @@ class MyRouter {
   static var routes = {
     Opener.path: (context) => const Opener(),
     WebViewApp.path: (context) => const WebViewApp(),
+    FlavoredWebView.path: (context) => const FlavoredWebView(),
     '/help': (context) => Platform.isAndroid ? const HelpAndroid() : const HelpIos(),
   };
 
-  static Future<String> getInitialRoute(WidgetRef ref) async {
+  static Future<String> getInitialRoute(WidgetRef ref, {bool isFlavored = false}) async {
     HumHub humhub = await ref.read(humHubProvider).getInstance();
-    RedirectAction action = await humhub.action(ref);
+    RedirectAction action =  !isFlavored ? await humhub.action(ref) : RedirectAction.flavored;
     switch (action) {
       case RedirectAction.opener:
         initRoute = Opener.path;
@@ -49,6 +51,10 @@ class MyRouter {
         initRoute = WebViewApp.path;
         initParams = humhub.manifest;
         return WebViewApp.path;
+      case RedirectAction.flavored:
+        initRoute = FlavoredWebView.path;
+        initParams = humhub.manifest;
+        return FlavoredWebView.path;
     }
   }
 }

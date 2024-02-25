@@ -8,7 +8,7 @@ class Manifest {
   final String backgroundColor;
   final String themeColor;
 
-  Manifest(this.display, this.startUrl, this.shortName, this.name, this.backgroundColor, this.themeColor);
+  Manifest({required this.display, required this.startUrl, required this.shortName, required this.name, required this.backgroundColor, required this.themeColor});
 
   String get baseUrl {
     Uri url = Uri.parse(startUrl);
@@ -17,12 +17,12 @@ class Manifest {
 
   factory Manifest.fromJson(Map<String, dynamic> json) {
     return Manifest(
-      json['display'] as String,
-      json['start_url'] as String,
-      json['short_name'] as String,
-      json['name'] as String,
-      json['background_color'] as String,
-      json['theme_color'] as String,
+      display: json['display'] as String,
+      startUrl: json['start_url'] as String,
+      shortName: json['short_name'] as String,
+      name: json['name'] as String,
+      backgroundColor: json['background_color'] as String,
+      themeColor: json['theme_color'] as String,
     );
   }
 

@@ -22,7 +22,7 @@ import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class WebViewGlobalController {
   static InAppWebViewController? _value;
@@ -34,15 +34,15 @@ class WebViewGlobalController {
   }
 }
 
-class WebViewApp extends ConsumerStatefulWidget {
-  const WebViewApp({super.key});
-  static const String path = '/web_view';
+class FlavoredWebView extends ConsumerStatefulWidget {
+  const FlavoredWebView({super.key});
+  static const String path = '/flavored_web_view';
 
   @override
-  WebViewAppState createState() => WebViewAppState();
+  FlavoredWebViewState createState() => FlavoredWebViewState();
 }
 
-class WebViewAppState extends ConsumerState<WebViewApp> {
+class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
   late AuthInAppBrowser authBrowser;
   late Manifest manifest;
   late URLRequest _initialRequest;
@@ -133,9 +133,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     if (Platform.isAndroid ||
         action.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED ||
         action.iosWKNavigationType == IOSWKNavigationType.FORM_SUBMITTED) {
-      Map<String, String> mergedMap = {...?_initialRequest.headers, ...?action.request.headers};
-      URLRequest newRequest = action.request.copyWith(headers: mergedMap);
-      controller.loadUrl(urlRequest: newRequest);
+      action.request.headers?.addAll(_initialRequest.headers!);
+      controller.loadUrl(urlRequest: action.request);
       return NavigationActionPolicy.CANCEL;
     }
     return NavigationActionPolicy.ALLOW;
@@ -188,7 +187,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     }
     String? payloadFromPush = InitFromPush.usePayload();
     if (payloadFromPush != null) url = payloadFromPush;
-    return URLRequest(url: Uri.parse(url ?? manifest.startUrl), headers: ref.read(humHubProvider).customHeaders);
+    return URLRequest(url: Uri.parse(url ?? manifest.baseUrl), headers: ref.read(humHubProvider).customHeaders);
   }
 
   _onLoadStop(InAppWebViewController controller, Uri? url) {
@@ -198,7 +197,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
           .evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
       WebViewGlobalController.value!.evaluateJavascript(
           source:
-              "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+          "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _setAjaxHeadersJQuery(controller);
     _pullToRefreshController?.endRefreshing();
@@ -217,38 +216,38 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     return kIsWeb
         ? null
         : PullToRefreshController(
-            options: _pullToRefreshOptions,
-            onRefresh: () async {
-              Uri? url = await WebViewGlobalController.value!.getUrl();
-              if (url != null) {
-                WebViewGlobalController.value!.loadUrl(
-                  urlRequest: URLRequest(
-                      url: await WebViewGlobalController.value!.getUrl(),
-                      headers: ref.read(humHubProvider).customHeaders),
-                );
-              } else {
-                WebViewGlobalController.value!.reload();
-              }
-            },
+      options: _pullToRefreshOptions,
+      onRefresh: () async {
+        Uri? url = await WebViewGlobalController.value!.getUrl();
+        if (url != null) {
+          WebViewGlobalController.value!.loadUrl(
+            urlRequest: URLRequest(
+                url: await WebViewGlobalController.value!.getUrl(),
+                headers: ref.read(humHubProvider).customHeaders),
           );
+        } else {
+          WebViewGlobalController.value!.reload();
+        }
+      },
+    );
   }
 
   askForNotificationPermissions() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.notification_permission_popup_title),
-        content: Text(AppLocalizations.of(context)!.notification_permission_popup_content),
+        title: const Text("Notification Permission"),
+        content: const Text("Please enable notifications for HumHub in the device settings"),
         actions: <Widget>[
           TextButton(
-            child: Text(AppLocalizations.of(context)!.enable),
+            child: const Text("Enable"),
             onPressed: () {
               AppSettings.openAppSettings();
               Navigator.pop(context);
             },
           ),
           TextButton(
-            child: Text(AppLocalizations.of(context)!.skip),
+            child: const Text("Skip"),
             onPressed: () {
               Navigator.pop(context);
             },
