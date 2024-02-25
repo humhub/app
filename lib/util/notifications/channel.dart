@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/universal_opener_controller.dart';
 import 'package:humhub/util/router.dart';
-import 'package:loggy/loggy.dart';
 
 abstract class NotificationChannel {
   final String id;
@@ -15,7 +14,6 @@ abstract class NotificationChannel {
 
   @protected
   Future<void> navigate(String route, {Object? arguments}) async {
-    logInfo('NotificationChannel navigate: $route');
     if (navigatorKey.currentState?.mounted ?? false) {
       await navigatorKey.currentState?.pushNamed(
         route,

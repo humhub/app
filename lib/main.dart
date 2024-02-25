@@ -1,4 +1,3 @@
-import 'package:flavor_getter/flavor_getter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,10 +15,20 @@ main() async {
   Loggy.initLoggy(
     logPrinter: const GlobalLog(),
   );
+
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
-    FlavorGetter().getFlavor().then((value) {
-      runApp(const ProviderScope(child: MyApp()));
+    PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
+      logDebug("Package Name: ${packageInfo.packageName}");
+      switch (packageInfo.packageName) {
+        case "com.humhub.app":
+          logDebug("Package Name: ${packageInfo.packageName}");
+          runApp(const ProviderScope(child: OpenerApp()));
+          break;
+        default:
+          logDebug("Package Name: ${packageInfo.packageName}");
+          runApp(const ProviderScope(child: OpenerApp()));
+      }
     });
   });
 }

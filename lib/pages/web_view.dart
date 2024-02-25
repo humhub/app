@@ -153,7 +153,6 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       WebMessageListener(
         jsObjectName: "flutterChannel",
         onPostMessage: (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
-          logInfo(inMessage);
           ChannelMessage message = ChannelMessage.fromJson(inMessage!);
           await _handleJSMessage(message, headlessWebView!);
         },
@@ -261,8 +260,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
 
   Future<void> _setAjaxHeadersJQuery(InAppWebViewController controller) async {
     String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(ref.read(humHubProvider).customHeaders).toString()}});";
-    dynamic jsResponse = await controller.evaluateJavascript(source: jsCode);
-    logInfo(jsResponse != null ? jsResponse.toString() : "Script returned null value");
+    await controller.evaluateJavascript(source: jsCode);
   }
 
   Future<void> _handleJSMessage(ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
