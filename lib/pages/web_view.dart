@@ -17,7 +17,6 @@ import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/universal_opener_controller.dart';
-import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:humhub/util/router.dart' as m;
@@ -181,11 +180,6 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     if (args == null) {
       manifest = m.MyRouter.initParams;
     }
-    if (args is ManifestWithRemoteMsg) {
-      ManifestWithRemoteMsg manifestPush = args;
-      manifest = manifestPush.manifest;
-      url = manifestPush.remoteMessage.data['url'];
-    }
     String? payloadFromPush = InitFromPush.usePayload();
     if (payloadFromPush != null) url = payloadFromPush;
     return URLRequest(url: Uri.parse(url ?? manifest.startUrl), headers: ref.read(humHubProvider).customHeaders);
@@ -299,7 +293,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
           await headlessWebView.webViewController.loadUrl(urlRequest: request);
         }
         break;
-      case ChannelAction.none:
+      default:
         break;
     }
   }

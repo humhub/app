@@ -11,16 +11,12 @@ import 'package:humhub/components/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/providers.dart';
-import 'package:humhub/util/universal_opener_controller.dart';
-import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
 
 
@@ -35,8 +31,8 @@ class WebViewGlobalController {
 }
 
 class FlavoredWebView extends ConsumerStatefulWidget {
-  const FlavoredWebView({super.key});
-  static const String path = '/flavored_web_view';
+  final HumHub instance;
+  const FlavoredWebView({super.key, required this.instance});
 
   @override
   FlavoredWebViewState createState() => FlavoredWebViewState();
@@ -44,7 +40,6 @@ class FlavoredWebView extends ConsumerStatefulWidget {
 
 class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
   late AuthInAppBrowser authBrowser;
-  late Manifest manifest;
   late URLRequest _initialRequest;
   final _options = InAppWebViewGroupOptions(
     crossPlatform: InAppWebViewOptions(
@@ -73,7 +68,7 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
     _initialRequest = _initRequest;
     _pullToRefreshController = initPullToRefreshController;
     authBrowser = AuthInAppBrowser(
-      manifest: manifest,
+      manifest: widget.instance.manifest!,
       concludeAuth: (URLRequest request) {
         _concludeAuth(request);
       },
@@ -82,7 +77,7 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
     return WillPopScope(
       onWillPop: () => WebViewGlobalController.value!.exitApp(context, ref),
       child: Scaffold(
-        backgroundColor: HexColor(manifest.themeColor),
+        backgroundColor: HexColor(widget.instance.manifest!.themeColor),
         body: SafeArea(
           bottom: false,
           child: InAppWebView(
@@ -94,12 +89,10 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
             shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
             onCreateWindow: (inAppWebViewController, createWindowAction) async {
               final urlToOpen = createWindowAction.request.url;
-
-              if (urlToOpen == null) return Future.value(false); // Don't create a new window.
-
+              if (urlToOpen == null) return Future.value(false);
               if (await canLaunchUrl(urlToOpen)) {
                 await launchUrl(urlToOpen,
-                    mode: LaunchMode.externalApplication); // Open the URL in the default browser.
+                    mode: LaunchMode.externalApplication);
               } else {
                 logError('Could not launch $urlToOpen');
               }
@@ -125,7 +118,7 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
     // 1st check if url is not def. app url and open it in a browser or inApp.
     _setAjaxHeadersJQuery(controller);
     final url = action.request.url!.origin;
-    if (!url.startsWith(manifest.baseUrl) && action.isForMainFrame) {
+    if (!url.startsWith(widget.instance.manifest!.baseUrl) && action.isForMainFrame) {
       authBrowser.launchUrl(action.request);
       return NavigationActionPolicy.CANCEL;
     }
@@ -166,28 +159,10 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
   }
 
   URLRequest get _initRequest {
-    final args = ModalRoute.of(context)?.settings.arguments;
-    String? url;
-    if (args is Manifest) {
-      manifest = args;
-    }
-    if (args is UniversalOpenerController) {
-      UniversalOpenerController controller = args;
-      ref.read(humHubProvider).setInstance(controller.humhub);
-      manifest = controller.humhub.manifest!;
-      url = controller.url;
-    }
-    if (args == null) {
-      manifest = m.MyRouter.initParams;
-    }
-    if (args is ManifestWithRemoteMsg) {
-      ManifestWithRemoteMsg manifestPush = args;
-      manifest = manifestPush.manifest;
-      url = manifestPush.remoteMessage.data['url'];
-    }
+    String? url = widget.instance.manifest!.startUrl;
     String? payloadFromPush = InitFromPush.usePayload();
     if (payloadFromPush != null) url = payloadFromPush;
-    return URLRequest(url: Uri.parse(url ?? manifest.baseUrl), headers: ref.read(humHubProvider).customHeaders);
+    return URLRequest(url: Uri.parse(url), headers: widget.instance.customHeaders);
   }
 
   _onLoadStop(InAppWebViewController controller, Uri? url) {
@@ -211,7 +186,7 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
 
   PullToRefreshController? get initPullToRefreshController {
     _pullToRefreshOptions = PullToRefreshOptions(
-      color: HexColor(manifest.themeColor),
+      color: HexColor(widget.instance.manifest!.themeColor),
     );
     return kIsWeb
         ? null
@@ -223,7 +198,7 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
           WebViewGlobalController.value!.loadUrl(
             urlRequest: URLRequest(
                 url: await WebViewGlobalController.value!.getUrl(),
-                headers: ref.read(humHubProvider).customHeaders),
+                headers: widget.instance.customHeaders),
           );
         } else {
           WebViewGlobalController.value!.reload();
@@ -258,22 +233,12 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
   }
 
   Future<void> _setAjaxHeadersJQuery(InAppWebViewController controller) async {
-    String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(ref.read(humHubProvider).customHeaders).toString()}});";
+    String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(widget.instance.customHeaders).toString()}});";
     await controller.evaluateJavascript(source: jsCode);
   }
 
   Future<void> _handleJSMessage(ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
     switch (message.action) {
-      case ChannelAction.showOpener:
-        ref.read(humHubProvider).setIsHideOpener(false);
-        ref.read(humHubProvider).clearSafeStorage();
-        FlutterAppBadger.updateBadgeCount(0);
-        Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
-        break;
-      case ChannelAction.hideOpener:
-        ref.read(humHubProvider).setIsHideOpener(true);
-        ref.read(humHubProvider).setHash(HumHub.generateHash(32));
-        break;
       case ChannelAction.registerFcmDevice:
         String? token = ref.read(pushTokenProvider).value;
         if (token != null) {
@@ -298,8 +263,9 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
           await headlessWebView.webViewController.loadUrl(urlRequest: request);
         }
         break;
-      case ChannelAction.none:
+      default:
         break;
+
     }
   }
 

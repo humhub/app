@@ -1,10 +1,7 @@
 import 'dart:io';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/flavored/flavored_web_view.dart';
 import 'package:humhub/models/hum_hub.dart';
-import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/help/help_android.dart';
 import 'package:humhub/pages/help/help_ios.dart';
 import 'package:humhub/pages/opener.dart';
@@ -36,13 +33,12 @@ class MyRouter {
   static var routes = {
     Opener.path: (context) => const Opener(),
     WebViewApp.path: (context) => const WebViewApp(),
-    FlavoredWebView.path: (context) => const FlavoredWebView(),
     '/help': (context) => Platform.isAndroid ? const HelpAndroid() : const HelpIos(),
   };
 
-  static Future<String> getInitialRoute(WidgetRef ref, {bool isFlavored = false}) async {
+  static Future<String> getInitialRoute(WidgetRef ref) async {
     HumHub humhub = await ref.read(humHubProvider).getInstance();
-    RedirectAction action =  !isFlavored ? await humhub.action(ref) : RedirectAction.flavored;
+    RedirectAction action = await humhub.action(ref);
     switch (action) {
       case RedirectAction.opener:
         initRoute = Opener.path;
@@ -51,20 +47,6 @@ class MyRouter {
         initRoute = WebViewApp.path;
         initParams = humhub.manifest;
         return WebViewApp.path;
-      case RedirectAction.flavored:
-        initRoute = FlavoredWebView.path;
-        initParams = humhub.manifest;
-        return FlavoredWebView.path;
     }
   }
-}
-
-class ManifestWithRemoteMsg {
-  final Manifest _manifest;
-  final RemoteMessage _remoteMessage;
-
-  RemoteMessage get remoteMessage => _remoteMessage;
-  Manifest get manifest => _manifest;
-
-  ManifestWithRemoteMsg(this._manifest, this._remoteMessage);
 }

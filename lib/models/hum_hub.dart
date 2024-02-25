@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/api_provider.dart';
 
-enum RedirectAction { opener, webView, flavored }
+enum RedirectAction { opener, webView }
 
 class HumHub {
   Manifest? manifest;
