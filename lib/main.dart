@@ -2,8 +2,7 @@ import 'package:flavor_getter/flavor_getter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:humhub/util/intent/intent_plugin.dart';
+import 'package:humhub/opener_app.dart';
 import 'package:humhub/util/log.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/override_locale.dart';
@@ -14,23 +13,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 main() async {
-  // Retrieve flavor argument
-  //String? flavor = appFlavor;
-  String flavor = 'Unknown';
-  final flavorGetterPlugin = FlavorGetter();
-  try {
-    flavor = await flavorGetterPlugin.getFlavor() ?? 'Unknown flavor';
-  } on PlatformException {
-    flavor = 'Failed to get flavor';
-  }
-
   Loggy.initLoggy(
     logPrinter: const GlobalLog(),
   );
   WidgetsFlutterBinding.ensureInitialized();
-  await clearSecureStorageOnReinstall();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
-    runApp(const ProviderScope(child: MyApp()));
+    FlavorGetter().getFlavor().then((value) {
+      runApp(const ProviderScope(child: MyApp()));
+    });
   });
 }
 
