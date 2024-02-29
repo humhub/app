@@ -29,7 +29,7 @@ main() async {
           runApp(const ProviderScope(child: OpenerApp()));
           break;
         default:
-          UniversalOpenerController opener = UniversalOpenerController(url: 'https://sometestproject12345.humhub.com');
+          UniversalOpenerController opener = UniversalOpenerController(url: 'https://sometestproject12345.humhub.com/manifest.json');
           HumHub? instance = await opener.initHumHub();
           logDebug("Package Name: ${packageInfo.packageName}");
           runApp(ProviderScope(child: FlavoredApp(instance: instance!)));

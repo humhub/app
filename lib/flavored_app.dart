@@ -5,6 +5,7 @@ import 'package:humhub/flavored/flavored_web_view.dart';
 import 'package:humhub/util/intent/intent_plugin.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/push/push_plugin.dart';
+import 'package:humhub/util/router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/hum_hub.dart';
@@ -25,13 +26,18 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
       child: NotificationPlugin(
         child: PushPlugin(
           child: MaterialApp(
-              debugShowCheckedModeBanner: false,
-              theme: ThemeData(
-                fontFamily: 'OpenSans',
-              ),
-              builder: (context, child) {
-                return FlavoredWebView(instance: widget.instance);
-              }),
+            debugShowCheckedModeBanner: false,
+            onGenerateRoute: (settings) {
+              return MaterialPageRoute(
+                builder: (context) => const FlavoredWebView(),
+                settings: RouteSettings(arguments: widget.instance),
+              );
+            },
+            navigatorKey: navigatorKey,
+            theme: ThemeData(
+              fontFamily: 'OpenSans',
+            ),
+          ),
         ),
       ),
     );

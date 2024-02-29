@@ -30,14 +30,15 @@ class WebViewGlobalController {
 }
 
 class FlavoredWebView extends ConsumerStatefulWidget {
-  final HumHub instance;
-  const FlavoredWebView({super.key, required this.instance});
+  static const String path = '/flavored_web_view';
+  const FlavoredWebView({super.key});
 
   @override
   FlavoredWebViewState createState() => FlavoredWebViewState();
 }
 
 class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
+  late HumHub instance;
   late AuthInAppBrowser authBrowser;
   late URLRequest _initialRequest;
   final _options = InAppWebViewGroupOptions(
@@ -61,22 +62,24 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
   void initState() {
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
+    instance = ModalRoute.of(context)?.settings.arguments as HumHub;
     _initialRequest = _initRequest;
     _pullToRefreshController = initPullToRefreshController;
     authBrowser = AuthInAppBrowser(
-      manifest: widget.instance.manifest!,
+      manifest: instance.manifest!,
       concludeAuth: (URLRequest request) {
         _concludeAuth(request);
       },
     );
     // ignore: deprecated_member_use
     return WillPopScope(
-      onWillPop: () => WebViewGlobalController.value!.exitApp(context, ref),
+      onWillPop: () {
+        return WebViewGlobalController.value!.exitApp(context, ref);
+      },
       child: Scaffold(
-        backgroundColor: HexColor(widget.instance.manifest!.themeColor),
+        backgroundColor: HexColor(instance.manifest!.themeColor),
         body: SafeArea(
           bottom: false,
           child: InAppWebView(
@@ -117,7 +120,7 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
     // 1st check if url is not def. app url and open it in a browser or inApp.
     _setAjaxHeadersJQuery(controller);
     final url = action.request.url!.origin;
-    if (!url.startsWith(widget.instance.manifest!.baseUrl) && action.isForMainFrame) {
+    if (!url.startsWith(instance.manifest!.baseUrl) && action.isForMainFrame) {
       authBrowser.launchUrl(action.request);
       return NavigationActionPolicy.CANCEL;
     }
@@ -158,10 +161,10 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
   }
 
   URLRequest get _initRequest {
-    String? url = widget.instance.manifest!.startUrl;
+    String? url = instance.manifest!.startUrl;
     String? payloadFromPush = InitFromPush.usePayload();
     if (payloadFromPush != null) url = payloadFromPush;
-    return URLRequest(url: Uri.parse(url), headers: widget.instance.customHeaders);
+    return URLRequest(url: Uri.parse(url), headers: instance.customHeaders);
   }
 
   _onLoadStop(InAppWebViewController controller, Uri? url) {
@@ -185,7 +188,7 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
 
   PullToRefreshController? get initPullToRefreshController {
     _pullToRefreshOptions = PullToRefreshOptions(
-      color: HexColor(widget.instance.manifest!.themeColor),
+      color: HexColor(instance.manifest!.themeColor),
     );
     return kIsWeb
         ? null
@@ -197,7 +200,7 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
           WebViewGlobalController.value!.loadUrl(
             urlRequest: URLRequest(
                 url: await WebViewGlobalController.value!.getUrl(),
-                headers: widget.instance.customHeaders),
+                headers: instance.customHeaders),
           );
         } else {
           WebViewGlobalController.value!.reload();
@@ -232,7 +235,7 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
   }
 
   Future<void> _setAjaxHeadersJQuery(InAppWebViewController controller) async {
-    String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(widget.instance.customHeaders).toString()}});";
+    String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(instance.customHeaders).toString()}});";
     await controller.evaluateJavascript(source: jsCode);
   }
 
