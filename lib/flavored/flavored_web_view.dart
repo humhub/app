@@ -18,7 +18,6 @@ import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 class WebViewGlobalController {
   static InAppWebViewController? _value;
 
@@ -62,6 +61,7 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
   void initState() {
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     instance = ModalRoute.of(context)?.settings.arguments as HumHub;
@@ -93,8 +93,7 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
               final urlToOpen = createWindowAction.request.url;
               if (urlToOpen == null) return Future.value(false);
               if (await canLaunchUrl(urlToOpen)) {
-                await launchUrl(urlToOpen,
-                    mode: LaunchMode.externalApplication);
+                await launchUrl(urlToOpen, mode: LaunchMode.externalApplication);
               } else {
                 logError('Could not launch $urlToOpen');
               }
@@ -128,8 +127,9 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
     if (Platform.isAndroid ||
         action.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED ||
         action.iosWKNavigationType == IOSWKNavigationType.FORM_SUBMITTED) {
-      action.request.headers?.addAll(_initialRequest.headers!);
-      controller.loadUrl(urlRequest: action.request);
+      Map<String, String> mergedMap = {...instance.customHeaders, ...?action.request.headers};
+      URLRequest newRequest = action.request.copyWith(headers: mergedMap);
+      controller.loadUrl(urlRequest: newRequest);
       return NavigationActionPolicy.CANCEL;
     }
     return NavigationActionPolicy.ALLOW;
@@ -174,7 +174,7 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
           .evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
       WebViewGlobalController.value!.evaluateJavascript(
           source:
-          "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+              "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _setAjaxHeadersJQuery(controller);
     _pullToRefreshController?.endRefreshing();
@@ -193,20 +193,19 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
     return kIsWeb
         ? null
         : PullToRefreshController(
-      options: _pullToRefreshOptions,
-      onRefresh: () async {
-        Uri? url = await WebViewGlobalController.value!.getUrl();
-        if (url != null) {
-          WebViewGlobalController.value!.loadUrl(
-            urlRequest: URLRequest(
-                url: await WebViewGlobalController.value!.getUrl(),
-                headers: instance.customHeaders),
+            options: _pullToRefreshOptions,
+            onRefresh: () async {
+              Uri? url = await WebViewGlobalController.value!.getUrl();
+              if (url != null) {
+                WebViewGlobalController.value!.loadUrl(
+                  urlRequest:
+                      URLRequest(url: await WebViewGlobalController.value!.getUrl(), headers: instance.customHeaders),
+                );
+              } else {
+                WebViewGlobalController.value!.reload();
+              }
+            },
           );
-        } else {
-          WebViewGlobalController.value!.reload();
-        }
-      },
-    );
   }
 
   askForNotificationPermissions() {
@@ -267,7 +266,6 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
         break;
       default:
         break;
-
     }
   }
 

@@ -146,3 +146,37 @@ extension IterableX<E> on Iterable<E> {
     });
   }
 }
+
+extension URLRequestExtension on URLRequest {
+  URLRequest copyWith({
+    Uri? url,
+    String? method,
+    Uint8List? body,
+    Map<String, String>? headers,
+    bool? iosAllowsCellularAccess,
+    bool? iosAllowsConstrainedNetworkAccess,
+    bool? iosAllowsExpensiveNetworkAccess,
+    IOSURLRequestCachePolicy? iosCachePolicy,
+    bool? iosHttpShouldHandleCookies,
+    bool? iosHttpShouldUsePipelining,
+    IOSURLRequestNetworkServiceType? iosNetworkServiceType,
+    double? iosTimeoutInterval,
+    Uri? iosMainDocumentURL,
+  }) {
+    return URLRequest(
+      url: url ?? this.url,
+      method: method ?? this.method,
+      headers: headers ?? this.headers,
+      body: body ?? this.body,
+      iosAllowsCellularAccess: iosAllowsCellularAccess ?? this.iosAllowsCellularAccess,
+      iosAllowsConstrainedNetworkAccess: iosAllowsConstrainedNetworkAccess ?? this.iosAllowsConstrainedNetworkAccess,
+      iosAllowsExpensiveNetworkAccess: iosAllowsExpensiveNetworkAccess ?? this.iosAllowsExpensiveNetworkAccess,
+      iosCachePolicy: iosCachePolicy ?? this.iosCachePolicy,
+      iosHttpShouldHandleCookies: iosHttpShouldHandleCookies ?? this.iosHttpShouldHandleCookies,
+      iosHttpShouldUsePipelining: iosHttpShouldUsePipelining ?? this.iosHttpShouldUsePipelining,
+      iosNetworkServiceType: iosNetworkServiceType ?? this.iosNetworkServiceType,
+      iosTimeoutInterval: iosTimeoutInterval ?? this.iosTimeoutInterval,
+      iosMainDocumentURL: iosMainDocumentURL ?? this.iosMainDocumentURL,
+    );
+  }
+}
