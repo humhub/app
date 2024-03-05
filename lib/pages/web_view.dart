@@ -133,8 +133,9 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     if (Platform.isAndroid ||
         action.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED ||
         action.iosWKNavigationType == IOSWKNavigationType.FORM_SUBMITTED) {
-      action.request.headers?.addAll(_initialRequest.headers!);
-      controller.loadUrl(urlRequest: action.request);
+      Map<String, String> mergedMap = {...?_initialRequest.headers, ...?action.request.headers};
+      URLRequest newRequest = action.request.copyWith(headers: mergedMap);
+      controller.loadUrl(urlRequest: newRequest);
       return NavigationActionPolicy.CANCEL;
     }
     return NavigationActionPolicy.ALLOW;

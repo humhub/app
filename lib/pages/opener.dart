@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/components/language_switcher.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/form_helper.dart';
@@ -51,7 +53,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
       });
 
       String? urlIntent = InitFromIntent.usePayloadForInit();
-      if(urlIntent != null){
+      if (urlIntent != null) {
         await RedirectNotificationChannel().onTap(urlIntent);
       }
     });
@@ -85,6 +87,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
+                    const Align(alignment: Alignment.topRight, child: LocaleSwitch(width: 70,)),
                     Expanded(
                       flex: 2,
                       child: AnimatedOpacity(
