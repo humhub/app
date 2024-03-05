@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/components/language_switcher.dart';
 import 'package:humhub/pages/web_view.dart';
@@ -87,9 +88,17 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    const Align(alignment: Alignment.topRight, child: LocaleSwitch(width: 70,)),
+                    const Expanded(
+                      flex: 1,
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: LocaleSwitch(
+                          width: 70,
+                        ),
+                      ),
+                    ),
                     Expanded(
-                      flex: 2,
+                      flex: 8,
                       child: AnimatedOpacity(
                         opacity: _visible ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 300),
@@ -101,7 +110,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                       ),
                     ),
                     Expanded(
-                        flex: 3,
+                        flex: 12,
                         child: AnimatedOpacity(
                           opacity: _textFieldAddInfoVisibility ? 1.0 : 0.0,
                           duration: const Duration(milliseconds: 500),
@@ -144,7 +153,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                           ),
                         )),
                     Expanded(
-                      flex: 1,
+                      flex: 4,
                       child: AnimatedOpacity(
                         opacity: _visible ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 300),
@@ -164,7 +173,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                       ),
                     ),
                     Expanded(
-                      flex: 1,
+                      flex: 4,
                       child: GestureDetector(
                         onTap: () {
                           _controller.isActive = true;
