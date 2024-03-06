@@ -39,23 +39,22 @@ class OpenerController {
     Uri uri = assumeUrl(url);
     if (uri.pathSegments.isEmpty) {
       asyncData = await APIProvider.of(ref).request(Manifest.get(uri.origin));
-      logDebug("1");
+      if (!asyncData!.hasError) return true;
+
+      asyncData = await APIProvider.of(ref).request(Manifest.get(uri.origin, isUriPretty: false));
       if (!asyncData!.hasError) return true;
     }
-    for (var i = uri.pathSegments.length - 1; i >= 0; i--) {
+    for (var i = uri.pathSegments.length; i >= 0; i--) {
       String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
       asyncData = await APIProvider.of(ref).request(Manifest.get(i != 0 ? urlIn : uri.origin));
-      logDebug("2 in $i");
       if (!asyncData!.hasError) return true;
     }
     // Here we still did not find the manifest.json assume that it is somewhere in a format ../../index.php?r=web%2Fpwa-manifest%2Findex
-    for (var i = uri.pathSegments.length - 1; i >= 0; i--) {
+    for (var i = uri.pathSegments.length; i >= 0; i--) {
       String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
       asyncData = await APIProvider.of(ref).request(Manifest.get(i != 0 ? urlIn : uri.origin, isUriPretty: false));
-      logDebug("3 in $i");
       if (!asyncData!.hasError) return true;
     }
-    logDebug("4");
     return asyncData!.hasError;
   }
 
@@ -84,9 +83,12 @@ class OpenerController {
     }
     // Get the manifest.json for given url.
     await findManifest(helper.model[formUrlKey]!);
-    await checkHumHubModuleView(asyncData!.value!.startUrl);
+    logDebug("Here");
+    if (asyncData!.hasValue) {
+      await checkHumHubModuleView(asyncData!.value!.startUrl);
+    }
     // If manifest.json does not exist the url is incorrect.
-    // This is a temp. fix the validator expect sync. function this is some established workaround.
+    // This is a temp. fix the validator expect sync function this is established workaround.
     // In the future we could define our own TextFormField that would also validate the API responses.
     // But it this is not acceptable I can suggest simple popup or tempPopup.
     if (asyncData!.hasError || !doesViewExist) {
