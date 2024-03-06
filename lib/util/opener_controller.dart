@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:http/http.dart' as http;
 import 'package:loggy/loggy.dart';
@@ -24,22 +23,40 @@ class OpenerController {
 
   OpenerController({required this.ref, required this.helper});
 
-  findManifest(String url) async {
+  /// Finds the `manifest.json` file associated with the given URL. If the URL does not
+  /// directly point to the `manifest.json` file, it traverses up the directory structure
+  /// to locate it. If not found, it assumes a default path format. This method makes
+  /// asynchronous requests to fetch the manifest data.
+  ///
+  /// @param url The URL from which to start searching for the `manifest.json` file.
+  /// @return A Future that completes with no result once the `manifest.json` file is found
+  /// or the default path is assumed, or if an error occurs during the search process.
+  /// Additionally, it may trigger a check for the HumHub module view based on the start URL
+  /// obtained from the manifest data.
+  ///
+  /// @throws Exception if an error occurs during the search process.
+  Future<bool> findManifest(String url) async {
     Uri uri = assumeUrl(url);
-    if (!uri.isUriPretty()) {
-      asyncData = await APIProvider.of(ref).request(Manifest.get(uri.origin, isUriPretty: false));
-    } else {
-      for (var i = uri.pathSegments.length - 1; i >= 0; i--) {
-        String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
-        asyncData = await APIProvider.of(ref).request(Manifest.get(i != 0 ? urlIn : uri.origin));
-        if (!asyncData!.hasError) break;
-      }
-      if (uri.pathSegments.isEmpty) {
-        asyncData = await APIProvider.of(ref).request(Manifest.get(uri.origin));
-      }
+    if (uri.pathSegments.isEmpty) {
+      asyncData = await APIProvider.of(ref).request(Manifest.get(uri.origin));
+      logDebug("1");
+      if (!asyncData!.hasError) return true;
     }
-    if (asyncData!.hasError) return;
-    await checkHumHubModuleView(asyncData!.value!.startUrl);
+    for (var i = uri.pathSegments.length - 1; i >= 0; i--) {
+      String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
+      asyncData = await APIProvider.of(ref).request(Manifest.get(i != 0 ? urlIn : uri.origin));
+      logDebug("2 in $i");
+      if (!asyncData!.hasError) return true;
+    }
+    // Here we still did not find the manifest.json assume that it is somewhere in a format ../../index.php?r=web%2Fpwa-manifest%2Findex
+    for (var i = uri.pathSegments.length - 1; i >= 0; i--) {
+      String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
+      asyncData = await APIProvider.of(ref).request(Manifest.get(i != 0 ? urlIn : uri.origin, isUriPretty: false));
+      logDebug("3 in $i");
+      if (!asyncData!.hasError) return true;
+    }
+    logDebug("4");
+    return asyncData!.hasError;
   }
 
   checkHumHubModuleView(String url) async {
@@ -67,6 +84,7 @@ class OpenerController {
     }
     // Get the manifest.json for given url.
     await findManifest(helper.model[formUrlKey]!);
+    await checkHumHubModuleView(asyncData!.value!.startUrl);
     // If manifest.json does not exist the url is incorrect.
     // This is a temp. fix the validator expect sync. function this is some established workaround.
     // In the future we could define our own TextFormField that would also validate the API responses.

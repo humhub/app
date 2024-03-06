@@ -94,11 +94,3 @@ extension FutureAsyncValueX<T> on Future<AsyncValue<T>> {
         (asyncValue) => asyncValue.asData?.value,
       );
 }
-
-extension PrettyUri on Uri {
-  bool isUriPretty() {
-    RegExp regex = RegExp(r'index\.php.*[?&]r=');
-    String path = Uri.decodeComponent(toString());
-    return !regex.hasMatch(path);
-  }
-}
