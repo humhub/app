@@ -36,26 +36,27 @@ class OpenerController {
   ///
   /// @throws Exception if an error occurs during the search process.
   Future<bool> findManifest(String url) async {
-    Uri uri = assumeUrl(url);
-    if (uri.pathSegments.isEmpty) {
-      asyncData = await APIProvider.of(ref).request(Manifest.get(uri.origin));
-      if (!asyncData!.hasError) return true;
-
-      asyncData = await APIProvider.of(ref).request(Manifest.get(uri.origin, isUriPretty: false));
-      if (!asyncData!.hasError) return true;
-    }
-    for (var i = uri.pathSegments.length; i >= 0; i--) {
-      String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
-      asyncData = await APIProvider.of(ref).request(Manifest.get(i != 0 ? urlIn : uri.origin));
-      if (!asyncData!.hasError) return true;
-    }
-    // Here we still did not find the manifest.json assume that it is somewhere in a format ../../index.php?r=web%2Fpwa-manifest%2Findex
-    for (var i = uri.pathSegments.length; i >= 0; i--) {
-      String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
-      asyncData = await APIProvider.of(ref).request(Manifest.get(i != 0 ? urlIn : uri.origin, isUriPretty: false));
-      if (!asyncData!.hasError) return true;
+    List<String> possibleUrls = generatePossibleManifestsUrls(url);
+    for (var url in possibleUrls) {
+      asyncData = await APIProvider.of(ref).request(Manifest.get(url));
+      if (!asyncData!.hasError) break;
     }
     return asyncData!.hasError;
+  }
+
+  List<String> generatePossibleManifestsUrls(String url) {
+    List<String> urls = [];
+    Uri uri = assumeUrl(url);
+
+    for (var i = uri.pathSegments.length; i >= 0; i--) {
+      String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
+      urls.add(Manifest.defineUrl(i != 0 ? urlIn : uri.origin));
+    }
+    for (var i = uri.pathSegments.length; i >= 0; i--) {
+      String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
+      urls.add(Manifest.defineUrl(i != 0 ? urlIn : uri.origin, isUriPretty: false));
+    }
+    return urls;
   }
 
   checkHumHubModuleView(String url) async {
