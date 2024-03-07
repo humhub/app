@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humhub/util/opener_controller.dart';
-import 'package:loggy/loggy.dart';
 import 'package:mockito/mockito.dart';
 
 class MyHttpOverrides extends HttpOverrides {
