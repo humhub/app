@@ -44,21 +44,6 @@ class OpenerController {
     return asyncData!.hasError;
   }
 
-  List<String> generatePossibleManifestsUrls(String url) {
-    List<String> urls = [];
-    Uri uri = assumeUrl(url);
-
-    for (var i = uri.pathSegments.length; i >= 0; i--) {
-      String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
-      urls.add(Manifest.defineUrl(i != 0 ? urlIn : uri.origin));
-    }
-    for (var i = uri.pathSegments.length; i >= 0; i--) {
-      String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
-      urls.add(Manifest.defineUrl(i != 0 ? urlIn : uri.origin, isUriPretty: false));
-    }
-    return urls;
-  }
-
   checkHumHubModuleView(String url) async {
     Response? response;
     response = await http.Client().get(Uri.parse(url)).catchError((err) {
@@ -113,11 +98,6 @@ class OpenerController {
 
   bool get allOk => !(asyncData == null || asyncData!.hasError || !doesViewExist);
 
-  Uri assumeUrl(String url) {
-    if (url.startsWith("https://") || url.startsWith("http://")) return Uri.parse(url);
-    return Uri.parse("https://$url");
-  }
-
   String? validateUrl(String? value) {
     if (value == error404) return 'Your HumHub installation does not exist';
     if (value == noConnection) return 'Please check your internet connection.';
@@ -125,5 +105,25 @@ class OpenerController {
       return 'Specify you HumHub location';
     }
     return null;
+  }
+
+  static List<String> generatePossibleManifestsUrls(String url) {
+    List<String> urls = [];
+    Uri uri = assumeUrl(url);
+
+    for (var i = uri.pathSegments.length; i >= 0; i--) {
+      String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
+      urls.add(Manifest.defineUrl(i != 0 ? urlIn : uri.origin));
+    }
+    for (var i = uri.pathSegments.length; i >= 0; i--) {
+      String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
+      urls.add(Manifest.defineUrl(i != 0 ? urlIn : uri.origin, isUriPretty: false));
+    }
+    return urls;
+  }
+
+  static Uri assumeUrl(String url) {
+    if (url.startsWith("https://") || url.startsWith("http://")) return Uri.parse(url);
+    return Uri.parse("https://$url");
   }
 }
