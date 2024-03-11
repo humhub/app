@@ -85,6 +85,7 @@ jobs:
           versionName: ${{ env.version }}
       - run: flutter clean
       - run: flutter pub get
+      - run: flutter test
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos
       - run: flutter build apk --release --split-per-abi --build-name="${{ env.version }}" --build-number=${{ env.version_code }}
       - run: flutter build appbundle --release --build-name="${{ env.version }}" --build-number=${{ env.version_code }}

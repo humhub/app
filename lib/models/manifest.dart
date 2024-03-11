@@ -35,10 +35,12 @@ class Manifest {
         'theme_color': themeColor,
       };
 
-  static Future<Manifest> Function(Dio dio) get(String url, {bool isUriPretty = true}) => (dio) async {
-        Response<dynamic> res = !isUriPretty
-            ? await dio.get('$url/index.php?r=web%2Fpwa-manifest%2Findex')
-            : await dio.get('$url/manifest.json');
+  static Future<Manifest> Function(Dio dio) get(String url) => (dio) async {
+        Response<dynamic> res = await dio.get(url);
         return Manifest.fromJson(res.data);
       };
+
+  static String defineUrl(String url, {bool isUriPretty = true}) {
+    return !isUriPretty ? '$url/index.php?r=web%2Fpwa-manifest%2Findex' : '$url/manifest.json';
+  }
 }

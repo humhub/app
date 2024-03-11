@@ -1,65 +1,73 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:humhub/pages/opener.dart';
-import 'package:mockito/mockito.dart';
+import 'package:humhub/util/opener_controller.dart';
 
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-  }
-}
+void main() {
+  void testGroupOfURIs(Map<String, String> uriMap) {
+    List<String> failedExpectations = [];
 
-class MockFlutterSecureStorage extends Mock implements FlutterSecureStorage {}
+    uriMap.forEach((key, value) {
+      List<String> generatedUrls = OpenerController.generatePossibleManifestsUrls(key);
+      if (!generatedUrls.contains(value)) {
+        failedExpectations.add(
+            "🐛 Opener URL $key generated:\n ${generatedUrls.toString()} list \n the expected value $value was not found");
+      }
+    });
 
-Future<void> main() async {
-  setUp(() {
-    HttpOverrides.global = MyHttpOverrides();
-  });
-
-  testWidgets('Test opener URL parsing', (WidgetTester tester) async {
-    // Key value map of URLs with bool that represent the expected value
-    Map<String, bool> urlsAndValuesIn = {
-      "https://community.humhub.com": true,
-      "https://demo.cuzy.app/": true,
-      "https://sometestproject12345.humhub.com/": true,
-      "https://sometestproject12345.humhub.com/some/path": true,
-      "https://sometestproject123456.humhub.com/": false,
-      "https://sometestproject123456.humhubb.com": false,
-      "sometestproject12345.humhub.com": true,
-      "//demo.cuzy.app/": false,
-    };
-
-    Map<String, bool> urlsAndValuesOut = {};
-    Key openerKey = const Key('opener');
-
-    for (var urlEntry in urlsAndValuesIn.entries) {
-      String url = urlEntry.key;
-      await tester.pumpWidget(
-        MaterialApp(
-          home: ProviderScope(
-            child: Scaffold(body: Opener(key: openerKey)),
-          ),
-        ),
-      );
-      final state = tester.state<OpenerState>(find.byKey(openerKey));
-      state.controlLer.helper.model[state.controlLer.formUrlKey] = url;
-      bool isBreaking = false;
-
-      await tester.runAsync(() async {
-        try {
-          await state.controlLer.findManifest(url);
-        } catch (er) {
-          isBreaking = true;
-        }
-      });
-      isBreaking ? urlsAndValuesOut[url] = !isBreaking : urlsAndValuesOut[url] = !state.controlLer.asyncData!.hasError;
+    if (failedExpectations.isNotEmpty) {
+      fail(failedExpectations.join("\n\n"));
     }
+  }
 
-    expect(urlsAndValuesOut, urlsAndValuesIn);
+  group('Generate possible Manifests.json URLs and check if exists', () {
+    /// [key] represents the opener dialog input string
+    /// [value] represents the actual manifest.json location
+
+    test('Check HumHub Community URLs', () {
+      Map<String, String> map = {
+        "https://community.humhub.com/": "https://community.humhub.com/manifest.json",
+        "https://community.humhub.com": "https://community.humhub.com/manifest.json",
+        "community.humhub.com/": "https://community.humhub.com/manifest.json",
+        "community.humhub.com": "https://community.humhub.com/manifest.json",
+        "community.humhub.com/some/more": "https://community.humhub.com/manifest.json",
+        "https://community.humhub.com/and/more": "https://community.humhub.com/manifest.json",
+      };
+      testGroupOfURIs(map);
+    });
+
+    test('Check sometestproject12345 URLs', () {
+      Map<String, String> map = {
+        "https://sometestproject12345.humhub.com/": "https://sometestproject12345.humhub.com/manifest.json",
+        "https://sometestproject12345.humhub.com": "https://sometestproject12345.humhub.com/manifest.json",
+        "sometestproject12345.humhub.com/": "https://sometestproject12345.humhub.com/manifest.json",
+        "sometestproject12345.humhub.com": "https://sometestproject12345.humhub.com/manifest.json",
+        "https://sometestproject12345.humhub.com/some/more": "https://sometestproject12345.humhub.com/manifest.json",
+        "https://sometestproject12345.humhub.com/manifest.json":
+            "https://sometestproject12345.humhub.com/manifest.json",
+      };
+      testGroupOfURIs(map);
+    });
+
+    test('Check some test.cuzy.app URLs', () {
+      Map<String, String> map = {
+        "https://test.cuzy.app/humhub": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
+        "test.cuzy.app/humhub/": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
+        "test.cuzy.app/humhub/some": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
+        "test.cuzy.app/humhub": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
+        "https://test.cuzy.app/humhub/some": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
+        "https://test.cuzy.app/humhub/index.php?r=dashboard%2Fdashboard" : "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex"
+      };
+      testGroupOfURIs(map);
+    });
+
+    /// TEMPLATE: copy this and change it for your use case
+    /*test('Check some HumHum instance URLs', () {
+      /// [key] represents the opener dialog input string
+      /// [value] represents the actual manifest.json location
+      Map<String, String> map = {
+        "https://test.cuzy.app/humhub": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
+        "test.cuzy.app/humhub": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
+      };
+      testGroupOfURIs(map);
+    });*/
   });
 }

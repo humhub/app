@@ -189,7 +189,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     }
     String? payloadFromPush = InitFromPush.usePayload();
     if (payloadFromPush != null) url = payloadFromPush;
-    return URLRequest(url: Uri.parse(url ?? manifest.baseUrl), headers: ref.read(humHubProvider).customHeaders);
+    return URLRequest(url: Uri.parse(url ?? manifest.startUrl), headers: ref.read(humHubProvider).customHeaders);
   }
 
   _onLoadStop(InAppWebViewController controller, Uri? url) {
