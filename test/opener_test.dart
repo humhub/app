@@ -63,7 +63,7 @@ void main() {
     test('Check some test.cuzy.app URLs', () {
       Map<String, String> map = {
         "https://test.cuzy.app/humhub": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
-        "test.cuzy.app/humhub": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
+        "test.cuzy.app/humhub/": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
         "test.cuzy.app/humhub/some": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
         "test.cuzy.app/humhub": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
         "https://test.cuzy.app/humhub/some": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
