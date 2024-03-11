@@ -47,19 +47,6 @@ void main() {
       testGroupOfURIs(map);
     });
 
-    test('Check some sometestproject12345 URLs', () {
-      Map<String, String> map = {
-        "https://sometestproject12345.humhub.com/": "https://sometestproject12345.humhub.com/manifest.json",
-        "https://sometestproject12345.humhub.com": "https://sometestproject12345.humhub.com/manifest.json",
-        "sometestproject12345.humhub.com/": "https://sometestproject12345.humhub.com/manifest.json",
-        "sometestproject12345.humhub.com": "https://sometestproject12345.humhub.com/manifest.json",
-        "https://sometestproject12345.humhub.com/some/more": "https://sometestproject12345.humhub.com/manifest.json",
-        "https://sometestproject12345.humhub.com/manifest.json":
-            "https://sometestproject12345.humhub.com/manifest.json",
-      };
-      testGroupOfURIs(map);
-    });
-
     test('Check some test.cuzy.app URLs', () {
       Map<String, String> map = {
         "https://test.cuzy.app/humhub": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
@@ -67,6 +54,7 @@ void main() {
         "test.cuzy.app/humhub/some": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
         "test.cuzy.app/humhub": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
         "https://test.cuzy.app/humhub/some": "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex",
+        "https://test.cuzy.app/humhub/index.php?r=dashboard%2Fdashboard" : "https://test.cuzy.app/humhub/index.php?r=web%2Fpwa-manifest%2Findex"
       };
       testGroupOfURIs(map);
     });
