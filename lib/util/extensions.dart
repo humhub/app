@@ -8,7 +8,7 @@ import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
 
 extension MyWebViewController on InAppWebViewController {
-  Future<bool> exitApp(BuildContext context, ref) async {
+  Future<bool> exitApp(context, ref) async {
     bool canGoBack = await this.canGoBack();
     if (canGoBack) {
       goBack();

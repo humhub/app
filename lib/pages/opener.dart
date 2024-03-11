@@ -1,10 +1,8 @@
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/components/language_switcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/form_helper.dart';
@@ -88,12 +86,13 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    const Expanded(
-                      flex: 1,
+                    const Padding(
+                      padding: EdgeInsets.only(top: 8, right: 8),
                       child: Align(
-                        alignment: Alignment.topRight,
-                        child: LocaleSwitch(
-                          width: 70,
+                        alignment: Alignment.centerRight,
+                        child: SizedBox(
+                          width: 110,
+                          child: LocaleSwitch(),
                         ),
                       ),
                     ),
@@ -164,7 +163,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                             child: TextButton(
                               onPressed: _connectInstance,
                               child: Text(
-                                'Connect',
+                                AppLocalizations.of(context)!.connect,
                                 style: TextStyle(color: primaryColor, fontSize: 20),
                               ),
                             ),

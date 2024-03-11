@@ -1,5 +1,25 @@
 {
-  "cancel" : "Cancel",
-  "help_title" : "What is HumHub?",
-  "help_first_par" : "HumHub is an Open Source software used by organizations, associations and companies mainly as social network, intranet or communication platform."
+  "@@locale" : "en",
+
+  "help_title": "What is HumHub?",
+  "help_first_par": "HumHub is an Open Source software used by organizations, associations and companies mainly as social network, intranet or communication platform.",
+  "help_second_par": "The software digitizes organizational structures and helps people around the world to connect, communicate and facilitates daily collaboration. The HumHub App is intuitive to use and allows every user to access and browse their network from anywhere.",
+  "help_third_par": "The HumHub app is intuitive to use and allows you to access your network from anywhere. When notifications are enabled, you will also receive push notifications about important information within your network and can use the app to keep up to date with any relevant news at any time.",
+  "help_forth_par": "HumHub networks are basically private (internal to the organization) communication platforms. It is only possible to log into existing networks for which you have corresponding login data. Organizations or companies can of course set up and run their own HumHub network at any time. All information can be found at",
+
+
+  "how_to_connect_title": "How can I connect my network?",
+  "how_to_connect_first_par": "There are many thousands of networks worldwide. Therefore, to log into your existing network, you need the exact URL of your individual network.",
+  "how_to_connect_sec_par": "Your URL can be found in the address bar of your browser in the login area of your network.",
+  "how_to_connect_third_par": "Please contact your administrator or network operator if you do not know your URL or login details.",
+
+  "more_info_title": "What is HumHub?",
+  "more_info_first_par": "HumHub networks are basically closed communication platforms (internal to the organization). It is only possible to log into existing networks.",
+  "more_info_second_par": "Organizations or companies can of course set up and operate their own HumHub network at any time.",
+  "more_info_third_par": "All information can be found here:",
+  "more_info_pro_edition": "Professional Edition",
+  "more_info_pro_edition_url": "https://www.humhub.com/en/professional-edition",
+
+  "connect": "Connect",
+  "cancel" : "Cancel"
 }

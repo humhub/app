@@ -4,13 +4,11 @@ import 'package:humhub/util/override_locale.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LocaleSwitch extends StatefulWidget {
-  final double width;
   static Key userProfileLocaleDropdown = const Key('user_profile_locale_dropdown');
   const LocaleSwitch({
     Key? key,
     this.showTitle = false,
     this.forceLight = false,
-    this.width = 100,
   }) : super(key: key);
 
   final bool showTitle;
@@ -23,52 +21,61 @@ class LocaleSwitch extends StatefulWidget {
 class _LocaleSwitchState extends State<LocaleSwitch> {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: widget.width,
-      child: DropdownButtonFormField<int>(
-        style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
-        key: LocaleSwitch.userProfileLocaleDropdown,
-        selectedItemBuilder: (_) {
-          return _items
-              .map(
-                (e) => Text(
-                  e.toUpperCase(),
-                ),
-              )
-              .toList();
-        },
-        dropdownColor: widget.forceLight ? Colors.white : Theme.of(context).colorScheme.background,
-        decoration: widget.showTitle
-            ? InputDecoration(
-                labelText: AppLocalizations.of(context)!.cancel,
-                enabledBorder: InputBorder.none,
-                fillColor: Colors.black,
-              )
-            : InputDecoration.collapsed(
-                hintText: AppLocalizations.of(context)!.cancel,
-              ).copyWith(
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
+    return DropdownButtonFormField<int>(
+      style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+      key: LocaleSwitch.userProfileLocaleDropdown,
+      isExpanded: true,
+      selectedItemBuilder: (_) {
+        return _items
+            .map(
+              (locale) => Row(
+            children: [
+              Image.asset("assets/images/locale/${locale}_locale_flag.png", height: 30, width: 30),
+              const SizedBox(width: 20),
+              Text(
+                locale.toUpperCase(),
               ),
-        isExpanded: true,
-        value: _value(context),
-        icon: Icon(Icons.arrow_drop_down, color: Theme.of(context).primaryColor),
-        items: _items
-            .mapIndexed(
-              (text, index) => DropdownMenuItem(
-                value: index,
-                child: Text(
-                  text.toUpperCase(),
-                ),
-              ),
-            )
-            .toList(),
-        onChanged: (index) {
-          if (index == null) return;
-          Locale? locale = AppLocalizations.supportedLocales.elementAt(index);
-          OverrideLocale.of(context).changeLocale(locale);
-        },
+            ],
+          ),
+        )
+            .toList();
+      },
+      dropdownColor: widget.forceLight ? Colors.white : Theme.of(context).colorScheme.background,
+      decoration: widget.showTitle
+          ? InputDecoration(
+        labelText: AppLocalizations.of(context)!.cancel,
+        enabledBorder: InputBorder.none,
+        fillColor: Colors.black,
+      )
+          : InputDecoration.collapsed(
+        hintText: AppLocalizations.of(context)!.cancel,
+      ).copyWith(
+        enabledBorder: InputBorder.none,
+        focusedBorder: InputBorder.none,
       ),
+      value: _value(context),
+      icon: Icon(Icons.arrow_drop_down, color: Theme.of(context).primaryColor),
+      items: _items
+          .mapIndexed(
+            (localeString, index) => DropdownMenuItem(
+          value: index,
+          child: Row(
+            children: [
+              Image.asset("assets/images/locale/${localeString}_locale_flag.png", height: 30, width: 30),
+              const SizedBox(width: 20),
+              Text(
+                localeString.toUpperCase(),
+              ),
+            ],
+          ),
+        ),
+      )
+          .toList(),
+      onChanged: (index) {
+        if (index == null) return;
+        Locale? locale = AppLocalizations.supportedLocales.elementAt(index);
+        OverrideLocale.of(context).changeLocale(locale);
+      },
     );
   }
 

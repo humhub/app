@@ -90,11 +90,10 @@ flutter:
         - asset: assets/fonts/OpenSans-SemiBold.ttf
 
   assets:
-    - assets/images/logo.png
+    - assets/images/
+    - assets/images/locale/
     - assets/opener_animation.riv
     - assets/opener_animation_reverse.riv
-    - assets/opener_animation_reverse_test.riv
-    - assets/images/help.png
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

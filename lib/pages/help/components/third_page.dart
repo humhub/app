@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:humhub/components/ease_out_container.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:humhub/util/const.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ThirdPage extends StatelessWidget {
   final bool fadeIn;
@@ -20,22 +21,22 @@ class ThirdPage extends StatelessWidget {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                Locales.moreInfoTitle,
+                AppLocalizations.of(context)!.more_info_title,
                 style: getHeaderStyle(context),
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(Locales.moreInfoFirstPar, style: paragraphStyle),
+            child: Text(AppLocalizations.of(context)!.more_info_first_par, style: paragraphStyle),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(Locales.moreInfoSecPar, style: paragraphStyle),
+            child: Text(AppLocalizations.of(context)!.more_info_second_par, style: paragraphStyle),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(Locales.moreInfoThirdPar, style: paragraphStyle),
+            child: Text(AppLocalizations.of(context)!.more_info_third_par, style: paragraphStyle),
           ),
           const SizedBox(
             height: 40,
@@ -58,11 +59,11 @@ class ThirdPage extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      launchUrl(Uri.parse(Locales.moreInfoProEditionUrl), mode: LaunchMode.platformDefault);
+                      launchUrl(Uri.parse(AppLocalizations.of(context)!.more_info_pro_edition_url), mode: LaunchMode.platformDefault);
                     },
                     child: Center(
                       child: Text(
-                        Locales.moreInfoProEdition,
+                        AppLocalizations.of(context)!.more_info_pro_edition,
                         style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.normal),
                       ),
                     ),
