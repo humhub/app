@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+// TODO: Assets
 class StorageKeys {
   static String humhubInstance = "humHubInstance";
   static String lastInstanceUrl = "humHubLastUrl";

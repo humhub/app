@@ -102,7 +102,6 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         _latestUri = uri;
         String? redirectUrl = uri.queryParameters['url'];
         if (redirectUrl != null && navigatorKey.currentState != null) {
-          logInfo('MD22 IF open: $_initialUriIsHandled');
           tryNavigateWithOpener(redirectUrl);
         } else {
           if (redirectUrl != null) {
@@ -124,7 +123,6 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   }
 
   Future<bool> tryNavigateWithOpener(String redirectUrl) async {
-    logInfo('MD initHumHub payload: $redirectUrl');
     bool isNewRouteSameAsCurrent = false;
     navigatorKey.currentState!.popUntil((route) {
       if (route.settings.name == WebViewApp.path) {

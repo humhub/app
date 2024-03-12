@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
+// TODO: Locale
 class ConnectivityPlugin {
   static Future<bool> get hasConnectivity async {
     ConnectivityResult connectivityResult = await Connectivity().checkConnectivity();

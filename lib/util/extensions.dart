@@ -6,7 +6,7 @@ import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
-
+// TODO: Locale
 extension MyWebViewController on InAppWebViewController {
   Future<bool> exitApp(context, ref) async {
     bool canGoBack = await this.canGoBack();
