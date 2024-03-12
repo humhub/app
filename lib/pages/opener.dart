@@ -86,13 +86,17 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    const Padding(
-                      padding: EdgeInsets.only(top: 8, right: 8),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: SizedBox(
-                          width: 110,
-                          child: LocaleSwitch(),
+                    AnimatedOpacity(
+                      opacity: _visible ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: const Padding(
+                        padding: EdgeInsets.only(top: 8, right: 8),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: SizedBox(
+                            width: 110,
+                            child: LocaleSwitch(),
+                          ),
                         ),
                       ),
                     ),
