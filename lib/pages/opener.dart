@@ -72,12 +72,12 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
             fit: StackFit.expand,
             children: [
               RiveAnimation.asset(
-                'assets/opener_animation.riv',
+                Assets.openerAnimationForward,
                 fit: BoxFit.fill,
                 controllers: [_controller],
               ),
               RiveAnimation.asset(
-                'assets/opener_animation_reverse.riv',
+                Assets.openerAnimationReverse,
                 fit: BoxFit.fill,
                 controllers: [_controllerReverse],
               ),
@@ -104,53 +104,56 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                         child: SizedBox(
                           height: 100,
                           width: 230,
-                          child: Image.asset('assets/images/logo.png'),
+                          child: Image.asset(Assets.logo),
                         ),
                       ),
                     ),
                     Expanded(
-                        flex: 12,
-                        child: AnimatedOpacity(
-                          opacity: _textFieldAddInfoVisibility ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 500),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 35),
-                            child: Column(
-                              children: [
-                                FutureBuilder<String>(
-                                  future: ref.read(humHubProvider).getLastUrl(),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      controlLer.urlTextController.text = snapshot.data!;
-                                      return TextFormField(
-                                        keyboardType: TextInputType.url,
-                                        controller: controlLer.urlTextController,
-                                        cursorColor: Theme.of(context).textTheme.bodySmall?.color,
-                                        onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
-                                        onEditingComplete: () {
-                                          controlLer.helper.onSaved(controlLer.formUrlKey);
-                                          _connectInstance();
-                                        },
-                                        style: const TextStyle(
-                                          decoration: TextDecoration.none,
-                                        ),
-                                        decoration: openerDecoration(context),
-                                        validator: controlLer.validateUrl,
-                                        autocorrect: false,
-                                      );
-                                    }
-                                    return const Center(child: CircularProgressIndicator());
-                                  },
+                      flex: 12,
+                      child: AnimatedOpacity(
+                        opacity: _textFieldAddInfoVisibility ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 500),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 35),
+                          child: Column(
+                            children: [
+                              FutureBuilder<String>(
+                                future: ref.read(humHubProvider).getLastUrl(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    controlLer.urlTextController.text = snapshot.data!;
+                                    return TextFormField(
+                                      keyboardType: TextInputType.url,
+                                      controller: controlLer.urlTextController,
+                                      cursorColor: Theme.of(context).textTheme.bodySmall?.color,
+                                      onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
+                                      onEditingComplete: () {
+                                        controlLer.helper.onSaved(controlLer.formUrlKey);
+                                        _connectInstance();
+                                      },
+                                      style: const TextStyle(
+                                        decoration: TextDecoration.none,
+                                      ),
+                                      decoration: openerDecoration(context),
+                                      validator: controlLer.validateUrl,
+                                      autocorrect: false,
+                                    );
+                                  }
+                                  return const Center(child: CircularProgressIndicator());
+                                },
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: Text(
+                                  AppLocalizations.of(context)!.opener_enter_url,
+                                  style: const TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13),
                                 ),
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 5),
-                                  child: Text('Enter your url and log in to your network.',
-                                      style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13)),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        )),
+                        ),
+                      ),
+                    ),
                     Expanded(
                       flex: 4,
                       child: AnimatedOpacity(
@@ -214,9 +217,9 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                         child: AnimatedOpacity(
                           opacity: _visible ? 1.0 : 0.0,
                           duration: const Duration(milliseconds: 300),
-                          child: const Text(
-                            "Need Help?",
-                            style: TextStyle(
+                          child: Text(
+                            AppLocalizations.of(context)!.opener_need_help,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w500,
                               decoration: TextDecoration.underline,
@@ -258,7 +261,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
         ),
       ),
       floatingLabelBehavior: FloatingLabelBehavior.always,
-      labelText: 'URL',
+      labelText: AppLocalizations.of(context)!.url.toUpperCase(),
       labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color));
 
   @override

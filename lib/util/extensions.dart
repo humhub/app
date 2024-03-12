@@ -6,7 +6,8 @@ import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
-// TODO: Locale
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 extension MyWebViewController on InAppWebViewController {
   Future<bool> exitApp(context, ref) async {
     bool canGoBack = await this.canGoBack();
@@ -17,18 +18,18 @@ extension MyWebViewController on InAppWebViewController {
       final exitConfirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Are you sure?'),
-          content: const Text('Do you want to exit an App'),
+          title: Text(AppLocalizations.of(context)!.web_view_exit_popup_title),
+          content: Text(AppLocalizations.of(context)!.web_view_exit_popup_content),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('No'),
+              child: Text(AppLocalizations.of(context)!.no),
             ),
             TextButton(
               onPressed: () {
                 closeOrOpenDialog(context, ref);
               },
-              child: const Text('Yes'),
+              child: Text(AppLocalizations.of(context)!.yes),
             ),
           ],
         ),
@@ -78,14 +79,6 @@ extension FutureAsyncValueX<T> on Future<AsyncValue<T>> {
   Future<T?> get valueOrNull => then(
         (asyncValue) => asyncValue.asData?.value,
       );
-}
-
-extension PrettyUri on Uri {
-  bool isUriPretty() {
-    RegExp regex = RegExp(r'index\.php.*[?&]r=');
-    String path = Uri.decodeComponent(toString());
-    return !regex.hasMatch(path);
-  }
 }
 
 extension URLRequestExtension on URLRequest {

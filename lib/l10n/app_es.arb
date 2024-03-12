@@ -1,25 +1,46 @@
 {
-  "@@locale" : "es",
+  "@@locale": "es",
 
-  "help_title": "What is HumHub?",
-  "help_first_par": "HumHub is an Open Source software used by organizations, associations and companies mainly as social network, intranet or communication platform.",
-  "help_second_par": "The software digitizes organizational structures and helps people around the world to connect, communicate and facilitates daily collaboration. The HumHub App is intuitive to use and allows every user to access and browse their network from anywhere.",
-  "help_third_par": "The HumHub app is intuitive to use and allows you to access your network from anywhere. When notifications are enabled, you will also receive push notifications about important information within your network and can use the app to keep up to date with any relevant news at any time.",
-  "help_forth_par": "HumHub networks are basically private (internal to the organization) communication platforms. It is only possible to log into existing networks for which you have corresponding login data. Organizations or companies can of course set up and run their own HumHub network at any time. All information can be found at",
+  "opener_enter_url": "Ingrese su URL e inicie sesión en su red.",
+  "opener_need_help": "¿Necesitas ayuda?",
 
+  "help_title": "¿Qué es HumHub?",
+  "help_first_par": "HumHub es un software de código abierto utilizado por organizaciones, asociaciones y empresas principalmente como red social, intranet o plataforma de comunicación.",
+  "help_second_par": "El software digitaliza las estructuras organizativas y ayuda a las personas de todo el mundo a conectarse, comunicarse y facilita la colaboración diaria. La aplicación HumHub es intuitiva de usar y permite que cada usuario acceda y navegue por su red desde cualquier lugar.",
+  "help_third_par": "La aplicación HumHub es intuitiva de usar y le permite acceder a su red desde cualquier lugar. Cuando las notificaciones están habilitadas, también recibirá notificaciones push sobre información importante dentro de su red y podrá utilizar la aplicación para mantenerse al día con cualquier noticia relevante en cualquier momento.",
+  "help_forth_par": "Las redes de HumHub son básicamente plataformas de comunicación privadas (internas para la organización). Solo es posible iniciar sesión en redes existentes para las cuales tiene los datos de inicio de sesión correspondientes. Las organizaciones o empresas pueden, por supuesto, configurar y ejecutar su propia red de HumHub en cualquier momento. Toda la información se puede encontrar en",
 
-  "how_to_connect_title": "How can I connect my network?",
-  "how_to_connect_first_par": "There are many thousands of networks worldwide. Therefore, to log into your existing network, you need the exact URL of your individual network.",
-  "how_to_connect_sec_par": "Your URL can be found in the address bar of your browser in the login area of your network.",
-  "how_to_connect_third_par": "Please contact your administrator or network operator if you do not know your URL or login details.",
+  "how_to_connect_title": "¿Cómo puedo conectar mi red?",
+  "how_to_connect_first_par": "Hay muchos miles de redes en todo el mundo. Por lo tanto, para iniciar sesión en su red existente, necesita la URL exacta de su red individual.",
+  "how_to_connect_sec_par": "Su URL se puede encontrar en la barra de direcciones de su navegador en el área de inicio de sesión de su red.",
+  "how_to_connect_third_par": "Por favor, póngase en contacto con su administrador u operador de red si no conoce su URL o detalles de inicio de sesión.",
+  "how_to_connect_url_example": "ejemplo.humhub.com",
 
-  "more_info_title": "What is HumHub?",
-  "more_info_first_par": "HumHub networks are basically closed communication platforms (internal to the organization). It is only possible to log into existing networks.",
-  "more_info_second_par": "Organizations or companies can of course set up and operate their own HumHub network at any time.",
-  "more_info_third_par": "All information can be found here:",
-  "more_info_pro_edition": "Professional Edition",
-  "more_info_pro_edition_url": "https://www.humhub.com/en/professional-edition",
+  "more_info_title": "¿Qué es HumHub?",
+  "more_info_first_par": "Las redes de HumHub son básicamente plataformas de comunicación cerradas (internas para la organización). Solo es posible iniciar sesión en redes existentes.",
+  "more_info_second_par": "Las organizaciones o empresas pueden, por supuesto, configurar y operar su propia red de HumHub en cualquier momento.",
+  "more_info_third_par": "Toda la información se puede encontrar aquí:",
+  "more_info_pro_edition": "Edición Profesional",
+  "more_info_pro_edition_url": "https://www.humhub.com/es/edicion-profesional",
 
-  "connect": "Connect",
-  "cancel" : "Cancel"
+  "notification_permission_popup_title": "Permiso de notificación",
+  "notification_permission_popup_content": "Por favor, habilite las notificaciones para HumHub en la configuración del dispositivo.",
+
+  "connectivity_popup_title": "Sin conexión",
+  "connectivity_popup_content": "Por favor, verifique su conexión a Internet e inténtelo de nuevo.",
+
+  "web_view_exit_popup_title": "¿Estás seguro?",
+  "web_view_exit_popup_content": "¿Desea salir de la aplicación?",
+
+  "connect": "Conectar",
+  "cancel": "Cancelar",
+  "url": "URL",
+  "back": "Atrás",
+  "next": "Siguiente",
+  "connect_now": "Conectar ahora",
+  "enable": "Activar",
+  "skip": "Saltar",
+  "ok": "Aceptar",
+  "no": "No",
+  "yes": "Sí"
 }

@@ -22,7 +22,7 @@ import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WebViewGlobalController {
   static InAppWebViewController? _value;
@@ -178,7 +178,6 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
       ref.read(humHubProvider).setInstance(controller.humhub);
       manifest = controller.humhub.manifest!;
       url = controller.url;
-      logInfo("HR123 66 $url");
     }
     if (args == null) {
       manifest = m.MyRouter.initParams;
@@ -239,18 +238,18 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Notification Permission"),
-        content: const Text("Please enable notifications for HumHub in the device settings"),
+        title: Text(AppLocalizations.of(context)!.notification_permission_popup_title),
+        content: Text(AppLocalizations.of(context)!.notification_permission_popup_content),
         actions: <Widget>[
           TextButton(
-            child: const Text("Enable"),
+            child: Text(AppLocalizations.of(context)!.enable),
             onPressed: () {
               AppSettings.openAppSettings();
               Navigator.pop(context);
             },
           ),
           TextButton(
-            child: const Text("Skip"),
+            child: Text(AppLocalizations.of(context)!.skip),
             onPressed: () {
               Navigator.pop(context);
             },

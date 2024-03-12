@@ -63,7 +63,7 @@ class SecondPage extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: 'example.humhub.com',
+                              text: AppLocalizations.of(context)!.how_to_connect_url_example,
                               style: TextStyle(
                                 color: Colors.grey.shade800,
                               ),

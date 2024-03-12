@@ -1,7 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-// TODO: Locale
 class ConnectivityPlugin {
   static Future<bool> get hasConnectivity async {
     ConnectivityResult connectivityResult = await Connectivity().checkConnectivity();
@@ -15,11 +15,11 @@ class NoConnectionDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('No Connection'),
-      content: const Text('Please check your internet connection and try again.'),
+      title:  Text(AppLocalizations.of(context)!.connectivity_popup_title),
+      content:  Text(AppLocalizations.of(context)!.connectivity_popup_content),
       actions: [
         TextButton(
-          child: const Text('OK'),
+          child:  Text(AppLocalizations.of(context)!.ok.toUpperCase()),
           onPressed: () {
             Navigator.of(context).pop(); // Close the dialog
           },
