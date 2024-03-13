@@ -1,7 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/components/language_switcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/form_helper.dart';
@@ -51,7 +52,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
       });
 
       String? urlIntent = InitFromIntent.usePayloadForInit();
-      if(urlIntent != null){
+      if (urlIntent != null) {
         await RedirectNotificationChannel().onTap(urlIntent);
       }
     });
@@ -62,86 +63,103 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
     controlLer = OpenerController(ref: ref, helper: helper);
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        bottom: false,
-        top: false,
-        child: Form(
-          key: helper.key,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              RiveAnimation.asset(
-                'assets/opener_animation.riv',
-                fit: BoxFit.fill,
-                controllers: [_controller],
-              ),
-              RiveAnimation.asset(
-                'assets/opener_animation_reverse.riv',
-                fit: BoxFit.fill,
-                controllers: [_controllerReverse],
-              ),
-              Padding(
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          RiveAnimation.asset(
+            Assets.openerAnimationForward,
+            fit: BoxFit.fill,
+            controllers: [_controller],
+          ),
+          RiveAnimation.asset(
+            Assets.openerAnimationReverse,
+            fit: BoxFit.fill,
+            controllers: [_controllerReverse],
+          ),
+          SafeArea(
+            bottom: false,
+            top: false,
+            child: Form(
+              key: helper.key,
+              child: Padding(
                 padding: const EdgeInsets.only(top: 50),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
+                    AnimatedOpacity(
+                      opacity: _visible ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: const Padding(
+                        padding: EdgeInsets.only(top: 10, right: 16),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: SizedBox(
+                            width: 110,
+                            child: LanguageSwitcher(),
+                          ),
+                        ),
+                      ),
+                    ),
                     Expanded(
-                      flex: 2,
+                      flex: 8,
                       child: AnimatedOpacity(
                         opacity: _visible ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 300),
                         child: SizedBox(
                           height: 100,
                           width: 230,
-                          child: Image.asset('assets/images/logo.png'),
+                          child: Image.asset(Assets.logo),
                         ),
                       ),
                     ),
                     Expanded(
-                        flex: 3,
-                        child: AnimatedOpacity(
-                          opacity: _textFieldAddInfoVisibility ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 500),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 35),
-                            child: Column(
-                              children: [
-                                FutureBuilder<String>(
-                                  future: ref.read(humHubProvider).getLastUrl(),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      controlLer.urlTextController.text = snapshot.data!;
-                                      return TextFormField(
-                                        keyboardType: TextInputType.url,
-                                        controller: controlLer.urlTextController,
-                                        cursorColor: Theme.of(context).textTheme.bodySmall?.color,
-                                        onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
-                                        onEditingComplete: () {
-                                          controlLer.helper.onSaved(controlLer.formUrlKey);
-                                          _connectInstance();
-                                        },
-                                        style: const TextStyle(
-                                          decoration: TextDecoration.none,
-                                        ),
-                                        decoration: openerDecoration(context),
-                                        validator: controlLer.validateUrl,
-                                        autocorrect: false,
-                                      );
-                                    }
-                                    return const Center(child: CircularProgressIndicator());
-                                  },
+                      flex: 12,
+                      child: AnimatedOpacity(
+                        opacity: _textFieldAddInfoVisibility ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 500),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 35),
+                          child: Column(
+                            children: [
+                              FutureBuilder<String>(
+                                future: ref.read(humHubProvider).getLastUrl(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    controlLer.urlTextController.text = snapshot.data!;
+                                    return TextFormField(
+                                      keyboardType: TextInputType.url,
+                                      controller: controlLer.urlTextController,
+                                      cursorColor: Theme.of(context).textTheme.bodySmall?.color,
+                                      onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
+                                      onEditingComplete: () {
+                                        controlLer.helper.onSaved(controlLer.formUrlKey);
+                                        _connectInstance();
+                                      },
+                                      style: const TextStyle(
+                                        decoration: TextDecoration.none,
+                                      ),
+                                      decoration: openerDecoration(context),
+                                      validator: controlLer.validateUrl,
+                                      autocorrect: false,
+                                    );
+                                  }
+                                  return const Center(child: CircularProgressIndicator());
+                                },
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: Text(
+                                  AppLocalizations.of(context)!.opener_enter_url,
+                                  style: const TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13),
                                 ),
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 5),
-                                  child: Text('Enter your url and log in to your network.',
-                                      style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13)),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        )),
+                        ),
+                      ),
+                    ),
                     Expanded(
-                      flex: 1,
+                      flex: 4,
                       child: AnimatedOpacity(
                         opacity: _visible ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 300),
@@ -152,7 +170,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                             child: TextButton(
                               onPressed: _connectInstance,
                               child: Text(
-                                'Connect',
+                                AppLocalizations.of(context)!.connect,
                                 style: TextStyle(color: primaryColor, fontSize: 20),
                               ),
                             ),
@@ -161,7 +179,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                       ),
                     ),
                     Expanded(
-                      flex: 1,
+                      flex: 4,
                       child: GestureDetector(
                         onTap: () {
                           _controller.isActive = true;
@@ -203,9 +221,9 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                         child: AnimatedOpacity(
                           opacity: _visible ? 1.0 : 0.0,
                           duration: const Duration(milliseconds: 300),
-                          child: const Text(
-                            "Need Help?",
-                            style: TextStyle(
+                          child: Text(
+                            AppLocalizations.of(context)!.opener_need_help,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w500,
                               decoration: TextDecoration.underline,
@@ -217,9 +235,9 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                   ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -247,7 +265,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
         ),
       ),
       floatingLabelBehavior: FloatingLabelBehavior.always,
-      labelText: 'URL',
+      labelText: AppLocalizations.of(context)!.url.toUpperCase(),
       labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color));
 
   @override

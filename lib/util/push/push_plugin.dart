@@ -55,7 +55,6 @@ class PushPluginState extends ConsumerState<PushPlugin> {
 
     ref.read(firebaseInitialized.notifier).state = const AsyncValue.data(true);
 
-    /// We do this to create provider and read Firebase token
     ref.read(pushTokenProvider);
   }
 

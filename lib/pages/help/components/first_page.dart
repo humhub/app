@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:humhub/components/rotating_globe.dart';
 import 'package:humhub/util/const.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 class FirstPage extends StatelessWidget {
@@ -20,7 +21,7 @@ class FirstPage extends StatelessWidget {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                Locales.helpTitle,
+                AppLocalizations.of(context)!.help_title,
                 style: getHeaderStyle(context),
               ),
             ),
@@ -28,18 +29,18 @@ class FirstPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
-              Locales.helpFirstPar,
+              AppLocalizations.of(context)!.help_first_par,
               style: paragraphStyle,
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(Locales.helpSecPar, style: paragraphStyle),
+            child: Text(AppLocalizations.of(context)!.help_second_par, style: paragraphStyle),
           ),
           Center(
             child: RotatingGlobe(
               rotationDirection: fadeIn ? Direction.left : Direction.right,
-              imagePath: 'assets/images/help.png',
+              imagePath: Assets.helpImg,
             ),
           ),
         ],

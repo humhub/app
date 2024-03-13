@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:humhub/components/ease_out_container.dart';
 import 'package:humhub/util/const.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SecondPage extends StatelessWidget {
   final bool fadeIn;
@@ -19,14 +20,14 @@ class SecondPage extends StatelessWidget {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                Locales.howToConnectTitle,
+                AppLocalizations.of(context)!.how_to_connect_title,
                 style: getHeaderStyle(context),
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(Locales.howToConnectFirstPar, style: paragraphStyle),
+            child: Text(AppLocalizations.of(context)!.how_to_connect_first_par, style: paragraphStyle),
           ),
           EaseOutContainer(
             fadeIn: fadeIn,
@@ -62,7 +63,7 @@ class SecondPage extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: 'example.humhub.com',
+                              text: AppLocalizations.of(context)!.how_to_connect_url_example,
                               style: TextStyle(
                                 color: Colors.grey.shade800,
                               ),
@@ -78,7 +79,7 @@ class SecondPage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(Locales.howToConnectSecPar, style: paragraphStyle),
+            child: Text(AppLocalizations.of(context)!.how_to_connect_sec_par, style: paragraphStyle),
           ),
           EaseOutContainer(
             fadeIn: fadeIn,
@@ -100,10 +101,10 @@ class SecondPage extends StatelessWidget {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        'Connect',
-                        style: TextStyle(color: Colors.white, fontSize: 18),
+                        AppLocalizations.of(context)!.connect,
+                        style: const TextStyle(color: Colors.white, fontSize: 18),
                       ),
                     ),
                   ),
@@ -113,7 +114,7 @@ class SecondPage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Text(Locales.howToConnectThirdPar, style: paragraphStyle),
+            child: Text(AppLocalizations.of(context)!.how_to_connect_third_par, style: paragraphStyle),
           )
         ],
       ),

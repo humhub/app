@@ -5,10 +5,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:humhub/util/intent/intent_plugin.dart';
 import 'package:humhub/util/log.dart';
 import 'package:humhub/util/notifications/plugin.dart';
+import 'package:humhub/util/override_locale.dart';
 import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 main() async {
   Loggy.initLoggy(
@@ -35,22 +37,29 @@ class MyAppState extends ConsumerState<MyApp> {
     return IntentPlugin(
       child: NotificationPlugin(
         child: PushPlugin(
-          child: FutureBuilder<String>(
-            future: MyRouter.getInitialRoute(ref),
-            builder: (context, snap) {
-              if (snap.hasData) {
-                return MaterialApp(
-                  debugShowCheckedModeBanner: false,
-                  initialRoute: snap.data,
-                  routes: MyRouter.routes,
-                  navigatorKey: navigatorKey,
-                  theme: ThemeData(
-                    fontFamily: 'OpenSans',
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
-            },
+          child: OverrideLocale(
+            builder: (overrideLocale) => Builder(
+              builder: (context) => FutureBuilder<String>(
+                future: MyRouter.getInitialRoute(ref),
+                builder: (context, snap) {
+                  if (snap.hasData) {
+                    return MaterialApp(
+                      debugShowCheckedModeBanner: false,
+                      initialRoute: snap.data,
+                      routes: MyRouter.routes,
+                      navigatorKey: navigatorKey,
+                      localizationsDelegates: AppLocalizations.localizationsDelegates,
+                      supportedLocales: AppLocalizations.supportedLocales,
+                      locale: overrideLocale,
+                      theme: ThemeData(
+                        fontFamily: 'OpenSans',
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
           ),
         ),
       ),
@@ -62,7 +71,7 @@ clearSecureStorageOnReinstall() async {
   String key = 'hasRunBefore';
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool hasRunBefore = prefs.getBool(key) ?? false;
-  if(!hasRunBefore) {
+  if (!hasRunBefore) {
     FlutterSecureStorage storage = const FlutterSecureStorage();
     await storage.deleteAll();
     prefs.setBool(key, true);

@@ -6,6 +6,7 @@ import 'package:humhub/components/help_safe_area.dart';
 import 'package:humhub/components/page_animation_container.dart';
 import 'package:humhub/pages/help/components/first_page.dart';
 import 'package:humhub/pages/help/components/third_page.dart';
+import 'package:humhub/util/const.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'components/second_page.dart';
 
@@ -55,7 +56,7 @@ class HelpAndroidState extends State<HelpAndroid> {
                   padding: const EdgeInsets.only(top: 60, bottom: 40),
                   width: MediaQuery.of(context).size.width * 0.6,
                   child: EaseOutContainer(
-                    child: Image.asset('assets/images/logo.png'),
+                    child: Image.asset(Assets.logo),
                   ),
                 ),
               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'animated_padding_component.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BottomNavigation extends StatefulWidget {
   final int pageCount;
@@ -43,9 +44,9 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
                   padding: const EdgeInsets.only(left: 6),
                   child: TextButton(
                     onPressed: () => navigateBack(),
-                    child: const Text(
-                      "Back",
-                      style: TextStyle(color: Colors.grey),
+                    child: Text(
+                      AppLocalizations.of(context)!.back,
+                      style: const TextStyle(color: Colors.grey),
                       maxLines: 1,
                     ),
                   ),
@@ -83,7 +84,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
                   child: TextButton(
                     onPressed: () => navigateForth(),
                     child: Text(
-                      selectedIndex != widget.pageCount - 1 ? "Next" : "Connect now",
+                      selectedIndex != widget.pageCount - 1 ? AppLocalizations.of(context)!.next : AppLocalizations.of(context)!.connect_now,
                       style: const TextStyle(color: Colors.grey),
                     ),
                   ),

@@ -1,0 +1,46 @@
+{
+  "@@locale": "fr",
+
+  "opener_enter_url": "Entrez votre URL et connectez-vous à votre réseau.",
+  "opener_need_help": "Besoin d'aide ?",
+
+  "help_title": "Qu'est-ce que HumHub ?",
+  "help_first_par": "HumHub est un logiciel open source utilisé par des organisations, des associations et des entreprises principalement comme réseau social, intranet ou plateforme de communication.",
+  "help_second_par": "Le logiciel numérise les structures organisationnelles et aide les gens du monde entier à se connecter, communiquer et faciliter la collaboration quotidienne. L'application HumHub est intuitive à utiliser et permet à chaque utilisateur d'accéder et de parcourir son réseau de n'importe où.",
+  "help_third_par": "L'application HumHub est intuitive à utiliser et vous permet d'accéder à votre réseau de n'importe où. Lorsque les notifications sont activées, vous recevrez également des notifications push concernant des informations importantes au sein de votre réseau et pourrez utiliser l'application pour rester à jour sur toute nouvelle pertinente à tout moment.",
+  "help_forth_par": "Les réseaux HumHub sont essentiellement des plates-formes de communication privées (internes à l'organisation). Il n'est possible de se connecter qu'aux réseaux existants pour lesquels vous disposez des données de connexion correspondantes. Les organisations ou les entreprises peuvent bien sûr créer et exploiter leur propre réseau HumHub à tout moment. Toutes les informations peuvent être trouvées sur",
+
+  "how_to_connect_title": "Comment puis-je connecter mon réseau ?",
+  "how_to_connect_first_par": "Il existe des milliers de réseaux dans le monde entier. Par conséquent, pour vous connecter à votre réseau existant, vous avez besoin de l'URL exacte de votre réseau individuel.",
+  "how_to_connect_sec_par": "Votre URL se trouve dans la barre d'adresse de votre navigateur dans la zone de connexion de votre réseau.",
+  "how_to_connect_third_par": "Veuillez contacter votre administrateur ou l'opérateur du réseau si vous ne connaissez pas votre URL ou vos données de connexion.",
+  "how_to_connect_url_example": "exemple.humhub.com",
+
+  "more_info_title": "Qu'est-ce que HumHub ?",
+  "more_info_first_par": "Les réseaux HumHub sont essentiellement des plates-formes de communication fermées (internes à l'organisation). Il n'est possible de se connecter qu'aux réseaux existants.",
+  "more_info_second_par": "Les organisations ou les entreprises peuvent bien sûr créer et exploiter leur propre réseau HumHub à tout moment.",
+  "more_info_third_par": "Toutes les informations peuvent être trouvées ici :",
+  "more_info_pro_edition": "Édition Professionnelle",
+  "more_info_pro_edition_url": "https://www.humhub.com/fr/edition-professionnelle",
+
+  "notification_permission_popup_title": "Permission de notification",
+  "notification_permission_popup_content": "Veuillez activer les notifications pour HumHub dans les paramètres de l'appareil.",
+
+  "connectivity_popup_title": "Pas de connexion",
+  "connectivity_popup_content": "Veuillez vérifier votre connexion Internet et réessayer.",
+
+  "web_view_exit_popup_title": "Êtes-vous sûr ?",
+  "web_view_exit_popup_content": "Voulez-vous quitter l'application ?",
+
+  "connect": "Connecter",
+  "cancel": "Annuler",
+  "url": "URL",
+  "back": "Retour",
+  "next": "Suivant",
+  "connect_now": "Connecter maintenant",
+  "enable": "Activer",
+  "skip": "Passer",
+  "ok": "OK",
+  "no": "Non",
+  "yes": "Oui"
+}
