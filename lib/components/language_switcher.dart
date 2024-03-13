@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/override_locale.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class LocaleSwitch extends StatefulWidget {
+class LanguageSwitcher extends StatefulWidget {
   static Key userProfileLocaleDropdown = const Key('user_profile_locale_dropdown');
-  const LocaleSwitch({
+  const LanguageSwitcher({
     Key? key,
     this.showTitle = false,
     this.forceLight = false,
@@ -15,61 +16,63 @@ class LocaleSwitch extends StatefulWidget {
   final bool forceLight;
 
   @override
-  State<LocaleSwitch> createState() => _LocaleSwitchState();
+  State<LanguageSwitcher> createState() => _LanguageSwitcherState();
 }
 
-class _LocaleSwitchState extends State<LocaleSwitch> {
+class _LanguageSwitcherState extends State<LanguageSwitcher> {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<int>(
       style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
-      key: LocaleSwitch.userProfileLocaleDropdown,
+      key: LanguageSwitcher.userProfileLocaleDropdown,
       isExpanded: true,
       selectedItemBuilder: (_) {
         return _items
             .map(
               (locale) => Row(
-            children: [
-              Image.asset("assets/images/locale/${locale}_locale_flag.png", height: 30, width: 30),
-              const SizedBox(width: 20),
-              Text(
-                locale.toUpperCase(),
+                children: [
+                  Image.asset("assets/images/locale/${locale}_locale_flag.png", height: 30, width: 30),
+                  const SizedBox(width: 20),
+                  Text(
+                    locale.toUpperCase(),
+                    style: TextStyle(color: primaryColor, fontSize: 16),
+                  ),
+                ],
               ),
-            ],
-          ),
-        )
+            )
             .toList();
       },
       dropdownColor: widget.forceLight ? Colors.white : Theme.of(context).colorScheme.background,
       decoration: widget.showTitle
           ? InputDecoration(
-        labelText: AppLocalizations.of(context)!.cancel,
-        enabledBorder: InputBorder.none,
-        fillColor: Colors.black,
-      )
+              labelText: AppLocalizations.of(context)!.cancel,
+              enabledBorder: InputBorder.none,
+              fillColor: Colors.black,
+            )
           : InputDecoration.collapsed(
-        hintText: AppLocalizations.of(context)!.cancel,
-      ).copyWith(
-        enabledBorder: InputBorder.none,
-        focusedBorder: InputBorder.none,
-      ),
+              hintText: AppLocalizations.of(context)!.cancel,
+            ).copyWith(
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+            ),
       value: _value(context),
-      icon: Icon(Icons.arrow_drop_down, color: Theme.of(context).primaryColor),
+      icon: Icon(Icons.arrow_drop_down, color: primaryColor),
       items: _items
           .mapIndexed(
             (localeString, index) => DropdownMenuItem(
-          value: index,
-          child: Row(
-            children: [
-              Image.asset("assets/images/locale/${localeString}_locale_flag.png", height: 30, width: 30),
-              const SizedBox(width: 20),
-              Text(
-                localeString.toUpperCase(),
+              value: index,
+              child: Row(
+                children: [
+                  Image.asset("assets/images/locale/${localeString}_locale_flag.png", height: 30, width: 30),
+                  const SizedBox(width: 20),
+                  Text(
+                    localeString.toUpperCase(),
+                    style: TextStyle(color: primaryColor, fontSize: 16),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-      )
+            ),
+          )
           .toList(),
       onChanged: (index) {
         if (index == null) return;

@@ -63,25 +63,25 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
     controlLer = OpenerController(ref: ref, helper: helper);
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        bottom: false,
-        top: false,
-        child: Form(
-          key: helper.key,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              RiveAnimation.asset(
-                Assets.openerAnimationForward,
-                fit: BoxFit.fill,
-                controllers: [_controller],
-              ),
-              RiveAnimation.asset(
-                Assets.openerAnimationReverse,
-                fit: BoxFit.fill,
-                controllers: [_controllerReverse],
-              ),
-              Padding(
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          RiveAnimation.asset(
+            Assets.openerAnimationForward,
+            fit: BoxFit.fill,
+            controllers: [_controller],
+          ),
+          RiveAnimation.asset(
+            Assets.openerAnimationReverse,
+            fit: BoxFit.fill,
+            controllers: [_controllerReverse],
+          ),
+          SafeArea(
+            bottom: false,
+            top: false,
+            child: Form(
+              key: helper.key,
+              child: Padding(
                 padding: const EdgeInsets.only(top: 50),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -90,12 +90,12 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                       opacity: _visible ? 1.0 : 0.0,
                       duration: const Duration(milliseconds: 300),
                       child: const Padding(
-                        padding: EdgeInsets.only(top: 8, right: 8),
+                        padding: EdgeInsets.only(top: 10, right: 16),
                         child: Align(
                           alignment: Alignment.centerRight,
                           child: SizedBox(
                             width: 110,
-                            child: LocaleSwitch(),
+                            child: LanguageSwitcher(),
                           ),
                         ),
                       ),
@@ -235,9 +235,9 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                   ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
