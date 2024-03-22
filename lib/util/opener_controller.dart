@@ -69,7 +69,6 @@ class OpenerController {
     }
     // Get the manifest.json for given url.
     await findManifest(helper.model[formUrlKey]!);
-    logDebug("Here");
     if (asyncData!.hasValue) {
       await checkHumHubModuleView(asyncData!.value!.startUrl);
     }
