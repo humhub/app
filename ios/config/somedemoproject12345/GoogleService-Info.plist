@@ -2,10 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CLIENT_ID</key>
-	<string>21392898126-filvre2lp06kebh2p7b788tqepqcvtqq.apps.googleusercontent.com</string>
-	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.21392898126-filvre2lp06kebh2p7b788tqepqcvtqq</string>
 	<key>API_KEY</key>
 	<string>AIzaSyA8W3b9OErgZBzkwPQ2sDMgyw_WWFWVPro</string>
 	<key>GCM_SENDER_ID</key>
@@ -19,16 +15,16 @@
 	<key>STORAGE_BUCKET</key>
 	<string>humhub-push-service.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_GCM_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:21392898126:ios:d4f4e884a9ca908008ab1f</string>
+	<string>1:21392898126:ios:a8fa271c0aa2032308ab1f</string>
 </dict>
 </plist>
