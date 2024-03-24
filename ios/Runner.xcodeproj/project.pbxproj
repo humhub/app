@@ -16,8 +16,6 @@
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		F605E7BB2BB0124C00C5A638 /* config in Resources */ = {isa = PBXBuildFile; fileRef = F605E7BA2BB0124C00C5A638 /* config */; };
 		F605E7CC2BB0272B00C5A638 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F605E7BD2BB019CA00C5A638 /* Info.plist */; };
-		F65851052AC2EF210036C268 /* RunnerProfile.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = F6025A732AC02D3D001D4FD8 /* RunnerProfile.entitlements */; };
-		F65851062AC2EF210036C268 /* Runner.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = D9895F6A29D4AEFD00F6E619 /* Runner.entitlements */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -59,11 +57,9 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B0923C99B3D7D830E060FB78 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		C42986942265DBF922E58364 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D9895F6A29D4AEFD00F6E619 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		E19677FCB56ED73B18B816B8 /* Pods-Runner.profile-main.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile-main.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile-main.xcconfig"; sourceTree = "<group>"; };
 		E50352C59ADC43A180463F03 /* Pods-Runner.profile-somedemoproject12345.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile-somedemoproject12345.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile-somedemoproject12345.xcconfig"; sourceTree = "<group>"; };
 		E6222EE95F0BEB86D750252B /* Pods-Runner.profile-opener.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile-opener.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile-opener.xcconfig"; sourceTree = "<group>"; };
-		F6025A732AC02D3D001D4FD8 /* RunnerProfile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RunnerProfile.entitlements; sourceTree = "<group>"; };
 		F605E7BA2BB0124C00C5A638 /* config */ = {isa = PBXFileReference; lastKnownFileType = folder; path = config; sourceTree = "<group>"; };
 		F605E7BE2BB019D200C5A638 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = en; path = en.lproj/Info.plist; sourceTree = "<group>"; };
 		F605E7BF2BB01AC300C5A638 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Main.strings; sourceTree = "<group>"; };
@@ -72,6 +68,12 @@
 		F605E7C22BB01AD300C5A638 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
 		F605E7C32BB01AD300C5A638 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		F605E7C42BB01AD300C5A638 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = de; path = de.lproj/Info.plist; sourceTree = "<group>"; };
+		F605E7CD2BB02FD100C5A638 /* Runner_somedemoproject12345.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Runner_somedemoproject12345.entitlements; sourceTree = "<group>"; };
+		F605E7CE2BB02FD100C5A638 /* Runner_humhubCommunity.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Runner_humhubCommunity.entitlements; sourceTree = "<group>"; };
+		F605E7CF2BB02FD100C5A638 /* Runner_opener.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Runner_opener.entitlements; sourceTree = "<group>"; };
+		F605E7D02BB0303000C5A638 /* RunnerProfile_humhubCommunity.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = RunnerProfile_humhubCommunity.entitlements; sourceTree = "<group>"; };
+		F605E7D12BB0303000C5A638 /* RunnerProfile_opener.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = RunnerProfile_opener.entitlements; sourceTree = "<group>"; };
+		F605E7D22BB0303000C5A638 /* RunnerProfile_somedemoproject12345.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = RunnerProfile_somedemoproject12345.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,8 +152,12 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
-				F6025A732AC02D3D001D4FD8 /* RunnerProfile.entitlements */,
-				D9895F6A29D4AEFD00F6E619 /* Runner.entitlements */,
+				F605E7D02BB0303000C5A638 /* RunnerProfile_humhubCommunity.entitlements */,
+				F605E7D12BB0303000C5A638 /* RunnerProfile_opener.entitlements */,
+				F605E7D22BB0303000C5A638 /* RunnerProfile_somedemoproject12345.entitlements */,
+				F605E7CE2BB02FD100C5A638 /* Runner_humhubCommunity.entitlements */,
+				F605E7CF2BB02FD100C5A638 /* Runner_opener.entitlements */,
+				F605E7CD2BB02FD100C5A638 /* Runner_somedemoproject12345.entitlements */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
@@ -232,9 +238,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F605E7CC2BB0272B00C5A638 /* Info.plist in Resources */,
-				F65851052AC2EF210036C268 /* RunnerProfile.entitlements in Resources */,
 				F605E7BB2BB0124C00C5A638 /* config in Resources */,
-				F65851062AC2EF210036C268 /* Runner.entitlements in Resources */,
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
@@ -438,9 +442,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = main;
+				ASSETCATALOG_COMPILER_APPICON_NAME = opener;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Runner/RunnerProfile.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Runner/RunnerProfile_opener.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
@@ -585,9 +589,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = main;
+				ASSETCATALOG_COMPILER_APPICON_NAME = opener;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner_opener.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
@@ -620,9 +624,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = main;
+				ASSETCATALOG_COMPILER_APPICON_NAME = opener;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner_opener.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
@@ -714,7 +718,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = somedemoproject12345;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner_somedemoproject12345.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
@@ -801,7 +805,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = somedemoproject12345;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner_somedemoproject12345.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
@@ -885,7 +889,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = somedemoproject12345;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Runner/RunnerProfile.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Runner/RunnerProfile_somedemoproject12345.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
@@ -974,7 +978,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = humhubCommunity;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner_humhubCommunity.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
@@ -1061,7 +1065,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = humhubCommunity;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner_humhubCommunity.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
@@ -1145,7 +1149,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = humhubCommunity;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Runner/RunnerProfile.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Runner/RunnerProfile_humhubCommunity.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
