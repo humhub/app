@@ -15,6 +15,7 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		F605E7BB2BB0124C00C5A638 /* config in Resources */ = {isa = PBXBuildFile; fileRef = F605E7BA2BB0124C00C5A638 /* config */; };
+		F605E7CC2BB0272B00C5A638 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F605E7BD2BB019CA00C5A638 /* Info.plist */; };
 		F65851052AC2EF210036C268 /* RunnerProfile.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = F6025A732AC02D3D001D4FD8 /* RunnerProfile.entitlements */; };
 		F65851062AC2EF210036C268 /* Runner.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = D9895F6A29D4AEFD00F6E619 /* Runner.entitlements */; };
 /* End PBXBuildFile section */
@@ -34,17 +35,22 @@
 
 /* Begin PBXFileReference section */
 		060E921A0514C445F2CFA448 /* Pods-Runner.release-main.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release-main.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release-main.xcconfig"; sourceTree = "<group>"; };
+		1173D09162C0C3559B6797F3 /* Pods-Runner.debug-opener.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug-opener.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug-opener.xcconfig"; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		1C28C6E29E479EA1E0F61AD8 /* Pods-Runner.debug-humhubcommunity.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug-humhubcommunity.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug-humhubcommunity.xcconfig"; sourceTree = "<group>"; };
 		20D44F0A2B5C057C5E00DD22 /* Pods-Runner.release-somedemoproject12345.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release-somedemoproject12345.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release-somedemoproject12345.xcconfig"; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		3D2D0C33D8059AB759146103 /* Pods-Runner.debug-somedemoproject12345.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug-somedemoproject12345.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug-somedemoproject12345.xcconfig"; sourceTree = "<group>"; };
 		51928F160581B0A70D51E7A1 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		51D9E5C372C450446E9E9AFD /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		56E0BC4708CEF73749D566A5 /* Pods-Runner.debug-main.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug-main.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug-main.xcconfig"; sourceTree = "<group>"; };
+		6B1DC6FEF5AFB9479D1E6074 /* Pods-Runner.release-opener.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release-opener.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release-opener.xcconfig"; sourceTree = "<group>"; };
+		72B20E74DD485A3E5495A469 /* Pods-Runner.release-humhubcommunity.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release-humhubcommunity.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release-humhubcommunity.xcconfig"; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		7E710AD36D845A22A4FA867C /* Pods-Runner.profile-humhubcommunity.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile-humhubcommunity.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile-humhubcommunity.xcconfig"; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -56,9 +62,9 @@
 		D9895F6A29D4AEFD00F6E619 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		E19677FCB56ED73B18B816B8 /* Pods-Runner.profile-main.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile-main.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile-main.xcconfig"; sourceTree = "<group>"; };
 		E50352C59ADC43A180463F03 /* Pods-Runner.profile-somedemoproject12345.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile-somedemoproject12345.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile-somedemoproject12345.xcconfig"; sourceTree = "<group>"; };
+		E6222EE95F0BEB86D750252B /* Pods-Runner.profile-opener.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile-opener.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile-opener.xcconfig"; sourceTree = "<group>"; };
 		F6025A732AC02D3D001D4FD8 /* RunnerProfile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RunnerProfile.entitlements; sourceTree = "<group>"; };
 		F605E7BA2BB0124C00C5A638 /* config */ = {isa = PBXFileReference; lastKnownFileType = folder; path = config; sourceTree = "<group>"; };
-		F605E7BC2BB019CA00C5A638 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Base; path = Base.lproj/Info.plist; sourceTree = "<group>"; };
 		F605E7BE2BB019D200C5A638 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = en; path = en.lproj/Info.plist; sourceTree = "<group>"; };
 		F605E7BF2BB01AC300C5A638 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Main.strings; sourceTree = "<group>"; };
 		F605E7C02BB01AC300C5A638 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -92,6 +98,12 @@
 				56E0BC4708CEF73749D566A5 /* Pods-Runner.debug-main.xcconfig */,
 				060E921A0514C445F2CFA448 /* Pods-Runner.release-main.xcconfig */,
 				E19677FCB56ED73B18B816B8 /* Pods-Runner.profile-main.xcconfig */,
+				1173D09162C0C3559B6797F3 /* Pods-Runner.debug-opener.xcconfig */,
+				1C28C6E29E479EA1E0F61AD8 /* Pods-Runner.debug-humhubcommunity.xcconfig */,
+				6B1DC6FEF5AFB9479D1E6074 /* Pods-Runner.release-opener.xcconfig */,
+				72B20E74DD485A3E5495A469 /* Pods-Runner.release-humhubcommunity.xcconfig */,
+				E6222EE95F0BEB86D750252B /* Pods-Runner.profile-opener.xcconfig */,
+				7E710AD36D845A22A4FA867C /* Pods-Runner.profile-humhubcommunity.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -219,6 +231,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F605E7CC2BB0272B00C5A638 /* Info.plist in Resources */,
 				F65851052AC2EF210036C268 /* RunnerProfile.entitlements in Resources */,
 				F605E7BB2BB0124C00C5A638 /* config in Resources */,
 				F65851062AC2EF210036C268 /* Runner.entitlements in Resources */,
@@ -358,7 +371,6 @@
 		F605E7BD2BB019CA00C5A638 /* Info.plist */ = {
 			isa = PBXVariantGroup;
 			children = (
-				F605E7BC2BB019CA00C5A638 /* Base */,
 				F605E7BE2BB019D200C5A638 /* en */,
 				F605E7C12BB01AC300C5A638 /* fr */,
 				F605E7C42BB01AD300C5A638 /* de */,
@@ -704,11 +716,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5439UTM27E;
+				DEVELOPMENT_TEAM = 5439UTM27E;
 				ENABLE_BITCODE = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -720,10 +730,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.humhub.community.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.humhub.somedemoproject12345.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = humhub_distribution_profile;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -794,11 +803,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5439UTM27E;
+				DEVELOPMENT_TEAM = 5439UTM27E;
 				ENABLE_BITCODE = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -810,10 +817,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.humhub.community.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.humhub.somedemoproject12345.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = humhub_distribution_profile;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -881,11 +887,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/RunnerProfile.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5439UTM27E;
+				DEVELOPMENT_TEAM = 5439UTM27E;
 				ENABLE_BITCODE = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -897,10 +901,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.humhub.community.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.humhub.somedemoproject12345.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = humhub_distribution_profile;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -973,11 +976,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5439UTM27E;
+				DEVELOPMENT_TEAM = 5439UTM27E;
 				ENABLE_BITCODE = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -989,10 +990,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.humhub.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.humhub.community.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = humhub_distribution_profile;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1063,11 +1063,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5439UTM27E;
+				DEVELOPMENT_TEAM = 5439UTM27E;
 				ENABLE_BITCODE = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -1079,10 +1077,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.humhub.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.humhub.community.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = humhub_distribution_profile;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1150,11 +1147,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/RunnerProfile.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5439UTM27E;
+				DEVELOPMENT_TEAM = 5439UTM27E;
 				ENABLE_BITCODE = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -1166,10 +1161,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.humhub.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.humhub.community.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = humhub_distribution_profile;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

@@ -41,7 +41,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="sometestproject12345.humhub.com"
+                    android:host="com.humhub.community.app"
                     android:scheme="https" />
             </intent-filter>
 

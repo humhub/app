@@ -57,6 +57,6 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-	<string>We need access to your camera to take photos and videos for sharing in the app.</string>
+    <string>We need access to your camera to take photos and videos for sharing in the app.</string>
 </dict>
 </plist>
