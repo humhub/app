@@ -104,9 +104,14 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
             onLoadStart: (controller, uri) async {
               _setAjaxHeadersJQuery(controller);
             },
-            onProgressChanged: _onProgressChanged,
-            onLoadError: (InAppWebViewController controller, Uri? url, int code, String message) {
+            onLoadError: (InAppWebViewController controller, Uri? url, int code, String message) async {
               if (code == -1009) NoConnectionDialog.show(context);
+              await _pullToRefreshController?.endRefreshing();
+            },
+            onProgressChanged: (controller, progress) async {
+              if (progress == 100) {
+                await _pullToRefreshController?.endRefreshing();
+              }
             },
           ),
         ),
@@ -167,7 +172,7 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
     return URLRequest(url: Uri.parse(url), headers: instance.customHeaders);
   }
 
-  _onLoadStop(InAppWebViewController controller, Uri? url) {
+  _onLoadStop(InAppWebViewController controller, Uri? url) async {
     // Disable remember me checkbox on login and set def. value to true: check if the page is actually login page, if it is inject JS that hides element
     if (url!.path.contains('/user/auth/login')) {
       WebViewGlobalController.value!
@@ -177,32 +182,24 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _setAjaxHeadersJQuery(controller);
-    _pullToRefreshController?.endRefreshing();
-  }
-
-  _onProgressChanged(InAppWebViewController controller, int progress) {
-    if (progress == 100) {
-      _pullToRefreshController?.endRefreshing();
-    }
+    await _pullToRefreshController?.endRefreshing();
   }
 
   PullToRefreshController? get initPullToRefreshController {
-    _pullToRefreshOptions = PullToRefreshOptions(
-      color: HexColor(instance.manifest!.themeColor),
-    );
+    _pullToRefreshOptions = Platform.isIOS
+        ? PullToRefreshOptions(color: Colors.white, backgroundColor: HexColor(instance.manifest!.themeColor))
+        : PullToRefreshOptions(
+            color: HexColor(instance.manifest!.themeColor),
+          );
     return kIsWeb
         ? null
         : PullToRefreshController(
             options: _pullToRefreshOptions,
             onRefresh: () async {
-              Uri? url = await WebViewGlobalController.value!.getUrl();
-              if (url != null) {
-                WebViewGlobalController.value!.loadUrl(
-                  urlRequest:
-                      URLRequest(url: await WebViewGlobalController.value!.getUrl(), headers: instance.customHeaders),
-                );
-              } else {
-                WebViewGlobalController.value!.reload();
+              if (defaultTargetPlatform == TargetPlatform.android) {
+                WebViewGlobalController.value?.reload();
+              } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+                WebViewGlobalController.value?.loadUrl(urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl()));
               }
             },
           );
