@@ -2,18 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:humhub/flavored/flavored_opener_controller.dart';
 import 'package:humhub/opener_app.dart';
-import 'package:humhub/util/intent/intent_plugin.dart';
+import 'package:humhub/util/flavor.dart';
 import 'package:humhub/util/log.dart';
-import 'package:humhub/util/notifications/plugin.dart';
-import 'package:humhub/util/override_locale.dart';
-import 'package:humhub/util/push/push_plugin.dart';
-import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'flavored_app.dart';
 import 'models/hum_hub.dart';
@@ -24,6 +18,7 @@ main() async {
   );
 
   WidgetsFlutterBinding.ensureInitialized();
+  clearSecureStorageOnReinstall();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
     PackageInfo.fromPlatform().then((PackageInfo packageInfo) async {
       logDebug("Package Name: ${packageInfo.packageName}");
@@ -33,58 +28,13 @@ main() async {
           runApp(const ProviderScope(child: OpenerApp()));
           break;
         default:
-          FlavoredOpenerController opener = FlavoredOpenerController(url: 'https://sometestproject12345.humhub.com/manifest.json');
-          HumHub? instance = await opener.initHumHub();
-          logDebug("Package Name: ${packageInfo.packageName}");
+          // Handle if the instance does not exist for selected boundel id.
+          HumHub? instance = await Flavor.getInstance(packageInfo.packageName);
           runApp(ProviderScope(child: FlavoredApp(instance: instance!)));
           break;
       }
     });
   });
-}
-
-class MyApp extends ConsumerStatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  MyAppState createState() => MyAppState();
-}
-
-class MyAppState extends ConsumerState<MyApp> {
-  @override
-  Widget build(BuildContext context) {
-    clearSecureStorageOnReinstall();
-    return IntentPlugin(
-      child: NotificationPlugin(
-        child: PushPlugin(
-          child: OverrideLocale(
-            builder: (overrideLocale) => Builder(
-              builder: (context) => FutureBuilder<String>(
-                future: MyRouter.getInitialRoute(ref),
-                builder: (context, snap) {
-                  if (snap.hasData) {
-                    return MaterialApp(
-                      debugShowCheckedModeBanner: false,
-                      initialRoute: snap.data,
-                      routes: MyRouter.routes,
-                      navigatorKey: navigatorKey,
-                      localizationsDelegates: AppLocalizations.localizationsDelegates,
-                      supportedLocales: AppLocalizations.supportedLocales,
-                      locale: overrideLocale,
-                      theme: ThemeData(
-                        fontFamily: 'OpenSans',
-                      ),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 clearSecureStorageOnReinstall() async {
@@ -97,3 +47,4 @@ clearSecureStorageOnReinstall() async {
     prefs.setBool(key, true);
   }
 }
+

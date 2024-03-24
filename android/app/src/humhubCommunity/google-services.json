@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "863483236670",
+    "project_id": "humhub-sometestproject12345",
+    "storage_bucket": "humhub-sometestproject12345.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:863483236670:android:2c8aafaf141021eeae1c6f",
+        "android_client_info": {
+          "package_name": "com.humhub.community.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAL269CvLzRzow4UzPybgbtS5iXQ_TiDQU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

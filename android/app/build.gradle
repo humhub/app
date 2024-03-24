@@ -85,6 +85,10 @@ android {
             dimension "flavor"
             applicationId "com.humhub.somedemoproject12345.app"
         }
+        humhubCommunity {
+            dimension "flavor"
+            applicationId "com.humhub.community.app"
+        }
     }
 }
 
