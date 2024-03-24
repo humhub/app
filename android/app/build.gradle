@@ -89,6 +89,10 @@ android {
             dimension "flavor"
             applicationId "com.humhub.community.app"
         }
+        opener {
+            dimension "flavor"
+            applicationId "com.humhub.app"
+        }
     }
 }
 
