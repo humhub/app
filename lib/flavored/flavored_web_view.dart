@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:app_settings/app_settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
@@ -14,6 +13,7 @@ import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:humhub/util/show_dialog.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -53,9 +53,8 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
     ),
   );
 
-  PullToRefreshController? _pullToRefreshController;
-  late PullToRefreshOptions _pullToRefreshOptions;
   HeadlessInAppWebView? headlessWebView;
+  late PullToRefreshController _pullToRefreshController;
 
   @override
   void initState() {
@@ -65,8 +64,23 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
   @override
   Widget build(BuildContext context) {
     instance = ModalRoute.of(context)?.settings.arguments as HumHub;
+    _pullToRefreshController = _pullToRefreshController = PullToRefreshController(
+      options: PullToRefreshOptions(
+        color: HexColor(instance.manifest!.themeColor),
+      ),
+      onRefresh: () async {
+        Uri? url = await WebViewGlobalController.value!.getUrl();
+        if (url != null) {
+          WebViewGlobalController.value!.loadUrl(
+            urlRequest: URLRequest(
+                url: await WebViewGlobalController.value!.getUrl(), headers: ref.read(humHubProvider).customHeaders),
+          );
+        } else {
+          WebViewGlobalController.value!.reload();
+        }
+      },
+    );
     _initialRequest = _initRequest;
-    _pullToRefreshController = initPullToRefreshController;
     authBrowser = AuthInAppBrowser(
       manifest: instance.manifest!,
       concludeAuth: (URLRequest request) {
@@ -185,51 +199,6 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
     await _pullToRefreshController?.endRefreshing();
   }
 
-  PullToRefreshController? get initPullToRefreshController {
-    _pullToRefreshOptions = Platform.isIOS
-        ? PullToRefreshOptions(color: Colors.white, backgroundColor: HexColor(instance.manifest!.themeColor))
-        : PullToRefreshOptions(
-            color: HexColor(instance.manifest!.themeColor),
-          );
-    return kIsWeb
-        ? null
-        : PullToRefreshController(
-            options: _pullToRefreshOptions,
-            onRefresh: () async {
-              if (defaultTargetPlatform == TargetPlatform.android) {
-                WebViewGlobalController.value?.reload();
-              } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-                WebViewGlobalController.value?.loadUrl(urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl()));
-              }
-            },
-          );
-  }
-
-  askForNotificationPermissions() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Notification Permission"),
-        content: const Text("Please enable notifications for HumHub in the device settings"),
-        actions: <Widget>[
-          TextButton(
-            child: const Text("Enable"),
-            onPressed: () {
-              AppSettings.openAppSettings();
-              Navigator.pop(context);
-            },
-          ),
-          TextButton(
-            child: const Text("Skip"),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
   Future<void> _setAjaxHeadersJQuery(InAppWebViewController controller) async {
     String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(instance.customHeaders).toString()}});";
     await controller.evaluateJavascript(source: jsCode);
@@ -241,15 +210,12 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
         String? token = ref.read(pushTokenProvider).value;
         if (token != null) {
           var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          URLRequest request = URLRequest(url: Uri.parse(message.url!), method: "POST", body: postData);
-          await headlessWebView.webViewController.loadUrl(urlRequest: request).catchError((error, stackTrace) {
-            logError(error, request, stackTrace);
-          });
+          await WebViewGlobalController.value?.postUrl(url: Uri.parse(message.url!), postData: postData);
         }
         var status = await Permission.notification.status;
         // status.isDenied: The user has previously denied the notification permission
         // !status.isGranted: The user has never been asked for the notification permission
-        if (status.isDenied || !status.isGranted) askForNotificationPermissions();
+        if (status.isDenied || !status.isGranted) ShowDialog.of(context).notificationPermission();
         break;
       case ChannelAction.updateNotificationCount:
         if (message.count != null) FlutterAppBadger.updateBadgeCount(message.count!);
@@ -274,5 +240,24 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
     if (headlessWebView != null) {
       headlessWebView!.dispose();
     }
+  }
+
+  PullToRefreshController getPullToRefreshController(HumHub instance, InAppWebViewController controller) {
+    PullToRefreshOptions pullToRefreshOptions = PullToRefreshOptions(
+      color: HexColor(instance.manifest!.themeColor),
+    );
+    return PullToRefreshController(
+      options: pullToRefreshOptions,
+      onRefresh: () async {
+        Uri? url = await controller.getUrl();
+        if (url != null) {
+          controller.loadUrl(
+            urlRequest: URLRequest(url: await controller.getUrl(), headers: instance.customHeaders),
+          );
+        } else {
+          controller.reload();
+        }
+      },
+    );
   }
 }

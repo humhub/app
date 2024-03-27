@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/providers.dart';
@@ -9,6 +10,7 @@ import 'package:loggy/loggy.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 extension MyWebViewController on InAppWebViewController {
+
   Future<bool> exitApp(context, ref) async {
     bool canGoBack = await this.canGoBack();
     if (canGoBack) {

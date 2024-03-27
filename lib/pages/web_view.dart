@@ -16,6 +16,7 @@ import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:humhub/util/show_dialog.dart';
 import 'package:humhub/util/universal_opener_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -70,7 +71,22 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   @override
   Widget build(BuildContext context) {
     _initialRequest = _initRequest;
-    _pullToRefreshController = initPullToRefreshController;
+    _pullToRefreshController = PullToRefreshController(
+      options: PullToRefreshOptions(
+        color: HexColor(manifest.themeColor),
+      ),
+      onRefresh: () async {
+        Uri? url = await WebViewGlobalController.value!.getUrl();
+        if (url != null) {
+          WebViewGlobalController.value!.loadUrl(
+            urlRequest: URLRequest(
+                url: await WebViewGlobalController.value!.getUrl(), headers: ref.read(humHubProvider).customHeaders),
+          );
+        } else {
+          WebViewGlobalController.value!.reload();
+        }
+      },
+    );
     authBrowser = AuthInAppBrowser(
       manifest: manifest,
       concludeAuth: (URLRequest request) {
@@ -204,54 +220,6 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     }
   }
 
-  PullToRefreshController? get initPullToRefreshController {
-    _pullToRefreshOptions = PullToRefreshOptions(
-      color: HexColor(manifest.themeColor),
-    );
-    return kIsWeb
-        ? null
-        : PullToRefreshController(
-            options: _pullToRefreshOptions,
-            onRefresh: () async {
-              Uri? url = await WebViewGlobalController.value!.getUrl();
-              if (url != null) {
-                WebViewGlobalController.value!.loadUrl(
-                  urlRequest: URLRequest(
-                      url: await WebViewGlobalController.value!.getUrl(),
-                      headers: ref.read(humHubProvider).customHeaders),
-                );
-              } else {
-                WebViewGlobalController.value!.reload();
-              }
-            },
-          );
-  }
-
-  askForNotificationPermissions() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.notification_permission_popup_title),
-        content: Text(AppLocalizations.of(context)!.notification_permission_popup_content),
-        actions: <Widget>[
-          TextButton(
-            child: Text(AppLocalizations.of(context)!.enable),
-            onPressed: () {
-              AppSettings.openAppSettings();
-              Navigator.pop(context);
-            },
-          ),
-          TextButton(
-            child: Text(AppLocalizations.of(context)!.skip),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
   Future<void> _setAjaxHeadersJQuery(InAppWebViewController controller) async {
     String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(ref.read(humHubProvider).customHeaders).toString()}});";
     await controller.evaluateJavascript(source: jsCode);
@@ -273,13 +241,12 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         String? token = ref.read(pushTokenProvider).value;
         if (token != null) {
           var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          URLRequest request = URLRequest(url: Uri.parse(message.url!), method: "POST", body: postData);
-          await headlessWebView.webViewController.loadUrl(urlRequest: request);
+          await WebViewGlobalController.value?.postUrl(url: Uri.parse(message.url!), postData: postData);
         }
         var status = await Permission.notification.status;
         // status.isDenied: The user has previously denied the notification permission
         // !status.isGranted: The user has never been asked for the notification permission
-        if (status.isDenied || !status.isGranted) askForNotificationPermissions();
+        if (status.isDenied || !status.isGranted) ShowDialog.of(context).notificationPermission();
         break;
       case ChannelAction.updateNotificationCount:
         if (message.count != null) FlutterAppBadger.updateBadgeCount(message.count!);
