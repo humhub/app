@@ -976,7 +976,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = "Humhub Community";
+				APP_DISPLAY_NAME = Community;
 				ASSETCATALOG_COMPILER_APPICON_NAME = humhubCommunity;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner_humhubCommunity.entitlements;
@@ -1063,7 +1063,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = "Humhub Community";
+				APP_DISPLAY_NAME = Community;
 				ASSETCATALOG_COMPILER_APPICON_NAME = humhubCommunity;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner_humhubCommunity.entitlements;
@@ -1147,7 +1147,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = "Humhub Community";
+				APP_DISPLAY_NAME = Community;
 				ASSETCATALOG_COMPILER_APPICON_NAME = humhubCommunity;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/RunnerProfile_humhubCommunity.entitlements;
