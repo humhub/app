@@ -35,4 +35,24 @@ class ShowDialog {
       ),
     );
   }
+
+  noInternetPopup(){
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title:  Text(AppLocalizations.of(context)!.connectivity_popup_title),
+          content:  Text(AppLocalizations.of(context)!.connectivity_popup_content),
+          actions: [
+            TextButton(
+              child:  Text(AppLocalizations.of(context)!.ok.toUpperCase()),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

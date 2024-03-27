@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:app_settings/app_settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
@@ -12,7 +11,6 @@ import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
-import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/providers.dart';
@@ -22,7 +20,6 @@ import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WebViewGlobalController {
   static InAppWebViewController? _value;
@@ -60,7 +57,6 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   );
 
   PullToRefreshController? _pullToRefreshController;
-  late PullToRefreshOptions _pullToRefreshOptions;
   HeadlessInAppWebView? headlessWebView;
 
   @override
@@ -127,7 +123,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
             },
             onProgressChanged: _onProgressChanged,
             onLoadError: (InAppWebViewController controller, Uri? url, int code, String message) {
-              if (code == -1009) NoConnectionDialog.show(context);
+              if (code == -1009) ShowDialog.of(context).noInternetPopup();
             },
           ),
         ),

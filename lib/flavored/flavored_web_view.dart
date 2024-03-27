@@ -9,7 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/components/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/hum_hub.dart';
-import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/providers.dart';
@@ -119,12 +118,12 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
               _setAjaxHeadersJQuery(controller);
             },
             onLoadError: (InAppWebViewController controller, Uri? url, int code, String message) async {
-              if (code == -1009) NoConnectionDialog.show(context);
-              await _pullToRefreshController?.endRefreshing();
+              if (code == -1009) ShowDialog.of(context).noInternetPopup();
+              await _pullToRefreshController.endRefreshing();
             },
             onProgressChanged: (controller, progress) async {
               if (progress == 100) {
-                await _pullToRefreshController?.endRefreshing();
+                await _pullToRefreshController.endRefreshing();
               }
             },
           ),
@@ -196,7 +195,7 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _setAjaxHeadersJQuery(controller);
-    await _pullToRefreshController?.endRefreshing();
+    await _pullToRefreshController.endRefreshing();
   }
 
   Future<void> _setAjaxHeadersJQuery(InAppWebViewController controller) async {
