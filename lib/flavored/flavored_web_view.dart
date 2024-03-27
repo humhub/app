@@ -242,7 +242,9 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
         if (token != null) {
           var postData = Uint8List.fromList(utf8.encode("token=$token"));
           URLRequest request = URLRequest(url: Uri.parse(message.url!), method: "POST", body: postData);
-          await headlessWebView.webViewController.loadUrl(urlRequest: request);
+          await headlessWebView.webViewController.loadUrl(urlRequest: request).catchError((error, stackTrace) {
+            logError(error, request, stackTrace);
+          });
         }
         var status = await Permission.notification.status;
         // status.isDenied: The user has previously denied the notification permission
