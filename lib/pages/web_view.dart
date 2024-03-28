@@ -13,6 +13,7 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/channel.dart';
+import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/show_dialog.dart';
 import 'package:humhub/util/universal_opener_controller.dart';
@@ -242,7 +243,9 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         var status = await Permission.notification.status;
         // status.isDenied: The user has previously denied the notification permission
         // !status.isGranted: The user has never been asked for the notification permission
-        if (status.isDenied || !status.isGranted) ShowDialog.of(context).notificationPermission();
+        bool wasAskedBefore = await NotificationPlugin.hasAskedPermissionBefore();
+        // ignore: use_build_context_synchronously
+        if (status != PermissionStatus.granted && !wasAskedBefore) ShowDialog.of(context).notificationPermission();
         break;
       case ChannelAction.updateNotificationCount:
         if (message.count != null) FlutterAppBadger.updateBadgeCount(message.count!);

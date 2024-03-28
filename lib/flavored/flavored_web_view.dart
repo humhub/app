@@ -11,11 +11,11 @@ import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/notifications/channel.dart';
+import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/show_dialog.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class WebViewGlobalController {
@@ -215,7 +215,8 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
         var status = await Permission.notification.status;
         // status.isDenied: The user has previously denied the notification permission
         // !status.isGranted: The user has never been asked for the notification permission
-        bool wasAskedBefore = await wasAskedBeforeForPermissions();
+        bool wasAskedBefore = await NotificationPlugin.hasAskedPermissionBefore();
+        // ignore: use_build_context_synchronously
         if (status != PermissionStatus.granted && !wasAskedBefore) ShowDialog.of(context).notificationPermission();
         break;
       case ChannelAction.updateNotificationCount:
@@ -260,13 +261,5 @@ class FlavoredWebViewState extends ConsumerState<FlavoredWebView> {
         }
       },
     );
-  }
-
-  Future<bool> wasAskedBeforeForPermissions() async {
-    String key = 'was_asked_before';
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var data = prefs.getBool(key) ?? false;
-    prefs.setBool(key, true);
-    return data;
   }
 }
