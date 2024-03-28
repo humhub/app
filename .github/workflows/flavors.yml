@@ -1,0 +1,15 @@
+name: version-release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  flavor_release:
+    strategy:
+      matrix:
+        target: [opener, humhubCommunity, somedemoproject12345]
+    uses: .github/workflows/version-release.yml@main
+    with:
+      target: ${{ matrix.target }}
