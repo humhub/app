@@ -3,8 +3,8 @@ import 'package:http/http.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:http/http.dart' as http;
-import 'api_provider.dart';
-import 'connectivity_plugin.dart';
+import '../api_provider.dart';
+import '../connectivity_plugin.dart';
 
 class UniversalOpenerController {
   late AsyncValue<Manifest>? asyncData;

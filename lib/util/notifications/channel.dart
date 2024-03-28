@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:humhub/pages/web_view.dart';
-import 'package:humhub/util/universal_opener_controller.dart';
+import 'package:humhub/util/opener_controllers/universal_opener_controller.dart';
 import 'package:humhub/util/router.dart';
 
 abstract class NotificationChannel {

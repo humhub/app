@@ -24,11 +24,10 @@ main() async {
       logDebug("Package Name: ${packageInfo.packageName}");
       switch (packageInfo.packageName) {
         case "com.humhub.app":
-          logDebug("Package Name: ${packageInfo.packageName}");
           runApp(const ProviderScope(child: OpenerApp()));
           break;
         default:
-          // Handle if the instance does not exist for selected boundel id.
+          // Handle if the instance does not exist for selected bundle id.
           HumHub? instance = await Flavor.getInstance(packageInfo.packageName);
           runApp(ProviderScope(child: FlavoredApp(instance: instance!)));
           break;

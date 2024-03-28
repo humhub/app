@@ -1,4 +1,4 @@
-import 'package:humhub/flavored/flavored_opener_controller.dart';
+import 'package:humhub/util/opener_controllers/flavored_opener_controller.dart';
 import 'package:humhub/models/hum_hub.dart';
 
 class Flavor {

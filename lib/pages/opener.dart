@@ -8,7 +8,7 @@ import 'package:humhub/util/const.dart';
 import 'package:humhub/util/form_helper.dart';
 import 'package:humhub/util/intent/intent_plugin.dart';
 import 'package:humhub/util/notifications/channel.dart';
-import 'package:humhub/util/opener_controller.dart';
+import 'package:humhub/util/opener_controllers/opener_controller.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:rive/rive.dart';
 import 'help/help_android.dart';

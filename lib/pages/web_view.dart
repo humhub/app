@@ -16,7 +16,7 @@ import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/show_dialog.dart';
-import 'package:humhub/util/universal_opener_controller.dart';
+import 'package:humhub/util/opener_controllers/universal_opener_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:humhub/util/router.dart' as m;

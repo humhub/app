@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:humhub/util/opener_controller.dart';
+import 'package:humhub/util/opener_controllers/opener_controller.dart';
 
 void main() {
   void testGroupOfURIs(Map<String, String> uriMap) {

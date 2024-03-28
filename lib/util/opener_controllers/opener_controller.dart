@@ -6,9 +6,9 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:http/http.dart' as http;
 import 'package:loggy/loggy.dart';
-import 'api_provider.dart';
-import 'connectivity_plugin.dart';
-import 'form_helper.dart';
+import '../api_provider.dart';
+import '../connectivity_plugin.dart';
+import '../form_helper.dart';
 
 class OpenerController {
   late AsyncValue<Manifest>? asyncData;

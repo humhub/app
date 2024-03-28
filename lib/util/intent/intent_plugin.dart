@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/router.dart';
-import 'package:humhub/util/universal_opener_controller.dart';
+import 'package:humhub/util/opener_controllers/universal_opener_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uni_links/uni_links.dart';
