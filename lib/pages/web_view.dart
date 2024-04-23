@@ -131,8 +131,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
     if (Platform.isAndroid ||
-        action.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED ||
-        action.iosWKNavigationType == IOSWKNavigationType.FORM_SUBMITTED) {
+        action.navigationType == NavigationType.LINK_ACTIVATED ||
+        action.navigationType == NavigationType.FORM_SUBMITTED) {
       Map<String, String> mergedMap = {...?_initialRequest.headers, ...?action.request.headers};
       URLRequest newRequest = action.request.copyWith(headers: mergedMap);
       controller.loadUrl(urlRequest: newRequest);
@@ -154,7 +154,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         jsObjectName: "flutterChannel",
         onPostMessage: (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
           logInfo(inMessage);
-          ChannelMessage message = ChannelMessage.fromJson(inMessage!);
+          ChannelMessage message = ChannelMessage.fromJson(inMessage!.data);
           await _handleJSMessage(message, headlessWebView!);
         },
       ),
@@ -189,7 +189,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     }
     String? payloadFromPush = InitFromPush.usePayload();
     if (payloadFromPush != null) url = payloadFromPush;
-    return URLRequest(url: Uri.parse(url ?? manifest.startUrl), headers: ref.read(humHubProvider).customHeaders);
+    return URLRequest(
+        url: WebUri.uri(Uri.parse(url ?? manifest.startUrl)), headers: ref.read(humHubProvider).customHeaders);
   }
 
   _onLoadStop(InAppWebViewController controller, Uri? url) {
@@ -281,8 +282,8 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         String? token = ref.read(pushTokenProvider).value;
         if (token != null) {
           var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          URLRequest request = URLRequest(url: Uri.parse(message.url!), method: "POST", body: postData);
-          await headlessWebView.webViewController.loadUrl(urlRequest: request);
+          URLRequest request = URLRequest(url: WebUri.uri(Uri.parse(message.url!)), method: "POST", body: postData);
+          await headlessWebView.webViewController?.loadUrl(urlRequest: request);
         }
         var status = await Permission.notification.status;
         // status.isDenied: The user has previously denied the notification permission
@@ -296,9 +297,9 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         String? token = ref.read(pushTokenProvider).value;
         if (token != null) {
           var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          URLRequest request = URLRequest(url: Uri.parse(message.url!), method: "POST", body: postData);
+          URLRequest request = URLRequest(url: WebUri.uri(Uri.parse(message.url!)), method: "POST", body: postData);
           // Works but for admin to see the changes it need to reload a page because a request is called on separate instance.
-          await headlessWebView.webViewController.loadUrl(urlRequest: request);
+          await headlessWebView.webViewController?.loadUrl(urlRequest: request);
         }
         break;
       case ChannelAction.none:
