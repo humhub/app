@@ -46,21 +46,17 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   late AuthInAppBrowser authBrowser;
   late Manifest manifest;
   late URLRequest _initialRequest;
-  final _options = InAppWebViewGroupOptions(
-    crossPlatform: InAppWebViewOptions(
-      useShouldOverrideUrlLoading: true,
-      useShouldInterceptFetchRequest: true,
-      javaScriptEnabled: true,
-      supportZoom: false,
-      javaScriptCanOpenWindowsAutomatically: true,
-    ),
-    android: AndroidInAppWebViewOptions(
-      supportMultipleWindows: true,
-    ),
+  final _settings = InAppWebViewSettings(
+    supportMultipleWindows: true,
+    useShouldOverrideUrlLoading: true,
+    useShouldInterceptFetchRequest: true,
+    javaScriptEnabled: true,
+    supportZoom: false,
+    javaScriptCanOpenWindowsAutomatically: true,
   );
 
   PullToRefreshController? _pullToRefreshController;
-  late PullToRefreshOptions _pullToRefreshOptions;
+  late PullToRefreshSettings _pullToRefreshSettings;
   HeadlessInAppWebView? headlessWebView;
 
   @override
@@ -87,7 +83,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
           bottom: false,
           child: InAppWebView(
             initialUrlRequest: _initialRequest,
-            initialOptions: _options,
+            initialSettings: _settings,
             pullToRefreshController: _pullToRefreshController,
             shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
             onWebViewCreated: _onWebViewCreated,
@@ -111,8 +107,9 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               _setAjaxHeadersJQuery(controller);
             },
             onProgressChanged: _onProgressChanged,
-            onLoadError: (InAppWebViewController controller, Uri? url, int code, String message) {
-              if (code == -1009) NoConnectionDialog.show(context);
+            onReceivedError: (InAppWebViewController controller, WebResourceRequest? url, WebResourceError error) {
+              //if (error.type. == -1009) NoConnectionDialog.show(context);
+              print("object");
             },
           ),
         ),
@@ -213,13 +210,13 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   }
 
   PullToRefreshController? get initPullToRefreshController {
-    _pullToRefreshOptions = PullToRefreshOptions(
+    _pullToRefreshSettings = PullToRefreshSettings(
       color: HexColor(manifest.themeColor),
     );
     return kIsWeb
         ? null
         : PullToRefreshController(
-            options: _pullToRefreshOptions,
+            settings: _pullToRefreshSettings,
             onRefresh: () async {
               Uri? url = await WebViewGlobalController.value!.getUrl();
               if (url != null) {
