@@ -14,22 +14,33 @@ class UniversalOpenerController {
 
   UniversalOpenerController({required this.url});
 
-  findManifest(String url) async {
-    Uri uri = assumeUrl(url);
-    for (var i = uri.pathSegments.length - 1; i >= 0; i--) {
-      String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
-      asyncData = await APIProvider.requestBasic(Manifest.get(i != 0 ? urlIn : uri.origin));
+  Future<bool> findManifest(String url) async {
+    List<String> possibleUrls = generatePossibleManifestsUrls(url);
+    for (var url in possibleUrls) {
+      asyncData = await APIProvider.requestBasic(Manifest.get(url));
       if (!asyncData!.hasError) break;
     }
-    if (uri.pathSegments.isEmpty) {
-      asyncData = await APIProvider.requestBasic(Manifest.get(uri.origin));
-    }
-    await checkHumHubModuleView(uri);
+    return asyncData!.hasError;
   }
 
-  checkHumHubModuleView(Uri uri) async {
+  static List<String> generatePossibleManifestsUrls(String url) {
+    List<String> urls = [];
+    Uri uri = assumeUrl(url);
+
+    for (var i = uri.pathSegments.length; i >= 0; i--) {
+      String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
+      urls.add(Manifest.defineUrl(i != 0 ? urlIn : uri.origin));
+    }
+    for (var i = uri.pathSegments.length; i >= 0; i--) {
+      String urlIn = "${uri.origin}/${uri.pathSegments.getRange(0, i).join('/')}";
+      urls.add(Manifest.defineUrl(i != 0 ? urlIn : uri.origin, isUriPretty: false));
+    }
+    return urls;
+  }
+
+  checkHumHubModuleView(String url) async {
     Response? response;
-    response = await http.Client().get(Uri.parse(uri.origin)).catchError((err) {
+    response = await http.Client().get(Uri.parse(url)).catchError((err) {
       return Response("Found manifest but not humhub.modules.ui.view tag", 404);
     });
 
@@ -43,6 +54,9 @@ class UniversalOpenerController {
       return null;
     }
     await findManifest(url);
+    if (asyncData!.hasValue) {
+      await checkHumHubModuleView(asyncData!.value!.startUrl);
+    }
     if (asyncData!.hasError || !doesViewExist) {
       asyncData = null;
       return null;
@@ -55,17 +69,8 @@ class UniversalOpenerController {
     }
   }
 
-  bool get allOk => !(asyncData == null || asyncData!.hasError || !doesViewExist);
-
-  Uri assumeUrl(String url) {
+  static Uri assumeUrl(String url) {
     if (url.startsWith("https://") || url.startsWith("http://")) return Uri.parse(url);
     return Uri.parse("https://$url");
-  }
-
-  String? validateUrl(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Specify you HumHub location';
-    }
-    return null;
   }
 }
