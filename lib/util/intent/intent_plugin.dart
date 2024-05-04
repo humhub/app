@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/pages/web_view.dart';
+import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/router.dart';
 import 'package:humhub/util/universal_opener_controller.dart';
 import 'package:loggy/loggy.dart';
@@ -60,7 +61,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
 
   /// Handle incoming links - the ones that the app will recieve from the OS
   /// while already started.
-  void _handleIncomingLinks() {
+  Future<void> _handleIncomingLinks() async {
     if (!kIsWeb) {
       // It will handle app links while the app is already started - be it in
       // the foreground or in the background.
@@ -98,7 +99,9 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         final uri = await getInitialUri();
         if (uri == null || !mounted) return;
         setState(() => _initialUri = uri);
-        if (!mounted) return;
+        if (!mounted) {
+          return;
+        }
         _latestUri = uri;
         String? redirectUrl = uri.queryParameters['url'];
         if (redirectUrl != null && navigatorKey.currentState != null) {
@@ -123,6 +126,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   }
 
   Future<bool> tryNavigateWithOpener(String redirectUrl) async {
+    LoadingProvider.of(ref).showLoading();
     bool isNewRouteSameAsCurrent = false;
     navigatorKey.currentState!.popUntil((route) {
       if (route.settings.name == WebViewApp.path) {
@@ -133,6 +137,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
     await opener.initHumHub();
     // Always pop the current instance and init the new one.
+    LoadingProvider.of(ref).dismissAll();
     navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
     return isNewRouteSameAsCurrent;
   }

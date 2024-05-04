@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:humhub/util/intent/intent_plugin.dart';
+import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/log.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/override_locale.dart';
@@ -51,6 +52,9 @@ class MyAppState extends ConsumerState<MyApp> {
                       localizationsDelegates: AppLocalizations.localizationsDelegates,
                       supportedLocales: AppLocalizations.supportedLocales,
                       locale: overrideLocale,
+                      builder: (context, child) => LoadingProvider(
+                        child: child!,
+                      ),
                       theme: ThemeData(
                         fontFamily: 'OpenSans',
                       ),
