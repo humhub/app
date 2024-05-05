@@ -41,15 +41,13 @@ class Manifest {
       };
 
   static String getUriWithoutExtension(String url) {
-    Uri uri = Uri.parse(url);
-    List<String> pathSegments = List.from(uri.pathSegments);
-
-    if (pathSegments.isNotEmpty) {
-      pathSegments.removeLast();
+    int lastSlashIndex = url.lastIndexOf('/');
+    // If there is no slash or only one character after the last slash, return the original URL
+    if (lastSlashIndex < 0 || lastSlashIndex == url.length - 1) {
+      return url;
     }
-
-    Uri modifiedUri = uri.replace(pathSegments: pathSegments);
-    return modifiedUri.toString();
+    // Remove everything after the last slash, including the slash itself
+    return url.substring(0, lastSlashIndex);
   }
 
   static String defineUrl(String url, {bool isUriPretty = true}) {
