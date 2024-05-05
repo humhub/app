@@ -14,13 +14,15 @@ class UniversalOpenerController {
 
   UniversalOpenerController({required this.url});
 
-  Future<bool> findManifest(String url) async {
+  Future<String?> findManifest(String url) async {
     List<String> possibleUrls = generatePossibleManifestsUrls(url);
+    String? manifestUrl;
     for (var url in possibleUrls) {
       asyncData = await APIProvider.requestBasic(Manifest.get(url));
+      manifestUrl = url;
       if (!asyncData!.hasError) break;
     }
-    return asyncData!.hasError;
+    return manifestUrl;
   }
 
   static List<String> generatePossibleManifestsUrls(String url) {
@@ -53,17 +55,17 @@ class UniversalOpenerController {
       asyncData = null;
       return null;
     }
-    await findManifest(url);
-    if (asyncData!.hasValue) {
+    String? manifestUrl = await findManifest(url);
+    if (asyncData!.hasValue && manifestUrl != null) {
       await checkHumHubModuleView(asyncData!.value!.startUrl);
     }
-    if (asyncData!.hasError || !doesViewExist) {
+    if (asyncData!.hasError || !doesViewExist || manifestUrl == null) {
       asyncData = null;
       return null;
     } else {
       Manifest manifest = asyncData!.value!;
       String hash = HumHub.generateHash(32);
-      HumHub instance = HumHub(manifest: manifest, randomHash: hash);
+      HumHub instance = HumHub(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl);
       humhub = instance;
       return instance;
     }

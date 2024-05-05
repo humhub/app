@@ -40,6 +40,18 @@ class Manifest {
         return Manifest.fromJson(res.data);
       };
 
+  static String getUriWithoutExtension(String url) {
+    Uri uri = Uri.parse(url);
+    List<String> pathSegments = List.from(uri.pathSegments);
+
+    if (pathSegments.isNotEmpty) {
+      pathSegments.removeLast();
+    }
+
+    Uri modifiedUri = uri.replace(pathSegments: pathSegments);
+    return modifiedUri.toString();
+  }
+
   static String defineUrl(String url, {bool isUriPretty = true}) {
     return !isUriPretty ? '$url/index.php?r=web%2Fpwa-manifest%2Findex' : '$url/manifest.json';
   }
