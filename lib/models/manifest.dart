@@ -40,6 +40,16 @@ class Manifest {
         return Manifest.fromJson(res.data);
       };
 
+  static String getUriWithoutExtension(String url) {
+    int lastSlashIndex = url.lastIndexOf('/');
+    // If there is no slash or only one character after the last slash, return the original URL
+    if (lastSlashIndex < 0 || lastSlashIndex == url.length - 1) {
+      return url;
+    }
+    // Remove everything after the last slash, including the slash itself
+    return url.substring(0, lastSlashIndex);
+  }
+
   static String defineUrl(String url, {bool isUriPretty = true}) {
     return !isUriPretty ? '$url/index.php?r=web%2Fpwa-manifest%2Findex' : '$url/manifest.json';
   }

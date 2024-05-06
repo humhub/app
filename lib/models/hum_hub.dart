@@ -8,21 +8,18 @@ enum RedirectAction { opener, webView }
 
 class HumHub {
   Manifest? manifest;
+  String? manifestUrl;
   bool isHideOpener;
   String? randomHash;
   String? appVersion;
   String? pushToken;
 
-  HumHub({
-    this.manifest,
-    this.isHideOpener = false,
-    this.randomHash,
-    this.appVersion,
-    this.pushToken
-  });
+  HumHub(
+      {this.manifest, this.manifestUrl, this.isHideOpener = false, this.randomHash, this.appVersion, this.pushToken});
 
   Map<String, dynamic> toJson() => {
         'manifest': manifest?.toJson(),
+        'manifestUri': manifestUrl,
         'isHideDialog': isHideOpener,
         'randomHash': randomHash,
         'appVersion': appVersion,
@@ -31,8 +28,8 @@ class HumHub {
 
   factory HumHub.fromJson(Map<String, dynamic> json) {
     return HumHub(
-      manifest:
-          json['manifest'] != null ? Manifest.fromJson(json['manifest']) : null,
+      manifest: json['manifest'] != null ? Manifest.fromJson(json['manifest']) : null,
+      manifestUrl: json['manifestUri'],
       isHideOpener: json['isHideDialog'] as bool,
       randomHash: json['randomHash'],
       appVersion: json['appVersion'],
@@ -61,13 +58,12 @@ class HumHub {
   static String generateHash(int length) {
     final random = Random.secure();
     const characters = '0123456789abcdef';
-    return List.generate(
-        length, (_) => characters[random.nextInt(characters.length)]).join();
+    return List.generate(length, (_) => characters[random.nextInt(characters.length)]).join();
   }
 
-  Map<String, String> get customHeaders =>{
-    'x-humhub-app-token': randomHash!,
-    'x-humhub-app': appVersion ?? '1.0.0',
-    'x-humhub-app-ostate': isHideOpener ? '1' : '0'
-  };
+  Map<String, String> get customHeaders => {
+        'x-humhub-app-token': randomHash!,
+        'x-humhub-app': appVersion ?? '1.0.0',
+        'x-humhub-app-ostate': isHideOpener ? '1' : '0'
+      };
 }

@@ -35,13 +35,15 @@ class OpenerController {
   /// obtained from the manifest data.
   ///
   /// @throws Exception if an error occurs during the search process.
-  Future<bool> findManifest(String url) async {
+  Future<String?> findManifest(String url) async {
     List<String> possibleUrls = generatePossibleManifestsUrls(url);
+    String? manifestUrl;
     for (var url in possibleUrls) {
       asyncData = await APIProvider.of(ref).request(Manifest.get(url));
+      manifestUrl = Manifest.getUriWithoutExtension(url);
       if (!asyncData!.hasError) break;
     }
-    return asyncData!.hasError;
+    return manifestUrl;
   }
 
   checkHumHubModuleView(String url) async {
@@ -68,16 +70,15 @@ class OpenerController {
       return;
     }
     // Get the manifest.json for given url.
-    await findManifest(helper.model[formUrlKey]!);
-    logDebug("Here");
-    if (asyncData!.hasValue) {
+    String? manifestUrl = await findManifest(helper.model[formUrlKey]!);
+    if (asyncData!.hasValue && manifestUrl != null) {
       await checkHumHubModuleView(asyncData!.value!.startUrl);
     }
     // If manifest.json does not exist the url is incorrect.
     // This is a temp. fix the validator expect sync function this is established workaround.
     // In the future we could define our own TextFormField that would also validate the API responses.
     // But it this is not acceptable I can suggest simple popup or tempPopup.
-    if (asyncData!.hasError || !doesViewExist) {
+    if (asyncData!.hasError || !doesViewExist || manifestUrl == null) {
       logError("Open URL error: $asyncData");
       String value = urlTextController.text;
       urlTextController.text = error404;
@@ -92,7 +93,7 @@ class OpenerController {
       String currentUrl = urlTextController.text;
       String hash = HumHub.generateHash(32);
       if (lastUrl == currentUrl) hash = ref.read(humHubProvider).randomHash ?? hash;
-      await ref.read(humHubProvider).setInstance(HumHub(manifest: manifest, randomHash: hash));
+      await ref.read(humHubProvider).setInstance(HumHub(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl));
     }
   }
 
