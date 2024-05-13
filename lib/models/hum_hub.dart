@@ -1,8 +1,6 @@
 import 'dart:math';
-
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/util/api_provider.dart';
+import 'package:humhub/util/universal_opener_controller.dart';
 
 enum RedirectAction { opener, webView }
 
@@ -42,10 +40,9 @@ class HumHub {
       return RedirectAction.opener;
     } else {
       if (manifest != null) {
-        AsyncValue<Manifest> asyncData = await APIProvider.of(ref).request(
-          Manifest.get(manifest!.baseUrl),
-        );
-        if (asyncData.hasError) {
+        UniversalOpenerController openerController = UniversalOpenerController(url: manifest!.baseUrl);
+        String? manifestUrl = await openerController.findManifest(manifest!.baseUrl);
+        if (manifestUrl == null) {
           return RedirectAction.opener;
         } else {
           return RedirectAction.webView;
