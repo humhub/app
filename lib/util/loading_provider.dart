@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final _provider = StateProvider<GlobalKey<_ManagerState>>(
-      (ref) => GlobalKey<_ManagerState>(),
+  (ref) => GlobalKey<_ManagerState>(),
 );
 
 class LoadingProvider extends StatelessWidget {
@@ -24,12 +24,13 @@ class LoadingProvider extends StatelessWidget {
     );
   }
 
+  //ignore: library_private_types_in_public_api
   static _ManagerState of(WidgetRef ref) {
     final state = ref.read(_provider).currentState;
     assert(
-    state != null,
-    'Loading overlay is uninitialized. '
-        'Place LoadingProvider widget as high in widget tree as possible.',
+      state != null,
+      'Loading overlay is uninitialized. '
+      'Place LoadingProvider widget as high in widget tree as possible.',
     );
     return state!;
   }
