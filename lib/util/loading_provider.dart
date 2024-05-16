@@ -48,7 +48,7 @@ class _Manager extends StatefulWidget {
   _ManagerState createState() => _ManagerState();
 }
 
-class _ManagerState extends State<_Manager> {
+class _ManagerState extends State<_Manager> with SingleTickerProviderStateMixin {
   final List<OverlayEntry> _entries = [];
   final GlobalKey<OverlayState> _overlayKey = GlobalKey();
 
@@ -78,6 +78,29 @@ class _ManagerState extends State<_Manager> {
         child: Center(
           child: Loader.fullscreen(),
         ),
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _entries.add(entry);
+      _overlay?.insert(entry);
+    });
+  }
+
+  void showImagePulseAnimation() {
+    AnimationController controller = AnimationController(vsync: this, duration: const Duration(seconds: 1));
+    Animation<double> animation =
+        Tween(begin: 1.0, end: 1.5).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
+    controller.repeat(reverse: true);
+    if (_entries.isNotEmpty) return;
+    final entry = OverlayEntry(
+      builder: (_) => AnimatedBuilder(
+        animation: animation,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: animation.value,
+            child: Image.asset('assets/images/icon.png', width: 100, height: 100),
+          );
+        },
       ),
     );
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
