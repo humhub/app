@@ -1,0 +1,32 @@
+humhub/app@f-flavored:
+  - android/
+  - ios/
+  - assets/
+  - lib/
+  - linux
+  - macos/
+  - test/
+  - web/
+  - windows
+  - .gitignore
+  - .metadata
+  - analysis_options.yaml
+  - l10n.yaml
+  - pubspec.lock
+  - pubspec.yaml
+humhub/app-flavored@main:
+  - android/
+  - ios/
+  - assets/
+  - lib/
+  - linux
+  - macos/
+  - test/
+  - web/
+  - windows
+  - .gitignore
+  - .metadata
+  - analysis_options.yaml
+  - l10n.yaml
+  - pubspec.lock
+  - pubspec.yaml
