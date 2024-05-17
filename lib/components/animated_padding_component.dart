@@ -11,13 +11,8 @@ class AnimatedPaddingComponent extends StatefulWidget {
 }
 
 class AnimatedPaddingComponentState extends State<AnimatedPaddingComponent> {
-
   @override
   Widget build(BuildContext context) {
-    return AnimatedPadding(
-      duration: const Duration(milliseconds: 500),
-      padding: widget.padding,
-      child: widget.child
-    );
+    return AnimatedPadding(duration: const Duration(milliseconds: 500), padding: widget.padding, child: widget.child);
   }
 }

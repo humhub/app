@@ -7,20 +7,20 @@ class PushEvent extends RemoteMessage {
   PushEvent(RemoteMessage message)
       : parsedData = PushEventData.fromJson(message.data),
         super(
-        senderId: message.senderId,
-        category: message.category,
-        collapseKey: message.collapseKey,
-        contentAvailable: message.contentAvailable,
-        data: message.data,
-        from: message.from,
-        messageId: message.messageId,
-        messageType: message.messageType,
-        mutableContent: message.mutableContent,
-        notification: message.notification,
-        sentTime: message.sentTime,
-        threadId: message.threadId,
-        ttl: message.ttl,
-      );
+          senderId: message.senderId,
+          category: message.category,
+          collapseKey: message.collapseKey,
+          contentAvailable: message.contentAvailable,
+          data: message.data,
+          from: message.from,
+          messageId: message.messageId,
+          messageType: message.messageType,
+          mutableContent: message.mutableContent,
+          notification: message.notification,
+          sentTime: message.sentTime,
+          threadId: message.threadId,
+          ttl: message.ttl,
+        );
 }
 
 class PushEventData {
@@ -32,13 +32,13 @@ class PushEventData {
   final String? notificationCount;
 
   PushEventData(
-      this.notificationTitle,
-      this.notificationBody,
-      this.channel,
-      this.channelPayload,
-      this.redirectUrl,
-      this.notificationCount,
-      );
+    this.notificationTitle,
+    this.notificationBody,
+    this.channel,
+    this.channelPayload,
+    this.redirectUrl,
+    this.notificationCount,
+  );
 
   factory PushEventData.fromJson(Map<String, dynamic> json) => _$PushEventDataFromJson(json);
 }

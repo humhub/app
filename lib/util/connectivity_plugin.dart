@@ -15,11 +15,11 @@ class NoConnectionDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title:  Text(AppLocalizations.of(context)!.connectivity_popup_title),
-      content:  Text(AppLocalizations.of(context)!.connectivity_popup_content),
+      title: Text(AppLocalizations.of(context)!.connectivity_popup_title),
+      content: Text(AppLocalizations.of(context)!.connectivity_popup_content),
       actions: [
         TextButton(
-          child:  Text(AppLocalizations.of(context)!.ok.toUpperCase()),
+          child: Text(AppLocalizations.of(context)!.ok.toUpperCase()),
           onPressed: () {
             Navigator.of(context).pop(); // Close the dialog
           },
@@ -32,7 +32,9 @@ class NoConnectionDialog extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return const NoConnectionDialog();
+        return NoConnectionDialog(
+          key: context.widget.key,
+        );
       },
     );
   }

@@ -35,7 +35,7 @@ class _LanguageSwitcherState extends State<LanguageSwitcher> {
                   const SizedBox(width: 20),
                   Text(
                     locale.toUpperCase(),
-                    style: TextStyle(color: primaryColor, fontSize: 16),
+                    style: TextStyle(color: HumhubTheme.primaryColor, fontSize: 16),
                   ),
                 ],
               ),
@@ -56,7 +56,7 @@ class _LanguageSwitcherState extends State<LanguageSwitcher> {
               focusedBorder: InputBorder.none,
             ),
       value: _value(context),
-      icon: Icon(Icons.arrow_drop_down, color: primaryColor),
+      icon: Icon(Icons.arrow_drop_down, color: HumhubTheme.primaryColor),
       items: _items
           .mapIndexed(
             (localeString, index) => DropdownMenuItem(
@@ -67,7 +67,7 @@ class _LanguageSwitcherState extends State<LanguageSwitcher> {
                   const SizedBox(width: 20),
                   Text(
                     localeString.toUpperCase(),
-                    style: TextStyle(color: primaryColor, fontSize: 16),
+                    style: TextStyle(color: HumhubTheme.primaryColor, fontSize: 16),
                   ),
                 ],
               ),

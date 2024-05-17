@@ -7,8 +7,8 @@ import 'package:humhub/models/event.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/notifications/service.dart';
+import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/push/register_token_plugin.dart';
-import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
 
 class PushPlugin extends ConsumerStatefulWidget {

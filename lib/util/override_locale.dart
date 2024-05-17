@@ -15,9 +15,9 @@ class OverrideLocale extends StatefulWidget {
   static OverrideLocaleModel of(BuildContext context) {
     final result = context.dependOnInheritedWidgetOfExactType<OverrideLocaleModel>();
     assert(
-    result != null,
-    'No OverrideLocale found in context'
-        'Place OverrideLocale widget as high in widget tree as possible.',
+      result != null,
+      'No OverrideLocale found in context'
+      'Place OverrideLocale widget as high in widget tree as possible.',
     );
     return result!;
   }

@@ -8,7 +8,7 @@ import 'package:humhub/util/const.dart';
 import 'package:humhub/util/form_helper.dart';
 import 'package:humhub/util/intent/intent_plugin.dart';
 import 'package:humhub/util/notifications/channel.dart';
-import 'package:humhub/util/opener_controller.dart';
+import 'package:humhub/util/openers/opener_controller.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:rive/rive.dart';
 import 'help/help_android.dart';
@@ -171,7 +171,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                               onPressed: _connectInstance,
                               child: Text(
                                 AppLocalizations.of(context)!.connect,
-                                style: TextStyle(color: primaryColor, fontSize: 20),
+                                style: TextStyle(color: HumhubTheme.primaryColor, fontSize: 20),
                               ),
                             ),
                           ),

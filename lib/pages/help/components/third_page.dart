@@ -22,21 +22,21 @@ class ThirdPage extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 AppLocalizations.of(context)!.more_info_title,
-                style: getHeaderStyle(context),
+                style: HumhubTheme.getHeaderStyle(context),
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(AppLocalizations.of(context)!.more_info_first_par, style: paragraphStyle),
+            child: Text(AppLocalizations.of(context)!.more_info_first_par, style: HumhubTheme.paragraphStyle),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(AppLocalizations.of(context)!.more_info_second_par, style: paragraphStyle),
+            child: Text(AppLocalizations.of(context)!.more_info_second_par, style: HumhubTheme.paragraphStyle),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(AppLocalizations.of(context)!.more_info_third_par, style: paragraphStyle),
+            child: Text(AppLocalizations.of(context)!.more_info_third_par, style: HumhubTheme.paragraphStyle),
           ),
           const SizedBox(
             height: 40,
@@ -54,12 +54,13 @@ class ThirdPage extends StatelessWidget {
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.resolveWith<Color>(
                         (Set<MaterialState> states) {
-                          return primaryColor;
+                          return HumhubTheme.primaryColor;
                         },
                       ),
                     ),
                     onPressed: () {
-                      launchUrl(Uri.parse(AppLocalizations.of(context)!.more_info_pro_edition_url), mode: LaunchMode.platformDefault);
+                      launchUrl(Uri.parse(AppLocalizations.of(context)!.more_info_pro_edition_url),
+                          mode: LaunchMode.platformDefault);
                     },
                     child: Center(
                       child: Text(

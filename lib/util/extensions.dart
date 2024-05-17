@@ -18,8 +18,7 @@ extension MyWebViewController on InAppWebViewController {
       final exitConfirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0))),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
           title: Text(AppLocalizations.of(context)!.web_view_exit_popup_title),
           content: Text(AppLocalizations.of(context)!.web_view_exit_popup_content),
           actions: <Widget>[
@@ -58,7 +57,7 @@ class HexColor extends Color {
       return int.parse(hexColor, radix: 16);
     } catch (e) {
       logError("Color from manifest is not valid use primary color");
-      return primaryColor.value;
+      return HumhubTheme.primaryColor.value;
     }
   }
 

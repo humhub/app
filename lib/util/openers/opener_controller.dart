@@ -6,9 +6,9 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:http/http.dart' as http;
 import 'package:loggy/loggy.dart';
-import 'api_provider.dart';
-import 'connectivity_plugin.dart';
-import 'form_helper.dart';
+import '../api_provider.dart';
+import '../connectivity_plugin.dart';
+import '../form_helper.dart';
 
 class OpenerController {
   late AsyncValue<Manifest>? asyncData;
@@ -93,7 +93,9 @@ class OpenerController {
       String currentUrl = urlTextController.text;
       String hash = HumHub.generateHash(32);
       if (lastUrl == currentUrl) hash = ref.read(humHubProvider).randomHash ?? hash;
-      await ref.read(humHubProvider).setInstance(HumHub(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl));
+      await ref
+          .read(humHubProvider)
+          .setInstance(HumHub(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl));
     }
   }
 

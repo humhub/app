@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/util/universal_opener_controller.dart';
+import 'package:humhub/util/openers/universal_opener_controller.dart';
 
 enum RedirectAction { opener, webView }
 
