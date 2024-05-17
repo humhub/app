@@ -3,7 +3,7 @@ name: Sync HumHub app with app-flavored
 on:
   push:
     branches:
-      - '*'
+      - 'f-flavored'
 jobs:
   sync:
     runs-on: ubuntu-latest
