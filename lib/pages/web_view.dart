@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/components/auth_in_app_browser.dart';
+import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
@@ -25,15 +25,7 @@ import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class WebViewGlobalController {
-  static InAppWebViewController? _value;
-
-  static InAppWebViewController? get value => _value;
-
-  static void setValue(InAppWebViewController newValue) {
-    _value = newValue;
-  }
-}
+import '../util/web_view_global_controller.dart';
 
 class WebViewApp extends ConsumerStatefulWidget {
   const WebViewApp({super.key});

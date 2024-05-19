@@ -13,10 +13,10 @@ class OpenerApp extends ConsumerStatefulWidget {
   const OpenerApp({super.key});
 
   @override
-  MyAppState createState() => MyAppState();
+  OpenerAppState createState() => OpenerAppState();
 }
 
-class MyAppState extends ConsumerState<OpenerApp> {
+class OpenerAppState extends ConsumerState<OpenerApp> {
   @override
   Widget build(BuildContext context) {
     SecureStorageService.clearSecureStorageOnReinstall();
