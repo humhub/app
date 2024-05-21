@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -73,7 +74,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     );
     // ignore: deprecated_member_use
     return WillPopScope(
-      onWillPop: () => WebViewGlobalController.value!.exitApp(context, ref),
+      onWillPop: () => exitApp(context, ref),
       child: Scaffold(
         backgroundColor: HexColor(manifest.themeColor),
         body: SafeArea(
@@ -101,6 +102,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
             },
             onLoadStop: _onLoadStop,
             onLoadStart: (controller, uri) async {
+              logDebug("onLoadStart");
               _setAjaxHeadersJQuery(controller);
             },
             onProgressChanged: _onProgressChanged,
@@ -149,6 +151,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
           logInfo(inMessage);
           ChannelMessage message = ChannelMessage.fromJson(inMessage!);
           await _handleJSMessage(message, headlessWebView!);
+          logDebug('flutterChannel triggered: ${message.type}');
         },
       ),
     );
@@ -156,6 +159,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   }
 
   Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest request) async {
+    logDebug("_shouldInterceptFetchRequest");
     request.headers!.addAll(_initialRequest.headers!);
     return request;
   }
@@ -296,6 +300,39 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         break;
       case ChannelAction.none:
         break;
+    }
+  }
+
+  Future<bool> exitApp(context, ref) async {
+    bool canGoBack = await WebViewGlobalController.value!.canGoBack();
+    if (canGoBack) {
+      WebViewGlobalController.value!.goBack();
+      return Future.value(false);
+    } else {
+      final exitConfirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
+          title: Text(AppLocalizations.of(context)!.web_view_exit_popup_title),
+          content: Text(AppLocalizations.of(context)!.web_view_exit_popup_content),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(AppLocalizations.of(context)!.no),
+            ),
+            TextButton(
+              onPressed: () {
+                var isHide = ref.read(humHubProvider).isHideDialog;
+                isHide
+                    ? SystemNavigator.pop()
+                    : Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
+              },
+              child: Text(AppLocalizations.of(context)!.yes),
+            ),
+          ],
+        ),
+      );
+      return exitConfirmed ?? false;
     }
   }
 

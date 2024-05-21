@@ -1,51 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/const.dart';
-import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-extension MyWebViewController on InAppWebViewController {
-  Future<bool> exitApp(context, ref) async {
-    bool canGoBack = await this.canGoBack();
-    if (canGoBack) {
-      goBack();
-      return Future.value(false);
-    } else {
-      final exitConfirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
-          title: Text(AppLocalizations.of(context)!.web_view_exit_popup_title),
-          content: Text(AppLocalizations.of(context)!.web_view_exit_popup_content),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(AppLocalizations.of(context)!.no),
-            ),
-            TextButton(
-              onPressed: () {
-                closeOrOpenDialog(context, ref);
-              },
-              child: Text(AppLocalizations.of(context)!.yes),
-            ),
-          ],
-        ),
-      );
-      return exitConfirmed ?? false;
-    }
-  }
-
-  closeOrOpenDialog(BuildContext context, WidgetRef ref) {
-    var isHide = ref.read(humHubProvider).isHideDialog;
-    isHide
-        ? SystemNavigator.pop()
-        : Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
-  }
-}
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {

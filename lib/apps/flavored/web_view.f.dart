@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,15 +14,16 @@ import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/notifications/plugin.dart';
-import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/show_dialog.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WebViewF extends ConsumerStatefulWidget {
+  static const String path = '/web_view_f';
   const WebViewF({super.key});
 
   @override
@@ -48,7 +50,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   Widget build(BuildContext context) {
     // ignore: deprecated_member_use
     return WillPopScope(
-      onWillPop: () => WebViewGlobalController.value!.exitApp(context, ref),
+      onWillPop: () => exitApp(context, ref),
       child: Scaffold(
         backgroundColor: HexColor(instance.manifest.themeColor),
         body: SafeArea(
@@ -58,8 +60,8 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
             initialOptions: _options,
             pullToRefreshController: _pullToRefreshController,
             shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
-            onWebViewCreated: _onWebViewCreated,
             shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
+            onWebViewCreated: _onWebViewCreated,
             onCreateWindow: _onCreateWindow,
             onLoadStop: _onLoadStop,
             onLoadStart: _onLoadStart,
@@ -79,17 +81,17 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   }
 
   InAppWebViewGroupOptions get _options => InAppWebViewGroupOptions(
-    crossPlatform: InAppWebViewOptions(
-      useShouldOverrideUrlLoading: true,
-      useShouldInterceptFetchRequest: true,
-      javaScriptEnabled: true,
-      supportZoom: false,
-      javaScriptCanOpenWindowsAutomatically: true,
-    ),
-    android: AndroidInAppWebViewOptions(
-      supportMultipleWindows: true,
-    ),
-  );
+        crossPlatform: InAppWebViewOptions(
+          useShouldOverrideUrlLoading: true,
+          useShouldInterceptFetchRequest: true,
+          javaScriptEnabled: true,
+          supportZoom: false,
+          javaScriptCanOpenWindowsAutomatically: true,
+        ),
+        android: AndroidInAppWebViewOptions(
+          supportMultipleWindows: true,
+        ),
+      );
 
   PullToRefreshController get _pullToRefreshController => PullToRefreshController(
         options: PullToRefreshOptions(
@@ -99,8 +101,8 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           Uri? url = await WebViewGlobalController.value!.getUrl();
           if (url != null) {
             WebViewGlobalController.value!.loadUrl(
-              urlRequest: URLRequest(
-                  url: await WebViewGlobalController.value!.getUrl(), headers: ref.read(humHubProvider).customHeaders),
+              urlRequest:
+                  URLRequest(url: await WebViewGlobalController.value!.getUrl(), headers: instance.customHeaders),
             );
           } else {
             WebViewGlobalController.value!.reload();
@@ -170,7 +172,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           .evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
       WebViewGlobalController.value!.evaluateJavascript(
           source:
-          "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+              "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _setAjaxHeadersJQuery(controller);
     await _pullToRefreshController.endRefreshing();
@@ -178,7 +180,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   }
 
   Future<void> _onLoadStart(InAppWebViewController controller, Uri? url) async {
-    await _setAjaxHeadersJQuery(controller);
+    _setAjaxHeadersJQuery(controller);
     LoadingProvider.of(ref).dismissAll();
   }
 
@@ -200,7 +202,8 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
 
   Future<void> _setAjaxHeadersJQuery(InAppWebViewController controller) async {
     String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(instance.customHeaders).toString()}});";
-    await controller.evaluateJavascript(source: jsCode);
+    dynamic jsResponse = await controller.evaluateJavascript(source: jsCode);
+    logInfo(jsResponse != null ? jsResponse.toString() : "Script returned null value");
   }
 
   Future<void> _handleJSMessage(ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
@@ -232,6 +235,36 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         break;
       default:
         break;
+    }
+  }
+
+  Future<bool> exitApp(context, ref) async {
+    bool canGoBack = await WebViewGlobalController.value!.canGoBack();
+    if (canGoBack) {
+      WebViewGlobalController.value!.goBack();
+      return Future.value(false);
+    } else {
+      final exitConfirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
+          title: Text(AppLocalizations.of(context)!.web_view_exit_popup_title),
+          content: Text(AppLocalizations.of(context)!.web_view_exit_popup_content),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(AppLocalizations.of(context)!.no),
+            ),
+            TextButton(
+              onPressed: () {
+                SystemNavigator.pop();
+              },
+              child: Text(AppLocalizations.of(context)!.yes),
+            ),
+          ],
+        ),
+      );
+      return exitConfirmed ?? false;
     }
   }
 
