@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:humhub/apps/flavored/web_view.f.dart';
+import 'package:humhub/flavored/web_view.f.dart';
 
 final GlobalKey<NavigatorState> navigatorKeyF = GlobalKey<NavigatorState>();
 

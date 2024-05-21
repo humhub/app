@@ -1,5 +1,5 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:humhub/apps/flavored/models/manifest.f.dart';
+import 'package:humhub/flavored/models/manifest.f.dart';
 import 'package:humhub/models/hum_hub.dart';
 
 class HumHubF extends HumHub{

@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/apps/flavored/models/humhub.f.dart';
+import 'package:humhub/flavored/models/humhub.f.dart';
 import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/util/extensions.dart';
@@ -179,7 +179,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     LoadingProvider.of(ref).dismissAll();
   }
 
-  Future<void> _onLoadStart(InAppWebViewController controller, Uri? url) async {
+  void _onLoadStart(InAppWebViewController controller, Uri? url) async {
     _setAjaxHeadersJQuery(controller);
     LoadingProvider.of(ref).dismissAll();
   }

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/apps/flavored_app.dart';
+import 'package:humhub/app_flavored.dart';
 import 'package:humhub/util/log.dart';
 import 'package:humhub/util/storage_service.dart';
 import 'package:loggy/loggy.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'apps/opener_app.dart';
+import 'app_opener.dart';
 
 main() async {
   Loggy.initLoggy(

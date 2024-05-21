@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/apps/flavored/util/router.f.dart';
+import 'package:humhub/flavored/util/router.f.dart';
 import 'package:humhub/util/intent/intent_plugin.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/plugin.dart';
