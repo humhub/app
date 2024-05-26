@@ -1,14 +1,17 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/flavored/util/notifications/channel.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/notifications/init_from_push.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class NotificationChannel {
   final String id;
   final String name;
   final String description;
 
-  NotificationChannel(
+  const NotificationChannel(
       {this.id = 'redirect',
       this.name = 'Redirect app notifications',
       this.description = 'These notifications are redirect the user to specific url in a payload.'});
@@ -38,4 +41,19 @@ class NotificationChannel {
       }
     }
   }
+
+  static Future<NotificationChannel> getChannel() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform(); // Replace this with the actual condition logic
+    switch (packageInfo.packageName) {
+      case 'com.humhub.app':
+        return const NotificationChannel();
+      default:
+        return const NotificationChannelF();
+    }
+  }
 }
+
+// Providers for NotificationChannel and NotificationChannelF
+final notificationChannelProvider = FutureProvider<NotificationChannel>((ref) {
+  return NotificationChannel.getChannel();
+});

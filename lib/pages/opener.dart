@@ -53,7 +53,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
 
       String? urlIntent = InitFromIntent.usePayloadForInit();
       if (urlIntent != null) {
-        await NotificationChannel().onTap(urlIntent);
+        await ref.read(notificationChannelProvider).value!.onTap(urlIntent);
       }
     });
   }

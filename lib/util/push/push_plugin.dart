@@ -13,13 +13,11 @@ import 'package:loggy/loggy.dart';
 
 class PushPlugin extends ConsumerStatefulWidget {
   final Widget child;
-  final NotificationChannel channel;
 
-  const PushPlugin({
+   const PushPlugin({
     Key? key,
     required this.child,
-    required this.channel,
-  }) : super(key: key);
+  }) : super(key: key, );
 
   @override
   PushPluginState createState() => PushPluginState();
@@ -44,7 +42,7 @@ class PushPluginState extends ConsumerState<PushPlugin> {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       logInfo("Firebase messaging onMessageOpenedApp");
       final data = PushEvent(message).parsedData;
-      widget.channel.onTap(data.redirectUrl);
+      ref.read(notificationChannelProvider).value!.onTap(data.redirectUrl);
     });
 
     //When the app is terminated, i.e., app is neither in foreground or background.
@@ -62,6 +60,7 @@ class PushPluginState extends ConsumerState<PushPlugin> {
 
   @override
   void initState() {
+    ref.read(notificationChannelProvider);
     _init();
     super.initState();
   }
@@ -69,7 +68,7 @@ class PushPluginState extends ConsumerState<PushPlugin> {
   _handleInitialMsg(RemoteMessage message) {
     final data = PushEvent(message).parsedData;
     if (data.redirectUrl != null) {
-      widget.channel.onTap(data.redirectUrl);
+      ref.read(notificationChannelProvider).value!.onTap(data.redirectUrl);
     }
   }
 
@@ -81,7 +80,7 @@ class PushPluginState extends ConsumerState<PushPlugin> {
     final body = message.notification?.body;
     if (title == null || body == null) return;
     await notificationService.showNotification(
-      widget.channel,
+      ref.read(notificationChannelProvider).value!,
       title,
       body,
       payload: data.channelPayload,

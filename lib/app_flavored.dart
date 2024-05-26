@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/flavored/models/humhub.f.dart';
-import 'package:humhub/flavored/util/notifications/channel.dart';
 import 'package:humhub/flavored/util/router.f.dart';
 import 'package:humhub/util/intent/intent_plugin.dart';
 import 'package:humhub/util/loading_provider.dart';
@@ -25,7 +24,6 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
     return IntentPlugin(
       child: NotificationPlugin(
         child: PushPlugin(
-          channel: NotificationChannelF(),
           child: OverrideLocale(
             builder: (overrideLocale) => Builder(
               builder: (context) => MaterialApp(

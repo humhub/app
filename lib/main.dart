@@ -17,6 +17,6 @@ main() async {
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
   await dotenv.load(fileName: ".env");
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) async {
-    runApp(ProviderScope(child: await HumHub.app(packageInfo.packageName)));
+    runApp(ProviderScope(child: HumHub.app(packageInfo.packageName)));
   });
 }

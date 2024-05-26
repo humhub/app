@@ -67,7 +67,7 @@ class HumHub {
         'x-humhub-app-ostate': isHideOpener ? '1' : '0'
       };
 
-  static Future<Widget> app(String bundleId) async {
+  static Widget app(String bundleId) {
     switch (bundleId) {
       case 'com.humhub.app':
         return const OpenerApp();

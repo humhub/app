@@ -75,8 +75,12 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   }
 
   URLRequest get _initialRequest {
+    var payload = ModalRoute.of(context)!.settings.arguments;
     String? url = instance.manifest.startUrl;
-    String? payloadFromPush = InitFromPush.usePayload();
+    String? payloadForInitFromPush = InitFromPush.usePayload();
+    String? payloadFromPush;
+    if (payload is String) payloadFromPush = payload;
+    if (payloadForInitFromPush != null) url = payloadForInitFromPush;
     if (payloadFromPush != null) url = payloadFromPush;
     return URLRequest(url: Uri.parse(url), headers: instance.customHeaders);
   }
