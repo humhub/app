@@ -166,7 +166,6 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     } else {
       logError('Could not launch $urlToOpen');
     }
-    LoadingProvider.of(ref).dismissAll();
     return Future.value(true); // Allow creating a new window.
   }
 
@@ -186,7 +185,6 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
 
   void _onLoadStart(InAppWebViewController controller, Uri? url) async {
     _setAjaxHeadersJQuery(controller);
-    LoadingProvider.of(ref).dismissAll();
   }
 
   void _onLoadError(InAppWebViewController controller, Uri? url, int code, String message) async {
