@@ -13,10 +13,12 @@ import 'package:loggy/loggy.dart';
 
 class PushPlugin extends ConsumerStatefulWidget {
   final Widget child;
+  final NotificationChannel channel;
 
   const PushPlugin({
     Key? key,
     required this.child,
+    required this.channel,
   }) : super(key: key);
 
   @override
@@ -42,7 +44,7 @@ class PushPluginState extends ConsumerState<PushPlugin> {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       logInfo("Firebase messaging onMessageOpenedApp");
       final data = PushEvent(message).parsedData;
-      RedirectNotificationChannel().onTap(data.redirectUrl);
+      widget.channel.onTap(data.redirectUrl);
     });
 
     //When the app is terminated, i.e., app is neither in foreground or background.
@@ -64,35 +66,35 @@ class PushPluginState extends ConsumerState<PushPlugin> {
     super.initState();
   }
 
+  _handleInitialMsg(RemoteMessage message) {
+    final data = PushEvent(message).parsedData;
+    if (data.redirectUrl != null) {
+      widget.channel.onTap(data.redirectUrl);
+    }
+  }
+
+  Future<void> _handleNotification(RemoteMessage message, NotificationService notificationService) async {
+    // Here we handle the notification that we get form an push notification.
+    final data = PushEvent(message).parsedData;
+    if (message.notification == null) return;
+    final title = message.notification?.title;
+    final body = message.notification?.body;
+    if (title == null || body == null) return;
+    await notificationService.showNotification(
+      widget.channel,
+      title,
+      body,
+      payload: data.channelPayload,
+      redirectUrl: data.redirectUrl,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return RegisterToken(
       child: widget.child,
     );
   }
-}
-
-_handleInitialMsg(RemoteMessage message) {
-  final data = PushEvent(message).parsedData;
-  if (data.redirectUrl != null) {
-    RedirectNotificationChannel().onTap(data.redirectUrl);
-  }
-}
-
-Future<void> _handleNotification(RemoteMessage message, NotificationService notificationService) async {
-  // Here we handle the notification that we get form an push notification.
-  final data = PushEvent(message).parsedData;
-  if (message.notification == null) return;
-  final title = message.notification?.title;
-  final body = message.notification?.body;
-  if (title == null || body == null) return;
-  await notificationService.showNotification(
-    RedirectNotificationChannel(),
-    title,
-    body,
-    payload: data.channelPayload,
-    redirectUrl: data.redirectUrl,
-  );
 }
 
 Future<void> _handleData(RemoteMessage message, BuildContext context, WidgetRef ref) async {

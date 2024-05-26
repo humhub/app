@@ -41,7 +41,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="go.humhub.com"
+                    android:host="intranet.omrade.co"
                     android:scheme="https" />
             </intent-filter>
 

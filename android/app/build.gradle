@@ -80,6 +80,14 @@ android {
             }
         }
     }
+
+    flavorDimensions "flavor"
+    productFlavors {
+        omrade {
+            dimension "flavor"
+            applicationId "com.humhub.omrade.app"
+        }
+    }
 }
 
 flutter {

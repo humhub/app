@@ -1,18 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/app_flavored.dart';
 import 'package:humhub/flavored/models/humhub.f.dart';
 import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/loading_provider.dart';
-import 'package:humhub/util/notifications/channel.dart';
+import 'package:humhub/util/notifications/init_from_push.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/show_dialog.dart';
@@ -31,14 +31,15 @@ class WebViewF extends ConsumerStatefulWidget {
 }
 
 class FlavoredWebViewState extends ConsumerState<WebViewF> {
-  HumHubF instance = HumHubF();
   late AuthInAppBrowser _authBrowser;
   HeadlessInAppWebView? headlessWebView;
+  late HumHubF instance;
 
   @override
   void initState() {
+    instance = ref.read(humHubFProvider).value!;
     _authBrowser = AuthInAppBrowser(
-      manifest: instance.manifest,
+      manifest: ref.read(humHubFProvider).value!.manifest,
       concludeAuth: (URLRequest request) {
         _concludeAuth(request);
       },

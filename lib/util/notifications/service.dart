@@ -48,7 +48,7 @@ class NotificationService {
   static void handleNotification(NotificationResponse response) async {
     final parsed = response.payload != null ? json.decode(response.payload!) : {};
     if (parsed["redirectUrl"] != null) {
-      await RedirectNotificationChannel().onTap(parsed['redirectUrl']);
+      await NotificationChannel().onTap(parsed['redirectUrl']);
       return;
     }
   }
