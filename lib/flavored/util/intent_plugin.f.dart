@@ -4,29 +4,28 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/pages/web_view.dart';
+import 'package:humhub/flavored/util/router.f.dart';
+import 'package:humhub/flavored/web_view.f.dart';
 import 'package:humhub/util/loading_provider.dart';
-import 'package:humhub/util/router.dart';
-import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uni_links/uni_links.dart';
 
 bool _initialUriIsHandled = false;
 
-class IntentPlugin extends ConsumerStatefulWidget {
+class IntentPluginF extends ConsumerStatefulWidget {
   final Widget child;
 
-  const IntentPlugin({
+  const IntentPluginF({
     Key? key,
     required this.child,
   }) : super(key: key);
 
   @override
-  IntentPluginState createState() => IntentPluginState();
+  IntentPluginFState createState() => IntentPluginFState();
 }
 
-class IntentPluginState extends ConsumerState<IntentPlugin> {
+class IntentPluginFState extends ConsumerState<IntentPluginF> {
   StreamSubscription? intentDataStreamSubscription;
   List<SharedMediaFile>? sharedFiles;
   Object? _err;
@@ -68,8 +67,8 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
       _sub = uriLinkStream.listen((Uri? uri) async {
         if (!mounted) return;
         _latestUri = uri;
-        String? redirectUrl = uri!.queryParameters['url'];
-        if (redirectUrl != null && navigatorKey.currentState != null) {
+        String? redirectUrl = uri?.toString();
+        if (redirectUrl != null && navigatorKeyF.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         }
         _err = null;
@@ -104,13 +103,11 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         }
         _latestUri = uri;
         String? redirectUrl = uri.queryParameters['url'];
-        if (redirectUrl != null && navigatorKey.currentState != null) {
+        if (redirectUrl != null && navigatorKeyF.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         } else {
           if (redirectUrl != null) {
-            UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
-            await opener.initHumHub();
-            navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
+            navigatorKeyF.currentState!.pushNamed(WebViewF.path, arguments: redirectUrl);
             return;
           }
         }
@@ -128,31 +125,13 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   Future<bool> tryNavigateWithOpener(String redirectUrl) async {
     LoadingProvider.of(ref).showLoading();
     bool isNewRouteSameAsCurrent = false;
-    navigatorKey.currentState!.popUntil((route) {
-      if (route.settings.name == WebView.path) {
+    navigatorKeyF.currentState!.popUntil((route) {
+      if (route.settings.name == WebViewF.path) {
         isNewRouteSameAsCurrent = true;
       }
       return true;
     });
-    UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
-    await opener.initHumHub();
-    // Always pop the current instance and init the new one.
-    LoadingProvider.of(ref).dismissAll();
-    navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
+    navigatorKeyF.currentState!.pushNamed(WebViewF.path, arguments: redirectUrl);
     return isNewRouteSameAsCurrent;
-  }
-}
-
-class InitFromIntent {
-  static String? _redirectUrl;
-
-  static setPayloadForInit(String payload) {
-    _redirectUrl = payload;
-  }
-
-  static String? usePayloadForInit() {
-    String? payload = _redirectUrl;
-    _redirectUrl = null;
-    return payload;
   }
 }

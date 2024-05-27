@@ -17,13 +17,13 @@ class NotificationChannel {
       this.description = 'These notifications are redirect the user to specific url in a payload.'});
 
   /// If the WebView is not opened yet or the app is not running the onTap will wake up the app or redirect to the WebView.
-  /// If app is already running in WebView mode then the state of [WebViewApp] will be updated with new url.
+  /// If app is already running in WebView mode then the state of [WebView] will be updated with new url.
   ///
   Future<void> onTap(String? payload) async {
     if (payload != null && navigatorKey.currentState != null) {
       bool isNewRouteSameAsCurrent = false;
       navigatorKey.currentState!.popUntil((route) {
-        if (route.settings.name == WebViewApp.path) {
+        if (route.settings.name == WebView.path) {
           isNewRouteSameAsCurrent = true;
         }
         return true;
@@ -31,10 +31,10 @@ class NotificationChannel {
       UniversalOpenerController opener = UniversalOpenerController(url: payload);
       await opener.initHumHub();
       if (isNewRouteSameAsCurrent) {
-        navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
+        navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
         return;
       }
-      navigatorKey.currentState!.pushNamed(WebViewApp.path, arguments: opener);
+      navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
     } else {
       if (payload != null) {
         InitFromPush.setPayload(payload);

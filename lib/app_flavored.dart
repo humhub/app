@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/flavored/models/humhub.f.dart';
+import 'package:humhub/flavored/util/intent_plugin.f.dart';
 import 'package:humhub/flavored/util/router.f.dart';
-import 'package:humhub/util/intent/intent_plugin.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/override_locale.dart';
@@ -21,7 +21,7 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
   @override
   Widget build(BuildContext context) {
     SecureStorageService.clearSecureStorageOnReinstall();
-    return IntentPlugin(
+    return IntentPluginF(
       child: NotificationPlugin(
         child: PushPlugin(
           child: OverrideLocale(

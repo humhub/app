@@ -28,15 +28,15 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../util/web_view_global_controller.dart';
 
-class WebViewApp extends ConsumerStatefulWidget {
-  const WebViewApp({super.key});
+class WebView extends ConsumerStatefulWidget {
+  const WebView({super.key});
   static const String path = '/web_view';
 
   @override
   WebViewAppState createState() => WebViewAppState();
 }
 
-class WebViewAppState extends ConsumerState<WebViewApp> {
+class WebViewAppState extends ConsumerState<WebView> {
   late AuthInAppBrowser authBrowser;
   late Manifest manifest;
   late URLRequest _initialRequest;

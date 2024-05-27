@@ -246,7 +246,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
     await controlLer.initHumHub();
     if (controlLer.allOk) {
       ref.read(humHubProvider).getInstance().then((value) {
-        Navigator.pushNamed(ref.context, WebViewApp.path, arguments: value.manifest);
+        Navigator.pushNamed(ref.context, WebView.path, arguments: value.manifest);
       });
     }
   }

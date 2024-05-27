@@ -34,7 +34,7 @@ class MyRouter {
 
   static var routes = {
     Opener.path: (context) => const Opener(),
-    WebViewApp.path: (context) => const WebViewApp(),
+    WebView.path: (context) => const WebView(),
     '/help': (context) => Platform.isAndroid ? const HelpAndroid() : const HelpIos(),
   };
 
@@ -46,9 +46,9 @@ class MyRouter {
         initRoute = Opener.path;
         return Opener.path;
       case RedirectAction.webView:
-        initRoute = WebViewApp.path;
+        initRoute = WebView.path;
         initParams = humhub.manifest;
-        return WebViewApp.path;
+        return WebView.path;
     }
   }
 }
