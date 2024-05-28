@@ -15,8 +15,8 @@ main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SecureStorageService.clearSecureStorageOnReinstall();
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  await dotenv.load(fileName: ".env");
+  final app = await HumHub.app(packageInfo.packageName);
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) async {
-    runApp(ProviderScope(child: HumHub.app(packageInfo.packageName)));
+    runApp(ProviderScope(child: app));
   });
 }

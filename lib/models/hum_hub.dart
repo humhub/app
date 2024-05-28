@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:humhub/app_flavored.dart';
 import 'package:humhub/app_opener.dart';
 import 'package:humhub/models/manifest.dart';
@@ -67,11 +68,12 @@ class HumHub {
         'x-humhub-app-ostate': isHideOpener ? '1' : '0'
       };
 
-  static Widget app(String bundleId) {
+  static Future<Widget> app(String bundleId) async {
     switch (bundleId) {
       case 'com.humhub.app':
         return const OpenerApp();
       default:
+        await dotenv.load(fileName: ".env");
         return const FlavoredApp();
     }
   }

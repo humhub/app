@@ -91,7 +91,6 @@ flutter:
         - asset: assets/fonts/OpenSans-SemiBold.ttf
 
   assets:
-    - .env
     - assets/images/
     - assets/images/locale/
     - assets/opener_animation.riv
