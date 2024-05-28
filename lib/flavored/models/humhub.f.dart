@@ -3,7 +3,7 @@ import 'package:humhub/flavored/models/manifest.f.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-class HumHubF extends HumHub{
+class HumHubF extends HumHub {
   @override
   ManifestF get manifest => ManifestF.fromEnv();
   @override
@@ -17,18 +17,18 @@ class HumHubF extends HumHub{
     String? pushToken,
     required this.bundleId,
   }) : super(
-      isHideOpener: isHideOpener,
-      randomHash: HumHub.generateHash(32),
-      appVersion: appVersion,
-      pushToken: pushToken);
+            isHideOpener: isHideOpener,
+            randomHash: HumHub.generateHash(32),
+            appVersion: appVersion,
+            pushToken: pushToken);
 
   @override
   Map<String, String> get customHeaders => {
-    'x-humhub-app-token': randomHash!,
-    'x-humhub-app': appVersion ?? '1.0.0',
-    'x-humhub-app-bundle-id': bundleId,
-    'x-humhub-app-ostate': isHideOpener ? '1' : '0'
-  };
+        'x-humhub-app-token': randomHash!,
+        'x-humhub-app': appVersion ?? '1.0.0',
+        'x-humhub-app-bundle-id': bundleId,
+        'x-humhub-app-ostate': isHideOpener ? '1' : '0'
+      };
 
   static Future<HumHubF> initialize() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
