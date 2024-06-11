@@ -1,13 +1,7 @@
 humhub/app@f-flavored:
-  - android/
-  - ios/
   - assets/
   - lib/
-  - linux
-  - macos/
   - test/
-  - web/
-  - windows
   - .gitignore
   - .metadata
   - analysis_options.yaml
@@ -15,15 +9,9 @@ humhub/app@f-flavored:
   - pubspec.lock
   - pubspec.yaml
 humhub/app-flavored@main:
-  - android/
-  - ios/
   - assets/
   - lib/
-  - linux
-  - macos/
   - test/
-  - web/
-  - windows
   - .gitignore
   - .metadata
   - analysis_options.yaml
