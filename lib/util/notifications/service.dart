@@ -90,10 +90,8 @@ class NotificationService {
           presentAlert: true,
           presentBadge: true,
           presentSound: true,
-          badgeNumber: 1,
-          subtitle: channel.description,
           threadIdentifier: channel.id,
-          interruptionLevel: InterruptionLevel.critical,
+          interruptionLevel: InterruptionLevel.timeSensitive,
         ),
       );
 }
