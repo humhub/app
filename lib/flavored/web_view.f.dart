@@ -35,6 +35,8 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   HeadlessInAppWebView? headlessWebView;
   late HumHubF instance;
 
+  late PullToRefreshController pullToRefreshController;
+
   @override
   void initState() {
     instance = ref.read(humHubFProvider).value!;
@@ -45,6 +47,20 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       },
     );
     super.initState();
+
+    pullToRefreshController = PullToRefreshController(
+      options: PullToRefreshOptions(
+        color: HexColor(instance.manifest.themeColor),
+      ),
+      onRefresh: () async {
+        if (Platform.isAndroid) {
+          WebViewGlobalController.value?.reload();
+        } else if (Platform.isIOS) {
+          WebViewGlobalController.value
+              ?.loadUrl(urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl()));
+        }
+      },
+    );
   }
 
   @override
@@ -59,7 +75,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           child: InAppWebView(
             initialUrlRequest: _initialRequest,
             initialOptions: _options,
-            pullToRefreshController: _pullToRefreshController,
+            pullToRefreshController: pullToRefreshController,
             shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
             shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
             onWebViewCreated: _onWebViewCreated,
@@ -86,34 +102,21 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   }
 
   InAppWebViewGroupOptions get _options => InAppWebViewGroupOptions(
-        crossPlatform: InAppWebViewOptions(
-          useShouldOverrideUrlLoading: true,
-          useShouldInterceptFetchRequest: true,
-          javaScriptEnabled: true,
-          supportZoom: false,
-          javaScriptCanOpenWindowsAutomatically: true,
-        ),
-        android: AndroidInAppWebViewOptions(
-          supportMultipleWindows: true,
-        ),
-      );
-
-  PullToRefreshController get _pullToRefreshController => PullToRefreshController(
-        options: PullToRefreshOptions(
-          color: HexColor(instance.manifest.themeColor),
-        ),
-        onRefresh: () async {
-          Uri? url = await WebViewGlobalController.value!.getUrl();
-          if (url != null) {
-            WebViewGlobalController.value!.loadUrl(
-              urlRequest:
-                  URLRequest(url: await WebViewGlobalController.value!.getUrl(), headers: instance.customHeaders),
-            );
-          } else {
-            WebViewGlobalController.value!.reload();
-          }
-        },
-      );
+    crossPlatform: InAppWebViewOptions(
+      useShouldOverrideUrlLoading: true,
+      useShouldInterceptFetchRequest: true,
+      javaScriptEnabled: true,
+      supportZoom: false,
+      javaScriptCanOpenWindowsAutomatically: true,
+    ),
+    android: AndroidInAppWebViewOptions(
+      supportMultipleWindows: true,
+      useHybridComposition: true,
+    ),
+    ios: IOSInAppWebViewOptions(
+      allowsInlineMediaPlayback: true,
+    ),
+  );
 
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
@@ -176,11 +179,12 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           .evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
       WebViewGlobalController.value!.evaluateJavascript(
           source:
-              "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+          "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _setAjaxHeadersJQuery(controller);
-    await _pullToRefreshController.endRefreshing();
+    pullToRefreshController.endRefreshing();
     LoadingProvider.of(ref).dismissAll();
+    setState(() {});
   }
 
   void _onLoadStart(InAppWebViewController controller, Uri? url) async {
@@ -189,12 +193,14 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
 
   void _onLoadError(InAppWebViewController controller, Uri? url, int code, String message) async {
     if (code == -1009) ShowDialog.of(context).noInternetPopup();
-    await _pullToRefreshController.endRefreshing();
+    pullToRefreshController.endRefreshing();
+    setState(() {});
   }
 
   void _onProgressChanged(controller, progress) async {
     if (progress == 100) {
-      await _pullToRefreshController.endRefreshing();
+      pullToRefreshController.endRefreshing();
+      setState(() {});
     }
   }
 
