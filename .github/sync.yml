@@ -1,7 +1,10 @@
 humhub/app@f-flavored:
-  - assets/
-  - lib/
-  - test/
+  - source: assets/
+    deleteOrphaned: true
+  - source: lib/
+    deleteOrphaned: true
+  - source: test/
+    deleteOrphaned: true
   - .gitignore
   - .metadata
   - analysis_options.yaml
@@ -9,9 +12,12 @@ humhub/app@f-flavored:
   - pubspec.lock
   - pubspec.yaml
 humhub/app-flavored@main:
-  - assets/
-  - lib/
-  - test/
+  - source: assets/
+    deleteOrphaned: true
+  - source: lib/
+    deleteOrphaned: true
+  - source: test/
+    deleteOrphaned: true
   - .gitignore
   - .metadata
   - analysis_options.yaml
