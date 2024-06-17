@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:app_settings/app_settings.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -53,25 +53,40 @@ class WebViewAppState extends ConsumerState<WebView> {
     ),
   );
 
-  PullToRefreshController? _pullToRefreshController;
-  late PullToRefreshOptions _pullToRefreshOptions;
+  late PullToRefreshController _pullToRefreshController;
+
   HeadlessInAppWebView? headlessWebView;
 
   @override
   void initState() {
     super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _initialRequest = _initRequest;
+      _pullToRefreshController = PullToRefreshController(
+        options: PullToRefreshOptions(
+          color: HexColor(manifest.themeColor),
+        ),
+        onRefresh: () async {
+          if (Platform.isAndroid) {
+            WebViewGlobalController.value?.reload();
+          } else if (Platform.isIOS) {
+            WebViewGlobalController.value
+                ?.loadUrl(urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl()));
+          }
+        },
+      );
+      authBrowser = AuthInAppBrowser(
+        manifest: manifest,
+        concludeAuth: (URLRequest request) {
+          _concludeAuth(request);
+        },
+      );
+      setState(() {});
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    _initialRequest = _initRequest;
-    _pullToRefreshController = initPullToRefreshController;
-    authBrowser = AuthInAppBrowser(
-      manifest: manifest,
-      concludeAuth: (URLRequest request) {
-        _concludeAuth(request);
-      },
-    );
     // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () => exitApp(context, ref),
@@ -199,36 +214,13 @@ class WebViewAppState extends ConsumerState<WebView> {
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _setAjaxHeadersJQuery(controller);
-    _pullToRefreshController?.endRefreshing();
+    _pullToRefreshController.endRefreshing();
   }
 
   _onProgressChanged(InAppWebViewController controller, int progress) {
     if (progress == 100) {
-      _pullToRefreshController?.endRefreshing();
+      _pullToRefreshController.endRefreshing();
     }
-  }
-
-  PullToRefreshController? get initPullToRefreshController {
-    _pullToRefreshOptions = PullToRefreshOptions(
-      color: HexColor(manifest.themeColor),
-    );
-    return kIsWeb
-        ? null
-        : PullToRefreshController(
-            options: _pullToRefreshOptions,
-            onRefresh: () async {
-              Uri? url = await WebViewGlobalController.value!.getUrl();
-              if (url != null) {
-                WebViewGlobalController.value!.loadUrl(
-                  urlRequest: URLRequest(
-                      url: await WebViewGlobalController.value!.getUrl(),
-                      headers: ref.read(humHubProvider).customHeaders),
-                );
-              } else {
-                WebViewGlobalController.value!.reload();
-              }
-            },
-          );
   }
 
   askForNotificationPermissions() {
