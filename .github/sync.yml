@@ -1,4 +1,4 @@
-humhub/app@f-flavored:
+humhub/app@main:
   - source: assets/
     deleteOrphaned: true
     exclude: |
