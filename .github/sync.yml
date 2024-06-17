@@ -1,7 +1,8 @@
 humhub/app@f-flavored:
   - source: assets/
     deleteOrphaned: true
-    ignore: ["assets/.env"]
+    exclude: |
+      .env
   - source: lib/
     deleteOrphaned: true
   - source: test/
@@ -15,7 +16,8 @@ humhub/app@f-flavored:
 humhub/app-flavored@main:
   - source: assets/
     deleteOrphaned: true
-    ignore: ["assets/.env"]
+    exclude: |
+      .env
   - source: lib/
     deleteOrphaned: true
   - source: test/
