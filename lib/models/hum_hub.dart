@@ -73,7 +73,7 @@ class HumHub {
       case 'com.humhub.app':
         return const OpenerApp();
       default:
-        await dotenv.load(fileName: ".env");
+        await dotenv.load(fileName: "assets/.env");
         return const FlavoredApp();
     }
   }
