@@ -1,4 +1,4 @@
-humhub/app@main:
+humhub/app@master:
   - source: assets/
     deleteOrphaned: true
     exclude: |
@@ -13,7 +13,7 @@ humhub/app@main:
   - l10n.yaml
   - pubspec.lock
   - pubspec.yaml
-humhub/app-flavored@main:
+humhub/app-flavored@master:
   - source: assets/
     deleteOrphaned: true
     exclude: |
