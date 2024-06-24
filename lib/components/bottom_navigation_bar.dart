@@ -84,7 +84,9 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
                   child: TextButton(
                     onPressed: () => navigateForth(),
                     child: Text(
-                      selectedIndex != widget.pageCount - 1 ? AppLocalizations.of(context)!.next : AppLocalizations.of(context)!.connect_now,
+                      selectedIndex != widget.pageCount - 1
+                          ? AppLocalizations.of(context)!.next
+                          : AppLocalizations.of(context)!.connect_now,
                       style: const TextStyle(color: Colors.grey),
                     ),
                   ),

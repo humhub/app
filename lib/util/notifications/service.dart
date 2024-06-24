@@ -48,7 +48,8 @@ class NotificationService {
   static void handleNotification(NotificationResponse response) async {
     final parsed = response.payload != null ? json.decode(response.payload!) : {};
     if (parsed["redirectUrl"] != null) {
-      await RedirectNotificationChannel().onTap(parsed['redirectUrl']);
+      var channel = await NotificationChannel.getChannel();
+      channel.onTap(parsed['redirectUrl']);
       return;
     }
   }
@@ -84,6 +85,13 @@ class NotificationService {
           priority: Priority.high,
           largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
           color: color,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+          threadIdentifier: channel.id,
+          interruptionLevel: InterruptionLevel.timeSensitive,
         ),
       );
 }

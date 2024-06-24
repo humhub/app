@@ -59,6 +59,7 @@ dependencies:
   swipe_to: ^1.0.2
   shared_preferences: ^2.2.2
   intl: any
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -90,10 +91,10 @@ flutter:
         - asset: assets/fonts/OpenSans-SemiBold.ttf
 
   assets:
+    - assets/
     - assets/images/
     - assets/images/locale/
-    - assets/opener_animation.riv
-    - assets/opener_animation_reverse.riv
+    - assets/animations/
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

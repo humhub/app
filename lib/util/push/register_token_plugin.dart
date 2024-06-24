@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/api_provider.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:humhub/util/push/provider.dart';
 import 'package:loggy/loggy.dart';
 
 class RegisterToken extends ConsumerWidget {
@@ -42,7 +43,7 @@ class _RegisterToken extends ConsumerStatefulWidget {
   _RegisterTokenState createState() => _RegisterTokenState();
 }
 
-class _RegisterTokenState extends ConsumerState<_RegisterToken>{
+class _RegisterTokenState extends ConsumerState<_RegisterToken> {
   Future<void> _maybeRegisterToken() async {
     final token = await FirebaseMessaging.instance.getToken();
     if (token == null) {
@@ -66,13 +67,13 @@ class _RegisterTokenState extends ConsumerState<_RegisterToken>{
   }
 
   Future<void> Function(Dio dio) _registerToken(String? token) => (dio) async {
-    await dio.post(
-      '/fcm-push/token/update',
-      data: {
-        'token': token,
-      },
-    );
-  };
+        await dio.post(
+          '/fcm-push/token/update',
+          data: {
+            'token': token,
+          },
+        );
+      };
 
   @override
   void didUpdateWidget(oldWidget) {

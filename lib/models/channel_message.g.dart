@@ -1,10 +1,4 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 part of 'channel_message.dart';
-
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
 
 ChannelMessage _$ChannelMessageFromJson(String json) {
   if (json == "humhub.mobile.hideOpener") {

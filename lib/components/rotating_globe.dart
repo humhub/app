@@ -29,7 +29,7 @@ class _RotatingGlobeState extends State<RotatingGlobe> with TickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    if(_controller.isCompleted){
+    if (_controller.isCompleted) {
       _animation = widget.rotationDirection == Direction.left ? _animationSec : _animationFir;
       _controller.reset();
     }

@@ -21,13 +21,13 @@ class SecondPage extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 AppLocalizations.of(context)!.how_to_connect_title,
-                style: getHeaderStyle(context),
+                style: HumhubTheme.getHeaderStyle(context),
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(AppLocalizations.of(context)!.how_to_connect_first_par, style: paragraphStyle),
+            child: Text(AppLocalizations.of(context)!.how_to_connect_first_par, style: HumhubTheme.paragraphStyle),
           ),
           EaseOutContainer(
             fadeIn: fadeIn,
@@ -79,7 +79,7 @@ class SecondPage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(AppLocalizations.of(context)!.how_to_connect_sec_par, style: paragraphStyle),
+            child: Text(AppLocalizations.of(context)!.how_to_connect_sec_par, style: HumhubTheme.paragraphStyle),
           ),
           EaseOutContainer(
             fadeIn: fadeIn,
@@ -94,7 +94,7 @@ class SecondPage extends StatelessWidget {
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.resolveWith<Color>(
                         (Set<MaterialState> states) {
-                          return primaryColor;
+                          return HumhubTheme.primaryColor;
                         },
                       ),
                     ),
@@ -114,7 +114,7 @@ class SecondPage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Text(AppLocalizations.of(context)!.how_to_connect_third_par, style: paragraphStyle),
+            child: Text(AppLocalizations.of(context)!.how_to_connect_third_par, style: HumhubTheme.paragraphStyle),
           )
         ],
       ),

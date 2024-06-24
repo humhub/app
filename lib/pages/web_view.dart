@@ -2,21 +2,23 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:app_settings/app_settings.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/components/auth_in_app_browser.dart';
+import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/extensions.dart';
-import 'package:humhub/util/notifications/channel.dart';
+import 'package:humhub/util/notifications/init_from_push.dart';
 import 'package:humhub/util/providers.dart';
-import 'package:humhub/util/universal_opener_controller.dart';
+import 'package:humhub/util/openers/universal_opener_controller.dart';
+import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -24,25 +26,17 @@ import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class WebViewGlobalController {
-  static InAppWebViewController? _value;
+import '../util/web_view_global_controller.dart';
 
-  static InAppWebViewController? get value => _value;
-
-  static void setValue(InAppWebViewController newValue) {
-    _value = newValue;
-  }
-}
-
-class WebViewApp extends ConsumerStatefulWidget {
-  const WebViewApp({super.key});
+class WebView extends ConsumerStatefulWidget {
+  const WebView({super.key});
   static const String path = '/web_view';
 
   @override
   WebViewAppState createState() => WebViewAppState();
 }
 
-class WebViewAppState extends ConsumerState<WebViewApp> {
+class WebViewAppState extends ConsumerState<WebView> {
   late AuthInAppBrowser authBrowser;
   late Manifest manifest;
   late URLRequest _initialRequest;
@@ -59,28 +53,43 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
     ),
   );
 
-  PullToRefreshController? _pullToRefreshController;
-  late PullToRefreshOptions _pullToRefreshOptions;
+  late PullToRefreshController _pullToRefreshController;
+
   HeadlessInAppWebView? headlessWebView;
 
   @override
   void initState() {
     super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _initialRequest = _initRequest;
+      _pullToRefreshController = PullToRefreshController(
+        options: PullToRefreshOptions(
+          color: HexColor(manifest.themeColor),
+        ),
+        onRefresh: () async {
+          if (Platform.isAndroid) {
+            WebViewGlobalController.value?.reload();
+          } else if (Platform.isIOS) {
+            WebViewGlobalController.value
+                ?.loadUrl(urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl()));
+          }
+        },
+      );
+      authBrowser = AuthInAppBrowser(
+        manifest: manifest,
+        concludeAuth: (URLRequest request) {
+          _concludeAuth(request);
+        },
+      );
+      setState(() {});
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    _initialRequest = _initRequest;
-    _pullToRefreshController = initPullToRefreshController;
-    authBrowser = AuthInAppBrowser(
-      manifest: manifest,
-      concludeAuth: (URLRequest request) {
-        _concludeAuth(request);
-      },
-    );
     // ignore: deprecated_member_use
     return WillPopScope(
-      onWillPop: () => WebViewGlobalController.value!.exitApp(context, ref),
+      onWillPop: () => exitApp(context, ref),
       child: Scaffold(
         backgroundColor: HexColor(manifest.themeColor),
         body: SafeArea(
@@ -108,6 +117,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
             },
             onLoadStop: _onLoadStop,
             onLoadStart: (controller, uri) async {
+              logDebug("onLoadStart");
               _setAjaxHeadersJQuery(controller);
             },
             onProgressChanged: _onProgressChanged,
@@ -156,6 +166,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
           logInfo(inMessage);
           ChannelMessage message = ChannelMessage.fromJson(inMessage!);
           await _handleJSMessage(message, headlessWebView!);
+          logDebug('flutterChannel triggered: ${message.type}');
         },
       ),
     );
@@ -163,6 +174,7 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
   }
 
   Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest request) async {
+    logDebug("_shouldInterceptFetchRequest");
     request.headers!.addAll(_initialRequest.headers!);
     return request;
   }
@@ -202,36 +214,13 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _setAjaxHeadersJQuery(controller);
-    _pullToRefreshController?.endRefreshing();
+    _pullToRefreshController.endRefreshing();
   }
 
   _onProgressChanged(InAppWebViewController controller, int progress) {
     if (progress == 100) {
-      _pullToRefreshController?.endRefreshing();
+      _pullToRefreshController.endRefreshing();
     }
-  }
-
-  PullToRefreshController? get initPullToRefreshController {
-    _pullToRefreshOptions = PullToRefreshOptions(
-      color: HexColor(manifest.themeColor),
-    );
-    return kIsWeb
-        ? null
-        : PullToRefreshController(
-            options: _pullToRefreshOptions,
-            onRefresh: () async {
-              Uri? url = await WebViewGlobalController.value!.getUrl();
-              if (url != null) {
-                WebViewGlobalController.value!.loadUrl(
-                  urlRequest: URLRequest(
-                      url: await WebViewGlobalController.value!.getUrl(),
-                      headers: ref.read(humHubProvider).customHeaders),
-                );
-              } else {
-                WebViewGlobalController.value!.reload();
-              }
-            },
-          );
   }
 
   askForNotificationPermissions() {
@@ -303,6 +292,39 @@ class WebViewAppState extends ConsumerState<WebViewApp> {
         break;
       case ChannelAction.none:
         break;
+    }
+  }
+
+  Future<bool> exitApp(context, ref) async {
+    bool canGoBack = await WebViewGlobalController.value!.canGoBack();
+    if (canGoBack) {
+      WebViewGlobalController.value!.goBack();
+      return Future.value(false);
+    } else {
+      final exitConfirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
+          title: Text(AppLocalizations.of(context)!.web_view_exit_popup_title),
+          content: Text(AppLocalizations.of(context)!.web_view_exit_popup_content),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(AppLocalizations.of(context)!.no),
+            ),
+            TextButton(
+              onPressed: () {
+                var isHide = ref.read(humHubProvider).isHideDialog;
+                isHide
+                    ? SystemNavigator.pop()
+                    : Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
+              },
+              child: Text(AppLocalizations.of(context)!.yes),
+            ),
+          ],
+        ),
+      );
+      return exitConfirmed ?? false;
     }
   }
 

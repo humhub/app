@@ -3,10 +3,12 @@ import 'package:humhub/components/rotating_globe.dart';
 import 'package:humhub/util/const.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-
 class FirstPage extends StatelessWidget {
   final bool fadeIn;
-  const FirstPage({Key? key, required this.fadeIn,}) : super(key: key);
+  const FirstPage({
+    Key? key,
+    required this.fadeIn,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class FirstPage extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 AppLocalizations.of(context)!.help_title,
-                style: getHeaderStyle(context),
+                style: HumhubTheme.getHeaderStyle(context),
               ),
             ),
           ),
@@ -30,12 +32,12 @@ class FirstPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               AppLocalizations.of(context)!.help_first_par,
-              style: paragraphStyle,
+              style: HumhubTheme.paragraphStyle,
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(AppLocalizations.of(context)!.help_second_par, style: paragraphStyle),
+            child: Text(AppLocalizations.of(context)!.help_second_par, style: HumhubTheme.paragraphStyle),
           ),
           Center(
             child: RotatingGlobe(
