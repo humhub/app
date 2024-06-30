@@ -164,7 +164,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         jsObjectName: "flutterChannel",
         onPostMessage: (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
           logInfo(inMessage);
-          ChannelMessage message = ChannelMessage.fromJson(inMessage!);
+          ChannelMessage message = ChannelMessage.fromJson(inMessage!.data);
           await _handleJSMessage(message, headlessWebView!);
           logDebug('flutterChannel triggered: ${message.type}');
         },
@@ -201,7 +201,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     }
     String? payloadFromPush = InitFromPush.usePayload();
     if (payloadFromPush != null) url = payloadFromPush;
-    return URLRequest(url: Uri.parse(url ?? manifest.startUrl), headers: ref.read(humHubProvider).customHeaders);
+    return URLRequest(url: WebUri(url ?? manifest.startUrl), headers: ref.read(humHubProvider).customHeaders);
   }
 
   _onLoadStop(InAppWebViewController controller, Uri? url) {
@@ -270,8 +270,8 @@ class WebViewAppState extends ConsumerState<WebView> {
         String? token = ref.read(pushTokenProvider).value;
         if (token != null) {
           var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          URLRequest request = URLRequest(url: Uri.parse(message.url!), method: "POST", body: postData);
-          await headlessWebView.webViewController.loadUrl(urlRequest: request);
+          URLRequest request = URLRequest(url: WebUri(message.url!), method: "POST", body: postData);
+          await headlessWebView.webViewController?.loadUrl(urlRequest: request);
         }
         var status = await Permission.notification.status;
         // status.isDenied: The user has previously denied the notification permission
@@ -285,9 +285,9 @@ class WebViewAppState extends ConsumerState<WebView> {
         String? token = ref.read(pushTokenProvider).value;
         if (token != null) {
           var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          URLRequest request = URLRequest(url: Uri.parse(message.url!), method: "POST", body: postData);
+          URLRequest request = URLRequest(url: WebUri(message.url!), method: "POST", body: postData);
           // Works but for admin to see the changes it need to reload a page because a request is called on separate instance.
-          await headlessWebView.webViewController.loadUrl(urlRequest: request);
+          await headlessWebView.webViewController?.loadUrl(urlRequest: request);
         }
         break;
       case ChannelAction.none:

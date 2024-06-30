@@ -41,7 +41,7 @@ extension FutureAsyncValueX<T> on Future<AsyncValue<T>> {
 
 extension URLRequestExtension on URLRequest {
   URLRequest copyWith({
-    Uri? url,
+    WebUri? url,
     String? method,
     Uint8List? body,
     Map<String, String>? headers,
