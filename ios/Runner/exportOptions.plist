@@ -9,7 +9,7 @@
  <key>provisioningProfiles</key>
  <dict>
  <key>com.humhub.app</key>
- <string>humhub_distribution_profile_02</string>
+ <string>humhub_distribution_profile</string>
  </dict>
  </dict>
  </plist>
