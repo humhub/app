@@ -6,24 +6,22 @@ import 'package:loggy/loggy.dart';
 
 class AuthInAppBrowser extends InAppBrowser {
   final Manifest manifest;
-  late InAppBrowserClassOptions options;
+  late InAppBrowserClassSettings settings;
   final Function concludeAuth;
   static const String userAgent =
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
   AuthInAppBrowser({required this.manifest, required this.concludeAuth}) {
-    options = InAppBrowserClassOptions(
-      crossPlatform: InAppBrowserOptions(
+    settings = InAppBrowserClassSettings(
+      browserSettings: InAppBrowserSettings(
         hideUrlBar: false,
         toolbarTopBackgroundColor: HexColor(manifest.themeColor),
       ),
-      inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-        crossPlatform: InAppWebViewOptions(
-            javaScriptEnabled: true,
-            useShouldOverrideUrlLoading: true,
-            userAgent: userAgent,
-            applicationNameForUserAgent: 'HumHub-Mobile'),
-      ),
+      webViewSettings: InAppWebViewSettings(
+          javaScriptEnabled: true,
+          useShouldOverrideUrlLoading: true,
+          userAgent: userAgent,
+          applicationNameForUserAgent: 'HumHub-Mobile'),
     );
   }
 
@@ -39,6 +37,6 @@ class AuthInAppBrowser extends InAppBrowser {
   }
 
   launchUrl(URLRequest urlRequest) {
-    openUrlRequest(urlRequest: urlRequest, options: options);
+    openUrlRequest(urlRequest: urlRequest, settings: settings);
   }
 }

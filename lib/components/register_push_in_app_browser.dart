@@ -2,19 +2,17 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class RegisterPushInAppBrowser extends InAppBrowser {
   final URLRequest request;
-  late InAppBrowserClassOptions options;
+  late InAppBrowserClassSettings settings;
 
   RegisterPushInAppBrowser({required this.request}) {
-    options = InAppBrowserClassOptions(
-      crossPlatform: InAppBrowserOptions(hidden: true),
-      inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-        crossPlatform: InAppWebViewOptions(javaScriptEnabled: true),
-      ),
+    settings = InAppBrowserClassSettings(
+      browserSettings: InAppBrowserSettings(hidden: true),
+      webViewSettings: InAppWebViewSettings(javaScriptEnabled: true),
     );
   }
 
   Future<void> register() async {
-    await openUrlRequest(urlRequest: request, options: options);
+    await openUrlRequest(urlRequest: request, settings: settings);
     close();
   }
 }

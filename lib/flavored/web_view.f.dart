@@ -49,7 +49,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     super.initState();
 
     pullToRefreshController = PullToRefreshController(
-      options: PullToRefreshOptions(
+      settings: PullToRefreshSettings(
         color: HexColor(instance.manifest.themeColor),
       ),
       onRefresh: () async {
@@ -74,7 +74,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           bottom: false,
           child: InAppWebView(
             initialUrlRequest: _initialRequest,
-            initialOptions: _options,
+            initialSettings: _settings,
             pullToRefreshController: pullToRefreshController,
             shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
             shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
@@ -82,7 +82,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
             onCreateWindow: _onCreateWindow,
             onLoadStop: _onLoadStop,
             onLoadStart: _onLoadStart,
-            onLoadError: _onLoadError,
+            onReceivedError: _onLoadError,
             onProgressChanged: _onProgressChanged,
           ),
         ),
@@ -98,24 +98,18 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     if (payload is String) payloadFromPush = payload;
     if (payloadForInitFromPush != null) url = payloadForInitFromPush;
     if (payloadFromPush != null) url = payloadFromPush;
-    return URLRequest(url: Uri.parse(url), headers: instance.customHeaders);
+    return URLRequest(url: WebUri(url), headers: instance.customHeaders);
   }
 
-  InAppWebViewGroupOptions get _options => InAppWebViewGroupOptions(
-    crossPlatform: InAppWebViewOptions(
-      useShouldOverrideUrlLoading: true,
-      useShouldInterceptFetchRequest: true,
-      javaScriptEnabled: true,
-      supportZoom: false,
-      javaScriptCanOpenWindowsAutomatically: true,
-    ),
-    android: AndroidInAppWebViewOptions(
-      supportMultipleWindows: true,
-      useHybridComposition: true,
-    ),
-    ios: IOSInAppWebViewOptions(
-      allowsInlineMediaPlayback: true,
-    ),
+  InAppWebViewSettings get _settings => InAppWebViewSettings(
+    useShouldOverrideUrlLoading: true,
+    useShouldInterceptFetchRequest: true,
+    javaScriptEnabled: true,
+    supportZoom: false,
+    javaScriptCanOpenWindowsAutomatically: true,
+    supportMultipleWindows: true,
+    useHybridComposition: true,
+    allowsInlineMediaPlayback: true,
   );
 
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
@@ -129,8 +123,8 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
     if (Platform.isAndroid ||
-        action.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED ||
-        action.iosWKNavigationType == IOSWKNavigationType.FORM_SUBMITTED) {
+        action.navigationType == NavigationType.LINK_ACTIVATED ||
+        action.navigationType == NavigationType.FORM_SUBMITTED) {
       Map<String, String> mergedMap = {...instance.customHeaders, ...?action.request.headers};
       URLRequest newRequest = action.request.copyWith(headers: mergedMap);
       controller.loadUrl(urlRequest: newRequest);
@@ -147,7 +141,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       WebMessageListener(
         jsObjectName: "flutterChannel",
         onPostMessage: (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
-          ChannelMessage message = ChannelMessage.fromJson(inMessage!);
+          ChannelMessage message = ChannelMessage.fromJson(inMessage!.data);
           await _handleJSMessage(message, headlessWebView!);
         },
       ),
@@ -191,8 +185,9 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     _setAjaxHeadersJQuery(controller);
   }
 
-  void _onLoadError(InAppWebViewController controller, Uri? url, int code, String message) async {
-    if (code == -1009) ShowDialog.of(context).noInternetPopup();
+  void _onLoadError(InAppWebViewController controller, WebResourceRequest request,
+      WebResourceError error) async {
+    if (error.description == 'net::ERR_INTERNET_DISCONNECTED') ShowDialog.of(context).noInternetPopup();
     pullToRefreshController.endRefreshing();
     setState(() {});
   }
@@ -221,7 +216,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         String? token = ref.read(pushTokenProvider).value;
         if (token != null) {
           var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          await headlessWebView.webViewController.postUrl(url: Uri.parse(message.url!), postData: postData);
+          await headlessWebView.webViewController?.postUrl(url: WebUri(message.url!), postData: postData);
         }
         var status = await Permission.notification.status;
         // status.isDenied: The user has previously denied the notification permission
@@ -237,9 +232,9 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         String? token = ref.read(pushTokenProvider).value;
         if (token != null) {
           var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          URLRequest request = URLRequest(url: Uri.parse(message.url!), method: "POST", body: postData);
+          URLRequest request = URLRequest(url: WebUri(message.url!), method: "POST", body: postData);
           // Works but for admin to see the changes it need to reload a page because a request is called on separate instance.
-          await headlessWebView.webViewController.loadUrl(urlRequest: request);
+          await headlessWebView.webViewController?.loadUrl(urlRequest: request);
         }
         break;
       default:

@@ -41,34 +41,34 @@ extension FutureAsyncValueX<T> on Future<AsyncValue<T>> {
 
 extension URLRequestExtension on URLRequest {
   URLRequest copyWith({
-    Uri? url,
+    WebUri? url,
     String? method,
     Uint8List? body,
     Map<String, String>? headers,
     bool? iosAllowsCellularAccess,
     bool? iosAllowsConstrainedNetworkAccess,
     bool? iosAllowsExpensiveNetworkAccess,
-    IOSURLRequestCachePolicy? iosCachePolicy,
+    URLRequestCachePolicy? iosCachePolicy,
     bool? iosHttpShouldHandleCookies,
     bool? iosHttpShouldUsePipelining,
-    IOSURLRequestNetworkServiceType? iosNetworkServiceType,
+    URLRequestNetworkServiceType? iosNetworkServiceType,
     double? iosTimeoutInterval,
-    Uri? iosMainDocumentURL,
+    WebUri? iosMainDocumentURL,
   }) {
     return URLRequest(
       url: url ?? this.url,
       method: method ?? this.method,
       headers: headers ?? this.headers,
       body: body ?? this.body,
-      iosAllowsCellularAccess: iosAllowsCellularAccess ?? this.iosAllowsCellularAccess,
-      iosAllowsConstrainedNetworkAccess: iosAllowsConstrainedNetworkAccess ?? this.iosAllowsConstrainedNetworkAccess,
-      iosAllowsExpensiveNetworkAccess: iosAllowsExpensiveNetworkAccess ?? this.iosAllowsExpensiveNetworkAccess,
-      iosCachePolicy: iosCachePolicy ?? this.iosCachePolicy,
-      iosHttpShouldHandleCookies: iosHttpShouldHandleCookies ?? this.iosHttpShouldHandleCookies,
-      iosHttpShouldUsePipelining: iosHttpShouldUsePipelining ?? this.iosHttpShouldUsePipelining,
-      iosNetworkServiceType: iosNetworkServiceType ?? this.iosNetworkServiceType,
-      iosTimeoutInterval: iosTimeoutInterval ?? this.iosTimeoutInterval,
-      iosMainDocumentURL: iosMainDocumentURL ?? this.iosMainDocumentURL,
+      allowsCellularAccess: iosAllowsCellularAccess ?? allowsCellularAccess,
+      allowsConstrainedNetworkAccess: iosAllowsConstrainedNetworkAccess ?? allowsConstrainedNetworkAccess,
+      allowsExpensiveNetworkAccess: iosAllowsExpensiveNetworkAccess ?? allowsExpensiveNetworkAccess,
+      cachePolicy: iosCachePolicy,
+      httpShouldHandleCookies: iosHttpShouldHandleCookies ?? httpShouldHandleCookies,
+      httpShouldUsePipelining: iosHttpShouldUsePipelining ?? httpShouldUsePipelining,
+      networkServiceType: iosNetworkServiceType,
+      timeoutInterval: iosTimeoutInterval,
+      mainDocumentURL: iosMainDocumentURL,
     );
   }
 }

@@ -40,17 +40,13 @@ class WebViewAppState extends ConsumerState<WebView> {
   late AuthInAppBrowser authBrowser;
   late Manifest manifest;
   late URLRequest _initialRequest;
-  final _options = InAppWebViewGroupOptions(
-    crossPlatform: InAppWebViewOptions(
-      useShouldOverrideUrlLoading: true,
-      useShouldInterceptFetchRequest: true,
-      javaScriptEnabled: true,
-      supportZoom: false,
-      javaScriptCanOpenWindowsAutomatically: true,
-    ),
-    android: AndroidInAppWebViewOptions(
-      supportMultipleWindows: true,
-    ),
+  final _settings = InAppWebViewSettings(
+    useShouldOverrideUrlLoading: true,
+    useShouldInterceptFetchRequest: true,
+    javaScriptEnabled: true,
+    supportZoom: false,
+    javaScriptCanOpenWindowsAutomatically: true,
+    supportMultipleWindows: true,
   );
 
   late PullToRefreshController _pullToRefreshController;
@@ -63,7 +59,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _initialRequest = _initRequest;
       _pullToRefreshController = PullToRefreshController(
-        options: PullToRefreshOptions(
+        settings: PullToRefreshSettings(
           color: HexColor(manifest.themeColor),
         ),
         onRefresh: () async {
@@ -96,7 +92,7 @@ class WebViewAppState extends ConsumerState<WebView> {
           bottom: false,
           child: InAppWebView(
             initialUrlRequest: _initialRequest,
-            initialOptions: _options,
+            initialSettings: _settings,
             pullToRefreshController: _pullToRefreshController,
             shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
             onWebViewCreated: _onWebViewCreated,
@@ -121,8 +117,9 @@ class WebViewAppState extends ConsumerState<WebView> {
               _setAjaxHeadersJQuery(controller);
             },
             onProgressChanged: _onProgressChanged,
-            onLoadError: (InAppWebViewController controller, Uri? url, int code, String message) {
-              if (code == -1009) NoConnectionDialog.show(context);
+            onReceivedError: (InAppWebViewController controller, WebResourceRequest request,
+                WebResourceError error) {
+              if (error.description == 'net::ERR_INTERNET_DISCONNECTED') NoConnectionDialog.show(context);
             },
           ),
         ),
@@ -141,8 +138,8 @@ class WebViewAppState extends ConsumerState<WebView> {
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
     if (Platform.isAndroid ||
-        action.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED ||
-        action.iosWKNavigationType == IOSWKNavigationType.FORM_SUBMITTED) {
+        action.navigationType == NavigationType.LINK_ACTIVATED ||
+        action.navigationType == NavigationType.FORM_SUBMITTED) {
       Map<String, String> mergedMap = {...?_initialRequest.headers, ...?action.request.headers};
       URLRequest newRequest = action.request.copyWith(headers: mergedMap);
       controller.loadUrl(urlRequest: newRequest);
@@ -164,7 +161,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         jsObjectName: "flutterChannel",
         onPostMessage: (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
           logInfo(inMessage);
-          ChannelMessage message = ChannelMessage.fromJson(inMessage!);
+          ChannelMessage message = ChannelMessage.fromJson(inMessage!.data);
           await _handleJSMessage(message, headlessWebView!);
           logDebug('flutterChannel triggered: ${message.type}');
         },
@@ -201,7 +198,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     }
     String? payloadFromPush = InitFromPush.usePayload();
     if (payloadFromPush != null) url = payloadFromPush;
-    return URLRequest(url: Uri.parse(url ?? manifest.startUrl), headers: ref.read(humHubProvider).customHeaders);
+    return URLRequest(url: WebUri(url ?? manifest.startUrl), headers: ref.read(humHubProvider).customHeaders);
   }
 
   _onLoadStop(InAppWebViewController controller, Uri? url) {
@@ -270,8 +267,8 @@ class WebViewAppState extends ConsumerState<WebView> {
         String? token = ref.read(pushTokenProvider).value;
         if (token != null) {
           var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          URLRequest request = URLRequest(url: Uri.parse(message.url!), method: "POST", body: postData);
-          await headlessWebView.webViewController.loadUrl(urlRequest: request);
+          URLRequest request = URLRequest(url: WebUri(message.url!), method: "POST", body: postData);
+          await headlessWebView.webViewController?.loadUrl(urlRequest: request);
         }
         var status = await Permission.notification.status;
         // status.isDenied: The user has previously denied the notification permission
@@ -285,9 +282,9 @@ class WebViewAppState extends ConsumerState<WebView> {
         String? token = ref.read(pushTokenProvider).value;
         if (token != null) {
           var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          URLRequest request = URLRequest(url: Uri.parse(message.url!), method: "POST", body: postData);
+          URLRequest request = URLRequest(url: WebUri(message.url!), method: "POST", body: postData);
           // Works but for admin to see the changes it need to reload a page because a request is called on separate instance.
-          await headlessWebView.webViewController.loadUrl(urlRequest: request);
+          await headlessWebView.webViewController?.loadUrl(urlRequest: request);
         }
         break;
       case ChannelAction.none:
