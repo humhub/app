@@ -45,6 +45,15 @@ class HumHubNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  static Future<void> setInstanceStatic(HumHub instance) async {
+    final jsonString = json.encode(instance.toJson());
+    var storage = const FlutterSecureStorage();
+    var lastUrlFromStore = await storage.read(key: StorageKeys.lastInstanceUrl);
+    String? lastUrl = instance.manifestUrl != null ? instance.manifestUrl! : lastUrlFromStore;
+    await storage.write(key: StorageKeys.humhubInstance, value: jsonString);
+    await storage.write(key: StorageKeys.lastInstanceUrl, value: lastUrl);
+  }
+
   void setHash(String hash) {
     _humHubInstance.randomHash = hash;
     _updateSafeStorage();
