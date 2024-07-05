@@ -47,6 +47,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     supportZoom: false,
     javaScriptCanOpenWindowsAutomatically: true,
     supportMultipleWindows: true,
+    useHybridComposition: true,
   );
 
   late PullToRefreshController _pullToRefreshController;
@@ -117,8 +118,7 @@ class WebViewAppState extends ConsumerState<WebView> {
               _setAjaxHeadersJQuery(controller);
             },
             onProgressChanged: _onProgressChanged,
-            onReceivedError: (InAppWebViewController controller, WebResourceRequest request,
-                WebResourceError error) {
+            onReceivedError: (InAppWebViewController controller, WebResourceRequest request, WebResourceError error) {
               if (error.description == 'net::ERR_INTERNET_DISCONNECTED') NoConnectionDialog.show(context);
             },
           ),
