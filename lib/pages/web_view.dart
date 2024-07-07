@@ -15,6 +15,7 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/extensions.dart';
+import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/init_from_push.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
@@ -154,6 +155,7 @@ class WebViewAppState extends ConsumerState<WebView> {
   }
 
   _onWebViewCreated(InAppWebViewController controller) async {
+    LoadingProvider.of(ref).showLoading();
     headlessWebView = HeadlessInAppWebView();
     headlessWebView!.run();
     await controller.addWebMessageListener(
@@ -211,6 +213,7 @@ class WebViewAppState extends ConsumerState<WebView> {
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _setAjaxHeadersJQuery(controller);
+    LoadingProvider.of(ref).showLoading();
     _pullToRefreshController.endRefreshing();
   }
 
