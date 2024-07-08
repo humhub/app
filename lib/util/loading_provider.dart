@@ -15,12 +15,15 @@ class LoadingProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) => _Manager(
-        key: ref.watch(_provider),
-        child: child!,
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Consumer(
+        builder: (context, ref, child) => _Manager(
+          key: ref.watch(_provider),
+          child: child!,
+        ),
+        child: child,
       ),
-      child: child,
     );
   }
 
