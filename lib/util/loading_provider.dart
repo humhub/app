@@ -68,12 +68,12 @@ class _ManagerState extends State<_Manager> {
     );
   }
 
-  void showLoading() {
+  void showLoading({bool hideBackground = false}) {
     if (_entries.isNotEmpty) return;
     final entry = OverlayEntry(
       builder: (_) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.black54,
+        decoration: BoxDecoration(
+          color: hideBackground ? Colors.white : Colors.black54,
         ),
         child: Center(
           child: Loader.fullscreen(),
