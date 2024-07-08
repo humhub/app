@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/event.dart';
+import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/notifications/service.dart';
@@ -14,10 +15,12 @@ import 'package:loggy/loggy.dart';
 class PushPlugin extends ConsumerStatefulWidget {
   final Widget child;
 
-   const PushPlugin({
+  const PushPlugin({
     Key? key,
     required this.child,
-  }) : super(key: key, );
+  }) : super(
+          key: key,
+        );
 
   @override
   PushPluginState createState() => PushPluginState();
@@ -48,8 +51,11 @@ class PushPluginState extends ConsumerState<PushPlugin> {
     //When the app is terminated, i.e., app is neither in foreground or background.
     FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
       if (message != null) {
-        logInfo("Firebase messaging getInitialMessage message: $message");
-        _handleInitialMsg(message);
+        LoadingProvider.of(ref).showLoading(hideBackground: true);
+        final data = PushEvent(message).parsedData;
+        if (data.redirectUrl != null) {
+          ref.read(notificationChannelProvider).value!.onTap(data.redirectUrl);
+        }
       }
     });
 
@@ -63,13 +69,6 @@ class PushPluginState extends ConsumerState<PushPlugin> {
     ref.read(notificationChannelProvider);
     _init();
     super.initState();
-  }
-
-  _handleInitialMsg(RemoteMessage message) {
-    final data = PushEvent(message).parsedData;
-    if (data.redirectUrl != null) {
-      ref.read(notificationChannelProvider).value!.onTap(data.redirectUrl);
-    }
   }
 
   Future<void> _handleNotification(RemoteMessage message, NotificationService notificationService) async {

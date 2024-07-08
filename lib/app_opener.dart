@@ -45,7 +45,7 @@ class OpenerAppState extends ConsumerState<OpenerApp> {
                       ),
                     );
                   }
-                  return const SizedBox.shrink();
+                  return Container(color: Colors.white);
                 },
               ),
             ),

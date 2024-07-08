@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -15,6 +14,7 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/extensions.dart';
+import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/init_from_push.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
@@ -55,35 +55,27 @@ class WebViewAppState extends ConsumerState<WebView> {
   HeadlessInAppWebView? headlessWebView;
 
   @override
-  void initState() {
-    super.initState();
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      _initialRequest = _initRequest;
-      _pullToRefreshController = PullToRefreshController(
-        settings: PullToRefreshSettings(
-          color: HexColor(manifest.themeColor),
-        ),
-        onRefresh: () async {
-          if (Platform.isAndroid) {
-            WebViewGlobalController.value?.reload();
-          } else if (Platform.isIOS) {
-            WebViewGlobalController.value
-                ?.loadUrl(urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl()));
-          }
-        },
-      );
-      authBrowser = AuthInAppBrowser(
-        manifest: manifest,
-        concludeAuth: (URLRequest request) {
-          _concludeAuth(request);
-        },
-      );
-      setState(() {});
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    _initialRequest = _initRequest;
+    _pullToRefreshController = PullToRefreshController(
+      settings: PullToRefreshSettings(
+        color: HexColor(manifest.themeColor),
+      ),
+      onRefresh: () async {
+        if (Platform.isAndroid) {
+          WebViewGlobalController.value?.reload();
+        } else if (Platform.isIOS) {
+          WebViewGlobalController.value
+              ?.loadUrl(urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl()));
+        }
+      },
+    );
+    authBrowser = AuthInAppBrowser(
+      manifest: manifest,
+      concludeAuth: (URLRequest request) {
+        _concludeAuth(request);
+      },
+    );
     // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () => exitApp(context, ref),
@@ -154,6 +146,7 @@ class WebViewAppState extends ConsumerState<WebView> {
   }
 
   _onWebViewCreated(InAppWebViewController controller) async {
+    LoadingProvider.of(ref).showLoading();
     headlessWebView = HeadlessInAppWebView();
     headlessWebView!.run();
     await controller.addWebMessageListener(
@@ -211,6 +204,7 @@ class WebViewAppState extends ConsumerState<WebView> {
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _setAjaxHeadersJQuery(controller);
+    LoadingProvider.of(ref).dismissAll();
     _pullToRefreshController.endRefreshing();
   }
 
