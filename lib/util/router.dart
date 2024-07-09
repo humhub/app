@@ -40,6 +40,7 @@ class MyRouter {
 
   static Future<String> getInitialRoute(WidgetRef ref) async {
     HumHub humhub = await ref.read(humHubProvider).getInstance();
+    await Future.delayed(const Duration(milliseconds: 500));
     RedirectAction action = await humhub.action(ref);
     switch (action) {
       case RedirectAction.opener:

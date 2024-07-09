@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final _provider = StateProvider<GlobalKey<_ManagerState>>(
@@ -15,14 +16,22 @@ class LoadingProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Consumer(
-        builder: (context, ref, child) => _Manager(
-          key: ref.watch(_provider),
-          child: child!,
+    return Localizations(
+      locale: const Locale('en', ''),
+      delegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Consumer(
+          builder: (context, ref, child) => _Manager(
+            key: ref.watch(_provider),
+            child: child!,
+          ),
+          child: child,
         ),
-        child: child,
       ),
     );
   }

@@ -53,6 +53,11 @@ class WebViewAppState extends ConsumerState<WebView> {
   late PullToRefreshController _pullToRefreshController;
 
   HeadlessInAppWebView? headlessWebView;
+  @override
+  initState() {
+    super.initState();
+    LoadingProvider.of(ref).dismissAll();
+  }
 
   @override
   Widget build(BuildContext context) {
