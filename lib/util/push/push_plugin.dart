@@ -49,11 +49,13 @@ class PushPluginState extends ConsumerState<PushPlugin> {
     });
 
     //When the app is terminated, i.e., app is neither in foreground or background.
-    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
+    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) async {
+      logInfo(message);
       if (message != null) {
         LoadingProvider.of(ref).showLoading(hideBackground: true);
         final data = PushEvent(message).parsedData;
         if (data.redirectUrl != null) {
+          await Future.delayed(const Duration(milliseconds: 500));
           ref.read(notificationChannelProvider).value!.onTap(data.redirectUrl);
         }
       }

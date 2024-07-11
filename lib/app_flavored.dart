@@ -21,23 +21,23 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
   @override
   Widget build(BuildContext context) {
     SecureStorageService.clearSecureStorageOnReinstall();
-    return IntentPluginF(
-      child: NotificationPlugin(
-        child: PushPlugin(
-          child: OverrideLocale(
-            builder: (overrideLocale) => Builder(
-              builder: (context) => MaterialApp(
-                debugShowCheckedModeBanner: false,
-                initialRoute: RouterF.initRoute,
-                routes: RouterF.routes,
-                localizationsDelegates: AppLocalizations.localizationsDelegates,
-                supportedLocales: AppLocalizations.supportedLocales,
-                navigatorKey: navigatorKeyF,
-                builder: (context, child) => LoadingProvider(
-                  child: child!,
-                ),
-                theme: ThemeData(
-                  fontFamily: 'OpenSans',
+    return LoadingProvider(
+      child: IntentPluginF(
+        child: NotificationPlugin(
+          child: PushPlugin(
+            child: OverrideLocale(
+              builder: (overrideLocale) => Builder(
+                builder: (context) => MaterialApp(
+                  debugShowCheckedModeBanner: false,
+                  initialRoute: RouterF.initRoute,
+                  routes: RouterF.routes,
+                  localizationsDelegates: AppLocalizations.localizationsDelegates,
+                  supportedLocales: AppLocalizations.supportedLocales,
+                  navigatorKey: navigatorKeyF,
+                  builder: (context, child) => child!,
+                  theme: ThemeData(
+                    fontFamily: 'OpenSans',
+                  ),
                 ),
               ),
             ),
