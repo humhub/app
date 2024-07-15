@@ -61,10 +61,9 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
   @override
   Widget build(BuildContext context) {
     controlLer = OpenerController(ref: ref, helper: helper);
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      body: Stack(
-        fit: StackFit.expand,
+    return Container(
+      color: Colors.white,
+      child: Stack(
         children: [
           RiveAnimation.asset(
             Assets.openerAnimationForward,
@@ -76,163 +75,179 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
             fit: BoxFit.fill,
             controllers: [_controllerReverse],
           ),
-          SafeArea(
-            bottom: false,
-            top: false,
-            child: Form(
-              key: helper.key,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 50),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    AnimatedOpacity(
-                      opacity: _visible ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 300),
-                      child: const Padding(
-                        padding: EdgeInsets.only(top: 10, right: 16),
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: SizedBox(
-                            width: 110,
-                            child: LanguageSwitcher(),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 8,
-                      child: AnimatedOpacity(
+          Scaffold(
+            resizeToAvoidBottomInset: true,
+            backgroundColor: Colors.transparent,
+            body: SafeArea(
+              bottom: false,
+              top: false,
+              child: Form(
+                key: helper.key,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 50),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      AnimatedOpacity(
                         opacity: _visible ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 300),
-                        child: SizedBox(
-                          height: 100,
-                          width: 230,
-                          child: Image.asset(Assets.logo),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 12,
-                      child: AnimatedOpacity(
-                        opacity: _textFieldAddInfoVisibility ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 500),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 35),
-                          child: Column(
-                            children: [
-                              FutureBuilder<String>(
-                                future: ref.read(humHubProvider).getLastUrl(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData) {
-                                    controlLer.urlTextController.text = snapshot.data!;
-                                    return TextFormField(
-                                      keyboardType: TextInputType.url,
-                                      controller: controlLer.urlTextController,
-                                      cursorColor: Theme.of(context).textTheme.bodySmall?.color,
-                                      onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
-                                      onEditingComplete: () {
-                                        controlLer.helper.onSaved(controlLer.formUrlKey);
-                                        _connectInstance();
-                                      },
-                                      style: const TextStyle(
-                                        decoration: TextDecoration.none,
-                                      ),
-                                      decoration: openerDecoration(context),
-                                      validator: controlLer.validateUrl,
-                                      autocorrect: false,
-                                    );
-                                  }
-                                  return const Center(child: CircularProgressIndicator());
-                                },
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 5),
-                                child: Text(
-                                  AppLocalizations.of(context)!.opener_enter_url,
-                                  style: const TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 4,
-                      child: AnimatedOpacity(
-                        opacity: _visible ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 300),
-                        child: Center(
-                          child: Container(
-                            width: 140,
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
-                            child: TextButton(
-                              onPressed: _connectInstance,
-                              child: Text(
-                                AppLocalizations.of(context)!.connect,
-                                style: TextStyle(color: HumhubTheme.primaryColor, fontSize: 20),
-                              ),
+                        child: const Padding(
+                          padding: EdgeInsets.only(top: 10, right: 16),
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: SizedBox(
+                              width: 110,
+                              child: LanguageSwitcher(),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 4,
-                      child: GestureDetector(
-                        onTap: () {
-                          _controller.isActive = true;
-                          setState(() {
-                            _visible = false;
-                            _textFieldAddInfoVisibility = false;
-                          });
-                          Future.delayed(const Duration(milliseconds: 700)).then((value) {
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                transitionDuration: const Duration(milliseconds: 500),
-                                pageBuilder: (context, animation, secondaryAnimation) =>
-                                    Platform.isAndroid ? const HelpAndroid() : const HelpIos(),
-                                transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                  return FadeTransition(
-                                    opacity: animation,
-                                    child: child,
-                                  );
-                                },
-                              ),
-                            ).then((value) {
-                              setState(() {
-                                _controller.isActive = true;
-                                _animation.reset();
-                                _visible = true;
-                                Future.delayed(const Duration(milliseconds: 700), () {
-                                  setState(() {
-                                    _textFieldAddInfoVisibility = true;
-                                  });
-                                });
-                                _controllerReverse.isActive = true;
-                              });
-                            });
-                            _controllerReverse.isActive = true;
-                            _animationReverse.reset();
-                          });
-                        },
+                      Expanded(
+                        flex: 8,
                         child: AnimatedOpacity(
                           opacity: _visible ? 1.0 : 0.0,
                           duration: const Duration(milliseconds: 300),
-                          child: Text(
-                            AppLocalizations.of(context)!.opener_need_help,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
+                          child: SizedBox(
+                            height: 100,
+                            width: 230,
+                            child: Image.asset(Assets.logo),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 12,
+                        child: AnimatedOpacity(
+                          opacity: _textFieldAddInfoVisibility ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 500),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 35),
+                            child: Column(
+                              children: [
+                                FutureBuilder<String>(
+                                  future: ref.read(humHubProvider).getLastUrl(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      controlLer.urlTextController.text = snapshot.data!;
+                                      return TextFormField(
+                                        keyboardType: TextInputType.url,
+                                        controller: controlLer.urlTextController,
+                                        cursorColor: Theme.of(context).textTheme.bodySmall?.color,
+                                        onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
+                                        onEditingComplete: () {
+                                          controlLer.helper.onSaved(controlLer.formUrlKey);
+                                          _connectInstance();
+                                        },
+                                        style: const TextStyle(
+                                          decoration: TextDecoration.none,
+                                        ),
+                                        decoration: openerDecoration(context),
+                                        validator: controlLer.validateUrl,
+                                        autocorrect: false,
+                                      );
+                                    }
+                                    return const Center(child: CircularProgressIndicator());
+                                  },
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 5),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.opener_enter_url,
+                                    style:
+                                        const TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                      Expanded(
+                        flex: 4,
+                        child: AnimatedOpacity(
+                          opacity: _visible ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 300),
+                          child: Center(
+                            child: TextButton(
+                              onPressed: _connectInstance,
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  side: BorderSide(
+                                    color: HumhubTheme.primaryColor, // Adjust the color to match your theme
+                                    width: 2, // Adjust the width as needed
+                                  ),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 0), // Adjust padding as needed
+                                minimumSize: const Size(140, 55),
+                              ),
+                              child: Text(
+                                AppLocalizations.of(context)!.connect,
+                                style: TextStyle(
+                                  color: HumhubTheme.primaryColor,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 4,
+                        child: GestureDetector(
+                          onTap: () {
+                            _controller.isActive = true;
+                            setState(() {
+                              _visible = false;
+                              _textFieldAddInfoVisibility = false;
+                            });
+                            Future.delayed(const Duration(milliseconds: 700)).then((value) {
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  transitionDuration: const Duration(milliseconds: 500),
+                                  pageBuilder: (context, animation, secondaryAnimation) =>
+                                      Platform.isAndroid ? const HelpAndroid() : const HelpIos(),
+                                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
+                                ),
+                              ).then((value) {
+                                setState(() {
+                                  _controller.isActive = true;
+                                  _animation.reset();
+                                  _visible = true;
+                                  Future.delayed(const Duration(milliseconds: 700), () {
+                                    setState(() {
+                                      _textFieldAddInfoVisibility = true;
+                                    });
+                                  });
+                                  _controllerReverse.isActive = true;
+                                });
+                              });
+                              _controllerReverse.isActive = true;
+                              _animationReverse.reset();
+                            });
+                          },
+                          child: AnimatedOpacity(
+                            opacity: _visible ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 300),
+                            child: Text(
+                              AppLocalizations.of(context)!.opener_need_help,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
