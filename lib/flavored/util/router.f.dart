@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:humhub/flavored/web_view.f.dart';
 
 final GlobalKey<NavigatorState> navigatorKeyF = GlobalKey<NavigatorState>();
@@ -9,7 +10,14 @@ class RouterF {
   static String? initRoute = WebViewF.path;
   static dynamic initParams;
 
-  static var routes = {
-    WebViewF.path: (context) => const WebViewF(),
+  static Map<String, Widget Function(BuildContext)> routes = {
+    WebViewF.path: (context) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+      return const WebViewF();
+    },
   };
 }

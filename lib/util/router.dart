@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
@@ -32,10 +33,27 @@ class MyRouter {
   static String? initRoute;
   static dynamic initParams;
 
-  static var routes = {
-    Opener.path: (context) => const Opener(),
-    WebView.path: (context) => const WebView(),
-    '/help': (context) => Platform.isAndroid ? const HelpAndroid() : const HelpIos(),
+  static Map<String, Widget Function(BuildContext)> routes = {
+    Opener.path: (context) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+      return const Opener();
+    },
+    WebView.path: (context) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+      return const WebView();
+    },
+    '/help': (context) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+      return Platform.isAndroid ? const HelpAndroid() : const HelpIos();
+    },
   };
 
   static Future<String> getInitialRoute(WidgetRef ref) async {

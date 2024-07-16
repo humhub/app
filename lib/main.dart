@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/util/log.dart';
@@ -15,7 +14,5 @@ main() async {
   await SecureStorageService.clearSecureStorageOnReinstall();
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
   final app = await HumHub.app(packageInfo.packageName);
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) async {
-    runApp(ProviderScope(child: app));
-  });
+  runApp(ProviderScope(child: app));
 }
