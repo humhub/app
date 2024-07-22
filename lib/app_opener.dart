@@ -5,6 +5,7 @@ import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/override_locale.dart';
 import 'package:humhub/util/push/push_plugin.dart';
+import 'package:humhub/util/push/push_support_popup.dart';
 import 'package:humhub/util/router.dart';
 import 'package:humhub/util/storage_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -38,7 +39,7 @@ class OpenerAppState extends ConsumerState<OpenerApp> {
                         localizationsDelegates: AppLocalizations.localizationsDelegates,
                         supportedLocales: AppLocalizations.supportedLocales,
                         locale: overrideLocale,
-                        builder: (context, child) => child!,
+                        builder: (context, child) => PushStatusWrapper(child: child!),
                         theme: ThemeData(
                           fontFamily: 'OpenSans',
                         ),
