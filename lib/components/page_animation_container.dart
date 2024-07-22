@@ -78,7 +78,7 @@ class PageAnimationContainerState extends State<PageAnimationContainer> with Tic
         ),
         FadeTransition(
           opacity: _fadeAnimation,
-          child: widget.children[_currentIndex],
+          child: _currentIndex < 0 ? widget.children[0] : widget.children[_currentIndex],
         ),
       ],
     );
