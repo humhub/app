@@ -89,13 +89,13 @@ jobs:
       - run: flutter analyze --no-fatal-warnings --no-fatal-infos
       - run: flutter build apk --release --split-per-abi --build-name="${{ env.version }}" --build-number=${{ env.version_code }}
       - run: flutter build appbundle --release --build-name="${{ env.version }}" --build-number=${{ env.version_code }}
-      - name: Create a Release in GitHub
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "build/app/outputs/apk/release/*.apk,build/app/outputs/bundle/release/app-release.aab"
-          token: ${{ github.token }}
-          commit: ${{ github.sha }}
-          allowUpdates: true
+#      - name: Create a Release in GitHub
+#        uses: ncipollo/release-action@v1
+#        with:
+#          artifacts: "build/app/outputs/apk/release/*.apk,build/app/outputs/bundle/release/app-release.aab"
+#          token: ${{ github.token }}
+#          commit: ${{ github.sha }}
+#          allowUpdates: true
       - name: Upload app bundle
         uses: actions/upload-artifact@v3
         with:
