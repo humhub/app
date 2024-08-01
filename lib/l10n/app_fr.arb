@@ -32,6 +32,8 @@
   "web_view_exit_popup_title": "Êtes-vous sûr ?",
   "web_view_exit_popup_content": "Voulez-vous quitter l'application ?",
 
+  "push_not_configured": "Les notifications push ne sont pas prises en charge par cette installation.",
+
   "connect": "Connecter",
   "cancel": "Annuler",
   "url": "URL",

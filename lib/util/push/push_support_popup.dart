@@ -6,6 +6,7 @@ import 'package:humhub/util/api_provider.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:loggy/loggy.dart';
 
 final _provider = StateProvider<GlobalKey<_PushStatusWrapperState>>(
@@ -55,27 +56,18 @@ class _PushStatusWrapperState extends ConsumerState<PushStatusWrapper> {
     if (_hasShownWarning && !force) return;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && (navigatorKey.currentState?.context.mounted ?? false)) {
+      if (mounted && (navigatorKey.currentState?.context.mounted ?? false) /*&& status.code != 200*/) {
         _hasShownWarning = true;
         showDialog(
           context: navigatorKey.currentState!.context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(status.title),
-              content: const Text(
-                  'The server is not configured for the mobile app and push notifications. Some functions may not be available.'),
+              title: Text(AppLocalizations.of(context)!.push_not_configured, style: TextStyle(fontSize: 20),),
               actions: <Widget>[
                 TextButton(
-                  child: const Text('OK'),
+                  child: Text(AppLocalizations.of(context)!.ok, style: TextStyle(fontSize: 16),),
                   onPressed: () {
                     Navigator.of(context).pop();
-                  },
-                ),
-                TextButton(
-                  child: const Text('More Info'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _openDocumentation();
                   },
                 ),
               ],
@@ -84,10 +76,6 @@ class _PushStatusWrapperState extends ConsumerState<PushStatusWrapper> {
         );
       }
     });
-  }
-
-  void _openDocumentation() {
-    // Logic to open the official documentation page
   }
 
   @override
@@ -119,15 +107,7 @@ class PushStatus {
 
   static Future<PushStatus> Function(Dio dio) get({required String baseUrl}) => (dio) async {
         Response<dynamic> res = await dio.get('$baseUrl/fcm-push/status');
+        print("object");
         return PushStatus.fromJson(res.data);
       };
-
-  String get title {
-    if (code == 200) return 'Success';
-    if (code == 501) return 'Not exists';
-    if (code == 501)
-      return 'Not configured';
-    else
-      return 'error';
-  }
 }

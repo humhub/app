@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:humhub/components/ease_out_container.dart';
+import 'package:humhub/util/theme_data.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:humhub/util/const.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ThirdPage extends StatelessWidget {

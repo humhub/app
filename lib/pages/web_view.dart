@@ -19,6 +19,7 @@ import 'package:humhub/util/notifications/init_from_push.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/push/provider.dart';
+import 'package:humhub/util/push/push_support_popup.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -81,43 +82,46 @@ class WebViewAppState extends ConsumerState<WebView> {
         _concludeAuth(request);
       },
     );
-    // ignore: deprecated_member_use
-    return WillPopScope(
-      onWillPop: () => exitApp(context, ref),
-      child: Scaffold(
-        backgroundColor: HexColor(manifest.themeColor),
-        body: SafeArea(
-          bottom: false,
-          child: InAppWebView(
-            initialUrlRequest: _initialRequest,
-            initialSettings: _settings,
-            pullToRefreshController: _pullToRefreshController,
-            shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
-            onWebViewCreated: _onWebViewCreated,
-            shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
-            onCreateWindow: (inAppWebViewController, createWindowAction) async {
-              final urlToOpen = createWindowAction.request.url;
 
-              if (urlToOpen == null) return Future.value(false); // Don't create a new window.
+    return PushStatusWrapper(
+      // ignore: deprecated_member_use
+      child: WillPopScope(
+        onWillPop: () => exitApp(context, ref),
+        child: Scaffold(
+          backgroundColor: HexColor(manifest.themeColor),
+          body: SafeArea(
+            bottom: false,
+            child: InAppWebView(
+              initialUrlRequest: _initialRequest,
+              initialSettings: _settings,
+              pullToRefreshController: _pullToRefreshController,
+              shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
+              onWebViewCreated: _onWebViewCreated,
+              shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
+              onCreateWindow: (inAppWebViewController, createWindowAction) async {
+                final urlToOpen = createWindowAction.request.url;
 
-              if (await canLaunchUrl(urlToOpen)) {
-                await launchUrl(urlToOpen,
-                    mode: LaunchMode.externalApplication); // Open the URL in the default browser.
-              } else {
-                logError('Could not launch $urlToOpen');
-              }
+                if (urlToOpen == null) return Future.value(false); // Don't create a new window.
 
-              return Future.value(true); // Allow creating a new window.
-            },
-            onLoadStop: _onLoadStop,
-            onLoadStart: (controller, uri) async {
-              logDebug("onLoadStart");
-              _setAjaxHeadersJQuery(controller);
-            },
-            onProgressChanged: _onProgressChanged,
-            onReceivedError: (InAppWebViewController controller, WebResourceRequest request, WebResourceError error) {
-              if (error.description == 'net::ERR_INTERNET_DISCONNECTED') NoConnectionDialog.show(context);
-            },
+                if (await canLaunchUrl(urlToOpen)) {
+                  await launchUrl(urlToOpen,
+                      mode: LaunchMode.externalApplication); // Open the URL in the default browser.
+                } else {
+                  logError('Could not launch $urlToOpen');
+                }
+
+                return Future.value(true); // Allow creating a new window.
+              },
+              onLoadStop: _onLoadStop,
+              onLoadStart: (controller, uri) async {
+                logDebug("onLoadStart");
+                _setAjaxHeadersJQuery(controller);
+              },
+              onProgressChanged: _onProgressChanged,
+              onReceivedError: (InAppWebViewController controller, WebResourceRequest request, WebResourceError error) {
+                if (error.description == 'net::ERR_INTERNET_DISCONNECTED') NoConnectionDialog.show(context);
+              },
+            ),
           ),
         ),
       ),
@@ -152,7 +156,29 @@ class WebViewAppState extends ConsumerState<WebView> {
 
   _onWebViewCreated(InAppWebViewController controller) async {
     LoadingProvider.of(ref).showLoading();
-    headlessWebView = HeadlessInAppWebView();
+    headlessWebView = HeadlessInAppWebView(
+      onReceivedLoginRequest: (controller, loginRequest) {
+        logInfo(loginRequest.toJson());
+      },
+      onReceivedHttpAuthRequest: (controller, loginRequest) {
+        logInfo(loginRequest.toJson());
+        return Future.value(HttpAuthResponse(password: 'test123', username: 'primozratej'));
+      },
+      onLoadStop: (controller, uri) async {
+        logInfo(uri.toString());
+        String? html = await controller.getHtml();
+        logInfo(html);
+        /// There is a little problem... The community page has an ${manifest.baseUrl}/fcm-push/status exposed to the public
+        /// in this case we can access the data without the need of auth, some instances like someDemo and omnihub are private and in need of auth so the status is not accesible without login.
+        /// There are 2 possible fixed:
+        /// 1. We can use JS channels (same as we did for register FCM token), trigger the message when the user log in and pass the json to the massage as data.
+        /// 2. We know that when we trigger register token the user is loged in and ready to use the app, we call the request from inside an webview where the user is already auth and then we parse the returned html as string
+        /// I think the nices solution would be num. 2.
+      },
+      onLoadResource: (controller, resource) {
+        logInfo(resource.toJson());
+      },
+    );
     headlessWebView!.run();
     await controller.addWebMessageListener(
       WebMessageListener(
@@ -261,6 +287,8 @@ class WebViewAppState extends ConsumerState<WebView> {
       case ChannelAction.hideOpener:
         ref.read(humHubProvider).setIsHideOpener(true);
         ref.read(humHubProvider).setHash(HumHub.generateHash(32));
+        URLRequest request = URLRequest(url: WebUri('${manifest.baseUrl}/fcm-push/status'), method: "GET");
+        headlessWebView.webViewController?.loadUrl(urlRequest: request);
         break;
       case ChannelAction.registerFcmDevice:
         String? token = ref.read(pushTokenProvider).value;

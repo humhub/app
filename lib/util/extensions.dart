@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/util/const.dart';
+import 'package:humhub/util/theme_data.dart';
 import 'package:loggy/loggy.dart';
 
 class HexColor extends Color {

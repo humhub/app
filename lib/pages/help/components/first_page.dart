@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:humhub/components/rotating_globe.dart';
 import 'package:humhub/util/const.dart';
+import 'package:humhub/util/theme_data.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FirstPage extends StatelessWidget {

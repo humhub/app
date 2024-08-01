@@ -12,6 +12,7 @@ import 'package:humhub/util/openers/opener_controller.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:rive/rive.dart';
 import 'help/help_android.dart';
+import 'package:humhub/util/theme_data.dart';
 import 'help/help_ios.dart';
 
 class Opener extends ConsumerStatefulWidget {

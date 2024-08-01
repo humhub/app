@@ -32,6 +32,8 @@
   "web_view_exit_popup_title": "Bist du sicher?",
   "web_view_exit_popup_content": "Möchtest du die App verlassen?",
 
+  "push_not_configured": "Push-Benachrichtigungen werden von dieser Installation nicht unterstützt.",
+
   "connect": "Verbinden",
   "cancel": "Abbrechen",
   "url": "URL",
