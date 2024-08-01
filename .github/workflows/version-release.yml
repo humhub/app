@@ -38,10 +38,10 @@ jobs:
           fetch-depth: 0
       - name: Extract version code
         id: extract_version_code
-        run: echo "version_code=$(git rev-list --count HEAD)" >> $GITHUB_ENV
+        run: echo "version_code=1" >> $GITHUB_ENV
       - name: Extract version
         id: extract_version
-        run: echo "version=$(echo ${{ github.ref }} | sed -e 's/^refs\/tags\/v//' -e 's/-.*//')" >> $GITHUB_ENV
+        run: echo "version=1.0.0" >> $GITHUB_ENV
       - name: Get version.txt
         uses: actions/download-artifact@v3
         with:
