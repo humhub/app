@@ -107,20 +107,25 @@ jobs:
     needs: [ build_android ]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: List directory contents
+        run: ls -R build/app/outputs/apk/release
       - name: Upload APK to Google Cloud Storage
         uses: google-github-actions/upload-cloud-storage@v2
         with:
           path: build/app/outputs/apk/release/app-release.apk
-          bucket: ${{ secrets.GCP_BUCKET_NAME }}
-          destination: app-release.apk
+          destination: gs://${{ secrets.GCP_BUCKET_NAME }}/app-release.apk
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.PLAYSTORE_ACCOUNT_KEY }}
-
       - name: Run Firebase Test Lab tests
         run: |
           gcloud firebase test android run --type robo --app gs://${{ secrets.GCP_BUCKET_NAME }}/app-release.apk --device model=Pixel4,version=30
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.PLAYSTORE_ACCOUNT_KEY }}
+
 
 #  release_android:
 #    name: Release APK to Google Play
