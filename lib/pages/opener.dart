@@ -137,6 +137,16 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                                           controlLer.helper.onSaved(controlLer.formUrlKey);
                                           _connectInstance();
                                         },
+                                        onChanged: (value) {
+                                          // Calculate the new cursor position
+                                          final cursorPosition = controlLer.urlTextController.selection.baseOffset;
+                                          final trimmedValue = value.trim();
+                                          // Update the text controller and set the new cursor position
+                                          controlLer.urlTextController.value = TextEditingValue(
+                                            text: trimmedValue,
+                                            selection: TextSelection.collapsed(offset: cursorPosition > trimmedValue.length ? trimmedValue.length : cursorPosition),
+                                          );
+                                        },
                                         style: const TextStyle(
                                           decoration: TextDecoration.none,
                                         ),
