@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 class StorageKeys {
-  static String humhubInstance = "humHubInstance";
-  static String lastInstanceUrl = "humHubLastUrl";
+  static String humhubInstance = "humhub_storage_key_02";
 }
 
 class Assets {

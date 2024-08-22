@@ -62,7 +62,7 @@ class _RegisterTokenState extends ConsumerState<_RegisterToken> {
     );
     if (!result.isError) {
       logInfo('Registered Firebase token, caching it name: PushPlugin');
-      ref.read(humHubProvider).setToken(token);
+      ref.read(humHubProvider).setProps(pushToken: token);
     }
   }
 

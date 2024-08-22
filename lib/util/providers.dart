@@ -10,74 +10,93 @@ import 'const.dart';
 
 class HumHubNotifier extends ChangeNotifier {
   final HumHub _humHubInstance;
+  final _storage = const FlutterSecureStorage();
+
+  // Initialize a list to store the last three instances
+  List<HumHub> _lastThreeInstances = [];
 
   HumHubNotifier(this._humHubInstance);
 
-  final _storage = const FlutterSecureStorage();
-
   bool get isHideDialog => _humHubInstance.isHideOpener;
-  Manifest? get manifest => _humHubInstance.manifest;
   String? get randomHash => _humHubInstance.randomHash;
   String? get appVersion => _humHubInstance.appVersion;
   String? get pushToken => _humHubInstance.pushToken;
   Map<String, String> get customHeaders => _humHubInstance.customHeaders;
 
-  void setIsHideOpener(bool isHide) {
-    _humHubInstance.isHideOpener = isHide;
-    _updateSafeStorage();
-    notifyListeners();
-  }
-
-  void setManifest(Manifest manifest) {
-    _humHubInstance.manifest = manifest;
-    _updateSafeStorage();
-    notifyListeners();
-  }
+  // Getters for the last three instances
+  List<HumHub> get lastThreeInstances => _lastThreeInstances;
 
   Future<void> setInstance(HumHub instance) async {
+    // Update the current instance
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     _humHubInstance.manifest = instance.manifest;
     _humHubInstance.isHideOpener = instance.isHideOpener;
     _humHubInstance.randomHash = instance.randomHash;
     _humHubInstance.appVersion = packageInfo.version;
     _humHubInstance.manifestUrl = instance.manifestUrl;
+
+    // Update the list of the last three instances
+    _addInstanceToHistory(instance);
+
     _updateSafeStorage();
     notifyListeners();
   }
 
-  void setHash(String hash) {
-    _humHubInstance.randomHash = hash;
+  Future<void> setProps(
+      {Manifest? manifest, bool? hideOpener, String? randomHash, String? manifestUrl, String? pushToken}) async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    if (manifest != null) _humHubInstance.manifest = manifest;
+    if (hideOpener != null) _humHubInstance.isHideOpener = hideOpener;
+    if (randomHash != null) _humHubInstance.randomHash = randomHash;
+    _humHubInstance.appVersion = packageInfo.version;
+    if (manifestUrl != null) _humHubInstance.manifestUrl = manifestUrl;
+    if (pushToken != null) _humHubInstance.pushToken = pushToken;
+
+    _addInstanceToHistory(_humHubInstance);
+
     _updateSafeStorage();
     notifyListeners();
   }
 
-  void setToken(String token) {
-    _humHubInstance.pushToken = token;
-    _updateSafeStorage();
-    notifyListeners();
+  // Adds a new instance to the history, maintaining a maximum of three instances
+  void _addInstanceToHistory(HumHub instance) {
+    if(instance.manifest == null) return;
+    _lastThreeInstances.insert(0, instance);
+    if (_lastThreeInstances.length > 3) {
+      _lastThreeInstances.removeLast();
+    }
   }
 
+  // Update the secure storage with the list of the last three instances
   _updateSafeStorage() async {
-    final jsonString = json.encode(_humHubInstance.toJson());
-    String lastUrl = _humHubInstance.manifestUrl != null ? _humHubInstance.manifestUrl! : await getLastUrl();
+    final jsonString = json.encode(_lastThreeInstances.map((e) => e.toJson()).toList());
     await _storage.write(key: StorageKeys.humhubInstance, value: jsonString);
-    await _storage.write(key: StorageKeys.lastInstanceUrl, value: lastUrl);
   }
 
+  // Clear the secure storage
   clearSafeStorage() async {
     await _storage.delete(key: StorageKeys.humhubInstance);
   }
 
-  Future<HumHub> getInstance() async {
+  // Retrieve the last three instances from secure storage
+  Future<List<HumHub>> getLastThreeInstances() async {
     var jsonStr = await _storage.read(key: StorageKeys.humhubInstance);
-    HumHub humHub = jsonStr != null ? HumHub.fromJson(json.decode(jsonStr)) : _humHubInstance;
-    setInstance(humHub);
-    return humHub;
+    if (jsonStr != null) {
+      List<dynamic> jsonList = json.decode(jsonStr);
+      _lastThreeInstances = jsonList.map((json) => HumHub.fromJson(json)).toList();
+    }
+    return _lastThreeInstances;
   }
 
-  Future<String> getLastUrl() async {
-    var lastUrl = await _storage.read(key: StorageKeys.lastInstanceUrl);
-    return lastUrl ?? "";
+  // For backward compatibility, retrieve the last instance
+  Future<HumHub> getInstance() async {
+    List<HumHub> instances = await getLastThreeInstances();
+    if (instances.isNotEmpty) {
+      return instances.first;
+    } else {
+      setInstance(_humHubInstance);
+      return _humHubInstance;
+    }
   }
 }
 

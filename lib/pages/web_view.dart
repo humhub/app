@@ -253,14 +253,14 @@ class WebViewAppState extends ConsumerState<WebView> {
   Future<void> _handleJSMessage(ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
     switch (message.action) {
       case ChannelAction.showOpener:
-        ref.read(humHubProvider).setIsHideOpener(false);
+        ref.read(humHubProvider).setProps(hideOpener: false);
         ref.read(humHubProvider).clearSafeStorage();
         FlutterAppBadger.updateBadgeCount(0);
         Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
         break;
       case ChannelAction.hideOpener:
-        ref.read(humHubProvider).setIsHideOpener(true);
-        ref.read(humHubProvider).setHash(HumHub.generateHash(32));
+        ref.read(humHubProvider).setProps(hideOpener: true);
+        ref.read(humHubProvider).setProps(randomHash: HumHub.generateHash(32));
         break;
       case ChannelAction.registerFcmDevice:
         String? token = ref.read(pushTokenProvider).value;

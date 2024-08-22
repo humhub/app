@@ -15,9 +15,16 @@ class HumHub {
   String? randomHash;
   String? appVersion;
   String? pushToken;
+  String? isCurrent;
 
   HumHub(
-      {this.manifest, this.manifestUrl, this.isHideOpener = false, this.randomHash, this.appVersion, this.pushToken});
+      {this.manifest,
+      this.manifestUrl,
+      this.isHideOpener = false,
+      this.randomHash,
+      this.appVersion,
+      this.pushToken,
+      this.isCurrent});
 
   Map<String, dynamic> toJson() => {
         'manifest': manifest?.toJson(),
@@ -26,6 +33,7 @@ class HumHub {
         'randomHash': randomHash,
         'appVersion': appVersion,
         'pushToken': pushToken,
+        'isCurrent': isCurrent,
       };
 
   factory HumHub.fromJson(Map<String, dynamic> json) {
@@ -36,6 +44,7 @@ class HumHub {
       randomHash: json['randomHash'],
       appVersion: json['appVersion'],
       pushToken: json['pushToken'],
+      isCurrent: json['isCurrent'],
     );
   }
 
