@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
@@ -16,6 +15,7 @@ import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/init_from_push.dart';
+import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/push/provider.dart';
@@ -26,6 +26,7 @@ import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../util/show_dialog.dart';
 import '../util/web_view_global_controller.dart';
 
 class WebView extends ConsumerStatefulWidget {
@@ -67,12 +68,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         color: HexColor(manifest.themeColor),
       ),
       onRefresh: () async {
-        if (Platform.isAndroid) {
-          WebViewGlobalController.value?.reload();
-        } else if (Platform.isIOS) {
-          WebViewGlobalController.value
-              ?.loadUrl(urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl()));
-        }
+        WebViewGlobalController.value?.reload();
       },
     );
     authBrowser = AuthInAppBrowser(
@@ -210,38 +206,12 @@ class WebViewAppState extends ConsumerState<WebView> {
     }
     _setAjaxHeadersJQuery(controller);
     LoadingProvider.of(ref).dismissAll();
-    _pullToRefreshController.endRefreshing();
   }
 
   _onProgressChanged(InAppWebViewController controller, int progress) {
     if (progress == 100) {
       _pullToRefreshController.endRefreshing();
     }
-  }
-
-  askForNotificationPermissions() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.notification_permission_popup_title),
-        content: Text(AppLocalizations.of(context)!.notification_permission_popup_content),
-        actions: <Widget>[
-          TextButton(
-            child: Text(AppLocalizations.of(context)!.enable),
-            onPressed: () {
-              AppSettings.openAppSettings();
-              Navigator.pop(context);
-            },
-          ),
-          TextButton(
-            child: Text(AppLocalizations.of(context)!.skip),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-    );
   }
 
   Future<void> _setAjaxHeadersJQuery(InAppWebViewController controller) async {
@@ -266,13 +236,14 @@ class WebViewAppState extends ConsumerState<WebView> {
         String? token = ref.read(pushTokenProvider).value;
         if (token != null) {
           var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          URLRequest request = URLRequest(url: WebUri(message.url!), method: "POST", body: postData);
-          await headlessWebView.webViewController?.loadUrl(urlRequest: request);
+          await headlessWebView.webViewController?.postUrl(url: WebUri(message.url!), postData: postData);
         }
         var status = await Permission.notification.status;
         // status.isDenied: The user has previously denied the notification permission
         // !status.isGranted: The user has never been asked for the notification permission
-        if (status.isDenied || !status.isGranted) askForNotificationPermissions();
+        bool wasAskedBefore = await NotificationPlugin.hasAskedPermissionBefore();
+        // ignore: use_build_context_synchronously
+        if (status != PermissionStatus.granted && !wasAskedBefore) ShowDialog.of(context).notificationPermission();
         break;
       case ChannelAction.updateNotificationCount:
         if (message.count != null) FlutterAppBadger.updateBadgeCount(message.count!);

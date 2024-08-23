@@ -14,5 +14,6 @@ main() async {
   await SecureStorageService.clearSecureStorageOnReinstall();
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
   final app = await HumHub.app(packageInfo.packageName);
+
   runApp(ProviderScope(child: app));
 }

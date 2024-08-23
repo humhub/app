@@ -176,9 +176,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _setAjaxHeadersJQuery(controller);
-    pullToRefreshController.endRefreshing();
     LoadingProvider.of(ref).dismissAll();
-    setState(() {});
   }
 
   void _onLoadStart(InAppWebViewController controller, Uri? url) async {
@@ -189,13 +187,11 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       WebResourceError error) async {
     if (error.description == 'net::ERR_INTERNET_DISCONNECTED') ShowDialog.of(context).noInternetPopup();
     pullToRefreshController.endRefreshing();
-    setState(() {});
   }
 
   void _onProgressChanged(controller, progress) async {
     if (progress == 100) {
       pullToRefreshController.endRefreshing();
-      setState(() {});
     }
   }
 
