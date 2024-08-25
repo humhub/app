@@ -33,7 +33,8 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
   final FormHelper helper = FormHelper();
   // Fade out Logo and opener when redirecting
   bool _visible = true;
-  bool _textFieldAddInfoVisibility = false;
+  bool _textFieldVisibility = false;
+  bool _languageSwitcherVisibility = false;
 
   @override
   void initState() {
@@ -45,9 +46,15 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
     _controllerReverse = _animationReverse;
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      Future.delayed(const Duration(milliseconds: 900), () {
+        setState(() {
+          _textFieldVisibility = true;
+        });
+      });
+
       Future.delayed(const Duration(milliseconds: 700), () {
         setState(() {
-          _textFieldAddInfoVisibility = true;
+          _languageSwitcherVisibility = true;
         });
       });
 
@@ -89,7 +96,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       AnimatedOpacity(
-                        opacity: _visible ? 1.0 : 0.0,
+                        opacity: _languageSwitcherVisibility ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 300),
                         child: const Padding(
                           padding: EdgeInsets.only(top: 10, right: 16),
@@ -104,21 +111,17 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                       ),
                       Expanded(
                         flex: 8,
-                        child: AnimatedOpacity(
-                          opacity: _visible ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 300),
-                          child: SizedBox(
-                            height: 100,
-                            width: 230,
-                            child: Image.asset(Assets.logo),
-                          ),
+                        child: SizedBox(
+                          height: 100,
+                          width: 230,
+                          child: Image.asset(Assets.logo),
                         ),
                       ),
                       Expanded(
                         flex: 12,
                         child: AnimatedOpacity(
-                          opacity: _textFieldAddInfoVisibility ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 500),
+                          opacity: _textFieldVisibility ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 250),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 35),
                             child: Column(
@@ -206,10 +209,12 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                         flex: 4,
                         child: GestureDetector(
                           onTap: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
                             _controller.isActive = true;
                             setState(() {
                               _visible = false;
-                              _textFieldAddInfoVisibility = false;
+                              _textFieldVisibility = false;
+                              _languageSwitcherVisibility = false;
                             });
                             Future.delayed(const Duration(milliseconds: 700)).then((value) {
                               Navigator.push(
@@ -232,7 +237,8 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                                   _visible = true;
                                   Future.delayed(const Duration(milliseconds: 700), () {
                                     setState(() {
-                                      _textFieldAddInfoVisibility = true;
+                                      _textFieldVisibility = true;
+                                      _languageSwitcherVisibility = true;
                                     });
                                   });
                                   _controllerReverse.isActive = true;
@@ -268,6 +274,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
   }
 
   _connectInstance() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     await controlLer.initHumHub();
     if (controlLer.allOk) {
       ref.read(humHubProvider).getInstance().then((value) {
