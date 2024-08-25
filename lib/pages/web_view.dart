@@ -68,7 +68,9 @@ class WebViewAppState extends ConsumerState<WebView> {
         color: HexColor(manifest.themeColor),
       ),
       onRefresh: () async {
-        WebViewGlobalController.value?.reload();
+        WebViewGlobalController.value?.loadUrl(
+          urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl(), headers: _initialRequest.headers),
+        );
       },
     );
     authBrowser = AuthInAppBrowser(
