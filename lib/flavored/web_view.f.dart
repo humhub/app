@@ -53,12 +53,9 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         color: HexColor(instance.manifest.themeColor),
       ),
       onRefresh: () async {
-        if (Platform.isAndroid) {
-          WebViewGlobalController.value?.reload();
-        } else if (Platform.isIOS) {
-          WebViewGlobalController.value
-              ?.loadUrl(urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl()));
-        }
+        WebViewGlobalController.value?.loadUrl(
+          urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl(), headers: _initialRequest.headers),
+        );
       },
     );
   }
@@ -102,15 +99,15 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   }
 
   InAppWebViewSettings get _settings => InAppWebViewSettings(
-    useShouldOverrideUrlLoading: true,
-    useShouldInterceptFetchRequest: true,
-    javaScriptEnabled: true,
-    supportZoom: false,
-    javaScriptCanOpenWindowsAutomatically: true,
-    supportMultipleWindows: true,
-    useHybridComposition: true,
-    allowsInlineMediaPlayback: true,
-  );
+        useShouldOverrideUrlLoading: true,
+        useShouldInterceptFetchRequest: true,
+        javaScriptEnabled: true,
+        supportZoom: false,
+        javaScriptCanOpenWindowsAutomatically: true,
+        supportMultipleWindows: true,
+        useHybridComposition: true,
+        allowsInlineMediaPlayback: true,
+      );
 
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
@@ -173,7 +170,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           .evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
       WebViewGlobalController.value!.evaluateJavascript(
           source:
-          "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+              "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     _setAjaxHeadersJQuery(controller);
     LoadingProvider.of(ref).dismissAll();
@@ -183,8 +180,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     _setAjaxHeadersJQuery(controller);
   }
 
-  void _onLoadError(InAppWebViewController controller, WebResourceRequest request,
-      WebResourceError error) async {
+  void _onLoadError(InAppWebViewController controller, WebResourceRequest request, WebResourceError error) async {
     if (error.description == 'net::ERR_INTERNET_DISCONNECTED') ShowDialog.of(context).noInternetPopup();
     pullToRefreshController.endRefreshing();
   }
