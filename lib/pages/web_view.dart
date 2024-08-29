@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
@@ -41,6 +41,9 @@ class WebViewAppState extends ConsumerState<WebView> {
   late AuthInAppBrowser authBrowser;
   late Manifest manifest;
   late URLRequest _initialRequest;
+  late PullToRefreshController _pullToRefreshController;
+  HeadlessInAppWebView? headlessWebView;
+
   final _settings = InAppWebViewSettings(
     useShouldOverrideUrlLoading: true,
     useShouldInterceptFetchRequest: true,
@@ -51,9 +54,6 @@ class WebViewAppState extends ConsumerState<WebView> {
     useHybridComposition: true,
   );
 
-  late PullToRefreshController _pullToRefreshController;
-
-  HeadlessInAppWebView? headlessWebView;
   @override
   initState() {
     super.initState();
@@ -68,9 +68,13 @@ class WebViewAppState extends ConsumerState<WebView> {
         color: HexColor(manifest.themeColor),
       ),
       onRefresh: () async {
-        WebViewGlobalController.value?.loadUrl(
-          urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl(), headers: _initialRequest.headers),
-        );
+        if (Platform.isAndroid) {
+          WebViewGlobalController.value?.reload();
+        } else if (Platform.isIOS) {
+          WebViewGlobalController.value?.loadUrl(
+              urlRequest: URLRequest(
+                  url: await WebViewGlobalController.value?.getUrl(), headers: ref.read(humHubProvider).customHeaders));
+        }
       },
     );
     authBrowser = AuthInAppBrowser(
@@ -93,83 +97,15 @@ class WebViewAppState extends ConsumerState<WebView> {
             shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
             onWebViewCreated: _onWebViewCreated,
             shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
-            onCreateWindow: (inAppWebViewController, createWindowAction) async {
-              final urlToOpen = createWindowAction.request.url;
-
-              if (urlToOpen == null) return Future.value(false); // Don't create a new window.
-
-              if (await canLaunchUrl(urlToOpen)) {
-                await launchUrl(urlToOpen,
-                    mode: LaunchMode.externalApplication); // Open the URL in the default browser.
-              } else {
-                logError('Could not launch $urlToOpen');
-              }
-
-              return Future.value(true); // Allow creating a new window.
-            },
+            onCreateWindow: _onCreateWindow,
             onLoadStop: _onLoadStop,
-            onLoadStart: (controller, uri) async {
-              logDebug("onLoadStart");
-              _setAjaxHeadersJQuery(controller);
-            },
+            onLoadStart: _onLoadStart,
             onProgressChanged: _onProgressChanged,
-            onReceivedError: (InAppWebViewController controller, WebResourceRequest request, WebResourceError error) {
-              if (error.description == 'net::ERR_INTERNET_DISCONNECTED') NoConnectionDialog.show(context);
-            },
+            onReceivedError: _onReceivedError,
           ),
         ),
       ),
     );
-  }
-
-  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
-      InAppWebViewController controller, NavigationAction action) async {
-    // 1st check if url is not def. app url and open it in a browser or inApp.
-    _setAjaxHeadersJQuery(controller);
-    final url = action.request.url!.origin;
-    if (!url.startsWith(manifest.baseUrl) && action.isForMainFrame) {
-      authBrowser.launchUrl(action.request);
-      return NavigationActionPolicy.CANCEL;
-    }
-    // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
-    if (Platform.isAndroid ||
-        action.navigationType == NavigationType.LINK_ACTIVATED ||
-        action.navigationType == NavigationType.FORM_SUBMITTED) {
-      Map<String, String> mergedMap = {...?_initialRequest.headers, ...?action.request.headers};
-      URLRequest newRequest = action.request.copyWith(headers: mergedMap);
-      controller.loadUrl(urlRequest: newRequest);
-      return NavigationActionPolicy.CANCEL;
-    }
-    return NavigationActionPolicy.ALLOW;
-  }
-
-  _concludeAuth(URLRequest request) {
-    authBrowser.close();
-    WebViewGlobalController.value!.loadUrl(urlRequest: request);
-  }
-
-  _onWebViewCreated(InAppWebViewController controller) async {
-    LoadingProvider.of(ref).showLoading();
-    headlessWebView = HeadlessInAppWebView();
-    headlessWebView!.run();
-    await controller.addWebMessageListener(
-      WebMessageListener(
-        jsObjectName: "flutterChannel",
-        onPostMessage: (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
-          logInfo(inMessage);
-          ChannelMessage message = ChannelMessage.fromJson(inMessage!.data);
-          await _handleJSMessage(message, headlessWebView!);
-          logDebug('flutterChannel triggered: ${message.type}');
-        },
-      ),
-    );
-    WebViewGlobalController.setValue(controller);
-  }
-
-  Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest request) async {
-    logDebug("_shouldInterceptFetchRequest");
-    request.headers!.addAll(_initialRequest.headers!);
-    return request;
   }
 
   URLRequest get _initRequest {
@@ -197,6 +133,65 @@ class WebViewAppState extends ConsumerState<WebView> {
     return URLRequest(url: WebUri(url ?? manifest.startUrl), headers: ref.read(humHubProvider).customHeaders);
   }
 
+  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
+      InAppWebViewController controller, NavigationAction action) async {
+    // 1st check if url is not def. app url and open it in a browser or inApp.
+    WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
+    final url = action.request.url!.origin;
+    if (!url.startsWith(manifest.baseUrl) && action.isForMainFrame) {
+      authBrowser.launchUrl(action.request);
+      return NavigationActionPolicy.CANCEL;
+    }
+    // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
+    if (Platform.isAndroid ||
+        action.navigationType == NavigationType.LINK_ACTIVATED ||
+        action.navigationType == NavigationType.FORM_SUBMITTED) {
+      Map<String, String> mergedMap = {...?_initialRequest.headers, ...?action.request.headers};
+      URLRequest newRequest = action.request.copyWith(headers: mergedMap);
+      controller.loadUrl(urlRequest: newRequest);
+      return NavigationActionPolicy.CANCEL;
+    }
+    return NavigationActionPolicy.ALLOW;
+  }
+
+  _onWebViewCreated(InAppWebViewController controller) async {
+    LoadingProvider.of(ref).showLoading();
+    headlessWebView = HeadlessInAppWebView();
+    headlessWebView!.run();
+    await controller.addWebMessageListener(
+      WebMessageListener(
+        jsObjectName: "flutterChannel",
+        onPostMessage: (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
+          logInfo(inMessage);
+          ChannelMessage message = ChannelMessage.fromJson(inMessage!.data);
+          await _handleJSMessage(message, headlessWebView!);
+          logDebug('flutterChannel triggered: ${message.type}');
+        },
+      ),
+    );
+    WebViewGlobalController.setValue(controller);
+  }
+
+  Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest request) async {
+    logDebug("_shouldInterceptFetchRequest");
+    request.headers!.addAll(_initialRequest.headers!);
+    return request;
+  }
+
+  Future<bool?> _onCreateWindow(controller, createWindowAction) async {
+    final urlToOpen = createWindowAction.request.url;
+
+    if (urlToOpen == null) return Future.value(false); // Don't create a new window.
+
+    if (await canLaunchUrl(urlToOpen)) {
+      await launchUrl(urlToOpen, mode: LaunchMode.externalApplication); // Open the URL in the default browser.
+    } else {
+      logError('Could not launch $urlToOpen');
+    }
+
+    return Future.value(true); // Allow creating a new window.
+  }
+
   _onLoadStop(InAppWebViewController controller, Uri? url) {
     // Disable remember me checkbox on login and set def. value to true: check if the page is actually login page, if it is inject JS that hides element
     if (url!.path.contains('/user/auth/login')) {
@@ -206,8 +201,12 @@ class WebViewAppState extends ConsumerState<WebView> {
           source:
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
-    _setAjaxHeadersJQuery(controller);
+    WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     LoadingProvider.of(ref).dismissAll();
+  }
+
+  void _onLoadStart(InAppWebViewController controller, Uri? url) async {
+    WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
   }
 
   _onProgressChanged(InAppWebViewController controller, int progress) {
@@ -216,10 +215,13 @@ class WebViewAppState extends ConsumerState<WebView> {
     }
   }
 
-  Future<void> _setAjaxHeadersJQuery(InAppWebViewController controller) async {
-    String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(ref.read(humHubProvider).customHeaders).toString()}});";
-    dynamic jsResponse = await controller.evaluateJavascript(source: jsCode);
-    logInfo(jsResponse != null ? jsResponse.toString() : "Script returned null value");
+  void _onReceivedError(InAppWebViewController controller, WebResourceRequest request, WebResourceError error) {
+    if (error.description == 'net::ERR_INTERNET_DISCONNECTED') NoConnectionDialog.show(context);
+  }
+
+  _concludeAuth(URLRequest request) {
+    authBrowser.close();
+    WebViewGlobalController.value!.loadUrl(urlRequest: request);
   }
 
   Future<void> _handleJSMessage(ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
@@ -235,10 +237,13 @@ class WebViewAppState extends ConsumerState<WebView> {
         ref.read(humHubProvider).setHash(HumHub.generateHash(32));
         break;
       case ChannelAction.registerFcmDevice:
-        String? token = ref.read(pushTokenProvider).value;
+        String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
         if (token != null) {
-          var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          await headlessWebView.webViewController?.postUrl(url: WebUri(message.url!), postData: postData);
+          WebViewGlobalController.ajaxPost(
+            url: message.url!,
+            data: '{ token: \'$token\' }',
+            headers: ref.read(humHubProvider).customHeaders,
+          );
         }
         var status = await Permission.notification.status;
         // status.isDenied: The user has previously denied the notification permission
@@ -251,12 +256,13 @@ class WebViewAppState extends ConsumerState<WebView> {
         if (message.count != null) FlutterAppBadger.updateBadgeCount(message.count!);
         break;
       case ChannelAction.unregisterFcmDevice:
-        String? token = ref.read(pushTokenProvider).value;
+        String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
         if (token != null) {
-          var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          URLRequest request = URLRequest(url: WebUri(message.url!), method: "POST", body: postData);
-          // Works but for admin to see the changes it need to reload a page because a request is called on separate instance.
-          await headlessWebView.webViewController?.loadUrl(urlRequest: request);
+          WebViewGlobalController.ajaxPost(
+            url: message.url!,
+            data: '{ token: \'$token\' }',
+            headers: ref.read(humHubProvider).customHeaders,
+          );
         }
         break;
       case ChannelAction.none:

@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
@@ -53,9 +53,13 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         color: HexColor(instance.manifest.themeColor),
       ),
       onRefresh: () async {
-        WebViewGlobalController.value?.loadUrl(
-          urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl(), headers: _initialRequest.headers),
-        );
+        if (Platform.isAndroid) {
+          WebViewGlobalController.value?.reload();
+        } else if (Platform.isIOS) {
+          WebViewGlobalController.value?.loadUrl(
+              urlRequest:
+                  URLRequest(url: await WebViewGlobalController.value?.getUrl(), headers: instance.customHeaders));
+        }
       },
     );
   }
@@ -112,7 +116,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
-    _setAjaxHeadersJQuery(controller);
+    WebViewGlobalController.ajaxSetHeaders(headers: instance.customHeaders);
     final url = action.request.url!.origin;
     if (!url.startsWith(instance.manifest.baseUrl) && action.isForMainFrame) {
       _authBrowser.launchUrl(action.request);
@@ -172,15 +176,16 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           source:
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
-    _setAjaxHeadersJQuery(controller);
+    WebViewGlobalController.ajaxSetHeaders(headers: instance.customHeaders);
     LoadingProvider.of(ref).dismissAll();
   }
 
   void _onLoadStart(InAppWebViewController controller, Uri? url) async {
-    _setAjaxHeadersJQuery(controller);
+    WebViewGlobalController.ajaxSetHeaders(headers: instance.customHeaders);
   }
 
   void _onLoadError(InAppWebViewController controller, WebResourceRequest request, WebResourceError error) async {
+    logError(error);
     if (error.description == 'net::ERR_INTERNET_DISCONNECTED') ShowDialog.of(context).noInternetPopup();
     pullToRefreshController.endRefreshing();
   }
@@ -196,19 +201,16 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     WebViewGlobalController.value!.loadUrl(urlRequest: request);
   }
 
-  Future<void> _setAjaxHeadersJQuery(InAppWebViewController controller) async {
-    String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(instance.customHeaders).toString()}});";
-    dynamic jsResponse = await controller.evaluateJavascript(source: jsCode);
-    logInfo(jsResponse != null ? jsResponse.toString() : "Script returned null value");
-  }
-
   Future<void> _handleJSMessage(ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
     switch (message.action) {
       case ChannelAction.registerFcmDevice:
-        String? token = ref.read(pushTokenProvider).value;
+        String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
         if (token != null) {
-          var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          await headlessWebView.webViewController?.postUrl(url: WebUri(message.url!), postData: postData);
+          WebViewGlobalController.ajaxPost(
+            url: message.url!,
+            data: '{ token: \'$token\' }',
+            headers: instance.customHeaders,
+          );
         }
         var status = await Permission.notification.status;
         // status.isDenied: The user has previously denied the notification permission
@@ -223,10 +225,11 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       case ChannelAction.unregisterFcmDevice:
         String? token = ref.read(pushTokenProvider).value;
         if (token != null) {
-          var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          URLRequest request = URLRequest(url: WebUri(message.url!), method: "POST", body: postData);
-          // Works but for admin to see the changes it need to reload a page because a request is called on separate instance.
-          await headlessWebView.webViewController?.loadUrl(urlRequest: request);
+          WebViewGlobalController.ajaxPost(
+            url: message.url!,
+            data: '{ token: \'$token\' }',
+            headers: instance.customHeaders,
+          );
         }
         break;
       default:
