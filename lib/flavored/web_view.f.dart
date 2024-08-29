@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
@@ -53,9 +54,13 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         color: HexColor(instance.manifest.themeColor),
       ),
       onRefresh: () async {
-        WebViewGlobalController.value?.loadUrl(
-          urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl(), headers: _initialRequest.headers),
-        );
+        if (Platform.isAndroid) {
+          WebViewGlobalController.value?.reload();
+        } else if (Platform.isIOS) {
+          WebViewGlobalController.value?.loadUrl(
+              urlRequest:
+                  URLRequest(url: await WebViewGlobalController.value?.getUrl(), headers: instance.customHeaders));
+        }
       },
     );
   }
@@ -181,6 +186,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   }
 
   void _onLoadError(InAppWebViewController controller, WebResourceRequest request, WebResourceError error) async {
+    logError(error);
     if (error.description == 'net::ERR_INTERNET_DISCONNECTED') ShowDialog.of(context).noInternetPopup();
     pullToRefreshController.endRefreshing();
   }
@@ -205,10 +211,29 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   Future<void> _handleJSMessage(ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
     switch (message.action) {
       case ChannelAction.registerFcmDevice:
-        String? token = ref.read(pushTokenProvider).value;
+        String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
         if (token != null) {
-          var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          await headlessWebView.webViewController?.postUrl(url: WebUri(message.url!), postData: postData);
+          String jsonHeaders = jsonEncode(instance.customHeaders);
+          String jsCode4 = """
+                  \$.ajax({
+                      url: '${message.url!}',
+                      type: 'POST',
+                      data: { token: '$token' },
+                      headers: $jsonHeaders,
+                      async: false, // IMPORTANT: it needs to be async
+                      success: function(data) {
+                          console.log('MD-1222');
+                      },
+                      error: function(xhr, status, error) {
+                          console.log('MD-1333');
+                          console.log(error);
+                          console.log(status);
+                          console.log(xhr);
+                      }
+                  });
+            """;
+
+          WebViewGlobalController.value?.evaluateJavascript(source: jsCode4);
         }
         var status = await Permission.notification.status;
         // status.isDenied: The user has previously denied the notification permission
