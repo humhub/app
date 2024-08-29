@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -257,12 +256,13 @@ class WebViewAppState extends ConsumerState<WebView> {
         if (message.count != null) FlutterAppBadger.updateBadgeCount(message.count!);
         break;
       case ChannelAction.unregisterFcmDevice:
-        String? token = ref.read(pushTokenProvider).value;
+        String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
         if (token != null) {
-          var postData = Uint8List.fromList(utf8.encode("token=$token"));
-          URLRequest request = URLRequest(url: WebUri(message.url!), method: "POST", body: postData);
-          // Works but for admin to see the changes it need to reload a page because a request is called on separate instance.
-          await headlessWebView.webViewController?.loadUrl(urlRequest: request);
+          WebViewGlobalController.ajaxPost(
+            url: message.url!,
+            data: '{ token: \'$token\' }',
+            headers: ref.read(humHubProvider).customHeaders,
+          );
         }
         break;
       case ChannelAction.none:
