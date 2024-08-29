@@ -137,7 +137,7 @@ class WebViewAppState extends ConsumerState<WebView> {
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
-    _setAjaxHeadersJQuery(controller);
+    WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     final url = action.request.url!.origin;
     if (!url.startsWith(manifest.baseUrl) && action.isForMainFrame) {
       authBrowser.launchUrl(action.request);
@@ -202,12 +202,12 @@ class WebViewAppState extends ConsumerState<WebView> {
           source:
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
-    _setAjaxHeadersJQuery(controller);
+    WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     LoadingProvider.of(ref).dismissAll();
   }
 
   void _onLoadStart(InAppWebViewController controller, Uri? url) async {
-    _setAjaxHeadersJQuery(controller);
+    WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
   }
 
   _onProgressChanged(InAppWebViewController controller, int progress) {
@@ -225,12 +225,6 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.value!.loadUrl(urlRequest: request);
   }
 
-  Future<void> _setAjaxHeadersJQuery(InAppWebViewController controller) async {
-    String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(ref.read(humHubProvider).customHeaders).toString()}});";
-    dynamic jsResponse = await controller.evaluateJavascript(source: jsCode);
-    logInfo(jsResponse != null ? jsResponse.toString() : "Script returned null value");
-  }
-
   Future<void> _handleJSMessage(ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
     switch (message.action) {
       case ChannelAction.showOpener:
@@ -246,27 +240,11 @@ class WebViewAppState extends ConsumerState<WebView> {
       case ChannelAction.registerFcmDevice:
         String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
         if (token != null) {
-          String jsonHeaders = jsonEncode(ref.read(humHubProvider).customHeaders);
-          String jsCode4 = """
-                  \$.ajax({
-                      url: '${message.url!}',
-                      type: 'POST',
-                      data: { token: '$token' },
-                      headers: $jsonHeaders,
-                      async: false, // IMPORTANT: it needs to be async
-                      success: function(data) {
-                          console.log('MD-1222');
-                      },
-                      error: function(xhr, status, error) {
-                          console.log('MD-1333');
-                          console.log(error);
-                          console.log(status);
-                          console.log(xhr);
-                      }
-                  });
-            """;
-
-          WebViewGlobalController.value?.evaluateJavascript(source: jsCode4);
+          WebViewGlobalController.ajaxPost(
+            url: message.url!,
+            data: '{ token: \'$token\' }',
+            headers: ref.read(humHubProvider).customHeaders,
+          );
         }
         var status = await Permission.notification.status;
         // status.isDenied: The user has previously denied the notification permission
