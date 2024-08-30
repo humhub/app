@@ -28,3 +28,18 @@ humhub/app-flavored@master:
   - l10n.yaml
   - pubspec.lock
   - pubspec.yaml
+humhub/app-inforisque-leclub@master:
+  - source: assets/
+    deleteOrphaned: true
+    exclude: |
+      .env
+  - source: lib/
+    deleteOrphaned: true
+  - source: test/
+    deleteOrphaned: true
+  - .gitignore
+  - .metadata
+  - analysis_options.yaml
+  - l10n.yaml
+  - pubspec.lock
+  - pubspec.yaml
