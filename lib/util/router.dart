@@ -57,7 +57,7 @@ class MyRouter {
   };
 
   static Future<String> getInitialRoute(WidgetRef ref) async {
-    HumHub humhub = await ref.read(humHubProvider).getInstance();
+    HumHub humhub = ref.watch(humHubProvider).instance;
     await Future.delayed(const Duration(milliseconds: 500));
     RedirectAction action = await humhub.action(ref);
     switch (action) {

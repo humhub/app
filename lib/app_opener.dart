@@ -4,6 +4,7 @@ import 'package:humhub/util/intent/intent_plugin.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/override_locale.dart';
+import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/router.dart';
 import 'package:humhub/util/storage_service.dart';
@@ -17,6 +18,13 @@ class OpenerApp extends ConsumerStatefulWidget {
 }
 
 class OpenerAppState extends ConsumerState<OpenerApp> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(humHubProvider).init();
+    });
+  }
   @override
   Widget build(BuildContext context) {
     SecureStorageService.clearSecureStorageOnReinstall();

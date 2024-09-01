@@ -21,6 +21,9 @@ class HumHubNotifier extends ChangeNotifier {
   String? get randomHash => _humHubInstance.randomHash;
   String? get appVersion => _humHubInstance.appVersion;
   String? get pushToken => _humHubInstance.pushToken;
+  Manifest? get manifest => _humHubInstance.manifest;
+  String? get manifestUrl => _humHubInstance.manifestUrl;
+  HumHub get instance => _humHubInstance;
   Map<String, String> get customHeaders => _humHubInstance.customHeaders;
 
   // Getters for the last three instances
@@ -60,7 +63,7 @@ class HumHubNotifier extends ChangeNotifier {
 
   // Adds a new instance to the history, maintaining a maximum of three instances
   void _addInstanceToHistory(HumHub instance) {
-    if(instance.manifest == null) return;
+    if (instance.manifest == null) return;
     _lastThreeInstances.insert(0, instance);
     if (_lastThreeInstances.length > 3) {
       _lastThreeInstances.removeLast();
@@ -79,24 +82,16 @@ class HumHubNotifier extends ChangeNotifier {
   }
 
   // Retrieve the last three instances from secure storage
-  Future<List<HumHub>> getLastThreeInstances() async {
+  Future<void> init() async {
     var jsonStr = await _storage.read(key: StorageKeys.humhubInstance);
     if (jsonStr != null) {
       List<dynamic> jsonList = json.decode(jsonStr);
       _lastThreeInstances = jsonList.map((json) => HumHub.fromJson(json)).toList();
+      if (_lastThreeInstances.isNotEmpty) {
+         setInstance(_lastThreeInstances.first);
+      }
     }
-    return _lastThreeInstances;
-  }
-
-  // For backward compatibility, retrieve the last instance
-  Future<HumHub> getInstance() async {
-    List<HumHub> instances = await getLastThreeInstances();
-    if (instances.isNotEmpty) {
-      return instances.first;
-    } else {
-      setInstance(_humHubInstance);
-      return _humHubInstance;
-    }
+    notifyListeners();
   }
 }
 

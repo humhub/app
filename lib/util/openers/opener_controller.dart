@@ -88,7 +88,7 @@ class OpenerController {
       Manifest manifest = asyncData!.value!;
       // Set the manifestStateProvider with the manifest value so that it's globally accessible
       // Generate hash and save it to store
-      String? lastUrl = (await ref.read(humHubProvider).getInstance()).manifestUrl ?? "";
+      String? lastUrl = ref.watch(humHubProvider).manifestUrl ?? "";
       String currentUrl = urlTextController.text;
       String hash = HumHub.generateHash(32);
       if (lastUrl == currentUrl) hash = ref.read(humHubProvider).randomHash ?? hash;

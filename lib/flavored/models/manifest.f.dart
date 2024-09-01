@@ -15,7 +15,8 @@ class ManifestF extends Manifest {
             shortName: shortName,
             name: name,
             backgroundColor: backgroundColor,
-            themeColor: themeColor);
+            themeColor: themeColor,
+            icons: []);
 
   factory ManifestF.fromEnv() {
     return ManifestF(
