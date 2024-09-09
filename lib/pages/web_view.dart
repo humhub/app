@@ -140,16 +140,6 @@ class WebViewAppState extends ConsumerState<WebView> {
       InAppWebViewController controller, NavigationAction action) async {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
 
-    // Download
-    /*if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
-      final shouldPerformDownload = action.shouldPerformDownload ?? false;
-      final url = action.request.url;
-      if (shouldPerformDownload && url != null) {
-        await downloadFile(context, url.toString());
-        return NavigationActionPolicy.DOWNLOAD;
-      }
-    }*/
-
     //Open in external browser
     final url = action.request.url!.origin;
     if (!url.startsWith(manifest.baseUrl) && action.isForMainFrame) {
