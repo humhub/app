@@ -87,17 +87,6 @@
                android:value="androidx.startup"
                tools:node="remove" />
        </provider>
-
-       <!-- declare customized Initializer -->
-       <provider
-           android:name="vn.hunghd.flutterdownloader.FlutterDownloaderInitializer"
-           android:authorities="${applicationId}.flutter-downloader-init"
-           android:exported="false">
-           <!-- change this number to configure the maximum number of concurrent tasks -->
-           <meta-data
-               android:name="vn.hunghd.flutterdownloader.MAX_CONCURRENT_TASKS"
-               android:value="5" />
-       </provider>
     </application>
 
 
