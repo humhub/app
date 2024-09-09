@@ -13,7 +13,7 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/extensions.dart';
-import 'package:humhub/util/file_downloader.dart';
+import 'package:humhub/util/file_handler.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/init_from_push.dart';
 import 'package:humhub/util/notifications/plugin.dart';
