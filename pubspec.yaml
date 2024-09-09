@@ -60,6 +60,8 @@ dependencies:
   shared_preferences: ^2.2.2
   intl: any
   flutter_dotenv: ^5.1.0
+  path_provider: ^2.1.4
+  open_file_plus: ^3.4.1+1
 
 dev_dependencies:
   flutter_test:

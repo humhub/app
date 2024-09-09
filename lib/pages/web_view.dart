@@ -13,6 +13,7 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/extensions.dart';
+import 'package:humhub/util/file_downloader.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/init_from_push.dart';
 import 'package:humhub/util/notifications/plugin.dart';
@@ -21,6 +22,7 @@ import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
+import 'package:open_file_plus/open_file_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
@@ -102,6 +104,7 @@ class WebViewAppState extends ConsumerState<WebView> {
             onLoadStart: _onLoadStart,
             onProgressChanged: _onProgressChanged,
             onReceivedError: _onReceivedError,
+            onDownloadStartRequest: _onDownloadStartRequest,
           ),
         ),
       ),
@@ -135,8 +138,19 @@ class WebViewAppState extends ConsumerState<WebView> {
 
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
-    // 1st check if url is not def. app url and open it in a browser or inApp.
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
+
+    // Download
+    /*if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+      final shouldPerformDownload = action.shouldPerformDownload ?? false;
+      final url = action.request.url;
+      if (shouldPerformDownload && url != null) {
+        await downloadFile(context, url.toString());
+        return NavigationActionPolicy.DOWNLOAD;
+      }
+    }*/
+
+    //Open in external browser
     final url = action.request.url!.origin;
     if (!url.startsWith(manifest.baseUrl) && action.isForMainFrame) {
       authBrowser.launchUrl(action.request);
@@ -178,18 +192,22 @@ class WebViewAppState extends ConsumerState<WebView> {
     return request;
   }
 
-  Future<bool?> _onCreateWindow(controller, createWindowAction) async {
-    final urlToOpen = createWindowAction.request.url;
+  Future<bool?> _onCreateWindow(InAppWebViewController controller, CreateWindowAction createWindowAction) async {
+    WebUri? urlToOpen = createWindowAction.request.url;
 
-    if (urlToOpen == null) return Future.value(false); // Don't create a new window.
+    if (urlToOpen == null) return Future.value(false);
+    if (urlToOpen.rawValue.contains('file/download')) {
+      controller.loadUrl(urlRequest: createWindowAction.request);
+      return Future.value(false);
+    }
 
     if (await canLaunchUrl(urlToOpen)) {
-      await launchUrl(urlToOpen, mode: LaunchMode.externalApplication); // Open the URL in the default browser.
+      await launchUrl(urlToOpen, mode: LaunchMode.externalApplication);
     } else {
       logError('Could not launch $urlToOpen');
     }
 
-    return Future.value(true); // Allow creating a new window.
+    return Future.value(true);
   }
 
   _onLoadStop(InAppWebViewController controller, Uri? url) {
@@ -301,6 +319,33 @@ class WebViewAppState extends ConsumerState<WebView> {
       );
       return exitConfirmed ?? false;
     }
+  }
+
+  void _onDownloadStartRequest(InAppWebViewController controller, DownloadStartRequest downloadStartRequest) async {
+    FileHandler(
+        downloadStartRequest: downloadStartRequest,
+        controller: controller,
+        onSuccess: (File file, String filename) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('File downloaded: $filename'),
+              action: SnackBarAction(
+                label: 'Open',
+                onPressed: () {
+                  // Open the downloaded file
+                  OpenFile.open(file.path);
+                },
+              ),
+            ),
+          );
+        },
+        onError: (er) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Something went wrong'),
+            ),
+          );
+        }).download();
   }
 
   @override
