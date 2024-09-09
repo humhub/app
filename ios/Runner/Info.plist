@@ -65,5 +65,7 @@
     </dict>
     <key>LSMinimumSystemVersion</key>
     <string>14.4</string>
+    <key>FLTEnableImpeller</key>
+    <false />
 </dict>
 </plist>

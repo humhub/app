@@ -21,6 +21,8 @@ import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:humhub/util/file_handler.dart';
+import 'package:open_file_plus/open_file_plus.dart';
 
 class WebViewF extends ConsumerStatefulWidget {
   static const String path = '/web_view_f';
@@ -85,6 +87,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
             onLoadStart: _onLoadStart,
             onReceivedError: _onLoadError,
             onProgressChanged: _onProgressChanged,
+            onDownloadStartRequest: _onDownloadStartRequest,
           ),
         ),
       ),
@@ -155,10 +158,14 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     return request;
   }
 
-  Future<bool> _onCreateWindow(inAppWebViewController, createWindowAction) async {
+  Future<bool> _onCreateWindow(InAppWebViewController controller, CreateWindowAction createWindowAction) async {
     logDebug("onCreateWindow");
     final urlToOpen = createWindowAction.request.url;
     if (urlToOpen == null) return Future.value(false);
+    if (urlToOpen.rawValue.contains('file/download')) {
+      controller.loadUrl(urlRequest: createWindowAction.request);
+      return Future.value(false);
+    }
     if (await canLaunchUrl(urlToOpen)) {
       await launchUrl(urlToOpen, mode: LaunchMode.externalApplication);
     } else {
@@ -265,6 +272,33 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       );
       return exitConfirmed ?? false;
     }
+  }
+
+  void _onDownloadStartRequest(InAppWebViewController controller, DownloadStartRequest downloadStartRequest) async {
+    FileHandler(
+        downloadStartRequest: downloadStartRequest,
+        controller: controller,
+        onSuccess: (File file, String filename) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('File downloaded: $filename'),
+              action: SnackBarAction(
+                label: 'Open',
+                onPressed: () {
+                  // Open the downloaded file
+                  OpenFile.open(file.path);
+                },
+              ),
+            ),
+          );
+        },
+        onError: (er) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Something went wrong'),
+            ),
+          );
+        }).download();
   }
 
   @override
