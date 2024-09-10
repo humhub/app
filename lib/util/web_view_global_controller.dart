@@ -1,11 +1,33 @@
 import 'dart:convert';
 
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/util/providers.dart';
 
 class WebViewGlobalController {
   static InAppWebViewController? _value;
 
   static InAppWebViewController? get value => _value;
+
+  /// [openCreateWindowInWebView]
+  ///
+  /// Determines if a URL should open in a new browser window or within the current web view.
+  ///
+  /// - Opens in a new window if:
+  ///   - The URL is for file downloads (`file/file/download` after base URL).
+  ///   - The URL is a @username profile redirect (`/u` after base URL).
+  ///   - The URL is a @space redirect (`/s` after base URL).
+  ///
+  /// [ref] is reference to the app state.
+  /// [url] is the URL to evaluate.
+  /// @return `true` if the URL should open in a new window, `false` otherwise.
+  static bool openCreateWindowInWebView(WidgetRef ref, String url) {
+    String? baseUrl = ref.read(humHubProvider).manifest?.baseUrl;
+    if (url.startsWith('$baseUrl/file/file/download')) return true;
+    if (url.startsWith('$baseUrl/u')) return true;
+    if (url.startsWith('$baseUrl/s')) return true;
+    return false;
+  }
 
   static void setValue(InAppWebViewController newValue) {
     _value = newValue;
@@ -20,15 +42,6 @@ class WebViewGlobalController {
               data: $data,
               headers: $jsonHeaders,
               async: false, // IMPORTANT: it needs to be async
-              success: function(data) {
-                  console.log('MD-1222');
-              },
-              error: function(xhr, status, error) {
-                  console.log('MD-1333');
-                  console.log(error);
-                  console.log(status);
-                  console.log(xhr);
-              }
           });
     """;
     value?.evaluateJavascript(source: jsCode4);
