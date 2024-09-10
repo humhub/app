@@ -186,7 +186,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebUri? urlToOpen = createWindowAction.request.url;
 
     if (urlToOpen == null) return Future.value(false);
-    if (urlToOpen.rawValue.contains('file/download')) {
+    if (WebViewGlobalController.openCreateWindowInWebView(ref, urlToOpen.rawValue)) {
       controller.loadUrl(urlRequest: createWindowAction.request);
       return Future.value(false);
     }
