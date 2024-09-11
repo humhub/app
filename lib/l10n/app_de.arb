@@ -32,7 +32,11 @@
   "web_view_exit_popup_title": "Bist du sicher?",
   "web_view_exit_popup_content": "Möchtest du die App verlassen?",
 
+  "file_download": "Datei heruntergeladen",
+  "generic_error": "Uups! Etwas ist schiefgelaufen.",
+
   "connect": "Verbinden",
+  "open": "Öffnen",
   "cancel": "Abbrechen",
   "url": "URL",
   "back": "Zurück",

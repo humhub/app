@@ -40,6 +40,7 @@ class WebView extends ConsumerStatefulWidget {
 }
 
 class WebViewAppState extends ConsumerState<WebView> {
+
   late AuthInAppBrowser authBrowser;
   late Manifest manifest;
   late URLRequest _initialRequest;
@@ -85,29 +86,29 @@ class WebViewAppState extends ConsumerState<WebView> {
         _concludeAuth(request);
       },
     );
-    // ignore: deprecated_member_use
-    return WillPopScope(
-      onWillPop: () => exitApp(context, ref),
-      child: Scaffold(
-        backgroundColor: HexColor(manifest.themeColor),
-        body: SafeArea(
+
+    return Scaffold(
+      backgroundColor: HexColor(manifest.themeColor),
+      body: SafeArea(
           bottom: false,
-          child: InAppWebView(
-            initialUrlRequest: _initialRequest,
-            initialSettings: _settings,
-            pullToRefreshController: _pullToRefreshController,
-            shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
-            onWebViewCreated: _onWebViewCreated,
-            shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
-            onCreateWindow: _onCreateWindow,
-            onLoadStop: _onLoadStop,
-            onLoadStart: _onLoadStart,
-            onProgressChanged: _onProgressChanged,
-            onReceivedError: _onReceivedError,
-            onDownloadStartRequest: _onDownloadStartRequest,
-          ),
-        ),
-      ),
+          // ignore: deprecated_member_use
+          child: WillPopScope(
+            onWillPop: () => exitApp(context, ref),
+            child: InAppWebView(
+              initialUrlRequest: _initialRequest,
+              initialSettings: _settings,
+              pullToRefreshController: _pullToRefreshController,
+              shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
+              onWebViewCreated: _onWebViewCreated,
+              shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
+              onCreateWindow: _onCreateWindow,
+              onLoadStop: _onLoadStop,
+              onLoadStart: _onLoadStart,
+              onProgressChanged: _onProgressChanged,
+              onReceivedError: _onReceivedError,
+              onDownloadStartRequest: _onDownloadStartRequest,
+            ),
+          )),
     );
   }
 
@@ -316,11 +317,11 @@ class WebViewAppState extends ConsumerState<WebView> {
         downloadStartRequest: downloadStartRequest,
         controller: controller,
         onSuccess: (File file, String filename) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          scaffoldMessengerStateKey.currentState?.showSnackBar(
             SnackBar(
-              content: Text('File downloaded: $filename'),
+              content: Text('${AppLocalizations.of(context)!.file_download}: $filename'),
               action: SnackBarAction(
-                label: 'Open',
+                label: AppLocalizations.of(context)!.open,
                 onPressed: () {
                   // Open the downloaded file
                   OpenFile.open(file.path);
@@ -330,9 +331,9 @@ class WebViewAppState extends ConsumerState<WebView> {
           );
         },
         onError: (er) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Something went wrong'),
+          scaffoldMessengerStateKey.currentState?.showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.generic_error),
             ),
           );
         }).download();

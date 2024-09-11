@@ -8,6 +8,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/app_flavored.dart';
 import 'package:humhub/flavored/models/humhub.f.dart';
+import 'package:humhub/flavored/util/router.f.dart';
 import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/util/extensions.dart';
@@ -159,7 +160,6 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   }
 
   Future<bool> _onCreateWindow(InAppWebViewController controller, CreateWindowAction createWindowAction) async {
-    logDebug("onCreateWindow");
     final urlToOpen = createWindowAction.request.url;
     if (urlToOpen == null) return Future.value(false);
     if (WebViewGlobalController.openCreateWindowInWebView(ref, urlToOpen.rawValue)) {
@@ -279,11 +279,11 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         downloadStartRequest: downloadStartRequest,
         controller: controller,
         onSuccess: (File file, String filename) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          scaffoldMessengerStateKeyF.currentState?.showSnackBar(
             SnackBar(
-              content: Text('File downloaded: $filename'),
+              content: Text('${AppLocalizations.of(context)!.file_download}: $filename'),
               action: SnackBarAction(
-                label: 'Open',
+                label: AppLocalizations.of(context)!.open,
                 onPressed: () {
                   // Open the downloaded file
                   OpenFile.open(file.path);
@@ -293,9 +293,9 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           );
         },
         onError: (er) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Something went wrong'),
+          scaffoldMessengerStateKeyF.currentState?.showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.generic_error),
             ),
           );
         }).download();
