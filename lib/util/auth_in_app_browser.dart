@@ -14,7 +14,8 @@ class AuthInAppBrowser extends InAppBrowser {
   AuthInAppBrowser({required this.manifest, required this.concludeAuth}) {
     settings = InAppBrowserClassSettings(
       browserSettings: InAppBrowserSettings(
-        hideUrlBar: false,
+        hideUrlBar: true,
+        hideToolbarTop: true,
         toolbarTopBackgroundColor: HexColor(manifest.themeColor),
       ),
       webViewSettings: InAppWebViewSettings(
