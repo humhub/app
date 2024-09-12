@@ -41,6 +41,7 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
             child: OverrideLocale(
               builder: (overrideLocale) => Builder(
                 builder: (context) => MaterialApp(
+                  scaffoldMessengerKey: scaffoldMessengerStateKeyF,
                   debugShowCheckedModeBanner: false,
                   initialRoute: RouterF.initRoute,
                   routes: RouterF.routes,

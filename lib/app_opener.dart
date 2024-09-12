@@ -44,10 +44,11 @@ class OpenerAppState extends ConsumerState<OpenerApp> {
                   builder: (context, snap) {
                     if (snap.hasData) {
                       return MaterialApp(
+                        navigatorKey: navigatorKey,
+                        scaffoldMessengerKey: scaffoldMessengerStateKey,
                         debugShowCheckedModeBanner: false,
                         initialRoute: snap.data,
                         routes: MyRouter.routes,
-                        navigatorKey: navigatorKey,
                         localizationsDelegates: AppLocalizations.localizationsDelegates,
                         supportedLocales: AppLocalizations.supportedLocales,
                         locale: overrideLocale,

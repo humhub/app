@@ -1,8 +1,9 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:humhub/flavored/web_view.f.dart';
 
 final GlobalKey<NavigatorState> navigatorKeyF = GlobalKey<NavigatorState>();
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerStateKeyF = GlobalKey<ScaffoldMessengerState>();
 
 NavigatorState? get navigator => navigatorKeyF.currentState;
 

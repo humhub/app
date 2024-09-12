@@ -33,8 +33,11 @@
   "web_view_exit_popup_title": "Are you sure?",
   "web_view_exit_popup_content": "Do you want to exit an App?",
 
+  "file_download": "File downloaded",
+  "generic_error": "Oops! Something went wrong.",
 
   "connect": "Connect",
+  "open": "Open",
   "cancel" : "Cancel",
   "url": "url",
   "back": "Back",
