@@ -23,9 +23,13 @@ class OpenerAppState extends ConsumerState<OpenerApp> {
   void initState() {
     super.initState();
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      final status = await Permission.notification.status;
-      if (!status.isGranted) {
+      final notifications = await Permission.notification.status;
+      if (!notifications.isGranted) {
         await Permission.notification.request();
+      }
+      final storage = await Permission.manageExternalStorage.status;
+      if (!storage.isGranted) {
+        await Permission.storage.request();
       }
     });
   }

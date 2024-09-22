@@ -109,9 +109,9 @@ class FileHandler {
     Directory? directory;
 
     if (Platform.isIOS) {
-      directory = await getApplicationDocumentsDirectory();
+      directory = await getDownloadsDirectory();
     } else {
-      String check = "/storage/emulated/0/Download/";
+      String check = "/storage/emulated/0/Download";
 
       bool dirDownloadExists = await Directory(check).exists();
       if (dirDownloadExists) {
