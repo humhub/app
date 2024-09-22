@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:humhub/util/permission_handler.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class FileHandler {
   final InAppWebViewController controller;
@@ -41,7 +43,14 @@ class FileHandler {
     this.onError,
   });
 
-  download() async {
+  download() {
+    PermissionHandler.runWithPermissionCheck(
+      permissions: [Permission.storage],
+      action: () => _download(),
+    );
+  }
+
+  _download() async {
     try {
       await controller.evaluateJavascript(source: _jsCode);
       await controller.evaluateJavascript(source: "downloadFile('${downloadStartRequest.url.toString()}');");
@@ -109,7 +118,7 @@ class FileHandler {
     Directory? directory;
 
     if (Platform.isIOS) {
-      directory = await getDownloadsDirectory();
+      directory = await getApplicationDocumentsDirectory();
     } else {
       String check = "/storage/emulated/0/Download";
 
@@ -117,7 +126,7 @@ class FileHandler {
       if (dirDownloadExists) {
         directory = Directory(check);
       } else {
-        directory = await getExternalStorageDirectory();
+        directory = await getApplicationDocumentsDirectory();
       }
     }
 

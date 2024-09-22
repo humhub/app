@@ -9,10 +9,8 @@ import 'package:humhub/pages/help/help_android.dart';
 import 'package:humhub/pages/help/help_ios.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/pages/web_view.dart';
+import 'package:humhub/util/const.dart';
 import 'package:humhub/util/providers.dart';
-
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<ScaffoldMessengerState> scaffoldMessengerStateKey = GlobalKey<ScaffoldMessengerState>();
 
 NavigatorState? get navigator => navigatorKey.currentState;
 

@@ -36,6 +36,9 @@
   "file_download": "File downloaded",
   "generic_error": "Oops! Something went wrong.",
 
+  "enable_permissions": "Enable permissions.",
+
+  "settings": "Settings",
   "connect": "Connect",
   "open": "Open",
   "cancel" : "Cancel",

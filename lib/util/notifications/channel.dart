@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/flavored/util/notifications/channel.dart';
 import 'package:humhub/pages/web_view.dart';
+import 'package:humhub/util/const.dart';
 import 'package:humhub/util/notifications/init_from_push.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
-import 'package:humhub/util/router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class NotificationChannel {
