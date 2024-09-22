@@ -89,28 +89,6 @@ class WebViewAppState extends ConsumerState<WebView> {
 
   @override
   Widget build(BuildContext context) {
-    _initialRequest = _initRequest;
-    _pullToRefreshController = PullToRefreshController(
-      settings: PullToRefreshSettings(
-        color: HexColor(manifest.themeColor),
-      ),
-      onRefresh: () async {
-        if (Platform.isAndroid) {
-          WebViewGlobalController.value?.reload();
-        } else if (Platform.isIOS) {
-          WebViewGlobalController.value?.loadUrl(
-              urlRequest: URLRequest(
-                  url: await WebViewGlobalController.value?.getUrl(), headers: ref.read(humHubProvider).customHeaders));
-        }
-      },
-    );
-    authBrowser = AuthInAppBrowser(
-      manifest: manifest,
-      concludeAuth: (URLRequest request) {
-        _concludeAuth(request);
-      },
-    );
-
     return Scaffold(
       backgroundColor: HexColor(manifest.themeColor),
       body: SafeArea(
