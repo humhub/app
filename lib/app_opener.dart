@@ -29,7 +29,7 @@ class OpenerAppState extends ConsumerState<OpenerApp> {
       }
       final storage = await Permission.manageExternalStorage.status;
       if (!storage.isGranted) {
-        await Permission.storage.request();
+        await Permission.manageExternalStorage.request();
       }
     });
   }
