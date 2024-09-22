@@ -40,12 +40,12 @@ class WebView extends ConsumerStatefulWidget {
 }
 
 class WebViewAppState extends ConsumerState<WebView> {
-
   late AuthInAppBrowser authBrowser;
   late Manifest manifest;
   late URLRequest _initialRequest;
   late PullToRefreshController _pullToRefreshController;
   HeadlessInAppWebView? headlessWebView;
+  bool isInit = false;
 
   final _settings = InAppWebViewSettings(
     useShouldOverrideUrlLoading: true,
@@ -58,9 +58,33 @@ class WebViewAppState extends ConsumerState<WebView> {
   );
 
   @override
-  initState() {
-    super.initState();
-    LoadingProvider.of(ref).dismissAll();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!isInit) {
+      _initialRequest = _initRequest;
+      _pullToRefreshController = PullToRefreshController(
+        settings: PullToRefreshSettings(
+          color: HexColor(manifest.themeColor),
+        ),
+        onRefresh: () async {
+          if (Platform.isAndroid) {
+            WebViewGlobalController.value?.reload();
+          } else if (Platform.isIOS) {
+            WebViewGlobalController.value?.loadUrl(
+                urlRequest: URLRequest(
+                    url: await WebViewGlobalController.value?.getUrl(),
+                    headers: ref.read(humHubProvider).customHeaders));
+          }
+        },
+      );
+      authBrowser = AuthInAppBrowser(
+        manifest: manifest,
+        concludeAuth: (URLRequest request) {
+          _concludeAuth(request);
+        },
+      );
+      isInit = true;
+    }
   }
 
   @override
@@ -341,9 +365,8 @@ class WebViewAppState extends ConsumerState<WebView> {
 
   @override
   void dispose() {
+    if (headlessWebView != null) headlessWebView!.dispose();
+    //_pullToRefreshController.dispose();
     super.dispose();
-    if (headlessWebView != null) {
-      headlessWebView!.dispose();
-    }
   }
 }

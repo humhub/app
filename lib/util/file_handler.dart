@@ -39,7 +39,6 @@ class FileHandler {
     required this.onSuccess,
     this.filename,
     this.onError,
-
   });
 
   download() async {

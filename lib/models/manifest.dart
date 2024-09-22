@@ -8,7 +8,13 @@ class Manifest {
   final String backgroundColor;
   final String themeColor;
 
-  Manifest({required this.display, required this.startUrl, required this.shortName, required this.name, required this.backgroundColor, required this.themeColor});
+  Manifest(
+      {required this.display,
+      required this.startUrl,
+      required this.shortName,
+      required this.name,
+      required this.backgroundColor,
+      required this.themeColor});
 
   String get baseUrl {
     Uri url = Uri.parse(startUrl);

@@ -1,18 +1,18 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/components/language_switcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:humhub/pages/help/help_android.dart';
+import 'package:humhub/pages/help/help_ios.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
-import 'package:humhub/util/form_helper.dart';
 import 'package:humhub/util/intent/intent_plugin.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/openers/opener_controller.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:rive/rive.dart';
-import 'help/help_android.dart';
-import 'help/help_ios.dart';
 
 class Opener extends ConsumerStatefulWidget {
   const Opener({Key? key}) : super(key: key);
@@ -23,39 +23,25 @@ class Opener extends ConsumerStatefulWidget {
 }
 
 class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMixin {
-  late OpenerController controlLer;
-
-  late RiveAnimationController _controller;
-  late SimpleAnimation _animation;
-  late RiveAnimationController _controllerReverse;
-  late SimpleAnimation _animationReverse;
-
-  final FormHelper helper = FormHelper();
-  // Fade out Logo and opener when redirecting
-  bool _visible = true;
-  bool _textFieldVisibility = false;
-  bool _languageSwitcherVisibility = false;
+  late OpenerController openerControlLer;
 
   @override
   void initState() {
     super.initState();
-    _animation = SimpleAnimation('animation', autoplay: false);
-    _controller = _animation;
-
-    _animationReverse = SimpleAnimation('animation', autoplay: true);
-    _controllerReverse = _animationReverse;
+    openerControlLer = OpenerController(ref: ref);
+    openerControlLer.setForwardAnimation(SimpleAnimation('animation', autoplay: false));
+    openerControlLer.setReverseAnimation(SimpleAnimation('animation', autoplay: true));
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Delay before showing text field
+      ref.read(visibilityProvider.notifier).toggleVisibility(true);
       Future.delayed(const Duration(milliseconds: 900), () {
-        setState(() {
-          _textFieldVisibility = true;
-        });
+        ref.read(textFieldVisibilityProvider.notifier).toggleVisibility(true);
       });
 
+      // Delay before showing language switcher
       Future.delayed(const Duration(milliseconds: 700), () {
-        setState(() {
-          _languageSwitcherVisibility = true;
-        });
+        ref.read(languageSwitcherVisibilityProvider.notifier).toggleVisibility(true);
       });
 
       String? urlIntent = InitFromIntent.usePayloadForInit();
@@ -67,7 +53,6 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
 
   @override
   Widget build(BuildContext context) {
-    controlLer = OpenerController(ref: ref, helper: helper);
     return Container(
       color: Colors.white,
       child: Stack(
@@ -75,12 +60,12 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
           RiveAnimation.asset(
             Assets.openerAnimationForward,
             fit: BoxFit.fill,
-            controllers: [_controller],
+            controllers: [openerControlLer.animationForwardController],
           ),
           RiveAnimation.asset(
             Assets.openerAnimationReverse,
             fit: BoxFit.fill,
-            controllers: [_controllerReverse],
+            controllers: [openerControlLer.animationReverseController],
           ),
           Scaffold(
             resizeToAvoidBottomInset: true,
@@ -89,14 +74,15 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
               bottom: false,
               top: false,
               child: Form(
-                key: helper.key,
+                key: openerControlLer.helper.key,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 50),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
+                      // Language Switcher visibility
                       AnimatedOpacity(
-                        opacity: _languageSwitcherVisibility ? 1.0 : 0.0,
+                        opacity: ref.watch(languageSwitcherVisibilityProvider) ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 300),
                         child: const Padding(
                           padding: EdgeInsets.only(top: 10, right: 16),
@@ -120,7 +106,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                       Expanded(
                         flex: 12,
                         child: AnimatedOpacity(
-                          opacity: _textFieldVisibility ? 1.0 : 0.0,
+                          opacity: ref.watch(textFieldVisibilityProvider) ? 1.0 : 0.0,
                           duration: const Duration(milliseconds: 250),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 35),
@@ -130,31 +116,33 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                                   future: ref.read(humHubProvider).getLastUrl(),
                                   builder: (context, snapshot) {
                                     if (snapshot.hasData) {
-                                      controlLer.urlTextController.text = snapshot.data!;
+                                      openerControlLer.urlTextController.text = snapshot.data!;
                                       return TextFormField(
                                         keyboardType: TextInputType.url,
-                                        controller: controlLer.urlTextController,
+                                        controller: openerControlLer.urlTextController,
                                         cursorColor: Theme.of(context).textTheme.bodySmall?.color,
-                                        onSaved: controlLer.helper.onSaved(controlLer.formUrlKey),
+                                        onSaved: openerControlLer.helper.onSaved(openerControlLer.formUrlKey),
                                         onEditingComplete: () {
-                                          controlLer.helper.onSaved(controlLer.formUrlKey);
+                                          openerControlLer.helper.onSaved(openerControlLer.formUrlKey);
                                           _connectInstance();
                                         },
                                         onChanged: (value) {
-                                          // Calculate the new cursor position
-                                          final cursorPosition = controlLer.urlTextController.selection.baseOffset;
+                                          final cursorPosition =
+                                              openerControlLer.urlTextController.selection.baseOffset;
                                           final trimmedValue = value.trim();
-                                          // Update the text controller and set the new cursor position
-                                          controlLer.urlTextController.value = TextEditingValue(
+                                          openerControlLer.urlTextController.value = TextEditingValue(
                                             text: trimmedValue,
-                                            selection: TextSelection.collapsed(offset: cursorPosition > trimmedValue.length ? trimmedValue.length : cursorPosition),
+                                            selection: TextSelection.collapsed(
+                                                offset: cursorPosition > trimmedValue.length
+                                                    ? trimmedValue.length
+                                                    : cursorPosition),
                                           );
                                         },
                                         style: const TextStyle(
                                           decoration: TextDecoration.none,
                                         ),
                                         decoration: openerDecoration(context),
-                                        validator: controlLer.validateUrl,
+                                        validator: openerControlLer.validateUrl,
                                         autocorrect: false,
                                       );
                                     }
@@ -177,7 +165,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                       Expanded(
                         flex: 4,
                         child: AnimatedOpacity(
-                          opacity: _visible ? 1.0 : 0.0,
+                          opacity: ref.watch(visibilityProvider) ? 1.0 : 0.0,
                           duration: const Duration(milliseconds: 300),
                           child: Center(
                             child: TextButton(
@@ -209,15 +197,8 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                         flex: 4,
                         child: GestureDetector(
                           onTap: () {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                            _controller.isActive = true;
-                            setState(() {
-                              _visible = false;
-                              _textFieldVisibility = false;
-                              _languageSwitcherVisibility = false;
-                            });
-                            Future.delayed(const Duration(milliseconds: 700)).then((value) {
-                              Navigator.push(
+                            openerControlLer.animationNavigationWrapper(
+                              navigate: () => Navigator.push(
                                 context,
                                 PageRouteBuilder(
                                   transitionDuration: const Duration(milliseconds: 500),
@@ -230,26 +211,11 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                                     );
                                   },
                                 ),
-                              ).then((value) {
-                                setState(() {
-                                  _controller.isActive = true;
-                                  _animation.reset();
-                                  _visible = true;
-                                  Future.delayed(const Duration(milliseconds: 700), () {
-                                    setState(() {
-                                      _textFieldVisibility = true;
-                                      _languageSwitcherVisibility = true;
-                                    });
-                                  });
-                                  _controllerReverse.isActive = true;
-                                });
-                              });
-                              _controllerReverse.isActive = true;
-                              _animationReverse.reset();
-                            });
+                              ),
+                            );
                           },
                           child: AnimatedOpacity(
-                            opacity: _visible ? 1.0 : 0.0,
+                            opacity: ref.watch(visibilityProvider) ? 1.0 : 0.0,
                             duration: const Duration(milliseconds: 300),
                             child: Text(
                               AppLocalizations.of(context)!.opener_need_help,
@@ -275,10 +241,13 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
 
   _connectInstance() async {
     FocusManager.instance.primaryFocus?.unfocus();
-    await controlLer.initHumHub();
-    if (controlLer.allOk) {
-      ref.read(humHubProvider).getInstance().then((value) {
-        Navigator.pushNamed(ref.context, WebView.path, arguments: value.manifest);
+    await openerControlLer.initHumHub();
+    if (openerControlLer.allOk) {
+      ref.read(humHubProvider).getInstance().then((instance) {
+        FocusManager.instance.primaryFocus?.unfocus();
+        openerControlLer.animationNavigationWrapper(
+          navigate: () => Navigator.pushNamed(ref.context, WebView.path, arguments: instance.manifest),
+        );
       });
     }
   }
@@ -302,11 +271,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
 
   @override
   void dispose() {
-    controlLer.urlTextController.dispose();
-    _controller.dispose();
-    _controllerReverse.dispose();
-    _animation.dispose();
-    _animationReverse.dispose();
+    openerControlLer.dispose();
     super.dispose();
   }
 }
