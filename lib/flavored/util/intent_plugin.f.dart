@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/flavored/util/router.f.dart';
 import 'package:humhub/flavored/web_view.f.dart';
+import 'package:humhub/util/const.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:loggy/loggy.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
@@ -68,7 +68,7 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
         if (!mounted) return;
         _latestUri = uri;
         String? redirectUrl = uri?.toString();
-        if (redirectUrl != null && navigatorKeyF.currentState != null) {
+        if (redirectUrl != null && navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         }
         _err = null;
@@ -103,11 +103,11 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
         }
         _latestUri = uri;
         String? redirectUrl = uri.queryParameters['url'];
-        if (redirectUrl != null && navigatorKeyF.currentState != null) {
+        if (redirectUrl != null && navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         } else {
           if (redirectUrl != null) {
-            navigatorKeyF.currentState!.pushNamed(WebViewF.path, arguments: redirectUrl);
+            navigatorKey.currentState!.pushNamed(WebViewF.path, arguments: redirectUrl);
             return;
           }
         }
@@ -125,13 +125,13 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
   Future<bool> tryNavigateWithOpener(String redirectUrl) async {
     LoadingProvider.of(ref).showLoading();
     bool isNewRouteSameAsCurrent = false;
-    navigatorKeyF.currentState!.popUntil((route) {
+    navigatorKey.currentState!.popUntil((route) {
       if (route.settings.name == WebViewF.path) {
         isNewRouteSameAsCurrent = true;
       }
       return true;
     });
-    navigatorKeyF.currentState!.pushNamed(WebViewF.path, arguments: redirectUrl);
+    navigatorKey.currentState!.pushNamed(WebViewF.path, arguments: redirectUrl);
     return isNewRouteSameAsCurrent;
   }
 }

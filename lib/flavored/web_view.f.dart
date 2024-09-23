@@ -8,9 +8,9 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/app_flavored.dart';
 import 'package:humhub/flavored/models/humhub.f.dart';
-import 'package:humhub/flavored/util/router.f.dart';
 import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
+import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/init_from_push.dart';
@@ -279,7 +279,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         downloadStartRequest: downloadStartRequest,
         controller: controller,
         onSuccess: (File file, String filename) {
-          scaffoldMessengerStateKeyF.currentState?.showSnackBar(
+          scaffoldMessengerStateKey.currentState?.showSnackBar(
             SnackBar(
               content: Text('${AppLocalizations.of(context)!.file_download}: $filename'),
               action: SnackBarAction(
@@ -293,7 +293,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           );
         },
         onError: (er) {
-          scaffoldMessengerStateKeyF.currentState?.showSnackBar(
+          scaffoldMessengerStateKey.currentState?.showSnackBar(
             SnackBar(
               content: Text(AppLocalizations.of(context)!.generic_error),
             ),

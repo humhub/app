@@ -6,22 +6,54 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:http/http.dart' as http;
 import 'package:loggy/loggy.dart';
+import 'package:rive/rive.dart';
 import '../api_provider.dart';
 import '../connectivity_plugin.dart';
 import '../form_helper.dart';
 
+// Create a notifier for visibility state
+class VisibilityNotifier extends StateNotifier<bool> {
+  VisibilityNotifier() : super(false); // Default to false
+
+  void toggleVisibility(bool isVisible) {
+    state = isVisible;
+  }
+}
+
+final textFieldVisibilityProvider = StateNotifierProvider<VisibilityNotifier, bool>(
+  (ref) => VisibilityNotifier(),
+);
+
+final languageSwitcherVisibilityProvider = StateNotifierProvider<VisibilityNotifier, bool>(
+  (ref) => VisibilityNotifier(),
+);
+
+final visibilityProvider = StateNotifierProvider<VisibilityNotifier, bool>(
+  (ref) => VisibilityNotifier(),
+);
+
 class OpenerController {
   late AsyncValue<Manifest>? asyncData;
   bool doesViewExist = false;
-  final FormHelper helper;
   TextEditingController urlTextController = TextEditingController();
   late String? postcodeErrorMessage;
   final String formUrlKey = "redirect_url";
   final String error404 = "404";
   final String noConnection = "no_connection";
   final WidgetRef ref;
+  late RiveAnimationController _animationForwardController;
+  late SimpleAnimation _animationForward;
+  late RiveAnimationController _animationReverseController;
+  late SimpleAnimation _animationReverse;
 
-  OpenerController({required this.ref, required this.helper});
+  RiveAnimationController get animationForwardController => _animationForwardController;
+  SimpleAnimation get animationForward => _animationForward;
+  RiveAnimationController get animationReverseController => _animationReverseController;
+  SimpleAnimation get animationReverse => _animationReverse;
+
+  final FormHelper helper = FormHelper();
+
+  OpenerController({required this.ref});
 
   /// Finds the `manifest.json` file associated with the given URL. If the URL does not
   /// directly point to the `manifest.json` file, it traverses up the directory structure
@@ -128,5 +160,49 @@ class OpenerController {
   static Uri assumeUrl(String url) {
     if (url.startsWith("https://") || url.startsWith("http://")) return Uri.parse(url);
     return Uri.parse("https://$url");
+  }
+
+  setForwardAnimation(SimpleAnimation animation) {
+    _animationForward = animation;
+    _animationForwardController = _animationForward;
+  }
+
+  setReverseAnimation(SimpleAnimation animation) {
+    _animationReverse = animation;
+    _animationReverseController = _animationReverse;
+  }
+
+  void animationNavigationWrapper({required Future<void> Function() navigate}) {
+    FocusManager.instance.primaryFocus?.unfocus();
+    _animationForwardController.isActive = true;
+    ref.read(visibilityProvider.notifier).toggleVisibility(false);
+    ref.read(textFieldVisibilityProvider.notifier).toggleVisibility(false);
+    ref.read(languageSwitcherVisibilityProvider.notifier).toggleVisibility(false);
+
+    Future.delayed(const Duration(milliseconds: 700)).then((_) {
+      navigate().then((value) {
+        _animationForwardController.isActive = true;
+        _animationForward.reset();
+        ref.read(visibilityProvider.notifier).toggleVisibility(true);
+
+        Future.delayed(const Duration(milliseconds: 700), () {
+          ref.read(textFieldVisibilityProvider.notifier).toggleVisibility(true);
+          ref.read(languageSwitcherVisibilityProvider.notifier).toggleVisibility(true);
+        });
+
+        _animationReverseController.isActive = true;
+      });
+
+      _animationReverseController.isActive = true;
+      _animationReverse.reset();
+    });
+  }
+
+  dispose() {
+    urlTextController.dispose();
+    _animationForwardController.dispose();
+    _animationReverseController.dispose();
+    _animationForward.dispose();
+    _animationReverse.dispose();
   }
 }

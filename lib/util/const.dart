@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerStateKey = GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class StorageKeys {
   static String humhubInstance = "humHubInstance";
   static String lastInstanceUrl = "humHubLastUrl";

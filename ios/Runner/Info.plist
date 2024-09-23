@@ -67,5 +67,11 @@
     <string>14.4</string>
     <key>FLTEnableImpeller</key>
     <false />
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>We need access to your photo library to save photos and videos.</string>
+    <key>UIFileSharingEnabled</key>
+    <true/>
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
 </dict>
 </plist>

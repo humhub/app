@@ -12,6 +12,7 @@ import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
+import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/file_handler.dart';
 import 'package:humhub/util/loading_provider.dart';
@@ -21,15 +22,14 @@ import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/router.dart';
+import 'package:humhub/util/show_dialog.dart';
+import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-import '../util/show_dialog.dart';
-import '../util/web_view_global_controller.dart';
 
 class WebView extends ConsumerStatefulWidget {
   const WebView({super.key});
@@ -40,12 +40,12 @@ class WebView extends ConsumerStatefulWidget {
 }
 
 class WebViewAppState extends ConsumerState<WebView> {
-
-  late AuthInAppBrowser authBrowser;
-  late Manifest manifest;
+  late AuthInAppBrowser _authBrowser;
+  late Manifest _manifest;
   late URLRequest _initialRequest;
   late PullToRefreshController _pullToRefreshController;
-  HeadlessInAppWebView? headlessWebView;
+  HeadlessInAppWebView? _headlessWebView;
+  bool _isInit = false;
 
   final _settings = InAppWebViewSettings(
     useShouldOverrideUrlLoading: true,
@@ -58,37 +58,39 @@ class WebViewAppState extends ConsumerState<WebView> {
   );
 
   @override
-  initState() {
-    super.initState();
-    LoadingProvider.of(ref).dismissAll();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInit) {
+      _initialRequest = _initRequest;
+      _pullToRefreshController = PullToRefreshController(
+        settings: PullToRefreshSettings(
+          color: HexColor(_manifest.themeColor),
+        ),
+        onRefresh: () async {
+          if (Platform.isAndroid) {
+            WebViewGlobalController.value?.reload();
+          } else if (Platform.isIOS) {
+            WebViewGlobalController.value?.loadUrl(
+                urlRequest: URLRequest(
+                    url: await WebViewGlobalController.value?.getUrl(),
+                    headers: ref.read(humHubProvider).customHeaders));
+          }
+        },
+      );
+      _authBrowser = AuthInAppBrowser(
+        manifest: _manifest,
+        concludeAuth: (URLRequest request) {
+          _concludeAuth(request);
+        },
+      );
+      _isInit = true;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    _initialRequest = _initRequest;
-    _pullToRefreshController = PullToRefreshController(
-      settings: PullToRefreshSettings(
-        color: HexColor(manifest.themeColor),
-      ),
-      onRefresh: () async {
-        if (Platform.isAndroid) {
-          WebViewGlobalController.value?.reload();
-        } else if (Platform.isIOS) {
-          WebViewGlobalController.value?.loadUrl(
-              urlRequest: URLRequest(
-                  url: await WebViewGlobalController.value?.getUrl(), headers: ref.read(humHubProvider).customHeaders));
-        }
-      },
-    );
-    authBrowser = AuthInAppBrowser(
-      manifest: manifest,
-      concludeAuth: (URLRequest request) {
-        _concludeAuth(request);
-      },
-    );
-
     return Scaffold(
-      backgroundColor: HexColor(manifest.themeColor),
+      backgroundColor: HexColor(_manifest.themeColor),
       body: SafeArea(
           bottom: false,
           // ignore: deprecated_member_use
@@ -116,25 +118,25 @@ class WebViewAppState extends ConsumerState<WebView> {
     final args = ModalRoute.of(context)!.settings.arguments;
     String? url;
     if (args is Manifest) {
-      manifest = args;
+      _manifest = args;
     }
     if (args is UniversalOpenerController) {
       UniversalOpenerController controller = args;
       ref.read(humHubProvider).setInstance(controller.humhub);
-      manifest = controller.humhub.manifest!;
+      _manifest = controller.humhub.manifest!;
       url = controller.url;
     }
     if (args == null) {
-      manifest = m.MyRouter.initParams;
+      _manifest = m.MyRouter.initParams;
     }
     if (args is ManifestWithRemoteMsg) {
       ManifestWithRemoteMsg manifestPush = args;
-      manifest = manifestPush.manifest;
+      _manifest = manifestPush.manifest;
       url = manifestPush.remoteMessage.data['url'];
     }
     String? payloadFromPush = InitFromPush.usePayload();
     if (payloadFromPush != null) url = payloadFromPush;
-    return URLRequest(url: WebUri(url ?? manifest.startUrl), headers: ref.read(humHubProvider).customHeaders);
+    return URLRequest(url: WebUri(url ?? _manifest.startUrl), headers: ref.read(humHubProvider).customHeaders);
   }
 
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
@@ -143,8 +145,8 @@ class WebViewAppState extends ConsumerState<WebView> {
 
     //Open in external browser
     final url = action.request.url!.origin;
-    if (!url.startsWith(manifest.baseUrl) && action.isForMainFrame) {
-      authBrowser.launchUrl(action.request);
+    if (!url.startsWith(_manifest.baseUrl) && action.isForMainFrame) {
+      _authBrowser.launchUrl(action.request);
       return NavigationActionPolicy.CANCEL;
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
@@ -161,15 +163,15 @@ class WebViewAppState extends ConsumerState<WebView> {
 
   _onWebViewCreated(InAppWebViewController controller) async {
     LoadingProvider.of(ref).showLoading();
-    headlessWebView = HeadlessInAppWebView();
-    headlessWebView!.run();
+    _headlessWebView = HeadlessInAppWebView();
+    _headlessWebView!.run();
     await controller.addWebMessageListener(
       WebMessageListener(
         jsObjectName: "flutterChannel",
         onPostMessage: (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
           logInfo(inMessage);
           ChannelMessage message = ChannelMessage.fromJson(inMessage!.data);
-          await _handleJSMessage(message, headlessWebView!);
+          await _handleJSMessage(message, _headlessWebView!);
           logDebug('flutterChannel triggered: ${message.type}');
         },
       ),
@@ -229,7 +231,7 @@ class WebViewAppState extends ConsumerState<WebView> {
   }
 
   _concludeAuth(URLRequest request) {
-    authBrowser.close();
+    _authBrowser.close();
     WebViewGlobalController.value!.loadUrl(urlRequest: request);
   }
 
@@ -341,9 +343,8 @@ class WebViewAppState extends ConsumerState<WebView> {
 
   @override
   void dispose() {
+    if (_headlessWebView != null) _headlessWebView!.dispose();
+    //_pullToRefreshController.dispose();
     super.dispose();
-    if (headlessWebView != null) {
-      headlessWebView!.dispose();
-    }
   }
 }

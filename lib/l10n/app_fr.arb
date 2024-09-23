@@ -35,6 +35,9 @@
   "file_download": "Fichier téléchargé",
   "generic_error": "Oups ! Quelque chose s'est mal passé.",
 
+  "enable_permissions": "Activer les autorisations.",
+
+  "settings": "Paramètres",
   "connect": "Connecter",
   "open": "Ouvrir",
   "cancel": "Annuler",

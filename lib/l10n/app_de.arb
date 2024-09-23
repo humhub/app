@@ -35,6 +35,9 @@
   "file_download": "Datei heruntergeladen",
   "generic_error": "Uups! Etwas ist schiefgelaufen.",
 
+  "enable_permissions": "Berechtigungen aktivieren.",
+
+  "settings": "Einstellungen",
   "connect": "Verbinden",
   "open": "Öffnen",
   "cancel": "Abbrechen",

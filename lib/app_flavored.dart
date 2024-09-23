@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/flavored/models/humhub.f.dart';
 import 'package:humhub/flavored/util/intent_plugin.f.dart';
 import 'package:humhub/flavored/util/router.f.dart';
+import 'package:humhub/util/const.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/override_locale.dart';
+import 'package:humhub/util/permission_handler.dart';
 import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/storage_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -24,10 +26,10 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
   void initState() {
     super.initState();
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      final status = await Permission.notification.status;
-      if (!status.isGranted) {
-        await Permission.notification.request();
-      }
+      await PermissionHandler.requestPermissions([
+        Permission.notification,
+        Permission.manageExternalStorage,
+      ]);
     });
   }
 
@@ -41,13 +43,13 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
             child: OverrideLocale(
               builder: (overrideLocale) => Builder(
                 builder: (context) => MaterialApp(
-                  scaffoldMessengerKey: scaffoldMessengerStateKeyF,
+                  scaffoldMessengerKey: scaffoldMessengerStateKey,
                   debugShowCheckedModeBanner: false,
                   initialRoute: RouterF.initRoute,
                   routes: RouterF.routes,
                   localizationsDelegates: AppLocalizations.localizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
-                  navigatorKey: navigatorKeyF,
+                  navigatorKey: navigatorKey,
                   builder: (context, child) => child!,
                   theme: ThemeData(
                     fontFamily: 'OpenSans',
