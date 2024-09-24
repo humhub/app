@@ -5,7 +5,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/util/permission_handler.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class FileHandler {
   final InAppWebViewController controller;
@@ -45,7 +44,7 @@ class FileHandler {
 
   download() {
     PermissionHandler.runWithPermissionCheck(
-      permissions: [Permission.storage],
+      permissions: [],
       action: () => _download(),
     );
   }
@@ -120,7 +119,7 @@ class FileHandler {
     if (Platform.isIOS) {
       directory = await getApplicationDocumentsDirectory();
     } else {
-      String check = "/storage/emulated/0/Download";
+      String check = (await getExternalStorageDirectory())?.path ?? '';
 
       bool dirDownloadExists = await Directory(check).exists();
       if (dirDownloadExists) {

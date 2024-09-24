@@ -28,7 +28,6 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       await PermissionHandler.requestPermissions([
         Permission.notification,
-        Permission.manageExternalStorage,
       ]);
     });
   }
