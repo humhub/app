@@ -27,7 +27,6 @@ class OpenerAppState extends ConsumerState<OpenerApp> {
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       await PermissionHandler.requestPermissions([
         Permission.notification,
-        Permission.manageExternalStorage,
       ]);
     });
   }
