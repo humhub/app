@@ -143,6 +143,7 @@ class WebViewAppState extends ConsumerState<WebView> {
 
     //Open in external browser
     final url = action.request.url!.rawValue;
+
     /// First BLOCK everything that rules out as blocked.
     if (BlackListRules.check(url)) {
       return NavigationActionPolicy.CANCEL;
@@ -195,7 +196,11 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebUri? urlToOpen = createWindowAction.request.url;
 
     if (urlToOpen == null) return Future.value(false);
-    if (WebViewGlobalController.openCreateWindowInWebView(ref, urlToOpen.rawValue)) {
+    if (WebViewGlobalController.openCreateWindowInWebView(
+
+      url: urlToOpen.rawValue,
+      manifest: ref.read(humHubProvider).manifest!,
+    )) {
       controller.loadUrl(urlRequest: createWindowAction.request);
       return Future.value(false);
     }

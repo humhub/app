@@ -160,7 +160,8 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   Future<bool> _onCreateWindow(InAppWebViewController controller, CreateWindowAction createWindowAction) async {
     final urlToOpen = createWindowAction.request.url;
     if (urlToOpen == null) return Future.value(false);
-    if (WebViewGlobalController.openCreateWindowInWebView(ref, urlToOpen.rawValue)) {
+    if (WebViewGlobalController.openCreateWindowInWebView(
+       url: urlToOpen.rawValue, manifest: instance.manifest)) {
       controller.loadUrl(urlRequest: createWindowAction.request);
       return Future.value(false);
     }
