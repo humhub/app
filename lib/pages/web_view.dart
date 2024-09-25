@@ -11,6 +11,7 @@ import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener.dart';
+import 'package:humhub/util/black_list_rules.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
@@ -144,9 +145,17 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
 
     //Open in external browser
-    final url = action.request.url!.origin;
+    final url = action.request.url!.rawValue;
+    /// First BLOCK everything that rules out as blocked.
+    if (BlackListRules.check(url)) {
+      return NavigationActionPolicy.CANCEL;
+    }
     if (!url.startsWith(_manifest.baseUrl) && action.isForMainFrame) {
       _authBrowser.launchUrl(action.request);
+      return NavigationActionPolicy.CANCEL;
+    }
+    if (!action.isForMainFrame) {
+      await launchUrl(action.request.url!.uriValue, mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers

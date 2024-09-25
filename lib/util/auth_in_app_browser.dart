@@ -14,10 +14,11 @@ class AuthInAppBrowser extends InAppBrowser {
   AuthInAppBrowser({required this.manifest, required this.concludeAuth}) {
     settings = InAppBrowserClassSettings(
       browserSettings: InAppBrowserSettings(
-        hideUrlBar: true,
-        hideToolbarTop: true,
-        toolbarTopBackgroundColor: HexColor(manifest.themeColor),
-      ),
+          hideUrlBar: true,
+          shouldCloseOnBackButtonPressed: true,
+          toolbarTopBackgroundColor: HexColor(manifest.themeColor),
+          toolbarTopTintColor: HexColor(manifest.themeColor),
+          presentationStyle: ModalPresentationStyle.OVER_FULL_SCREEN),
       webViewSettings: InAppWebViewSettings(
           javaScriptEnabled: true,
           useShouldOverrideUrlLoading: true,
