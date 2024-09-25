@@ -10,6 +10,7 @@ import 'package:humhub/app_flavored.dart';
 import 'package:humhub/flavored/models/humhub.f.dart';
 import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
+import 'package:humhub/util/black_list_rules.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/loading_provider.dart';
@@ -35,8 +36,9 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   late AuthInAppBrowser _authBrowser;
   HeadlessInAppWebView? headlessWebView;
   late HumHubF instance;
-
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   late PullToRefreshController pullToRefreshController;
+  late double downloadProgress = 0;
 
   @override
   void initState() {
@@ -71,6 +73,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     return WillPopScope(
       onWillPop: () => exitApp(context, ref),
       child: Scaffold(
+        key: _scaffoldKey,
         backgroundColor: HexColor(instance.manifest.themeColor),
         body: SafeArea(
           bottom: false,
@@ -119,9 +122,20 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
     WebViewGlobalController.ajaxSetHeaders(headers: instance.customHeaders);
-    final url = action.request.url!.origin;
+    final url = action.request.url!.rawValue;
+
+    /// First BLOCK everything that rules out as blocked.
+    if (BlackListRules.check(url)) {
+      return NavigationActionPolicy.CANCEL;
+    }
+    // For SSO
     if (!url.startsWith(instance.manifest.baseUrl) && action.isForMainFrame) {
       _authBrowser.launchUrl(action.request);
+      return NavigationActionPolicy.CANCEL;
+    }
+    // For all other external links
+    if (!url.startsWith(instance.manifest.baseUrl) && !action.isForMainFrame) {
+      await launchUrl(action.request.url!.uriValue, mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
@@ -160,8 +174,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   Future<bool> _onCreateWindow(InAppWebViewController controller, CreateWindowAction createWindowAction) async {
     final urlToOpen = createWindowAction.request.url;
     if (urlToOpen == null) return Future.value(false);
-    if (WebViewGlobalController.openCreateWindowInWebView(
-       url: urlToOpen.rawValue, manifest: instance.manifest)) {
+    if (WebViewGlobalController.openCreateWindowInWebView(url: urlToOpen.rawValue, manifest: instance.manifest)) {
       controller.loadUrl(urlRequest: createWindowAction.request);
       return Future.value(false);
     }
@@ -268,30 +281,111 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   }
 
   void _onDownloadStartRequest(InAppWebViewController controller, DownloadStartRequest downloadStartRequest) async {
+    PersistentBottomSheetController? persistentController;
+    //bool isBottomSheetVisible = false;
+
+    // Initialize the download progress
+    downloadProgress = 0;
+
+    // Timer to control when to show the bottom sheet
+    Timer? downloadTimer;
+    bool isDone = false;
+
     FileHandler(
-        downloadStartRequest: downloadStartRequest,
-        controller: controller,
-        onSuccess: (File file, String filename) {
-          scaffoldMessengerStateKey.currentState?.showSnackBar(
-            SnackBar(
-              content: Text('${AppLocalizations.of(context)!.file_download}: $filename'),
-              action: SnackBarAction(
-                label: AppLocalizations.of(context)!.open,
-                onPressed: () {
-                  // Open the downloaded file
-                  OpenFile.open(file.path);
-                },
-              ),
+      downloadStartRequest: downloadStartRequest,
+      controller: controller,
+      onSuccess: (File file, String filename) async {
+        // Hide the bottom sheet if it is visible
+        Navigator.popUntil(context, ModalRoute.withName(WebViewF.path));
+        isDone = true;
+        scaffoldMessengerStateKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text('${AppLocalizations.of(context)!.file_download}: $filename'),
+            action: SnackBarAction(
+              label: AppLocalizations.of(context)!.open,
+              onPressed: () {
+                OpenFile.open(file.path);
+              },
             ),
-          );
-        },
-        onError: (er) {
-          scaffoldMessengerStateKey.currentState?.showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context)!.generic_error),
-            ),
-          );
-        }).download();
+          ),
+        );
+      },
+      onStart: () async {
+        downloadProgress = 0;
+        // Start the timer for 1 second
+        downloadTimer = Timer(const Duration(seconds: 1), () {
+          // Show the persistent bottom sheet if not already shown
+          if (!isDone) {
+            persistentController = _scaffoldKey.currentState!.showBottomSheet((context) {
+              return Container(
+                width: MediaQuery.of(context).size.width,
+                height: 100,
+                color: const Color(0xff313033),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "${AppLocalizations.of(context)!.downloading}...",
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          CircularProgressIndicator(
+                            value: downloadProgress / 100,
+                            backgroundColor: Colors.grey,
+                            color: Colors.green,
+                          ),
+                          downloadProgress.toStringAsFixed(0) == "100"
+                              ? const Icon(
+                                  Icons.check,
+                                  color: Colors.green,
+                                  size: 25,
+                                )
+                              : Text(
+                                  downloadProgress.toStringAsFixed(0),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            });
+          }
+        });
+      },
+      onProgress: (progress) async {
+        downloadProgress = progress;
+        if (persistentController != null) {
+          persistentController!.setState!(() {});
+        }
+      },
+      onError: (er) {
+        downloadTimer?.cancel();
+        if (persistentController != null) {
+          Navigator.popUntil(context, ModalRoute.withName(WebViewF.path));
+        }
+        scaffoldMessengerStateKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.generic_error),
+          ),
+        );
+      },
+    ).download();
+
+    // Ensure to cancel the timer if download finishes before 1 second
+    Future.delayed(const Duration(seconds: 1), () {
+      if (downloadProgress >= 100) {
+        downloadTimer?.cancel();
+      }
+    });
   }
 
   @override
