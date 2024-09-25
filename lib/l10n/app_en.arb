@@ -24,9 +24,6 @@
   "more_info_pro_edition": "Professional Edition",
   "more_info_pro_edition_url": "https://www.humhub.com/en/professional-edition",
 
-  "notification_permission_popup_title": "Notification Permission",
-  "notification_permission_popup_content": "Please enable notifications for HumHub in the device settings",
-
   "connectivity_popup_title": "No Connection",
   "connectivity_popup_content": "Please check your internet connection and try again.",
 

@@ -6,10 +6,37 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PermissionHandler {
-  // Static method that takes a list of permissions and handles requests
-  static Future<void> requestPermissions(List<Permission> permissions) async => await permissions.request();
+  /// A static method that takes a list of permissions and handles permission requests.
+  /// It only requests permissions that have not yet been granted ([permission.isGranted]) and are not permanently denied ([permission.isPermanentlyDenied]).
+  ///
+  /// **Android:** This will be triggered every time if the user closes the permission modal without providing input.
+  /// **iOS:** Permissions will only be requested once, as the modal is required before continuing.
+  /// [permissions] - A list of [Permission] objects to be requested.
+  /// This method ensures that unnecessary permission requests are avoided, improving user experience.
+  static Future<void> requestPermissions(List<Permission> permissions) async {
+    // Filter permissions asynchronously
+    List<Permission> toRequest = [];
+    for (var permission in permissions) {
+      if (!(await permission.isGranted) && !(await permission.isPermanentlyDenied)) {
+        toRequest.add(permission);
+      }
+    }
+    // Request the permissions that are not granted
+    if (toRequest.isNotEmpty) {
+      await toRequest.request();
+    }
+  }
 
-  // Static method to check permissions before executing a function
+  /// A static method to check if all the necessary permissions are granted before executing a given action.
+  ///
+  /// If all required permissions are granted, the provided [action] is executed.
+  /// If any permissions are missing on Android, a [SnackBar] is shown informing the user to enable the required permissions.
+  /// **Parameters:**
+  /// - [permissions]: A list of [Permission] objects that need to be checked.
+  /// - [action]: A callback function that will be executed if the required permissions are granted.
+  /// **Android:** If the user closes the permissions dialog without providing input, the method won't proceed with the action.
+  /// **iOS:** Permissions are required before continuing, so the action will proceed automatically once permissions are granted.
+  /// If permissions are not granted, the user will be prompted to open the app settings.
   static Future<void> runWithPermissionCheck({
     required List<Permission> permissions,
     required Function action,

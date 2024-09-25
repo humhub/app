@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/notifications/service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationPlugin extends StatefulWidget {
   final Widget child;
@@ -16,14 +15,6 @@ class NotificationPlugin extends StatefulWidget {
       'Place NotificationPlugin widget as high in widget tree as possible.',
     );
     return plugin!;
-  }
-
-  static Future<bool> hasAskedPermissionBefore() async {
-    String key = 'was_asked_before';
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var data = prefs.getBool(key) ?? false;
-    prefs.setBool(key, true);
-    return data;
   }
 
   @override

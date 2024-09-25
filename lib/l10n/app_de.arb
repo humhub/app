@@ -23,9 +23,6 @@
   "more_info_pro_edition": "Professional Edition",
   "more_info_pro_edition_url": "https://www.humhub.com/de/professional-edition",
 
-  "notification_permission_popup_title": "Benachrichtigungen empfangen",
-  "notification_permission_popup_content": "Bitte aktiviere Benachrichtigungen für die HumHub App in deinen Geräteeinstellungen.",
-
   "connectivity_popup_title": "Keine Verbindung möglich.",
   "connectivity_popup_content": "Bitte überprüfe deine Internetverbindung und versuche es erneut.",
 
