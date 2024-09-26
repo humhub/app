@@ -1,8 +1,6 @@
 import 'dart:convert';
-
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/util/providers.dart';
+import 'package:humhub/models/manifest.dart';
 
 class WebViewGlobalController {
   static InAppWebViewController? _value;
@@ -21,8 +19,8 @@ class WebViewGlobalController {
   /// [ref] is reference to the app state.
   /// [url] is the URL to evaluate.
   /// @return `true` if the URL should open in a new window, `false` otherwise.
-  static bool openCreateWindowInWebView(WidgetRef ref, String url) {
-    String? baseUrl = ref.read(humHubProvider).manifest?.baseUrl;
+  static bool openCreateWindowInWebView({required String url, required Manifest manifest}) {
+    String? baseUrl = manifest.baseUrl;
     if (url.startsWith('$baseUrl/file/file/download')) return true;
     if (url.startsWith('$baseUrl/u')) return true;
     if (url.startsWith('$baseUrl/s')) return true;

@@ -58,6 +58,8 @@
 	<false/>
 	<key>NSCameraUsageDescription</key>
     <string>We need access to your camera to take photos and videos for sharing in the app.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>We need access your photo library to allow you to upload, view, and manage photos within the app.</string>
     <key>NSAppTransportSecurity</key>
     <dict>
         <key>NSAllowsArbitraryLoads</key>

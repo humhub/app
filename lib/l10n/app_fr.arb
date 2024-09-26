@@ -23,9 +23,6 @@
   "more_info_pro_edition": "Édition Professionnelle",
   "more_info_pro_edition_url": "https://www.humhub.com/fr/edition-professionnelle",
 
-  "notification_permission_popup_title": "Permission de notification",
-  "notification_permission_popup_content": "Veuillez activer les notifications pour HumHub dans les paramètres de l'appareil.",
-
   "connectivity_popup_title": "Pas de connexion",
   "connectivity_popup_content": "Veuillez vérifier votre connexion Internet et réessayer.",
 
@@ -37,6 +34,7 @@
 
   "enable_permissions": "Activer les autorisations.",
 
+  "downloading": "Téléchargement",
   "settings": "Paramètres",
   "connect": "Connecter",
   "open": "Ouvrir",

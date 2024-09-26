@@ -12,35 +12,68 @@ class FileHandler {
   final String? filename;
   final Function(Exception ex)? onError;
   final Function(File file, String filename) onSuccess;
+  final Function(double progress)? onProgress;
+  final Function()? onStart;
   static const String _jsCode = """
-    function downloadFile(url) {
-        fetch(url, {
-            headers: {
-                // Include necessary headers for authentication if needed
-                'Authorization': 'Bearer <your_token>'
-            }
-        })
-        .then(response => response.blob())
-        .then(blob => {
-            const reader = new FileReader();
-            reader.readAsDataURL(blob); 
-            reader.onloadend = function() {
-                const base64data = reader.result;
-                // Send the base64 content to Flutter
-                window.flutter_inappwebview.callHandler('downloadFile', base64data);
-            }
-        })
-        .catch(error => console.error('Error downloading file:', error));
-    }
+      function downloadFile(url) {
+          fetch(url, {
+              headers: {
+                  // Include necessary headers for authentication if needed
+                  'Authorization': 'Bearer <your_token>'
+              }
+          })
+          .then(response => {
+              const reader = response.body.getReader();
+              const contentLength = response.headers.get('Content-Length');
+              let receivedLength = 0;
+              let chunks = []; // array of received binary chunks (comprises the body)
+  
+              return new ReadableStream({
+                  start(controller) {
+                      function push() {
+                          reader.read().then(({ done, value }) => {
+                              if (done) {
+                                  const blob = new Blob(chunks); // Create blob from chunks
+                                  const fileReader = new FileReader();
+                                  fileReader.readAsDataURL(blob); 
+                                  fileReader.onloadend = function() {
+                                      const base64data = fileReader.result;
+                                      // Send the base64 content to Flutter
+                                      window.flutter_inappwebview.callHandler('downloadFile', base64data);
+                                  }
+                                  return;
+                              }
+  
+                              chunks.push(value); // Store received chunk
+                              receivedLength += value.length;
+  
+                              if (contentLength) {
+                                  // Calculate progress percentage
+                                  const progress = (receivedLength / contentLength) * 100;
+                                  // Send the progress to Flutter
+                                  window.flutter_inappwebview.callHandler('onProgress', progress);
+                              }
+  
+                              push(); // Call the push function again to read the next chunk
+                          });
+                      }
+  
+                      push(); // Start reading the data
+                  }
+              });
+          })
+          .catch(error => console.error('Error downloading file:', error));
+      }
   """;
 
-  const FileHandler({
-    required this.controller,
-    required this.downloadStartRequest,
-    required this.onSuccess,
-    this.filename,
-    this.onError,
-  });
+  const FileHandler(
+      {required this.controller,
+        required this.downloadStartRequest,
+        required this.onSuccess,
+        this.filename,
+        this.onError,
+        this.onProgress,
+        this.onStart});
 
   download() {
     PermissionHandler.runWithPermissionCheck(
@@ -51,6 +84,9 @@ class FileHandler {
 
   _download() async {
     try {
+      if (onStart != null) {
+        onStart!();
+      }
       await controller.evaluateJavascript(source: _jsCode);
       await controller.evaluateJavascript(source: "downloadFile('${downloadStartRequest.url.toString()}');");
       controller.addJavaScriptHandler(
@@ -60,11 +96,19 @@ class FileHandler {
             var (file, filename) = await _saveFile(base64Data);
             onSuccess(file, filename);
           });
+
+      controller.addJavaScriptHandler(
+          handlerName: 'onProgress',
+          callback: (args) {
+            double progress = double.parse(args[0].toString());
+            if (onProgress != null) {
+              onProgress!(progress);
+            }
+          });
     } catch (er) {
       if (er is Exception && onError != null) {
         onError!(er);
       }
-      //rethrow;
     }
   }
 
