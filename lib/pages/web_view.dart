@@ -110,6 +110,7 @@ class WebViewAppState extends ConsumerState<WebView> {
               onProgressChanged: _onProgressChanged,
               onReceivedError: _onReceivedError,
               onDownloadStartRequest: _onDownloadStartRequest,
+              onLongPressHitTestResult: _onLongPressHitTestResult,
             ),
           )),
     );
@@ -145,6 +146,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
 
     final url = action.request.url!.rawValue;
+
     /// First BLOCK everything that rules out as blocked.
     if (BlackListRules.check(url)) {
       return NavigationActionPolicy.CANCEL;
@@ -428,6 +430,14 @@ class WebViewAppState extends ConsumerState<WebView> {
         downloadTimer?.cancel();
       }
     });
+  }
+
+  void _onLongPressHitTestResult(InAppWebViewController controller, InAppWebViewHitTestResult hitResult) async {
+    if (hitResult.extra != null && hitResult.type == InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE) {
+      Clipboard.setData(
+        ClipboardData(text: hitResult.extra!),
+      );
+    }
   }
 
   @override

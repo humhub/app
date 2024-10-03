@@ -90,10 +90,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
             onReceivedError: _onLoadError,
             onProgressChanged: _onProgressChanged,
             onDownloadStartRequest: _onDownloadStartRequest,
-            onPermissionRequest: (controller, permissionRequest) {
-              logInfo('onPermissionRequest', [controller, permissionRequest]);
-              return Future.value(PermissionResponse(action: PermissionResponseAction.DENY));
-            },
+            onLongPressHitTestResult: _onLongPressHitTestResult,
           ),
         ),
       ),
@@ -390,6 +387,14 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         downloadTimer?.cancel();
       }
     });
+  }
+
+  void _onLongPressHitTestResult(InAppWebViewController controller, InAppWebViewHitTestResult hitResult) async {
+    if (hitResult.extra != null && hitResult.type == InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE) {
+      Clipboard.setData(
+        ClipboardData(text: hitResult.extra!),
+      );
+    }
   }
 
   @override
