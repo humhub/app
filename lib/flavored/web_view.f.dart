@@ -90,6 +90,10 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
             onReceivedError: _onLoadError,
             onProgressChanged: _onProgressChanged,
             onDownloadStartRequest: _onDownloadStartRequest,
+            onPermissionRequest: (controller, permissionRequest) {
+              logInfo('onPermissionRequest', [controller, permissionRequest]);
+              return Future.value(PermissionResponse(action: PermissionResponseAction.DENY));
+            },
           ),
         ),
       ),

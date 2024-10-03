@@ -22,16 +22,6 @@ class OpenerApp extends ConsumerStatefulWidget {
 
 class OpenerAppState extends ConsumerState<OpenerApp> {
   @override
-  void initState() {
-    super.initState();
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      await PermissionHandler.requestPermissions([
-        Permission.notification,
-      ]);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     SecureStorageService.clearSecureStorageOnReinstall();
     return LoadingProvider(
