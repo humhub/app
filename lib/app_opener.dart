@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/intent/intent_plugin.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/override_locale.dart';
-import 'package:humhub/util/permission_handler.dart';
 import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/router.dart';
 import 'package:humhub/util/storage_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class OpenerApp extends ConsumerStatefulWidget {
   const OpenerApp({super.key});
