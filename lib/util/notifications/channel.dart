@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/flavored/util/notifications/channel.dart';
+import 'package:humhub/flavored/util/notifications/channel.f.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/notifications/init_from_push.dart';
