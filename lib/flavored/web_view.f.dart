@@ -79,7 +79,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           bottom: false,
           child: InAppWebView(
             initialUrlRequest: _initialRequest,
-            initialSettings: _settings,
+            initialSettings: WebViewGlobalController.settings,
             pullToRefreshController: pullToRefreshController,
             shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
             shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
@@ -90,10 +90,6 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
             onReceivedError: _onLoadError,
             onProgressChanged: _onProgressChanged,
             onDownloadStartRequest: _onDownloadStartRequest,
-            onPermissionRequest: (controller, permissionRequest) {
-              logInfo('onPermissionRequest', [controller, permissionRequest]);
-              return Future.value(PermissionResponse(action: PermissionResponseAction.DENY));
-            },
           ),
         ),
       ),
@@ -110,17 +106,6 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     if (payloadFromPush != null) url = payloadFromPush;
     return URLRequest(url: WebUri(url), headers: instance.customHeaders);
   }
-
-  InAppWebViewSettings get _settings => InAppWebViewSettings(
-        useShouldOverrideUrlLoading: true,
-        useShouldInterceptFetchRequest: true,
-        javaScriptEnabled: true,
-        supportZoom: false,
-        javaScriptCanOpenWindowsAutomatically: true,
-        supportMultipleWindows: true,
-        useHybridComposition: true,
-        allowsInlineMediaPlayback: true,
-      );
 
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
