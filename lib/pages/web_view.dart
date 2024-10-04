@@ -47,16 +47,6 @@ class WebViewAppState extends ConsumerState<WebView> {
   bool _isInit = false;
   late double downloadProgress = 0;
 
-  final _settings = InAppWebViewSettings(
-    useShouldOverrideUrlLoading: true,
-    useShouldInterceptFetchRequest: true,
-    javaScriptEnabled: true,
-    supportZoom: false,
-    javaScriptCanOpenWindowsAutomatically: true,
-    supportMultipleWindows: true,
-    useHybridComposition: true,
-  );
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -99,7 +89,7 @@ class WebViewAppState extends ConsumerState<WebView> {
             onWillPop: () => exitApp(context, ref),
             child: InAppWebView(
               initialUrlRequest: _initialRequest,
-              initialSettings: _settings,
+              initialSettings: WebViewGlobalController.settings,
               pullToRefreshController: _pullToRefreshController,
               shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
               onWebViewCreated: _onWebViewCreated,
@@ -143,8 +133,10 @@ class WebViewAppState extends ConsumerState<WebView> {
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
+    WebViewGlobalController.injectWebSupportScript();
 
     final url = action.request.url!.rawValue;
+
     /// First BLOCK everything that rules out as blocked.
     if (BlackListRules.check(url)) {
       return NavigationActionPolicy.CANCEL;
@@ -226,11 +218,13 @@ class WebViewAppState extends ConsumerState<WebView> {
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
+    WebViewGlobalController.injectWebSupportScript();
     LoadingProvider.of(ref).dismissAll();
   }
 
   void _onLoadStart(InAppWebViewController controller, Uri? url) async {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
+    WebViewGlobalController.injectWebSupportScript();
   }
 
   _onProgressChanged(InAppWebViewController controller, int progress) {
