@@ -7,17 +7,12 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.VIDEO_CAPTURE" />
+    <uses-permission android:name="android.permission.AUDIO_CAPTURE" />
     <uses-permission
         android:name="android.permission.USE_FULL_SCREEN_INTENT"
         tools:node="remove" />
-    <!-- For media access -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-
-    <!-- For older versions (For Android 12 (API 31) and Below) -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
    <application
         android:label="HumHub"
@@ -64,6 +59,16 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+       <provider
+           android:name="com.pichillilorenzo.flutter_inappwebview_android.InAppWebViewFileProvider"
+           android:authorities="${applicationId}.flutter_inappwebview_android.fileprovider"
+           android:exported="false"
+           android:grantUriPermissions="true">
+           <meta-data
+               android:name="android.support.FILE_PROVIDER_PATHS"
+               android:resource="@xml/provider_paths" />
+       </provider>
 
     </application>
 
