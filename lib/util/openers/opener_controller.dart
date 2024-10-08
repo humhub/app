@@ -132,7 +132,7 @@ class OpenerController {
   }
 
   bool get allOk => !(asyncData == null || asyncData!.hasError || !doesViewExist);
-
+  // TODO: Add localization
   String? validateUrl(String? value) {
     if (value == error404) return 'Your HumHub installation does not exist';
     if (value == noConnection) return 'Please check your internet connection.';
