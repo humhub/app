@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import '../api_provider.dart';
 import '../connectivity_plugin.dart';
 
+
+// TODO: Rewrite openers so that the opener_controller will expand universal_opener_controller
 class UniversalOpenerController {
   late AsyncValue<Manifest>? asyncData;
   bool doesViewExist = false;
@@ -19,7 +21,7 @@ class UniversalOpenerController {
     String? manifestUrl;
     for (var url in possibleUrls) {
       asyncData = await APIProvider.requestBasic(Manifest.get(url));
-      manifestUrl = url;
+      manifestUrl = Manifest.getUriWithoutExtension(url);
       if (!asyncData!.hasError) break;
     }
     return manifestUrl;
