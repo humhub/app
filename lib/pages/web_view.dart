@@ -133,7 +133,6 @@ class WebViewAppState extends ConsumerState<WebView> {
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
-    WebViewGlobalController.injectWebSupportScript();
 
     final url = action.request.url!.rawValue;
 
@@ -218,13 +217,11 @@ class WebViewAppState extends ConsumerState<WebView> {
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
-    WebViewGlobalController.injectWebSupportScript();
     LoadingProvider.of(ref).dismissAll();
   }
 
   void _onLoadStart(InAppWebViewController controller, Uri? url) async {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
-    WebViewGlobalController.injectWebSupportScript();
   }
 
   _onProgressChanged(InAppWebViewController controller, int progress) {

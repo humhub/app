@@ -50,19 +50,6 @@ class WebViewGlobalController {
     value?.evaluateJavascript(source: jsCode);
   }
 
-  static void injectWebSupportScript() {
-    String script = """
-      var head = document.head || document.getElementsByTagName('head')[0];
-      var scriptElement = document.createElement('script');
-      scriptElement.type = 'application/javascript';
-      scriptElement.src = '/assets/packages/flutter_inappwebview/assets/web/web_support.js';
-      scriptElement.defer = true;
-      head.appendChild(scriptElement);
-    """;
-
-    value?.evaluateJavascript(source: script);
-  }
-
   static InAppWebViewSettings get settings => InAppWebViewSettings(
       useShouldOverrideUrlLoading: true,
       useShouldInterceptFetchRequest: true,
