@@ -20,7 +20,8 @@ class WebViewGlobalController {
   /// [ref] is reference to the app state.
   /// [url] is the URL to evaluate.
   /// @return `true` if the URL should open in a new window, `false` otherwise.
-  static bool openCreateWindowInWebView({required String url, required Manifest manifest}) {
+  static bool openCreateWindowInWebView(
+      {required String url, required Manifest manifest}) {
     String? baseUrl = manifest.baseUrl;
     if (url.startsWith('$baseUrl/file/file/download')) return true;
     if (url.startsWith('$baseUrl/u')) return true;
@@ -32,7 +33,10 @@ class WebViewGlobalController {
     _value = newValue;
   }
 
-  static void ajaxPost({required String url, required String data, Map<String, String>? headers}) {
+  static void ajaxPost(
+      {required String url,
+      required String data,
+      Map<String, String>? headers}) {
     String jsonHeaders = jsonEncode(headers);
     String jsCode4 = """
           \$.ajax({
@@ -40,35 +44,92 @@ class WebViewGlobalController {
               type: 'POST',
               data: $data,
               headers: $jsonHeaders,
-              async: false, // IMPORTANT: it needs to be async
+              async: false, // IMPORTANT: it needs to be sync
           });
     """;
     value?.evaluateJavascript(source: jsCode4);
   }
 
   static void ajaxSetHeaders({Map<String, String>? headers}) {
-    String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(headers).toString()}});";
+    String jsCode =
+        "\$.ajaxSetup({headers: ${jsonEncode(headers).toString()}});";
     value?.evaluateJavascript(source: jsCode);
   }
 
-  static void onLongPressHitTestResult(InAppWebViewController controller, InAppWebViewHitTestResult hitResult) async {
+  static void onLongPressHitTestResult(InAppWebViewController controller,
+      InAppWebViewHitTestResult hitResult) async {
     if (hitResult.extra != null &&
-        ([InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE, InAppWebViewHitTestResultType.EMAIL_TYPE]
-            .contains(hitResult.type))) {
+        ([
+          InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE,
+          InAppWebViewHitTestResultType.EMAIL_TYPE
+        ].contains(hitResult.type))) {
       Clipboard.setData(
         ClipboardData(text: hitResult.extra!),
       );
     }
   }
 
-  static InAppWebViewSettings get settings => InAppWebViewSettings(
+  static Future<void> listenToImageOpen() async {
+    // Inject JavaScript to monitor changes to the blueimp-gallery element
+    bool opened = false;
+    await _value?.evaluateJavascript(source: """
+            // Create a MutationObserver to monitor changes in the #blueimp-gallery element's attributes
+            var observer = new MutationObserver(function(mutations) {
+              mutations.forEach(function(mutation) {
+                var galleryElement = document.getElementById('blueimp-gallery');
+                
+                // Check if the gallery is opened (display: block)
+                if (galleryElement && galleryElement.style.display === 'block') {
+                  // Send message to Flutter when the image gallery is opened
+                  window.flutter_inappwebview.callHandler('onImageOpened');
+                }
+                
+                // Check if the gallery is closed (display: none)
+                if (galleryElement && galleryElement.style.display === 'none') {
+                  // Send message to Flutter when the image gallery is closed
+                  window.flutter_inappwebview.callHandler('onImageClosed');
+                }
+              });
+            });
+
+            // Observe changes in the style attribute of the #blueimp-gallery element
+            var target = document.getElementById('blueimp-gallery');
+            if (target) {
+              observer.observe(target, { attributes: true, attributeFilter: ['style'] });
+            }
+          """);
+
+    // Set up JavaScript handlers in Flutter to respond to image opening and closing events
+    _value?.addJavaScriptHandler(
+      handlerName: 'onImageOpened',
+      callback: (args) {
+        if (opened) return;
+        opened = true;
+        _value?.setSettings(settings: settings(zoom: opened));
+      },
+    );
+
+    _value?.addJavaScriptHandler(
+      handlerName: 'onImageClosed',
+      callback: (args) {
+        if (!opened) return;
+        opened = false;
+        _value?.setSettings(settings: settings(zoom: opened));
+      },
+    );
+  }
+
+  static InAppWebViewSettings settings({bool zoom = false}) {
+    return InAppWebViewSettings(
       useShouldOverrideUrlLoading: true,
       useShouldInterceptFetchRequest: true,
       javaScriptEnabled: true,
-      supportZoom: false,
       javaScriptCanOpenWindowsAutomatically: true,
       supportMultipleWindows: true,
       useHybridComposition: true,
       allowsInlineMediaPlayback: true,
-      mediaPlaybackRequiresUserGesture: false);
+      mediaPlaybackRequiresUserGesture: false,
+      supportZoom: zoom ? true : false,
+    );
+  }
 }

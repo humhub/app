@@ -79,7 +79,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           bottom: false,
           child: InAppWebView(
             initialUrlRequest: _initialRequest,
-            initialSettings: WebViewGlobalController.settings,
+            initialSettings: WebViewGlobalController.settings(),
             pullToRefreshController: pullToRefreshController,
             shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
             shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
@@ -112,6 +112,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
     WebViewGlobalController.ajaxSetHeaders(headers: instance.customHeaders);
+    WebViewGlobalController.listenToImageOpen();
     final url = action.request.url!.rawValue;
 
     /// First BLOCK everything that rules out as blocked.
@@ -186,11 +187,13 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     WebViewGlobalController.ajaxSetHeaders(headers: instance.customHeaders);
+    WebViewGlobalController.listenToImageOpen();
     LoadingProvider.of(ref).dismissAll();
   }
 
   void _onLoadStart(InAppWebViewController controller, Uri? url) async {
     WebViewGlobalController.ajaxSetHeaders(headers: instance.customHeaders);
+    WebViewGlobalController.listenToImageOpen();
   }
 
   void _onLoadError(InAppWebViewController controller, WebResourceRequest request, WebResourceError error) async {
