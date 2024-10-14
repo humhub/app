@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/components/language_switcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:humhub/pages/help/help_android.dart';
-import 'package:humhub/pages/help/help_ios.dart';
+import 'package:humhub/pages/help/help.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/intent/intent_plugin.dart';
@@ -203,7 +200,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                                 PageRouteBuilder(
                                   transitionDuration: const Duration(milliseconds: 500),
                                   pageBuilder: (context, animation, secondaryAnimation) =>
-                                      Platform.isAndroid ? const HelpAndroid() : const HelpIos(),
+                                      const Help(),
                                   transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                     return FadeTransition(
                                       opacity: animation,
