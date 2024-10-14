@@ -83,25 +83,27 @@ class WebViewAppState extends ConsumerState<WebView> {
       key: _scaffoldKey,
       backgroundColor: HexColor(_manifest.themeColor),
       body: SafeArea(
-          bottom: false,
-          // ignore: deprecated_member_use
-          child: WillPopScope(
-            onWillPop: () => exitApp(context, ref),
-            child: InAppWebView(
-              initialUrlRequest: _initialRequest,
-              initialSettings: WebViewGlobalController.settings,
-              pullToRefreshController: _pullToRefreshController,
-              shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
-              onWebViewCreated: _onWebViewCreated,
-              shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
-              onCreateWindow: _onCreateWindow,
-              onLoadStop: _onLoadStop,
-              onLoadStart: _onLoadStart,
-              onProgressChanged: _onProgressChanged,
-              onReceivedError: _onReceivedError,
-              onDownloadStartRequest: _onDownloadStartRequest,
-            ),
-          )),
+        bottom: false,
+        // ignore: deprecated_member_use
+        child: WillPopScope(
+          onWillPop: () => exitApp(context, ref),
+          child: InAppWebView(
+            initialUrlRequest: _initialRequest,
+            initialSettings: WebViewGlobalController.settings,
+            pullToRefreshController: _pullToRefreshController,
+            shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
+            onWebViewCreated: _onWebViewCreated,
+            shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
+            onCreateWindow: _onCreateWindow,
+            onLoadStop: _onLoadStop,
+            onLoadStart: _onLoadStart,
+            onProgressChanged: _onProgressChanged,
+            onReceivedError: _onReceivedError,
+            onDownloadStartRequest: _onDownloadStartRequest,
+            onLongPressHitTestResult: WebViewGlobalController.onLongPressHitTestResult,
+          ),
+        ),
+      ),
     );
   }
 

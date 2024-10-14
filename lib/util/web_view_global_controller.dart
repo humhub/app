@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/manifest.dart';
 
@@ -48,6 +49,16 @@ class WebViewGlobalController {
   static void ajaxSetHeaders({Map<String, String>? headers}) {
     String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(headers).toString()}});";
     value?.evaluateJavascript(source: jsCode);
+  }
+
+  static void onLongPressHitTestResult(InAppWebViewController controller, InAppWebViewHitTestResult hitResult) async {
+    if (hitResult.extra != null &&
+        ([InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE, InAppWebViewHitTestResultType.EMAIL_TYPE]
+            .contains(hitResult.type))) {
+      Clipboard.setData(
+        ClipboardData(text: hitResult.extra!),
+      );
+    }
   }
 
   static InAppWebViewSettings get settings => InAppWebViewSettings(

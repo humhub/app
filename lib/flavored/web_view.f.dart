@@ -90,6 +90,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
             onReceivedError: _onLoadError,
             onProgressChanged: _onProgressChanged,
             onDownloadStartRequest: _onDownloadStartRequest,
+            onLongPressHitTestResult: WebViewGlobalController.onLongPressHitTestResult,
           ),
         ),
       ),
