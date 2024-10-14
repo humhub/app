@@ -1,12 +1,10 @@
-import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/pages/help/help_android.dart';
-import 'package:humhub/pages/help/help_ios.dart';
+import 'package:humhub/pages/help/help.dart';
 import 'package:humhub/pages/opener.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
@@ -51,7 +49,7 @@ class MyRouter {
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
       ]);
-      return Platform.isAndroid ? const HelpAndroid() : const HelpIos();
+      return const Help();
     },
   };
 

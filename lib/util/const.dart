@@ -25,3 +25,7 @@ class HumhubTheme {
   static TextStyle paragraphStyle =
       const TextStyle(letterSpacing: 0.5, fontWeight: FontWeight.normal, color: Colors.black, fontSize: 15);
 }
+
+class Urls{
+  static String proEdition = 'https://www.humhub.com/de/professional-edition';
+}

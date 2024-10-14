@@ -59,7 +59,7 @@ class ThirdPage extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      launchUrl(Uri.parse(AppLocalizations.of(context)!.more_info_pro_edition_url),
+                      launchUrl(Uri.parse(Urls.proEdition),
                           mode: LaunchMode.platformDefault);
                     },
                     child: Center(
