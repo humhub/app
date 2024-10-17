@@ -249,8 +249,9 @@ class WebViewAppState extends ConsumerState<WebView> {
 
   void _onReceivedError(InAppWebViewController controller,
       WebResourceRequest request, WebResourceError error) {
-    if (error.description == 'net::ERR_INTERNET_DISCONNECTED')
+    if (error.description == 'net::ERR_INTERNET_DISCONNECTED') {
       NoConnectionDialog.show(context);
+    }
   }
 
   _concludeAuth(URLRequest request) {
@@ -284,8 +285,9 @@ class WebViewAppState extends ConsumerState<WebView> {
         }
         break;
       case ChannelAction.updateNotificationCount:
-        if (message.count != null)
+        if (message.count != null) {
           FlutterAppBadger.updateBadgeCount(message.count!);
+        }
         break;
       case ChannelAction.unregisterFcmDevice:
         String? token = ref.read(pushTokenProvider).value ??
