@@ -5,7 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:humhub/pages/help/help.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
-import 'package:humhub/util/intent/intent_plugin.dart';
+import 'package:humhub/util/init_from_url.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/openers/opener_controller.dart';
 import 'package:humhub/util/providers.dart';
@@ -41,7 +41,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
         ref.read(languageSwitcherVisibilityProvider.notifier).toggleVisibility(true);
       });
 
-      String? urlIntent = InitFromIntent.usePayloadForInit();
+      String? urlIntent = InitFromUrl.usePayload();
       if (urlIntent != null) {
         await ref.read(notificationChannelProvider).value!.onTap(urlIntent);
       }

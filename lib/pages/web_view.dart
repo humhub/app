@@ -16,8 +16,8 @@ import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/file_handler.dart';
+import 'package:humhub/util/init_from_url.dart';
 import 'package:humhub/util/loading_provider.dart';
-import 'package:humhub/util/notifications/init_from_push.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/push/provider.dart';
@@ -127,7 +127,7 @@ class WebViewAppState extends ConsumerState<WebView> {
       _manifest = manifestPush.manifest;
       url = manifestPush.remoteMessage.data['url'];
     }
-    String? payloadFromPush = InitFromPush.usePayload();
+    String? payloadFromPush = InitFromUrl.usePayload();
     if (payloadFromPush != null) url = payloadFromPush;
     return URLRequest(
         url: WebUri(url ?? _manifest.startUrl),

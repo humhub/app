@@ -6,9 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/flavored/web_view.f.dart';
 import 'package:humhub/util/const.dart';
+import 'package:humhub/util/init_from_url.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:loggy/loggy.dart';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uni_links/uni_links.dart';
 
 bool _initialUriIsHandled = false;
@@ -27,7 +27,6 @@ class IntentPluginF extends ConsumerStatefulWidget {
 
 class IntentPluginFState extends ConsumerState<IntentPluginF> {
   StreamSubscription? intentDataStreamSubscription;
-  List<SharedMediaFile>? sharedFiles;
   Object? _err;
   Uri? _initialUri;
   Uri? _latestUri;
@@ -37,20 +36,11 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
   void initState() {
     logInfo([_err, _initialUri, _latestUri, _sub]);
     super.initState();
-    intentDataStreamSubscription = ReceiveSharingIntent.getMediaStream().listen((List<SharedMediaFile> value) {
-      setState(() {
-        sharedFiles = value;
-      });
-    });
 
-    // For sharing images coming from outside the app while the app is closed
-    ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> value) {
-      setState(() {
-        sharedFiles = value;
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _handleInitialUri();
+      _subscribeToUriStream();
     });
-    _handleInitialUri();
-    _handleIncomingLinks();
   }
 
   @override
@@ -60,7 +50,7 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
 
   /// Handle incoming links - the ones that the app will recieve from the OS
   /// while already started.
-  Future<void> _handleIncomingLinks() async {
+  Future<void> _subscribeToUriStream() async {
     if (!kIsWeb) {
       // It will handle app links while the app is already started - be it in
       // the foreground or in the background.
@@ -91,25 +81,18 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
     // In this example app this is an almost useless guard, but it is here to
     // show we are not going to call getInitialUri multiple times, even if this
     // was a widget that will be disposed of (ex. a navigation route change).
-
     if (!_initialUriIsHandled) {
       _initialUriIsHandled = true;
       try {
-        final uri = await getInitialUri();
-        if (uri == null || !mounted) return;
+        Uri? uri = await getInitialUri();
+        if (uri == null) return;
         setState(() => _initialUri = uri);
-        if (!mounted) {
-          return;
-        }
         _latestUri = uri;
-        String? redirectUrl = uri.queryParameters['url'];
-        if (redirectUrl != null && navigatorKey.currentState != null) {
+        String? redirectUrl = uri.toString();
+        if (navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         } else {
-          if (redirectUrl != null) {
-            navigatorKey.currentState!.pushNamed(WebViewF.path, arguments: redirectUrl);
-            return;
-          }
+          InitFromUrl.setPayload(redirectUrl);
         }
       } on PlatformException {
         // Platform messages may fail but we ignore the exception
