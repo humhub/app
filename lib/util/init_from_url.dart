@@ -1,4 +1,4 @@
-class InitFromPush {
+class InitFromUrl {
   static String? _redirectUrlFromInit;
 
   static setPayload(String payload) {

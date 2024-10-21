@@ -38,20 +38,10 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   void initState() {
     logInfo([_err, _initialUri, _latestUri, _sub]);
     super.initState();
-    intentDataStreamSubscription = ReceiveSharingIntent.getMediaStream().listen((List<SharedMediaFile> value) {
-      setState(() {
-        sharedFiles = value;
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _handleInitialUri();
+      _subscribeToUriStream();
     });
-
-    // For sharing images coming from outside the app while the app is closed
-    ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> value) {
-      setState(() {
-        sharedFiles = value;
-      });
-    });
-    _handleInitialUri();
-    _handleIncomingLinks();
   }
 
   @override
@@ -61,7 +51,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
 
   /// Handle incoming links - the ones that the app will recieve from the OS
   /// while already started.
-  Future<void> _handleIncomingLinks() async {
+  Future<void> _subscribeToUriStream() async {
     if (!kIsWeb) {
       // It will handle app links while the app is already started - be it in
       // the foreground or in the background.
@@ -99,20 +89,14 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         final uri = await getInitialUri();
         if (uri == null || !mounted) return;
         setState(() => _initialUri = uri);
-        if (!mounted) {
-          return;
-        }
         _latestUri = uri;
-        String? redirectUrl = uri.queryParameters['url'];
-        if (redirectUrl != null && navigatorKey.currentState != null) {
+        String? redirectUrl = uri.toString();
+        if (navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         } else {
-          if (redirectUrl != null) {
-            UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
-            await opener.initHumHub();
-            navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
-            return;
-          }
+          UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
+          await opener.initHumHub();
+          navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
         }
       } on PlatformException {
         // Platform messages may fail but we ignore the exception
@@ -140,19 +124,5 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     LoadingProvider.of(ref).dismissAll();
     navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
     return isNewRouteSameAsCurrent;
-  }
-}
-
-class InitFromIntent {
-  static String? _redirectUrl;
-
-  static setPayloadForInit(String payload) {
-    _redirectUrl = payload;
-  }
-
-  static String? usePayloadForInit() {
-    String? payload = _redirectUrl;
-    _redirectUrl = null;
-    return payload;
   }
 }

@@ -1,7 +1,7 @@
 import 'package:humhub/flavored/web_view.f.dart';
 import 'package:humhub/util/const.dart';
+import 'package:humhub/util/init_from_url.dart';
 import 'package:humhub/util/notifications/channel.dart';
-import 'package:humhub/util/notifications/init_from_push.dart';
 
 class NotificationChannelF extends NotificationChannel {
   const NotificationChannelF(
@@ -29,7 +29,7 @@ class NotificationChannelF extends NotificationChannel {
       navigatorKey.currentState!.pushNamed(WebViewF.path, arguments: payload);
     } else {
       if (payload != null) {
-        InitFromPush.setPayload(payload);
+        InitFromUrl.setPayload(payload);
       }
     }
   }

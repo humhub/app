@@ -13,8 +13,8 @@ import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/util/black_list_rules.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
+import 'package:humhub/util/init_from_url.dart';
 import 'package:humhub/util/loading_provider.dart';
-import 'package:humhub/util/notifications/init_from_push.dart';
 import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/show_dialog.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
@@ -100,7 +100,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   URLRequest get _initialRequest {
     var payload = ModalRoute.of(context)!.settings.arguments;
     String? url = instance.manifest.startUrl;
-    String? payloadForInitFromPush = InitFromPush.usePayload();
+    String? payloadForInitFromPush = InitFromUrl.usePayload();
     String? payloadFromPush;
     if (payload is String) payloadFromPush = payload;
     if (payloadForInitFromPush != null) url = payloadForInitFromPush;
