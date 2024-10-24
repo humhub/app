@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/flavored/web_view.f.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/init_from_url.dart';
+import 'package:humhub/util/intent/mail_link_provider.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:loggy/loggy.dart';
 import 'package:uni_links/uni_links.dart';
@@ -55,9 +56,9 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
       // It will handle app links while the app is already started - be it in
       // the foreground or in the background.
       _sub = uriLinkStream.listen((Uri? uri) async {
-        if (!mounted) return;
-        _latestUri = uri;
-        String? redirectUrl = uri?.toString();
+        if (!mounted && uri == null) return;
+        _latestUri = await MailProviderHandler.handleUniversalLink(uri!) ?? uri;
+        String? redirectUrl = _latestUri?.toString();
         if (redirectUrl != null && navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         }
@@ -87,8 +88,8 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
         Uri? uri = await getInitialUri();
         if (uri == null) return;
         setState(() => _initialUri = uri);
-        _latestUri = uri;
-        String? redirectUrl = uri.toString();
+        _latestUri = await MailProviderHandler.handleUniversalLink(uri) ?? uri;
+        String? redirectUrl = _latestUri.toString();
         if (navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         } else {
