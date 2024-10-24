@@ -120,7 +120,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                         ),
                       ),
                       Expanded(
-                        flex: 4,
+                        flex: 3,
                         child: SizedBox(
                           height: 100,
                           width: 230,
