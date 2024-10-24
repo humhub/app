@@ -10,7 +10,7 @@ import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/pages/opener.dart';
+import 'package:humhub/pages/opener/opener.dart';
 import 'package:humhub/util/black_list_rules.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/const.dart';
