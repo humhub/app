@@ -16,8 +16,7 @@ class SearchBarWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
-      color: Colors.red,
-      padding: EdgeInsets.only(top: 70),
+      padding: const EdgeInsets.only(top: 70),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
