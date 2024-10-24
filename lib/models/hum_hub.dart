@@ -15,9 +15,19 @@ class HumHub {
   String? randomHash;
   String? appVersion;
   String? pushToken;
+  List<Manifest> _history;
 
-  HumHub(
-      {this.manifest, this.manifestUrl, this.isHideOpener = false, this.randomHash, this.appVersion, this.pushToken});
+  List<Manifest> get history => _history;
+
+  HumHub({
+    this.manifest,
+    this.manifestUrl,
+    this.isHideOpener = false,
+    this.randomHash,
+    this.appVersion,
+    this.pushToken,
+    List<Manifest>? history,
+  }) : _history = history ?? [];
 
   Map<String, dynamic> toJson() => {
         'manifest': manifest?.toJson(),
@@ -26,6 +36,7 @@ class HumHub {
         'randomHash': randomHash,
         'appVersion': appVersion,
         'pushToken': pushToken,
+        'history': _history.map((manifest) => manifest.toJson()).toList(), // Serialize history
       };
 
   factory HumHub.fromJson(Map<String, dynamic> json) {
@@ -36,7 +47,57 @@ class HumHub {
       randomHash: json['randomHash'],
       appVersion: json['appVersion'],
       pushToken: json['pushToken'],
+      history: json['history'] != null
+          ? List<Manifest>.from(json['history'].map((json) => Manifest.fromJson(json)))
+          : [], // Deserialize history
     );
+  }
+
+  /// Adds a new [Manifest] to the history.
+  ///
+  /// This method checks if a [Manifest] with the same [startUrl] as the
+  /// provided [newManifest] already exists in the history. If it does,
+  /// the existing manifest will be updated with the new one. If not,
+  /// the new manifest will be added to the history list.
+  ///
+  /// [newManifest] The [Manifest] object to be added to the history.
+  /// If a manifest with the same [startUrl] exists, it will be updated.
+  ///
+  /// Note: The [Manifest] class should have a valid `startUrl`
+  /// property for this method to work correctly. The history list
+  /// will maintain unique entries based on the `startUrl`.
+  /// !!! This method should only be called inside a [HumHubNotifier] because it also needs to update secure storage.
+  void addToHistory(Manifest newManifest) {
+    final existingManifestIndex = _history.indexWhere((item) => item.startUrl == newManifest.startUrl);
+
+    if (existingManifestIndex >= 0) {
+      _history[existingManifestIndex] = newManifest;
+    } else {
+      _history.add(newManifest);
+    }
+  }
+
+  /// Removes a [Manifest] from the history based on its [startUrl].
+  ///
+  /// This method searches for a [Manifest] with the specified [startUrl]
+  /// in the history. If found, it removes the manifest from the list.
+  ///
+  /// [startUrl] The start URL of the [Manifest] to be removed from the history.
+  ///
+  /// Returns true if the manifest was successfully removed,
+  /// or false if no matching manifest was found.
+  /// Note: The history will not maintain any references to the
+  /// removed manifest after this operation.
+  /// !!! This method should only be called inside a [HumHubNotifier] because it also needs to update secure storage.
+  bool removeFromHistory(Manifest manifest) {
+    final existingManifestIndex = _history.indexWhere((item) => item == manifest);
+
+    if (existingManifestIndex >= 0) {
+      _history.removeAt(existingManifestIndex); // Remove the manifest
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<RedirectAction> action(ref) async {

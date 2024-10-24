@@ -3,13 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/components/language_switcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:humhub/pages/help/help.dart';
-import 'package:humhub/pages/web_view.dart';
+import 'package:humhub/pages/opener/components/search_bar.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/init_from_url.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/openers/opener_controller.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:rive/rive.dart';
+
+import 'components/last_login.dart';
 
 class Opener extends ConsumerStatefulWidget {
   const Opener({Key? key}) : super(key: key);
@@ -21,6 +23,7 @@ class Opener extends ConsumerStatefulWidget {
 
 class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMixin {
   late OpenerController openerControlLer;
+  late bool isSearchBarOpen = false;
 
   @override
   void initState() {
@@ -45,6 +48,13 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
       if (urlIntent != null) {
         await ref.read(notificationChannelProvider).value!.onTap(urlIntent);
       }
+
+      /// If there is only one item in history that means we can show [SearchBarWidget] that is already prefilled with url or null if count is 0.
+      if (ref.read(humHubProvider).history.length < 2) {
+        setState(() {
+          isSearchBarOpen = true;
+        });
+      }
     });
   }
 
@@ -67,6 +77,22 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
           Scaffold(
             resizeToAvoidBottomInset: true,
             backgroundColor: Colors.transparent,
+            floatingActionButton: isSearchBarOpen
+                ? AnimatedOpacity(
+                    opacity: ref.watch(languageSwitcherVisibilityProvider) ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 300),
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        setState(() {
+                          isSearchBarOpen = !isSearchBarOpen;
+                        });
+                      },
+                      tooltip: 'Increment',
+                      backgroundColor: Colors.white,
+                      child: Icon(Icons.arrow_back, color: HumhubTheme.primaryColor),
+                    ),
+                  )
+                : null,
             body: SafeArea(
               bottom: false,
               top: false,
@@ -76,6 +102,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                   padding: const EdgeInsets.only(top: 50),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       // Language Switcher visibility
                       AnimatedOpacity(
@@ -93,7 +120,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                         ),
                       ),
                       Expanded(
-                        flex: 8,
+                        flex: 4,
                         child: SizedBox(
                           height: 100,
                           width: 230,
@@ -101,97 +128,18 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                         ),
                       ),
                       Expanded(
-                        flex: 12,
-                        child: AnimatedOpacity(
-                          opacity: ref.watch(textFieldVisibilityProvider) ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 250),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 35),
-                            child: Column(
-                              children: [
-                                FutureBuilder<String>(
-                                  future: ref.read(humHubProvider).getLastUrl(),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      openerControlLer.urlTextController.text = snapshot.data!;
-                                      return TextFormField(
-                                        keyboardType: TextInputType.url,
-                                        controller: openerControlLer.urlTextController,
-                                        cursorColor: Theme.of(context).textTheme.bodySmall?.color,
-                                        onSaved: openerControlLer.helper.onSaved(openerControlLer.formUrlKey),
-                                        onEditingComplete: () {
-                                          openerControlLer.helper.onSaved(openerControlLer.formUrlKey);
-                                          _connectInstance();
-                                        },
-                                        onChanged: (value) {
-                                          final cursorPosition =
-                                              openerControlLer.urlTextController.selection.baseOffset;
-                                          final trimmedValue = value.trim();
-                                          openerControlLer.urlTextController.value = TextEditingValue(
-                                            text: trimmedValue,
-                                            selection: TextSelection.collapsed(
-                                                offset: cursorPosition > trimmedValue.length
-                                                    ? trimmedValue.length
-                                                    : cursorPosition),
-                                          );
-                                        },
-                                        style: const TextStyle(
-                                          decoration: TextDecoration.none,
-                                        ),
-                                        decoration: openerDecoration(context),
-                                        validator: openerControlLer.validateUrl,
-                                        autocorrect: false,
-                                      );
-                                    }
-                                    return const Center(child: CircularProgressIndicator());
+                          flex: 8,
+                          child: isSearchBarOpen
+                              ? SearchBarWidget(openerControlLer: openerControlLer)
+                              : LastLoginWidget(
+                                  onAddNetwork: () {
+                                    setState(() {
+                                      isSearchBarOpen = !isSearchBarOpen;
+                                    });
                                   },
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 5),
-                                  child: Text(
-                                    AppLocalizations.of(context)!.opener_enter_url,
-                                    style:
-                                        const TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                                )),
                       Expanded(
-                        flex: 4,
-                        child: AnimatedOpacity(
-                          opacity: ref.watch(visibilityProvider) ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 300),
-                          child: Center(
-                            child: TextButton(
-                              onPressed: _connectInstance,
-                              style: TextButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  side: BorderSide(
-                                    color: HumhubTheme.primaryColor, // Adjust the color to match your theme
-                                    width: 2, // Adjust the width as needed
-                                  ),
-                                ),
-                                padding: const EdgeInsets.symmetric(horizontal: 0), // Adjust padding as needed
-                                minimumSize: const Size(140, 55),
-                              ),
-                              child: Text(
-                                AppLocalizations.of(context)!.connect,
-                                style: TextStyle(
-                                  color: HumhubTheme.primaryColor,
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 4,
+                        flex: 2,
                         child: GestureDetector(
                           onTap: () {
                             openerControlLer.animationNavigationWrapper(
@@ -199,8 +147,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                                 context,
                                 PageRouteBuilder(
                                   transitionDuration: const Duration(milliseconds: 500),
-                                  pageBuilder: (context, animation, secondaryAnimation) =>
-                                      const Help(),
+                                  pageBuilder: (context, animation, secondaryAnimation) => const Help(),
                                   transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                     return FadeTransition(
                                       opacity: animation,
@@ -234,19 +181,6 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
         ],
       ),
     );
-  }
-
-  _connectInstance() async {
-    FocusManager.instance.primaryFocus?.unfocus();
-    await openerControlLer.initHumHub();
-    if (openerControlLer.allOk) {
-      ref.read(humHubProvider).getInstance().then((instance) {
-        FocusManager.instance.primaryFocus?.unfocus();
-        openerControlLer.animationNavigationWrapper(
-          navigate: () => Navigator.pushNamed(ref.context, WebView.path, arguments: instance.manifest),
-        );
-      });
-    }
   }
 
   InputDecoration openerDecoration(context) => InputDecoration(

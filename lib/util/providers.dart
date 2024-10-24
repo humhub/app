@@ -21,15 +21,10 @@ class HumHubNotifier extends ChangeNotifier {
   String? get appVersion => _humHubInstance.appVersion;
   String? get pushToken => _humHubInstance.pushToken;
   Map<String, String> get customHeaders => _humHubInstance.customHeaders;
+  List<Manifest> get history => _humHubInstance.history;
 
   void setIsHideOpener(bool isHide) {
     _humHubInstance.isHideOpener = isHide;
-    _updateSafeStorage();
-    notifyListeners();
-  }
-
-  void setManifest(Manifest manifest) {
-    _humHubInstance.manifest = manifest;
     _updateSafeStorage();
     notifyListeners();
   }
@@ -41,6 +36,15 @@ class HumHubNotifier extends ChangeNotifier {
     _humHubInstance.randomHash = instance.randomHash;
     _humHubInstance.appVersion = packageInfo.version;
     _humHubInstance.manifestUrl = instance.manifestUrl;
+    if (instance.manifest != null) {
+      _humHubInstance.addToHistory(instance.manifest!);
+    }
+    _updateSafeStorage();
+    notifyListeners();
+  }
+
+  Future<void> removeHistory(Manifest manifest) async {
+    _humHubInstance.removeFromHistory(manifest);
     _updateSafeStorage();
     notifyListeners();
   }

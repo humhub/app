@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:http/http.dart' as http;
 import 'package:loggy/loggy.dart';
@@ -196,6 +197,19 @@ class OpenerController {
       _animationReverseController.isActive = true;
       _animationReverse.reset();
     });
+  }
+
+  Future<void> connect() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    await initHumHub();
+    if (allOk) {
+      ref.read(humHubProvider).getInstance().then((instance) {
+        FocusManager.instance.primaryFocus?.unfocus();
+        animationNavigationWrapper(
+          navigate: () => Navigator.pushNamed(ref.context, WebView.path, arguments: instance.manifest),
+        );
+      });
+    }
   }
 
   dispose() {
