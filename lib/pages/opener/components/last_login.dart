@@ -1,7 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/const.dart';
+import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:loggy/loggy.dart';
 
 class LastLoginWidget extends ConsumerWidget {
   final void Function()? onAddNetwork;
@@ -12,39 +16,47 @@ class LastLoginWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final humHub = ref.watch(humHubProvider);
     return Container(
-      color: Colors.red,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 22, horizontal: 10),
+            child: Text(
+              "Last login: ",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
           GridView.builder(
+            padding: EdgeInsets.zero,
             shrinkWrap: true,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              //crossAxisSpacing: 10,
-              //mainAxisSpacing: 10,
+              mainAxisExtent: 120,
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 20,
             ),
             itemCount: humHub.history.length + 1, // Include the add network tile
             itemBuilder: (context, index) {
               if (index < humHub.history.length) {
-                // Get the Manifest for the current index
                 final manifest = humHub.history[index];
-                return _buildLoginTile(manifest.name, Icons.business, 0); // Replace with your notification logic
+                return _buildLoginTile(manifest); // Replace with your notification logic
               } else {
-                // Last item for adding a network
                 return _buildAddNetworkTile();
               }
             },
           ),
-          SizedBox.shrink(),
         ],
       ),
     );
   }
 
   // Tile for last login with badge
-  Widget _buildLoginTile(String title, IconData icon, int notifications) {
+  Widget _buildLoginTile(Manifest manifest) {
     return Card(
-      elevation: 5,
+      //color: HexColor(manifest.themeColor),
+      surfaceTintColor: Colors.white,
+      elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -54,45 +66,38 @@ class LastLoginWidget extends ConsumerWidget {
         highlightColor: HumhubTheme.primaryColor.withOpacity(0.3),
         hoverColor: HumhubTheme.primaryColor.withOpacity(0.3),
         onTap: () {},
-        child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(icon, size: 50, color: Colors.blue),
-                  const SizedBox(height: 10),
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (notifications > 0)
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Text(
-                    notifications.toString(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
+            GestureDetector(
+              onTap: () {
+                logError("Here");
+              },
+              child: const Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 10, left: 10),
+                  child: Icon(
+                    Icons.close,
+                    size: 14,
                   ),
                 ),
               ),
+            ),
+            if (manifest.icons?.isNotEmpty ?? false)
+              CachedNetworkImage(
+                height: 40,
+                width: 40,
+                imageUrl: manifest.baseUrl + manifest.icons!.reversed.first.src,
+                fit: BoxFit.cover,
+              ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                manifest.name,
+                style: const TextStyle(fontSize: 14),
+              ),
+            )
           ],
         ),
       ),
