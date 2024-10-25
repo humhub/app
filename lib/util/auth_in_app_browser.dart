@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/util/extensions.dart';
 import 'package:loggy/loggy.dart';
 
 class AuthInAppBrowser extends InAppBrowser {
@@ -14,11 +13,13 @@ class AuthInAppBrowser extends InAppBrowser {
   AuthInAppBrowser({required this.manifest, required this.concludeAuth}) {
     settings = InAppBrowserClassSettings(
       browserSettings: InAppBrowserSettings(
-          hideUrlBar: true,
-          shouldCloseOnBackButtonPressed: true,
-          toolbarTopBackgroundColor: HexColor(manifest.themeColor),
-          toolbarTopTintColor: HexColor(manifest.themeColor),
-          presentationStyle: ModalPresentationStyle.OVER_FULL_SCREEN),
+        hideUrlBar: true,
+        hideToolbarTop: true,
+        closeOnCannotGoBack: true,
+        shouldCloseOnBackButtonPressed: true,
+        hideToolbarBottom: true,
+        presentationStyle: ModalPresentationStyle.POPOVER,
+      ),
       webViewSettings: InAppWebViewSettings(
           javaScriptEnabled: true,
           useShouldOverrideUrlLoading: true,
