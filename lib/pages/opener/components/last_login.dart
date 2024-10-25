@@ -105,26 +105,44 @@ class LastLoginWidget extends ConsumerWidget {
 
   // Tile for adding a network
   Widget _buildAddNetworkTile() {
-    return InkWell(
-      onTap: onAddNetwork,
-      child: Card(
-        shape: RoundedRectangleBorder(
+    return Card(
+      color: const Color(0XFFDBEFF0),
+      surfaceTintColor: Colors.white,
+      margin: const EdgeInsets.only(bottom: 25),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Center(
+        child: InkWell(
           borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.add, size: 50, color: Colors.grey),
-              SizedBox(height: 10),
-              Text(
-                "Add Network",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
+          splashColor: HumhubTheme.primaryColor.withOpacity(0.3),
+          highlightColor: HumhubTheme.primaryColor.withOpacity(0.3),
+          hoverColor: HumhubTheme.primaryColor.withOpacity(0.3),
+          onTap: onAddNetwork,
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0XFF1A8291),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Icon(Icons.add, size: 30, color: Colors.white),
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: 10),
+                Text(
+                  "Add Network",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
