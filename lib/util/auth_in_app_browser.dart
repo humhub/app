@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/util/extensions.dart';
 import 'package:loggy/loggy.dart';
+
+import 'extensions.dart';
 
 class AuthInAppBrowser extends InAppBrowser {
   final Manifest manifest;
@@ -14,16 +16,17 @@ class AuthInAppBrowser extends InAppBrowser {
   AuthInAppBrowser({required this.manifest, required this.concludeAuth}) {
     settings = InAppBrowserClassSettings(
       browserSettings: InAppBrowserSettings(
-          hideUrlBar: true,
-          shouldCloseOnBackButtonPressed: true,
-          toolbarTopBackgroundColor: HexColor(manifest.themeColor),
-          toolbarTopTintColor: HexColor(manifest.themeColor),
-          presentationStyle: ModalPresentationStyle.OVER_FULL_SCREEN),
+        hideUrlBar: true,
+        shouldCloseOnBackButtonPressed: true,
+        toolbarTopBackgroundColor: Colors.white,
+        toolbarTopTintColor: HexColor(manifest.themeColor),
+        presentationStyle: ModalPresentationStyle.PAGE_SHEET,
+      ),
       webViewSettings: InAppWebViewSettings(
-          javaScriptEnabled: true,
-          useShouldOverrideUrlLoading: true,
-          userAgent: userAgent,
-          applicationNameForUserAgent: 'HumHub-Mobile'),
+        javaScriptEnabled: true,
+        useShouldOverrideUrlLoading: true,
+        userAgent: userAgent,
+      ),
     );
   }
 
