@@ -113,6 +113,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     // 1st check if url is not def. app url and open it in a browser or inApp.
     WebViewGlobalController.ajaxSetHeaders(headers: instance.customHeaders);
     WebViewGlobalController.listenToImageOpen();
+    WebViewGlobalController.addMobileBottomPadding();
     final url = action.request.url!.rawValue;
 
     /// First BLOCK everything that rules out as blocked.
@@ -188,12 +189,14 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     }
     WebViewGlobalController.ajaxSetHeaders(headers: instance.customHeaders);
     WebViewGlobalController.listenToImageOpen();
+    WebViewGlobalController.addMobileBottomPadding();
     LoadingProvider.of(ref).dismissAll();
   }
 
   void _onLoadStart(InAppWebViewController controller, Uri? url) async {
     WebViewGlobalController.ajaxSetHeaders(headers: instance.customHeaders);
     WebViewGlobalController.listenToImageOpen();
+    WebViewGlobalController.addMobileBottomPadding();
   }
 
   void _onLoadError(InAppWebViewController controller, WebResourceRequest request, WebResourceError error) async {

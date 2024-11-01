@@ -20,8 +20,7 @@ class WebViewGlobalController {
   /// [ref] is reference to the app state.
   /// [url] is the URL to evaluate.
   /// @return `true` if the URL should open in a new window, `false` otherwise.
-  static bool openCreateWindowInWebView(
-      {required String url, required Manifest manifest}) {
+  static bool openCreateWindowInWebView({required String url, required Manifest manifest}) {
     String? baseUrl = manifest.baseUrl;
     if (url.startsWith('$baseUrl/file/file/download')) return true;
     if (url.startsWith('$baseUrl/u')) return true;
@@ -33,10 +32,7 @@ class WebViewGlobalController {
     _value = newValue;
   }
 
-  static void ajaxPost(
-      {required String url,
-      required String data,
-      Map<String, String>? headers}) {
+  static void ajaxPost({required String url, required String data, Map<String, String>? headers}) {
     String jsonHeaders = jsonEncode(headers);
     String jsCode4 = """
           \$.ajax({
@@ -51,18 +47,14 @@ class WebViewGlobalController {
   }
 
   static void ajaxSetHeaders({Map<String, String>? headers}) {
-    String jsCode =
-        "\$.ajaxSetup({headers: ${jsonEncode(headers).toString()}});";
+    String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(headers).toString()}});";
     value?.evaluateJavascript(source: jsCode);
   }
 
-  static void onLongPressHitTestResult(InAppWebViewController controller,
-      InAppWebViewHitTestResult hitResult) async {
+  static void onLongPressHitTestResult(InAppWebViewController controller, InAppWebViewHitTestResult hitResult) async {
     if (hitResult.extra != null &&
-        ([
-          InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE,
-          InAppWebViewHitTestResultType.EMAIL_TYPE
-        ].contains(hitResult.type))) {
+        ([InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE, InAppWebViewHitTestResultType.EMAIL_TYPE]
+            .contains(hitResult.type))) {
       Clipboard.setData(
         ClipboardData(text: hitResult.extra!),
       );
@@ -118,6 +110,43 @@ class WebViewGlobalController {
       },
     );
   }
+
+  static void addMobileBottomPadding() {
+    String jsCode = """
+    (function() {
+      var element = document.querySelector('#topbar > .container #top-menu-nav');
+      if (element) {
+          var bottomValue = window.getComputedStyle(element).getPropertyValue('bottom');
+          if (bottomValue === '0px') {
+              element.style.paddingBottom = '20px';
+              console.log('Padding applied');
+          } else {
+              console.log('Padding not applied, bottom is not 0');
+          }
+      } else {
+          console.log('Element not found');
+      }
+    })();
+  """;
+    value?.evaluateJavascript(source: jsCode);
+  }
+
+  /*static void addMobileBottomPadding() {
+    String jsCode = """
+    (function() {
+      if (window.innerWidth <= 570) {
+          // Check if the browser supports env(safe-area-inset-bottom)
+          if (CSS.supports('padding-bottom', 'env(safe-area-inset-bottom)')) {
+              document.getElementById('top-menu-nav').style.paddingBottom = 'env(safe-area-inset-bottom)';
+          } else {
+              // Fallback padding for unsupported browsers
+              document.getElementById('top-menu-nav').style.paddingBottom = '20px';
+          }
+      }
+    })();
+  """;
+    value?.evaluateJavascript(source: jsCode);
+  }*/
 
   static InAppWebViewSettings settings({bool zoom = false}) {
     return InAppWebViewSettings(
