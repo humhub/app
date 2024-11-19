@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -15,6 +16,8 @@ class HumHub {
   String? randomHash;
   String? appVersion;
   String? pushToken;
+  final bool isIos = Platform.isIOS || Platform.isMacOS;
+  final bool isAndroid = Platform.isAndroid;
 
   HumHub(
       {this.manifest, this.manifestUrl, this.isHideOpener = false, this.randomHash, this.appVersion, this.pushToken});
@@ -65,7 +68,9 @@ class HumHub {
   Map<String, String> get customHeaders => {
         'x-humhub-app-token': randomHash!,
         'x-humhub-app': appVersion ?? '1.0.0',
-        'x-humhub-app-ostate': isHideOpener ? '1' : '0'
+        'x-humhub-app-ostate': isHideOpener ? '1' : '0',
+        'x-humhub-app-is-ios': isIos ? '1' : '0',
+        'x-humhub-app-is-android': isAndroid ? '1' : '0'
       };
 
   static Future<Widget> app(String bundleId) async {

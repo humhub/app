@@ -20,8 +20,7 @@ class WebViewGlobalController {
   /// [ref] is reference to the app state.
   /// [url] is the URL to evaluate.
   /// @return `true` if the URL should open in a new window, `false` otherwise.
-  static bool openCreateWindowInWebView(
-      {required String url, required Manifest manifest}) {
+  static bool openCreateWindowInWebView({required String url, required Manifest manifest}) {
     String? baseUrl = manifest.baseUrl;
     if (url.startsWith('$baseUrl/file/file/download')) return true;
     if (url.startsWith('$baseUrl/u')) return true;
@@ -33,10 +32,7 @@ class WebViewGlobalController {
     _value = newValue;
   }
 
-  static void ajaxPost(
-      {required String url,
-      required String data,
-      Map<String, String>? headers}) {
+  static void ajaxPost({required String url, required String data, Map<String, String>? headers}) {
     String jsonHeaders = jsonEncode(headers);
     String jsCode4 = """
           \$.ajax({
@@ -51,18 +47,14 @@ class WebViewGlobalController {
   }
 
   static void ajaxSetHeaders({Map<String, String>? headers}) {
-    String jsCode =
-        "\$.ajaxSetup({headers: ${jsonEncode(headers).toString()}});";
+    String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(headers).toString()}});";
     value?.evaluateJavascript(source: jsCode);
   }
 
-  static void onLongPressHitTestResult(InAppWebViewController controller,
-      InAppWebViewHitTestResult hitResult) async {
+  static void onLongPressHitTestResult(InAppWebViewController controller, InAppWebViewHitTestResult hitResult) async {
     if (hitResult.extra != null &&
-        ([
-          InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE,
-          InAppWebViewHitTestResultType.EMAIL_TYPE
-        ].contains(hitResult.type))) {
+        ([InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE, InAppWebViewHitTestResultType.EMAIL_TYPE]
+            .contains(hitResult.type))) {
       Clipboard.setData(
         ClipboardData(text: hitResult.extra!),
       );
@@ -117,6 +109,22 @@ class WebViewGlobalController {
         _value?.setSettings(settings: settings(zoom: opened));
       },
     );
+  }
+
+  static void appendViewportFitCover() {
+    value?.evaluateJavascript(source: """
+    (function() {
+      var metaTags = document.getElementsByTagName('meta');
+      for (var i = 0; i < metaTags.length; i++) {
+        if (metaTags[i].name.toLowerCase() === 'viewport') {
+          var content = metaTags[i].content;
+          if (!content.includes('viewport-fit=cover')) {
+            metaTags[i].content = content + ', viewport-fit=cover';
+          }
+        }
+      }
+    })();
+  """);
   }
 
   static InAppWebViewSettings settings({bool zoom = false}) {
