@@ -14,133 +14,155 @@ class FileHandler {
   final Function(File file, String filename) onSuccess;
   final Function(double progress)? onProgress;
   final Function()? onStart;
+
   static const String _jsCode = """
-      function downloadFile(url) {
-          fetch(url, {
-              headers: {
-                  // Include necessary headers for authentication if needed
-                  'Authorization': 'Bearer <your_token>'
-              }
-          })
-          .then(response => {
-              const reader = response.body.getReader();
-              const contentLength = response.headers.get('Content-Length');
-              let receivedLength = 0;
-              let chunks = []; // array of received binary chunks (comprises the body)
-  
-              return new ReadableStream({
-                  start(controller) {
-                      function push() {
-                          reader.read().then(({ done, value }) => {
-                              if (done) {
-                                  const blob = new Blob(chunks); // Create blob from chunks
-                                  const fileReader = new FileReader();
-                                  fileReader.readAsDataURL(blob); 
-                                  fileReader.onloadend = function() {
-                                      const base64data = fileReader.result;
-                                      // Send the base64 content to Flutter
-                                      window.flutter_inappwebview.callHandler('downloadFile', base64data);
-                                  }
-                                  return;
-                              }
-  
-                              chunks.push(value); // Store received chunk
-                              receivedLength += value.length;
-  
-                              if (contentLength) {
-                                  // Calculate progress percentage
-                                  const progress = (receivedLength / contentLength) * 100;
-                                  // Send the progress to Flutter
-                                  window.flutter_inappwebview.callHandler('onProgress', progress);
-                              }
-  
-                              push(); // Call the push function again to read the next chunk
-                          });
-                      }
-  
-                      push(); // Start reading the data
-                  }
-              });
-          })
-          .catch(error => console.error('Error downloading file:', error));
-      }
+    function downloadFile(url) {
+        fetch(url)
+            .then(async response => {
+                const reader = response.body.getReader();
+                const contentLength = response.headers.get('Content-Length');
+                let receivedLength = 0;
+
+                try {
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) {
+                            window.flutter_inappwebview.callHandler('onDownloadComplete');
+                            break;
+                        }
+
+                        receivedLength += value.length;
+
+                        // Convert chunk to Base64
+                        const base64Chunk = arrayBufferToBase64(value.buffer);
+                        window.flutter_inappwebview.callHandler('onChunk', base64Chunk);
+
+                        if (contentLength) {
+                            const progress = (receivedLength / contentLength) * 100;
+                            window.flutter_inappwebview.callHandler('onProgress', progress);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Stream error:', error);
+                    window.flutter_inappwebview.callHandler('onError', error.toString());
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                window.flutter_inappwebview.callHandler('onError', error.toString());
+            });
+    }
+
+    function arrayBufferToBase64(buffer) {
+        let binary = '';
+        const bytes = new Uint8Array(buffer);
+        const len = bytes.byteLength;
+
+        for (let i = 0; i < len; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+    }
   """;
 
-  const FileHandler(
-      {required this.controller,
-        required this.downloadStartRequest,
-        required this.onSuccess,
-        this.filename,
-        this.onError,
-        this.onProgress,
-        this.onStart});
+  const FileHandler({
+    required this.controller,
+    required this.downloadStartRequest,
+    required this.onSuccess,
+    this.filename,
+    this.onError,
+    this.onProgress,
+    this.onStart,
+  });
 
-  download() {
+  void download() {
     PermissionHandler.runWithPermissionCheck(
       permissions: [],
       action: () => _download(),
     );
   }
 
-  _download() async {
+  Future<void> _download() async {
     try {
-      if (onStart != null) {
-        onStart!();
-      }
-      await controller.evaluateJavascript(source: _jsCode);
-      await controller.evaluateJavascript(source: "downloadFile('${downloadStartRequest.url.toString()}');");
-      controller.addJavaScriptHandler(
-          handlerName: 'downloadFile',
-          callback: (args) async {
-            String base64Data = args[0];
-            var (file, filename) = await _saveFile(base64Data);
-            onSuccess(file, filename);
-          });
+      onStart?.call();
 
+      Directory? directory = await _getDownloadDirectory();
+      if (directory == null) throw Exception("no_download_folder_found");
+
+      String endFilename = filename ?? downloadStartRequest.suggestedFilename ?? await _generateFilename();
+      String filePath = await _generateUniqueFilePath(directory, endFilename);
+      File file = File(filePath);
+      IOSink fileSink = file.openWrite();
+
+      // Inject JavaScript for file download
+      await controller.evaluateJavascript(source: _jsCode);
+      await controller.evaluateJavascript(
+        source: "downloadFile('${downloadStartRequest.url}');",
+      );
+
+      // Handle chunked data
       controller.addJavaScriptHandler(
-          handlerName: 'onProgress',
-          callback: (args) {
-            double progress = double.parse(args[0].toString());
-            if (onProgress != null) {
-              onProgress!(progress);
-            }
-          });
-    } catch (er) {
-      if (er is Exception && onError != null) {
-        onError!(er);
-      }
+        handlerName: 'onChunk',
+        callback: (args) async {
+          String base64Chunk = args[0];
+          List<int> chunkBytes = base64Decode(base64Chunk);
+          fileSink.add(chunkBytes); // Write to file
+        },
+      );
+
+      // Handle progress
+      controller.addJavaScriptHandler(
+        handlerName: 'onProgress',
+        callback: (args) {
+          double progress = double.parse(args[0].toString());
+          onProgress?.call(progress);
+        },
+      );
+
+      // Handle download completion
+      controller.addJavaScriptHandler(
+        handlerName: 'onDownloadComplete',
+        callback: (args) async {
+          await fileSink.close();
+          onSuccess(file, endFilename);
+        },
+      );
+
+      // Handle errors
+      controller.addJavaScriptHandler(
+        handlerName: 'onError',
+        callback: (args) async {
+          String errorMessage = args[0].toString();
+          await fileSink.close();
+          file.deleteSync();
+          onError?.call(Exception(errorMessage));
+        },
+      );
+    } catch (e) {
+      if (e is Exception) onError?.call(e);
     }
   }
 
   Future<(File file, String filename)> _saveFile(String base64Data) async {
-    // Decode base64 string to binary data
-    final decodedBytes = base64Decode(base64Data.split(",").last); // In case there's a base64 header
+    final decodedBytes = base64Decode(base64Data.split(",").last);
 
-    // Get the directory for storing files
     Directory? directory = await _getDownloadDirectory();
     if (directory == null) throw Exception("no_download_folder_found");
-    // Set a default filename if not provided
-    String endFilename = filename ?? downloadStartRequest.suggestedFilename ?? await _generateFilename();
 
-    // Generate a unique file path
+    String endFilename = filename ?? downloadStartRequest.suggestedFilename ?? await _generateFilename();
     String filePath = await _generateUniqueFilePath(directory, endFilename);
 
-    // Write the decoded data to the file
     File file = File(filePath);
     await file.writeAsBytes(decodedBytes);
     if (!await file.exists()) throw Exception("file_was_not_created");
+
     return (file, endFilename);
   }
 
   Future<String> _generateFilename() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    String appName = packageInfo.appName;
-    String filename = '${appName}file';
-
-    // Replace spaces with underscores
-    filename = filename.replaceAll(' ', '_');
-
-    return filename;
+    String appName = packageInfo.appName.replaceAll(' ', '_');
+    return '${appName}file';
   }
 
   Future<String> _generateUniqueFilePath(Directory directory, String baseFilename) async {
@@ -148,7 +170,6 @@ class FileHandler {
     int counter = 1;
 
     while (File(filePath).existsSync()) {
-      // Append a number in parentheses to the baseFilename
       String newFilename = '($counter)$baseFilename';
       filePath = '${directory.path}/$newFilename';
       counter++;
