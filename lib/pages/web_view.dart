@@ -139,6 +139,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(
         headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
+    WebViewGlobalController.appendViewportFitCover();
 
     final url = action.request.url!.rawValue;
 
@@ -232,6 +233,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(
         headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
+    WebViewGlobalController.appendViewportFitCover();
     LoadingProvider.of(ref).dismissAll();
   }
 
@@ -239,6 +241,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(
         headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
+    WebViewGlobalController.appendViewportFitCover();
   }
 
   _onProgressChanged(InAppWebViewController controller, int progress) {
