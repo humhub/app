@@ -4,8 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:humhub/app_flavored.dart';
 import 'package:humhub/app_opener.dart';
+import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/util/log.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
+import 'package:humhub/util/permission_handler.dart';
+import 'package:humhub/util/storage_service.dart';
+import 'package:loggy/loggy.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 enum RedirectAction { opener, webView }
 
@@ -73,8 +79,17 @@ class HumHub {
         'x-humhub-app-is-android': isAndroid ? '1' : '0'
       };
 
-  static Future<Widget> app(String bundleId) async {
-    switch (bundleId) {
+  static Future<Widget> init() async {
+    Loggy.initLoggy(
+      logPrinter: const GlobalLog(),
+    );
+    WidgetsFlutterBinding.ensureInitialized();
+    await SecureStorageService.clearSecureStorageOnReinstall();
+    await GlobalPackageInfo.init();
+    await PermissionHandler.requestPermissions(
+      [Permission.notification, Permission.camera, Permission.microphone, Permission.storage, Permission.photos],
+    );
+    switch (GlobalPackageInfo.info.packageName) {
       case 'com.humhub.app':
         return const OpenerApp();
       default:

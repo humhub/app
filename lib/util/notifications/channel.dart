@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/flavored/util/notifications/channel.f.dart';
+import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/init_from_url.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 class NotificationChannel {
   final String id;
@@ -43,8 +43,7 @@ class NotificationChannel {
   }
 
   static Future<NotificationChannel> getChannel() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform(); // Replace this with the actual condition logic
-    switch (packageInfo.packageName) {
+    switch (GlobalPackageInfo.info.packageName) {
       case 'com.humhub.app':
         return const NotificationChannel();
       default:
