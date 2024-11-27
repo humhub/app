@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 import 'const.dart';
 
@@ -35,11 +35,10 @@ class HumHubNotifier extends ChangeNotifier {
   }
 
   Future<void> setInstance(HumHub instance) async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
     _humHubInstance.manifest = instance.manifest;
     _humHubInstance.isHideOpener = instance.isHideOpener;
     _humHubInstance.randomHash = instance.randomHash;
-    _humHubInstance.appVersion = packageInfo.version;
+    _humHubInstance.appVersion = GlobalPackageInfo.info.version;
     _humHubInstance.manifestUrl = instance.manifestUrl;
     _updateSafeStorage();
     notifyListeners();

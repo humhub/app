@@ -42,9 +42,9 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
 
   @override
   void initState() {
-    instance = ref.read(humHubFProvider).value!;
+    instance = ref.read(humHubFProvider);
     _authBrowser = AuthInAppBrowser(
-      manifest: ref.read(humHubFProvider).value!.manifest,
+      manifest: ref.read(humHubFProvider).manifest,
       concludeAuth: (URLRequest request) {
         _concludeAuth(request);
       },

@@ -50,6 +50,6 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
   }
 }
 
-final humHubFProvider = FutureProvider<HumHubF>((ref) {
-  return HumHubF.initialize();
+final humHubFProvider = Provider<HumHubF>((ref) {
+  return HumHubF();
 });

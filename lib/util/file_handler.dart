@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/util/permission_handler.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileHandler {
@@ -143,6 +143,7 @@ class FileHandler {
     }
   }
 
+  // ignore: unused_element
   Future<(File file, String filename)> _saveFile(String base64Data) async {
     final decodedBytes = base64Decode(base64Data.split(",").last);
 
@@ -160,8 +161,7 @@ class FileHandler {
   }
 
   Future<String> _generateFilename() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    String appName = packageInfo.appName.replaceAll(' ', '_');
+    String appName = GlobalPackageInfo.info.appName.replaceAll(' ', '_');
     return '${appName}file';
   }
 
