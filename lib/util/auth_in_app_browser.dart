@@ -42,6 +42,6 @@ class AuthInAppBrowser extends InAppBrowser {
   }
 
   launchUrl(URLRequest urlRequest) {
-    openUrlRequest(urlRequest: urlRequest, /*options: options,*/ settings: settings);
+    openUrlRequest(urlRequest: urlRequest, settings: settings);
   }
 }
