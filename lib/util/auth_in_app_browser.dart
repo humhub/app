@@ -15,6 +15,8 @@ class AuthInAppBrowser extends InAppBrowser {
     settings = InAppBrowserClassSettings(
       browserSettings: InAppBrowserSettings(
         hideUrlBar: true,
+        hideTitleBar: true,
+        closeOnCannotGoBack: true,
         shouldCloseOnBackButtonPressed: true,
         toolbarTopBackgroundColor: Colors.white,
         toolbarTopTintColor: HexColor(manifest.themeColor),
@@ -40,6 +42,6 @@ class AuthInAppBrowser extends InAppBrowser {
   }
 
   launchUrl(URLRequest urlRequest) {
-    openUrlRequest(urlRequest: urlRequest, /*options: options,*/ settings: settings);
+    openUrlRequest(urlRequest: urlRequest, settings: settings);
   }
 }
