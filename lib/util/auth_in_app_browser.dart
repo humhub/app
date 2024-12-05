@@ -15,6 +15,8 @@ class AuthInAppBrowser extends InAppBrowser {
     settings = InAppBrowserClassSettings(
       browserSettings: InAppBrowserSettings(
         hideUrlBar: true,
+        hideTitleBar: true,
+        closeOnCannotGoBack: true,
         shouldCloseOnBackButtonPressed: true,
         toolbarTopBackgroundColor: Colors.white,
         toolbarTopTintColor: HexColor(manifest.themeColor),
