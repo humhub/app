@@ -15,9 +15,7 @@ class HumHub {
   String? randomHash;
   String? appVersion;
   String? pushToken;
-  List<Manifest> _history;
-
-  List<Manifest> get history => _history;
+  List<Manifest> history;
 
   HumHub({
     this.manifest,
@@ -27,7 +25,7 @@ class HumHub {
     this.appVersion,
     this.pushToken,
     List<Manifest>? history,
-  }) : _history = history ?? [];
+  }) : history = history ?? [];
 
   Map<String, dynamic> toJson() => {
         'manifest': manifest?.toJson(),
@@ -36,7 +34,7 @@ class HumHub {
         'randomHash': randomHash,
         'appVersion': appVersion,
         'pushToken': pushToken,
-        'history': _history.map((manifest) => manifest.toJson()).toList(), // Serialize history
+        'history': history.map((manifest) => manifest.toJson()).toList(),
       };
 
   factory HumHub.fromJson(Map<String, dynamic> json) {
@@ -67,13 +65,12 @@ class HumHub {
   /// property for this method to work correctly. The history list
   /// will maintain unique entries based on the `startUrl`.
   /// !!! This method should only be called inside a [HumHubNotifier] because it also needs to update secure storage.
-  void addToHistory(Manifest newManifest) {
-    final existingManifestIndex = _history.indexWhere((item) => item.startUrl == newManifest.startUrl);
-
+  void addOrUpdateHistory(Manifest newManifest) {
+    final existingManifestIndex = history.indexWhere((item) => item.startUrl == newManifest.startUrl);
     if (existingManifestIndex >= 0) {
-      _history[existingManifestIndex] = newManifest;
+      history[existingManifestIndex] = newManifest;
     } else {
-      _history.add(newManifest);
+      history.add(newManifest);
     }
   }
 
@@ -90,10 +87,10 @@ class HumHub {
   /// removed manifest after this operation.
   /// !!! This method should only be called inside a [HumHubNotifier] because it also needs to update secure storage.
   bool removeFromHistory(Manifest manifest) {
-    final existingManifestIndex = _history.indexWhere((item) => item == manifest);
+    final existingManifestIndex = history.indexWhere((item) => item == manifest);
 
     if (existingManifestIndex >= 0) {
-      _history.removeAt(existingManifestIndex); // Remove the manifest
+      history.removeAt(existingManifestIndex); // Remove the manifest
       return true;
     } else {
       return false;
