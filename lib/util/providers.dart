@@ -35,8 +35,9 @@ class HumHubNotifier extends ChangeNotifier {
     _humHubInstance.randomHash = instance.randomHash;
     _humHubInstance.appVersion = GlobalPackageInfo.info.version;
     _humHubInstance.manifestUrl = instance.manifestUrl;
-    if (instance.manifest != null) {
-      _humHubInstance.addToHistory(instance.manifest!);
+    _humHubInstance.history = instance.history;
+    if(instance.manifest != null){
+      _humHubInstance.addOrUpdateHistory(instance.manifest!);
     }
     _updateSafeStorage();
     notifyListeners();
@@ -44,6 +45,12 @@ class HumHubNotifier extends ChangeNotifier {
 
   Future<void> removeHistory(Manifest manifest) async {
     _humHubInstance.removeFromHistory(manifest);
+    _updateSafeStorage();
+    notifyListeners();
+  }
+
+  Future<void> addOrUpdateHistory(Manifest manifest) async {
+    _humHubInstance.addOrUpdateHistory(manifest);
     _updateSafeStorage();
     notifyListeners();
   }

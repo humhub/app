@@ -36,7 +36,7 @@ class HumHub {
     this.appVersion,
     this.pushToken,
     List<Manifest>? history,
-  }) : _history = history ?? [];
+  }) : history = history ?? [];
 
   Map<String, dynamic> toJson() => {
         'manifest': manifest?.toJson(),
@@ -85,9 +85,9 @@ class HumHub {
         _history.indexWhere((item) => item.startUrl == newManifest.startUrl);
 
     if (existingManifestIndex >= 0) {
-      _history[existingManifestIndex] = newManifest;
+      history[existingManifestIndex] = newManifest;
     } else {
-      _history.add(newManifest);
+      history.add(newManifest);
     }
   }
 
@@ -108,7 +108,7 @@ class HumHub {
         _history.indexWhere((item) => item == manifest);
 
     if (existingManifestIndex >= 0) {
-      _history.removeAt(existingManifestIndex); // Remove the manifest
+      history.removeAt(existingManifestIndex); // Remove the manifest
       return true;
     } else {
       return false;

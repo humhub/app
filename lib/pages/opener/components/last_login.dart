@@ -4,16 +4,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/providers.dart';
-import 'package:loggy/loggy.dart';
 
-class LastLoginWidget extends ConsumerWidget {
+class LastLoginWidget extends ConsumerStatefulWidget {
   final void Function()? onAddNetwork;
 
   const LastLoginWidget({super.key, this.onAddNetwork});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final humHub = ref.watch(humHubProvider);
+  ConsumerState<LastLoginWidget> createState() => _LastLoginWidgetState();
+}
+
+class _LastLoginWidgetState extends ConsumerState<LastLoginWidget> {
+  @override
+  Widget build(BuildContext context) {
+    final history = ref.watch(humHubProvider).history;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -35,10 +39,10 @@ class LastLoginWidget extends ConsumerWidget {
               crossAxisSpacing: 20,
               mainAxisSpacing: 20,
             ),
-            itemCount: humHub.history.length + 1, // Include the add network tile
+            itemCount: history.length + 1, // Include the add network tile
             itemBuilder: (context, index) {
-              if (index < humHub.history.length) {
-                final manifest = humHub.history[index];
+              if (index < history.length) {
+                final manifest = history[index];
                 return _buildLoginTile(manifest); // Replace with your notification logic
               } else {
                 return _buildAddNetworkTile();
@@ -53,7 +57,6 @@ class LastLoginWidget extends ConsumerWidget {
   // Tile for last login with badge
   Widget _buildLoginTile(Manifest manifest) {
     return Card(
-      //color: HexColor(manifest.themeColor),
       surfaceTintColor: Colors.white,
       elevation: 3,
       shape: RoundedRectangleBorder(
@@ -68,14 +71,14 @@ class LastLoginWidget extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            GestureDetector(
-              onTap: () {
-                logError("Here");
-              },
-              child: const Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: EdgeInsets.only(top: 10, left: 10),
+            Align(
+              alignment: Alignment.topLeft,
+              child: InkWell(
+                onTap: () {
+                  ref.watch(humHubProvider.notifier).removeHistory(manifest);
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(10.0),
                   child: Icon(
                     Icons.close,
                     size: 14,
@@ -96,7 +99,7 @@ class LastLoginWidget extends ConsumerWidget {
                 manifest.name,
                 style: const TextStyle(fontSize: 14),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -118,23 +121,23 @@ class LastLoginWidget extends ConsumerWidget {
           splashColor: HumhubTheme.primaryColor.withOpacity(0.3),
           highlightColor: HumhubTheme.primaryColor.withOpacity(0.3),
           hoverColor: HumhubTheme.primaryColor.withOpacity(0.3),
-          onTap: onAddNetwork,
+          onTap: widget.onAddNetwork,
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0XFF1A8291),
+                  decoration: const BoxDecoration(
+                    color: Color(0XFF1A8291),
                     shape: BoxShape.circle,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(4.0),
+                  child: const Padding(
+                    padding: EdgeInsets.all(4.0),
                     child: Icon(Icons.add, size: 30, color: Colors.white),
                   ),
                 ),
-                SizedBox(height: 10),
-                Text(
+                const SizedBox(height: 10),
+                const Text(
                   "Add Network",
                   style: TextStyle(
                     fontSize: 16,
