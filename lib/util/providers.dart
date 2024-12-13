@@ -15,7 +15,7 @@ class HumHubNotifier extends ChangeNotifier {
 
   final _storage = const FlutterSecureStorage();
 
-  bool get isHideDialog => _humHubInstance.isHideOpener;
+  OpenerState get openerState => _humHubInstance.openerState;
   Manifest? get manifest => _humHubInstance.manifest;
   String? get randomHash => _humHubInstance.randomHash;
   String? get appVersion => _humHubInstance.appVersion;
@@ -23,15 +23,15 @@ class HumHubNotifier extends ChangeNotifier {
   Map<String, String> get customHeaders => _humHubInstance.customHeaders;
   List<Manifest> get history => _humHubInstance.history;
 
-  void setIsHideOpener(bool isHide) {
-    _humHubInstance.isHideOpener = isHide;
+  void setOpenerState(OpenerState state) {
+    _humHubInstance.openerState = state;
     _updateSafeStorage();
     notifyListeners();
   }
 
   Future<void> setInstance(HumHub instance) async {
     _humHubInstance.manifest = instance.manifest;
-    _humHubInstance.isHideOpener = instance.isHideOpener;
+    _humHubInstance.openerState = instance.openerState;
     _humHubInstance.randomHash = instance.randomHash;
     _humHubInstance.appVersion = GlobalPackageInfo.info.version;
     _humHubInstance.manifestUrl = instance.manifestUrl;

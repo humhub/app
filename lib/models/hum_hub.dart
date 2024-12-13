@@ -15,10 +15,26 @@ import 'package:permission_handler/permission_handler.dart';
 
 enum RedirectAction { opener, webView }
 
+enum OpenerState {
+  shown(true),
+  hidden(false);
+
+  final bool value;
+
+  const OpenerState(this.value);
+
+  String get headerValue => value ? '1' : '0';
+
+  @override
+  String toString() {
+    return value ? "shown" : "hidden";
+  }
+}
+
 class HumHub {
   Manifest? manifest;
   String? manifestUrl;
-  bool isHideOpener;
+  OpenerState openerState;
   String? randomHash;
   String? appVersion;
   String? pushToken;
@@ -31,7 +47,7 @@ class HumHub {
   HumHub({
     this.manifest,
     this.manifestUrl,
-    this.isHideOpener = false,
+    this.openerState = OpenerState.shown,
     this.randomHash,
     this.appVersion,
     this.pushToken,
@@ -41,7 +57,7 @@ class HumHub {
   Map<String, dynamic> toJson() => {
         'manifest': manifest?.toJson(),
         'manifestUri': manifestUrl,
-        'isHideDialog': isHideOpener,
+        'openerState': openerState.value,
         'randomHash': randomHash,
         'appVersion': appVersion,
         'pushToken': pushToken,
@@ -55,7 +71,7 @@ class HumHub {
       manifest:
           json['manifest'] != null ? Manifest.fromJson(json['manifest']) : null,
       manifestUrl: json['manifestUri'],
-      isHideOpener: json['isHideDialog'] as bool,
+      openerState: (json['openerState'] as bool?) ?? true ? OpenerState.shown : OpenerState.hidden,
       randomHash: json['randomHash'],
       appVersion: json['appVersion'],
       pushToken: json['pushToken'],
@@ -116,7 +132,7 @@ class HumHub {
   }
 
   Future<RedirectAction> action(ref) async {
-    if (!isHideOpener) {
+    if (OpenerState.shown.value) {
       return RedirectAction.opener;
     } else {
       if (manifest != null) {
@@ -147,6 +163,8 @@ class HumHub {
         'x-humhub-app-ostate': isHideOpener ? '1' : '0',
         'x-humhub-app-is-ios': isIos ? '1' : '0',
         'x-humhub-app-is-android': isAndroid ? '1' : '0'
+        'x-humhub-app-opener-state': openerState.headerValue,
+        'x-humhub-app-is-multi-instance': '1',
       };
 
   static Future<Widget> init() async {

@@ -10,12 +10,12 @@ class HumHubF extends HumHub {
   String get manifestUrl => dotenv.env['MANIFEST_URL']!;
 
   HumHubF({
-    bool isHideOpener = false,
+    OpenerState openerState = OpenerState.shown,
     String? randomHash,
     String? appVersion,
     String? pushToken,
   }) : super(
-            isHideOpener: isHideOpener,
+            openerState: openerState,
             randomHash: HumHub.generateHash(32),
             appVersion: appVersion,
             pushToken: pushToken);
@@ -28,6 +28,8 @@ class HumHubF extends HumHub {
         'x-humhub-app-ostate': isHideOpener ? '1' : '0',
         'x-humhub-app-is-ios': isIos ? '1' : '0',
         'x-humhub-app-is-android': isAndroid ? '1' : '0'
+        'x-humhub-app-bundle-id': bundleId,
+        'x-humhub-app-ostate': openerState.headerValue
       };
 
   static Future<HumHubF> initialize() async {

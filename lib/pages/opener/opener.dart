@@ -2,28 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/components/language_switcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/help/help.dart';
 import 'package:humhub/pages/opener/components/search_bar.dart';
+import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/init_from_url.dart';
+import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/openers/opener_controller.dart';
+import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:rive/rive.dart';
 
 import 'components/last_login.dart';
 
-class Opener extends ConsumerStatefulWidget {
-  const Opener({Key? key}) : super(key: key);
+class OpenerPage extends ConsumerStatefulWidget {
+  const OpenerPage({Key? key}) : super(key: key);
   static const String path = '/opener';
 
   @override
-  OpenerState createState() => OpenerState();
+  OpenerPageState createState() => OpenerPageState();
 }
 
-class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMixin {
+class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProviderStateMixin {
   late OpenerController openerControlLer;
-  late bool isSearchBarOpen = false;
 
   @override
   void initState() {
@@ -35,7 +38,7 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Delay before showing text field
       ref.read(visibilityProvider.notifier).toggleVisibility(true);
-      Future.delayed(const Duration(milliseconds: 900), () {
+      Future.delayed(const Duration(milliseconds: 1000), () {
         ref.read(textFieldVisibilityProvider.notifier).toggleVisibility(true);
       });
 
@@ -50,10 +53,8 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
       }
 
       /// If there is only one item in history that means we can show [SearchBarWidget] that is already prefilled with url or null if count is 0.
-      if (ref.read(humHubProvider).history.length < 2) {
-        setState(() {
-          isSearchBarOpen = true;
-        });
+      if (ref.read(humHubProvider).history.isEmpty) {
+        ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility(true);
       }
     });
   }
@@ -77,15 +78,15 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
           Scaffold(
             resizeToAvoidBottomInset: true,
             backgroundColor: Colors.transparent,
-            floatingActionButton: isSearchBarOpen
+            floatingActionButton: ref.watch(searchBarVisibilityNotifier)
                 ? AnimatedOpacity(
                     opacity: ref.watch(languageSwitcherVisibilityProvider) ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 300),
                     child: FloatingActionButton(
                       onPressed: () {
-                        setState(() {
-                          isSearchBarOpen = !isSearchBarOpen;
-                        });
+                        ref
+                            .watch(searchBarVisibilityNotifier.notifier)
+                            .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
                       },
                       tooltip: 'Increment',
                       backgroundColor: Colors.white,
@@ -129,14 +130,24 @@ class OpenerState extends ConsumerState<Opener> with SingleTickerProviderStateMi
                       ),
                       Expanded(
                           flex: 8,
-                          child: isSearchBarOpen
+                          child: ref.watch(searchBarVisibilityNotifier)
                               ? SearchBarWidget(openerControlLer: openerControlLer)
                               : LastLoginWidget(
                                   onAddNetwork: () {
-                                    setState(() {
-                                      isSearchBarOpen = !isSearchBarOpen;
-                                    });
+                                    ref
+                                        .watch(searchBarVisibilityNotifier.notifier)
+                                        .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
                                   },
+                                  history: ref.watch(humHubProvider).history,
+                                  onSelectNetwork: (Manifest manifest) async {
+                                    UniversalOpenerController uniOpen =
+                                        UniversalOpenerController(url: manifest.baseUrl);
+                                    await uniOpen.initHumHub();
+                                    // Always pop the current instance and init the new one.
+                                    LoadingProvider.of(ref).dismissAll();
+                                    navigatorKey.currentState!.pushNamed(WebView.path, arguments: uniOpen);
+                                  },
+                                  onDeleteNetwork: ref.watch(humHubProvider.notifier).removeHistory,
                                 )),
                       Expanded(
                         flex: 2,

@@ -31,11 +31,11 @@ class MyRouter {
   static dynamic initParams;
 
   static Map<String, Widget Function(BuildContext)> routes = {
-    Opener.path: (context) {
+    OpenerPage.path: (context) {
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
       ]);
-      return const Opener();
+      return const OpenerPage();
     },
     WebView.path: (context) {
       SystemChrome.setPreferredOrientations([
@@ -59,8 +59,8 @@ class MyRouter {
     RedirectAction action = await humhub.action(ref);
     switch (action) {
       case RedirectAction.opener:
-        initRoute = Opener.path;
-        return Opener.path;
+        initRoute = OpenerPage.path;
+        return OpenerPage.path;
       case RedirectAction.webView:
         initRoute = WebView.path;
         initParams = humhub.manifest;

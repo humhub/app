@@ -3,21 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/const.dart';
-import 'package:humhub/util/providers.dart';
 
-class LastLoginWidget extends ConsumerStatefulWidget {
+class LastLoginWidget extends StatelessWidget {
+  final List<Manifest> history;
+  final void Function(Manifest manifest) onSelectNetwork;
+  final void Function(Manifest manifest) onDeleteNetwork;
   final void Function()? onAddNetwork;
 
-  const LastLoginWidget({super.key, this.onAddNetwork});
+  const LastLoginWidget({
+    super.key,
+    required this.history,
+    this.onAddNetwork,
+    required this.onSelectNetwork,
+    required this.onDeleteNetwork,
+  });
 
-  @override
-  ConsumerState<LastLoginWidget> createState() => _LastLoginWidgetState();
-}
-
-class _LastLoginWidgetState extends ConsumerState<LastLoginWidget> {
   @override
   Widget build(BuildContext context) {
-    final history = ref.watch(humHubProvider).history;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -43,7 +45,7 @@ class _LastLoginWidgetState extends ConsumerState<LastLoginWidget> {
             itemBuilder: (context, index) {
               if (index < history.length) {
                 final manifest = history[index];
-                return _buildLoginTile(manifest); // Replace with your notification logic
+                return _buildLoginTile(manifest);
               } else {
                 return _buildAddNetworkTile();
               }
@@ -54,7 +56,6 @@ class _LastLoginWidgetState extends ConsumerState<LastLoginWidget> {
     );
   }
 
-  // Tile for last login with badge
   Widget _buildLoginTile(Manifest manifest) {
     return Card(
       surfaceTintColor: Colors.white,
@@ -67,16 +68,14 @@ class _LastLoginWidgetState extends ConsumerState<LastLoginWidget> {
         splashColor: HumhubTheme.primaryColor.withOpacity(0.3),
         highlightColor: HumhubTheme.primaryColor.withOpacity(0.3),
         hoverColor: HumhubTheme.primaryColor.withOpacity(0.3),
-        onTap: () {},
+        onTap: () => onSelectNetwork(manifest),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Align(
               alignment: Alignment.topLeft,
               child: InkWell(
-                onTap: () {
-                  ref.watch(humHubProvider.notifier).removeHistory(manifest);
-                },
+                onTap: () => onDeleteNetwork(manifest),
                 child: const Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Icon(
@@ -106,7 +105,6 @@ class _LastLoginWidgetState extends ConsumerState<LastLoginWidget> {
     );
   }
 
-  // Tile for adding a network
   Widget _buildAddNetworkTile() {
     return Card(
       color: const Color(0XFFDBEFF0),
@@ -121,7 +119,7 @@ class _LastLoginWidgetState extends ConsumerState<LastLoginWidget> {
           splashColor: HumhubTheme.primaryColor.withOpacity(0.3),
           highlightColor: HumhubTheme.primaryColor.withOpacity(0.3),
           hoverColor: HumhubTheme.primaryColor.withOpacity(0.3),
-          onTap: widget.onAddNetwork,
+          onTap: onAddNetwork,
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,

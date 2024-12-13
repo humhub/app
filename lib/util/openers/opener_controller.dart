@@ -12,9 +12,8 @@ import '../api_provider.dart';
 import '../connectivity_plugin.dart';
 import '../form_helper.dart';
 
-// Create a notifier for visibility state
 class VisibilityNotifier extends StateNotifier<bool> {
-  VisibilityNotifier() : super(false); // Default to false
+  VisibilityNotifier() : super(false);
 
   void toggleVisibility(bool isVisible) {
     state = isVisible;
@@ -30,6 +29,10 @@ final languageSwitcherVisibilityProvider = StateNotifierProvider<VisibilityNotif
 );
 
 final visibilityProvider = StateNotifierProvider<VisibilityNotifier, bool>(
+  (ref) => VisibilityNotifier(),
+);
+
+final searchBarVisibilityNotifier = StateNotifierProvider<VisibilityNotifier, bool>(
   (ref) => VisibilityNotifier(),
 );
 
