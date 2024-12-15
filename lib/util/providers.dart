@@ -20,6 +20,7 @@ class HumHubNotifier extends ChangeNotifier {
   String? get randomHash => _humHubInstance.randomHash;
   String? get appVersion => _humHubInstance.appVersion;
   String? get pushToken => _humHubInstance.pushToken;
+  String? get manifestUrl => _humHubInstance.manifestUrl;
   Map<String, String> get customHeaders => _humHubInstance.customHeaders;
   List<Manifest> get history => _humHubInstance.history;
 
@@ -36,11 +37,38 @@ class HumHubNotifier extends ChangeNotifier {
     _humHubInstance.appVersion = GlobalPackageInfo.info.version;
     _humHubInstance.manifestUrl = instance.manifestUrl;
     _humHubInstance.history = instance.history;
-    if(instance.manifest != null){
-      _humHubInstance.addOrUpdateHistory(instance.manifest!);
-    }
     _updateSafeStorage();
     notifyListeners();
+  }
+
+  // Add a copyWith method
+  HumHub copyWith({
+    OpenerState? openerState,
+    Manifest? manifest,
+    String? randomHash,
+    String? appVersion,
+    String? pushToken,
+    Map<String, String>? customHeaders,
+    List<Manifest>? history,
+    String? manifestUrl,
+  }) {
+    HumHub instance =  HumHub(
+      openerState: openerState ?? this.openerState,
+      manifest: manifest ?? this.manifest,
+      randomHash: randomHash ?? this.randomHash,
+      appVersion: appVersion ?? this.appVersion,
+      pushToken: pushToken ?? this.pushToken,
+      history: history ?? this.history,
+      manifestUrl: manifestUrl ?? this.manifestUrl,
+    );
+    _humHubInstance.manifest = instance.manifest;
+    _humHubInstance.openerState = instance.openerState;
+    _humHubInstance.randomHash = instance.randomHash;
+    _humHubInstance.manifestUrl = instance.manifestUrl;
+    _humHubInstance.history = instance.history;
+    _updateSafeStorage();
+    notifyListeners();
+    return instance;
   }
 
   Future<void> removeHistory(Manifest manifest) async {

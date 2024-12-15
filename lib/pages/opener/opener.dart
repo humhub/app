@@ -129,10 +129,13 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                         ),
                       ),
                       Expanded(
-                          flex: 8,
-                          child: ref.watch(searchBarVisibilityNotifier)
-                              ? SearchBarWidget(openerControlLer: openerControlLer)
-                              : LastLoginWidget(
+                        flex: 8,
+                        child: ref.watch(searchBarVisibilityNotifier)
+                            ? SearchBarWidget(openerControlLer: openerControlLer)
+                            : AnimatedOpacity(
+                                opacity: ref.watch(textFieldVisibilityProvider) ? 1.0 : 0.0,
+                                duration: const Duration(milliseconds: 250),
+                                child: LastLoginWidget(
                                   onAddNetwork: () {
                                     ref
                                         .watch(searchBarVisibilityNotifier.notifier)
@@ -145,10 +148,16 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                                     await uniOpen.initHumHub();
                                     // Always pop the current instance and init the new one.
                                     LoadingProvider.of(ref).dismissAll();
-                                    navigatorKey.currentState!.pushNamed(WebView.path, arguments: uniOpen);
+
+                                    openerControlLer.animationNavigationWrapper(
+                                      navigate: () =>
+                                          navigatorKey.currentState!.pushNamed(WebView.path, arguments: uniOpen),
+                                    );
                                   },
                                   onDeleteNetwork: ref.watch(humHubProvider.notifier).removeHistory,
-                                )),
+                                ),
+                              ),
+                      ),
                       Expanded(
                         flex: 2,
                         child: GestureDetector(

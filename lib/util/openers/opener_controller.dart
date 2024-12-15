@@ -129,8 +129,9 @@ class OpenerController {
       String currentUrl = urlTextController.text;
       String hash = HumHub.generateHash(32);
       if (lastUrl == currentUrl) hash = ref.read(humHubProvider).randomHash ?? hash;
-      await ref.read(humHubProvider).setInstance(HumHub(
-          manifest: manifest, randomHash: hash, manifestUrl: manifestUrl, history: ref.read(humHubProvider).history));
+      await ref.read(humHubProvider.notifier).addOrUpdateHistory(manifest);
+      HumHub instance = ref.read(humHubProvider).copyWith(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl);
+      ref.read(humHubProvider.notifier).setInstance(instance);
     }
   }
 

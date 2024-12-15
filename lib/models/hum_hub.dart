@@ -124,7 +124,7 @@ class HumHub {
         _history.indexWhere((item) => item == manifest);
 
     if (existingManifestIndex >= 0) {
-      history.removeAt(existingManifestIndex); // Remove the manifest
+      history.removeAt(existingManifestIndex);
       return true;
     } else {
       return false;

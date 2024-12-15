@@ -1,11 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:http/http.dart' as http;
+import 'package:humhub/util/const.dart';
 import '../api_provider.dart';
 import '../connectivity_plugin.dart';
-
 
 // TODO: Rewrite openers so that the opener_controller will expand universal_opener_controller
 class UniversalOpenerController {
@@ -67,7 +70,9 @@ class UniversalOpenerController {
     } else {
       Manifest manifest = asyncData!.value!;
       String hash = HumHub.generateHash(32);
-      HumHub instance = HumHub(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl);
+      HumHub? lastInstance = await getLastInstance();
+      HumHub instance =
+          HumHub(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl, history: lastInstance?.history);
       humhub = instance;
       return instance;
     }
@@ -76,5 +81,12 @@ class UniversalOpenerController {
   static Uri assumeUrl(String url) {
     if (url.startsWith("https://") || url.startsWith("http://")) return Uri.parse(url);
     return Uri.parse("https://$url");
+  }
+
+  Future<HumHub?> getLastInstance() async {
+    const storage = FlutterSecureStorage();
+    var jsonStr = await storage.read(key: StorageKeys.humhubInstance);
+    HumHub? humHub = jsonStr != null ? HumHub.fromJson(json.decode(jsonStr)) : null;
+    return humHub;
   }
 }
