@@ -40,9 +40,7 @@ class HumHub {
   String? pushToken;
   final bool isIos = Platform.isIOS || Platform.isMacOS;
   final bool isAndroid = Platform.isAndroid;
-  List<Manifest> _history;
-
-  List<Manifest> get history => _history;
+  List<Manifest> history;
 
   HumHub({
     this.manifest,
@@ -61,9 +59,9 @@ class HumHub {
         'randomHash': randomHash,
         'appVersion': appVersion,
         'pushToken': pushToken,
-        'history': _history
+        'history': history
             .map((manifest) => manifest.toJson())
-            .toList(), // Serialize history
+            .toList(),
       };
 
   factory HumHub.fromJson(Map<String, dynamic> json) {
@@ -96,9 +94,9 @@ class HumHub {
   /// property for this method to work correctly. The history list
   /// will maintain unique entries based on the `startUrl`.
   /// !!! This method should only be called inside a [HumHubNotifier] because it also needs to update secure storage.
-  void addToHistory(Manifest newManifest) {
+  void addOrUpdateHistory(Manifest newManifest) {
     final existingManifestIndex =
-        _history.indexWhere((item) => item.startUrl == newManifest.startUrl);
+        history.indexWhere((item) => item.startUrl == newManifest.startUrl);
 
     if (existingManifestIndex >= 0) {
       history[existingManifestIndex] = newManifest;
@@ -121,7 +119,7 @@ class HumHub {
   /// !!! This method should only be called inside a [HumHubNotifier] because it also needs to update secure storage.
   bool removeFromHistory(Manifest manifest) {
     final existingManifestIndex =
-        _history.indexWhere((item) => item == manifest);
+        history.indexWhere((item) => item == manifest);
 
     if (existingManifestIndex >= 0) {
       history.removeAt(existingManifestIndex);
@@ -160,9 +158,8 @@ class HumHub {
   Map<String, String> get customHeaders => {
         'x-humhub-app-token': randomHash!,
         'x-humhub-app': appVersion ?? '1.0.0',
-        'x-humhub-app-ostate': isHideOpener ? '1' : '0',
         'x-humhub-app-is-ios': isIos ? '1' : '0',
-        'x-humhub-app-is-android': isAndroid ? '1' : '0'
+        'x-humhub-app-is-android': isAndroid ? '1' : '0',
         'x-humhub-app-opener-state': openerState.headerValue,
         'x-humhub-app-is-multi-instance': '1',
       };

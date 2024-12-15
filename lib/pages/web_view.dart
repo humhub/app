@@ -272,7 +272,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         ref.read(humHubProvider).clearSafeStorage();
         FlutterAppBadger.updateBadgeCount(0);
         Navigator.of(context).pushNamedAndRemoveUntil(
-            Opener.path, (Route<dynamic> route) => false);
+            OpenerPage.path, (Route<dynamic> route) => false);
         break;
       case ChannelAction.hideOpener:
         ref.read(humHubProvider).setOpenerState(OpenerState.hidden);
@@ -335,7 +335,7 @@ class WebViewAppState extends ConsumerState<WebView> {
                 isHide
                     ? SystemNavigator.pop()
                     : Navigator.of(context).pushNamedAndRemoveUntil(
-                        Opener.path, (Route<dynamic> route) => false);
+                    OpenerPage.path, (Route<dynamic> route) => false);
               },
               child: Text(AppLocalizations.of(context)!.yes),
             ),
