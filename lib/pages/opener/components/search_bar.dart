@@ -56,7 +56,7 @@ class SearchBarWidget extends ConsumerWidget {
                               decoration: TextDecoration.none,
                             ),
                             decoration: _openerDecoration(context),
-                            validator: openerControlLer.validateUrl,
+                            validator: (value) => openerControlLer.validateUrl(value, context),
                             autocorrect: false,
                           );
                         }

@@ -46,5 +46,9 @@
   "skip": "Überspringen",
   "ok": "OK",
   "no": "Nein",
-  "yes": "Ja"
+  "yes": "Ja",
+
+  "error_404": "Ihre HumHub-Installation existiert nicht.",
+  "error_no_connection": "Bitte überprüfen Sie Ihre Internetverbindung.",
+  "error_url_empty": "Geben Sie den Standort Ihrer HumHub-Installation an."
 }

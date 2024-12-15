@@ -11,6 +11,7 @@ import 'package:rive/rive.dart';
 import '../api_provider.dart';
 import '../connectivity_plugin.dart';
 import '../form_helper.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class VisibilityNotifier extends StateNotifier<bool> {
   VisibilityNotifier() : super(false);
@@ -136,12 +137,11 @@ class OpenerController {
   }
 
   bool get allOk => !(asyncData == null || asyncData!.hasError || !doesViewExist);
-  // TODO: Add localization
-  String? validateUrl(String? value) {
-    if (value == error404) return 'Your HumHub installation does not exist';
-    if (value == noConnection) return 'Please check your internet connection.';
+  String? validateUrl(String? value, BuildContext context) {
+    if (value == error404) return AppLocalizations.of(context)!.error_404;
+    if (value == noConnection) return AppLocalizations.of(context)!.error_no_connection;
     if (value == null || value.isEmpty) {
-      return 'Specify you HumHub location';
+      return AppLocalizations.of(context)!.error_url_empty;
     }
     return null;
   }
