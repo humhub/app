@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/const.dart';
@@ -166,7 +167,7 @@ class AddNetworkTile extends StatelessWidget {
             Icon(Icons.add, size: 28, color: HumhubTheme.primaryColor),
             const SizedBox(width: 10),
             Text(
-              'Add Network',
+              AppLocalizations.of(context)!.add_network,
               style: TextStyle(fontSize: 16, color: HumhubTheme.primaryColor, fontWeight: FontWeight.bold),
             ),
           ],

@@ -61,151 +61,154 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Stack(
-        children: [
-          RiveAnimation.asset(
-            Assets.openerAnimationForward,
-            fit: BoxFit.fill,
-            controllers: [openerControlLer.animationForwardController],
-          ),
-          RiveAnimation.asset(
-            Assets.openerAnimationReverse,
-            fit: BoxFit.fill,
-            controllers: [openerControlLer.animationReverseController],
-          ),
-          Scaffold(
-            resizeToAvoidBottomInset: true,
-            backgroundColor: Colors.transparent,
-            floatingActionButton:
-                ref.watch(searchBarVisibilityNotifier) && ref.watch(humHubProvider.notifier).history.isNotEmpty
-                    ? AnimatedOpacity(
-                        opacity: ref.watch(languageSwitcherVisibilityProvider) ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 300),
-                        child: FloatingActionButton(
-                          onPressed: () {
-                            ref
-                                .watch(searchBarVisibilityNotifier.notifier)
-                                .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
-                          },
-                          tooltip: 'Increment',
-                          backgroundColor: Colors.white,
-                          child: Icon(Icons.arrow_back, color: HumhubTheme.primaryColor),
-                        ),
-                      )
-                    : null,
-            body: SafeArea(
-              bottom: false,
-              top: false,
-              child: Form(
-                key: openerControlLer.helper.key,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 50),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      // Language Switcher visibility
-                      AnimatedOpacity(
-                        opacity: ref.watch(languageSwitcherVisibilityProvider) ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 300),
-                        child: const Padding(
-                          padding: EdgeInsets.only(top: 10, right: 16),
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: SizedBox(
-                              width: 110,
-                              child: LanguageSwitcher(),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Container(
+        color: Colors.white,
+        child: Stack(
+          children: [
+            RiveAnimation.asset(
+              Assets.openerAnimationForward,
+              fit: BoxFit.fill,
+              controllers: [openerControlLer.animationForwardController],
+            ),
+            RiveAnimation.asset(
+              Assets.openerAnimationReverse,
+              fit: BoxFit.fill,
+              controllers: [openerControlLer.animationReverseController],
+            ),
+            Scaffold(
+              resizeToAvoidBottomInset: true,
+              backgroundColor: Colors.transparent,
+              floatingActionButton:
+                  ref.watch(searchBarVisibilityNotifier) && ref.watch(humHubProvider.notifier).history.isNotEmpty
+                      ? AnimatedOpacity(
+                          opacity: ref.watch(languageSwitcherVisibilityProvider) ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 300),
+                          child: FloatingActionButton(
+                            onPressed: () {
+                              ref
+                                  .watch(searchBarVisibilityNotifier.notifier)
+                                  .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
+                            },
+                            tooltip: 'Increment',
+                            backgroundColor: Colors.white,
+                            child: Icon(Icons.arrow_back, color: HumhubTheme.primaryColor),
+                          ),
+                        )
+                      : null,
+              body: SafeArea(
+                bottom: false,
+                top: false,
+                child: Form(
+                  key: openerControlLer.helper.key,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 50),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        // Language Switcher visibility
+                        AnimatedOpacity(
+                          opacity: ref.watch(languageSwitcherVisibilityProvider) ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 300),
+                          child: const Padding(
+                            padding: EdgeInsets.only(top: 10, right: 16),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: SizedBox(
+                                width: 110,
+                                child: LanguageSwitcher(),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: SizedBox(
-                          height: 100,
-                          width: 230,
-                          child: Image.asset(Assets.logo),
+                        Expanded(
+                          flex: 3,
+                          child: SizedBox(
+                            height: 100,
+                            width: 230,
+                            child: Image.asset(Assets.logo),
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 10,
-                        child: ref.watch(searchBarVisibilityNotifier)
-                            ? SearchBarWidget(openerControlLer: openerControlLer)
-                            : AnimatedOpacity(
-                                opacity: ref.watch(textFieldVisibilityProvider) ? 1.0 : 0.0,
-                                duration: const Duration(milliseconds: 250),
-                                child: LastLoginWidget(
-                                    onAddNetwork: () {
-                                      ref
-                                          .watch(searchBarVisibilityNotifier.notifier)
-                                          .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
-                                    },
-                                    history: ref.watch(humHubProvider).history,
-                                    onSelectNetwork: (Manifest manifest) async {
-                                      UniversalOpenerController uniOpen =
-                                          UniversalOpenerController(url: manifest.baseUrl);
-                                      await uniOpen.initHumHub();
-                                      // Always pop the current instance and init the new one.
-                                      LoadingProvider.of(ref).dismissAll();
-
-                                      openerControlLer.animationNavigationWrapper(
-                                        navigate: () =>
-                                            navigatorKey.currentState!.pushNamed(WebView.path, arguments: uniOpen),
-                                      );
-                                    },
-                                    onDeleteNetwork: (manifest, isLast) {
-                                      ref.watch(humHubProvider.notifier).removeHistory(manifest);
-                                      if (isLast) {
+                        Expanded(
+                          flex: 10,
+                          child: ref.watch(searchBarVisibilityNotifier)
+                              ? SearchBarWidget(openerControlLer: openerControlLer)
+                              : AnimatedOpacity(
+                                  opacity: ref.watch(textFieldVisibilityProvider) ? 1.0 : 0.0,
+                                  duration: const Duration(milliseconds: 250),
+                                  child: LastLoginWidget(
+                                      onAddNetwork: () {
                                         ref
                                             .watch(searchBarVisibilityNotifier.notifier)
                                             .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
-                                      }
-                                    }),
-                              ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: GestureDetector(
-                          onTap: () {
-                            openerControlLer.animationNavigationWrapper(
-                              navigate: () => Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  transitionDuration: const Duration(milliseconds: 500),
-                                  pageBuilder: (context, animation, secondaryAnimation) => const Help(),
-                                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                    return FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    );
-                                  },
+                                      },
+                                      history: ref.watch(humHubProvider).history,
+                                      onSelectNetwork: (Manifest manifest) async {
+                                        UniversalOpenerController uniOpen =
+                                            UniversalOpenerController(url: manifest.baseUrl);
+                                        await uniOpen.initHumHub();
+                                        // Always pop the current instance and init the new one.
+                                        LoadingProvider.of(ref).dismissAll();
+
+                                        openerControlLer.animationNavigationWrapper(
+                                          navigate: () =>
+                                              navigatorKey.currentState!.pushNamed(WebView.path, arguments: uniOpen),
+                                        );
+                                      },
+                                      onDeleteNetwork: (manifest, isLast) {
+                                        ref.watch(humHubProvider.notifier).removeHistory(manifest);
+                                        if (isLast) {
+                                          ref
+                                              .watch(searchBarVisibilityNotifier.notifier)
+                                              .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
+                                        }
+                                      }),
                                 ),
-                              ),
-                            );
-                          },
-                          child: AnimatedOpacity(
-                            opacity: ref.watch(visibilityProvider) ? 1.0 : 0.0,
-                            duration: const Duration(milliseconds: 300),
-                            child: Text(
-                              AppLocalizations.of(context)!.opener_need_help,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                                decoration: TextDecoration.underline,
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: GestureDetector(
+                            onTap: () {
+                              openerControlLer.animationNavigationWrapper(
+                                navigate: () => Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    transitionDuration: const Duration(milliseconds: 500),
+                                    pageBuilder: (context, animation, secondaryAnimation) => const Help(),
+                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                            child: AnimatedOpacity(
+                              opacity: ref.watch(visibilityProvider) ? 1.0 : 0.0,
+                              duration: const Duration(milliseconds: 300),
+                              child: Text(
+                                AppLocalizations.of(context)!.opener_need_help,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  decoration: TextDecoration.underline,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

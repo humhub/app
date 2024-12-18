@@ -33,6 +33,8 @@
 
   "enable_permissions": "Activer les autorisations.",
 
+  "add_network": "Ajouter un réseau",
+
   "downloading": "Téléchargement",
   "settings": "Paramètres",
   "connect": "Connecter",
