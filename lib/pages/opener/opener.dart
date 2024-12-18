@@ -132,7 +132,7 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                           ),
                         ),
                         Expanded(
-                          flex: 10,
+                          flex: 9,
                           child: ref.watch(searchBarVisibilityNotifier)
                               ? SearchBarWidget(openerControlLer: openerControlLer)
                               : AnimatedOpacity(
@@ -168,34 +168,37 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                                 ),
                         ),
                         Expanded(
-                          flex: 2,
-                          child: GestureDetector(
-                            onTap: () {
-                              openerControlLer.animationNavigationWrapper(
-                                navigate: () => Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    transitionDuration: const Duration(milliseconds: 500),
-                                    pageBuilder: (context, animation, secondaryAnimation) => const Help(),
-                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                      return FadeTransition(
-                                        opacity: animation,
-                                        child: child,
-                                      );
-                                    },
+                          flex: 3,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 30),
+                            child: GestureDetector(
+                              onTap: () {
+                                openerControlLer.animationNavigationWrapper(
+                                  navigate: () => Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      transitionDuration: const Duration(milliseconds: 500),
+                                      pageBuilder: (context, animation, secondaryAnimation) => const Help(),
+                                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                        return FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        );
+                                      },
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                            child: AnimatedOpacity(
-                              opacity: ref.watch(visibilityProvider) ? 1.0 : 0.0,
-                              duration: const Duration(milliseconds: 300),
-                              child: Text(
-                                AppLocalizations.of(context)!.opener_need_help,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: TextDecoration.underline,
+                                );
+                              },
+                              child: AnimatedOpacity(
+                                opacity: ref.watch(visibilityProvider) ? 1.0 : 0.0,
+                                duration: const Duration(milliseconds: 300),
+                                child: Text(
+                                  AppLocalizations.of(context)!.opener_need_help,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                    decoration: TextDecoration.underline,
+                                  ),
                                 ),
                               ),
                             ),

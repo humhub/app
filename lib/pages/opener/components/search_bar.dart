@@ -76,38 +76,35 @@ class SearchBarWidget extends ConsumerWidget {
               ),
             ),
           ),
-          Expanded(
-            flex: 1,
-            child: AnimatedOpacity(
-              opacity: ref.watch(visibilityProvider) ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 300),
-              child: Center(
-                child: TextButton(
-                  onPressed: () {
-                    openerControlLer.connect().then((value) {
-                      ref
-                          .watch(searchBarVisibilityNotifier.notifier)
-                          .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
-                    });
-                  },
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(
-                        color: HumhubTheme.primaryColor,
-                        width: 2,
-                      ),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 0),
-                    minimumSize: const Size(140, 55),
-                  ),
-                  child: Text(
-                    AppLocalizations.of(context)!.connect,
-                    style: TextStyle(
+          AnimatedOpacity(
+            opacity: ref.watch(visibilityProvider) ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 300),
+            child: Center(
+              child: TextButton(
+                onPressed: () {
+                  openerControlLer.connect().then((value) {
+                    ref
+                        .watch(searchBarVisibilityNotifier.notifier)
+                        .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
+                  });
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: BorderSide(
                       color: HumhubTheme.primaryColor,
-                      fontSize: 20,
+                      width: 2,
                     ),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
+                  minimumSize: const Size(140, 55),
+                ),
+                child: Text(
+                  AppLocalizations.of(context)!.connect,
+                  style: TextStyle(
+                    color: HumhubTheme.primaryColor,
+                    fontSize: 20,
                   ),
                 ),
               ),
