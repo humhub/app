@@ -6,7 +6,7 @@ import 'package:humhub/util/const.dart';
 class LastLoginWidget extends StatelessWidget {
   final List<Manifest> history;
   final void Function(Manifest manifest) onSelectNetwork;
-  final void Function(Manifest manifest) onDeleteNetwork;
+  final void Function(Manifest manifest, bool isLast) onDeleteNetwork;
   final void Function()? onAddNetwork;
 
   const LastLoginWidget({
@@ -19,131 +19,157 @@ class LastLoginWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 22, horizontal: 10),
-            child: Text(
-              "Last login: ",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-          GridView.builder(
-            padding: EdgeInsets.zero,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
             shrinkWrap: true,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisExtent: 120,
-              crossAxisSpacing: 20,
-              mainAxisSpacing: 20,
-            ),
-            itemCount: history.length + 1, // Include the add network tile
+            itemCount: history.length,
             itemBuilder: (context, index) {
-              if (index < history.length) {
-                final manifest = history[index];
-                return _buildLoginTile(manifest);
-              } else {
-                return _buildAddNetworkTile();
-              }
+              return Container(
+                margin: const EdgeInsets.symmetric(vertical: 6),
+                child: InstanceTile(
+                  manifest: history[index],
+                  onSelectNetwork: onSelectNetwork,
+                  onDeleteNetwork: (manifest) => onDeleteNetwork(manifest, history.length == 1),
+                ),
+              );
             },
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLoginTile(Manifest manifest) {
-    return Card(
-      surfaceTintColor: Colors.white,
-      elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        splashColor: HumhubTheme.primaryColor.withOpacity(0.3),
-        highlightColor: HumhubTheme.primaryColor.withOpacity(0.3),
-        hoverColor: HumhubTheme.primaryColor.withOpacity(0.3),
-        onTap: () => onSelectNetwork(manifest),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Align(
-              alignment: Alignment.topLeft,
-              child: InkWell(
-                onTap: () => onDeleteNetwork(manifest),
-                child: const Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: Icon(
-                    Icons.close,
-                    size: 14,
-                  ),
-                ),
-              ),
-            ),
-            if (manifest.icons?.isNotEmpty ?? false)
-              CachedNetworkImage(
-                height: 40,
-                width: 40,
-                imageUrl: manifest.baseUrl + manifest.icons!.reversed.first.src,
-                fit: BoxFit.cover,
-              ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Text(
-                manifest.name,
-                style: const TextStyle(fontSize: 14),
-              ),
-            ),
-          ],
         ),
-      ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+          child: AddNetworkTile(onAddNetwork: onAddNetwork),
+        )
+      ],
     );
   }
+}
 
-  Widget _buildAddNetworkTile() {
-    return Card(
-      color: const Color(0XFFDBEFF0),
-      surfaceTintColor: Colors.white,
-      margin: const EdgeInsets.only(bottom: 25),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Center(
-        child: InkWell(
-          borderRadius: BorderRadius.circular(10),
-          splashColor: HumhubTheme.primaryColor.withOpacity(0.3),
-          highlightColor: HumhubTheme.primaryColor.withOpacity(0.3),
-          hoverColor: HumhubTheme.primaryColor.withOpacity(0.3),
-          onTap: onAddNetwork,
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  decoration: const BoxDecoration(
-                    color: Color(0XFF1A8291),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(4.0),
-                    child: Icon(Icons.add, size: 30, color: Colors.white),
-                  ),
+class InstanceTile extends StatelessWidget {
+  final Manifest manifest;
+  final void Function(Manifest manifest) onSelectNetwork;
+  final void Function(Manifest manifest) onDeleteNetwork;
+
+  static const double borderRadius = 15;
+
+  const InstanceTile({
+    Key? key,
+    required this.manifest,
+    required this.onSelectNetwork,
+    required this.onDeleteNetwork,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(borderRadius),
+      splashColor: HumhubTheme.primaryColor,
+      highlightColor: HumhubTheme.primaryColor,
+      onTap: () => onSelectNetwork(manifest),
+      child: Container(
+        margin: const EdgeInsets.all(1),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(borderRadius),
+          color: Colors.red,
+        ),
+        child: Dismissible(
+          key: Key(manifest.baseUrl),
+          direction: DismissDirection.endToStart,
+          background: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(borderRadius),
+            ),
+            alignment: Alignment.centerRight,
+            child: const Padding(
+              padding: EdgeInsets.only(right: 20),
+              child: Icon(
+                Icons.close,
+                color: Colors.white,
+                size: 30,
+              ),
+            ),
+          ),
+          onDismissed: (direction) {
+            onDeleteNetwork(manifest);
+          },
+          child: Container(
+            height: 65,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(borderRadius),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade300,
+                  spreadRadius: 2,
+                  blurRadius: 2,
+                  offset: const Offset(0, 0),
                 ),
-                const SizedBox(height: 10),
-                const Text(
-                  "Add Network",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (manifest.icons?.isNotEmpty ?? false)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(5), // Adjust the radius as needed
+                    child: CachedNetworkImage(
+                      height: 40,
+                      width: 40,
+                      imageUrl: manifest.baseUrl + manifest.icons!.reversed.first.src,
+                      fit: BoxFit.cover,
+                    ),
                   ),
+                const SizedBox(width: 20),
+                Text(
+                  manifest.name,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class AddNetworkTile extends StatelessWidget {
+  final void Function()? onAddNetwork;
+
+  static const double borderRadius = 10;
+
+  const AddNetworkTile({
+    Key? key,
+    required this.onAddNetwork,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(borderRadius),
+      onTap: onAddNetwork,
+      child: Container(
+        height: 55,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add, size: 28, color: HumhubTheme.primaryColor),
+            const SizedBox(width: 10),
+            Text(
+              'Add Network',
+              style: TextStyle(fontSize: 16, color: HumhubTheme.primaryColor, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ),
     );

@@ -49,7 +49,8 @@ class SearchBarWidget extends ConsumerWidget {
                               openerControlLer.urlTextController.value = TextEditingValue(
                                 text: trimmedValue,
                                 selection: TextSelection.collapsed(
-                                    offset: cursorPosition > trimmedValue.length ? trimmedValue.length : cursorPosition),
+                                    offset:
+                                        cursorPosition > trimmedValue.length ? trimmedValue.length : cursorPosition),
                               );
                             },
                             style: const TextStyle(
@@ -82,7 +83,13 @@ class SearchBarWidget extends ConsumerWidget {
               duration: const Duration(milliseconds: 300),
               child: Center(
                 child: TextButton(
-                  onPressed: openerControlLer.connect,
+                  onPressed: () {
+                    openerControlLer.connect().then((value) {
+                      ref
+                          .watch(searchBarVisibilityNotifier.notifier)
+                          .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
+                    });
+                  },
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -112,20 +119,20 @@ class SearchBarWidget extends ConsumerWidget {
   }
 
   InputDecoration _openerDecoration(BuildContext context) => InputDecoration(
-    focusedBorder: const OutlineInputBorder(
-      borderSide: BorderSide(
-        color: Colors.grey,
-        width: 1.0,
-      ),
-    ),
-    border: const OutlineInputBorder(
-      borderSide: BorderSide(
-        color: Colors.grey,
-        width: 1.0,
-      ),
-    ),
-    floatingLabelBehavior: FloatingLabelBehavior.always,
-    labelText: AppLocalizations.of(context)!.url.toUpperCase(),
-    labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color),
-  );
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.grey,
+            width: 1.0,
+          ),
+        ),
+        border: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.grey,
+            width: 1.0,
+          ),
+        ),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        labelText: AppLocalizations.of(context)!.url.toUpperCase(),
+        labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color),
+      );
 }

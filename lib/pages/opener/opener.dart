@@ -78,22 +78,23 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
           Scaffold(
             resizeToAvoidBottomInset: true,
             backgroundColor: Colors.transparent,
-            floatingActionButton: ref.watch(searchBarVisibilityNotifier)
-                ? AnimatedOpacity(
-                    opacity: ref.watch(languageSwitcherVisibilityProvider) ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 300),
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        ref
-                            .watch(searchBarVisibilityNotifier.notifier)
-                            .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
-                      },
-                      tooltip: 'Increment',
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.arrow_back, color: HumhubTheme.primaryColor),
-                    ),
-                  )
-                : null,
+            floatingActionButton:
+                ref.watch(searchBarVisibilityNotifier) && ref.watch(humHubProvider.notifier).history.isNotEmpty
+                    ? AnimatedOpacity(
+                        opacity: ref.watch(languageSwitcherVisibilityProvider) ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 300),
+                        child: FloatingActionButton(
+                          onPressed: () {
+                            ref
+                                .watch(searchBarVisibilityNotifier.notifier)
+                                .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
+                          },
+                          tooltip: 'Increment',
+                          backgroundColor: Colors.white,
+                          child: Icon(Icons.arrow_back, color: HumhubTheme.primaryColor),
+                        ),
+                      )
+                    : null,
             body: SafeArea(
               bottom: false,
               top: false,
@@ -129,33 +130,39 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                         ),
                       ),
                       Expanded(
-                        flex: 8,
+                        flex: 10,
                         child: ref.watch(searchBarVisibilityNotifier)
                             ? SearchBarWidget(openerControlLer: openerControlLer)
                             : AnimatedOpacity(
                                 opacity: ref.watch(textFieldVisibilityProvider) ? 1.0 : 0.0,
                                 duration: const Duration(milliseconds: 250),
                                 child: LastLoginWidget(
-                                  onAddNetwork: () {
-                                    ref
-                                        .watch(searchBarVisibilityNotifier.notifier)
-                                        .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
-                                  },
-                                  history: ref.watch(humHubProvider).history,
-                                  onSelectNetwork: (Manifest manifest) async {
-                                    UniversalOpenerController uniOpen =
-                                        UniversalOpenerController(url: manifest.baseUrl);
-                                    await uniOpen.initHumHub();
-                                    // Always pop the current instance and init the new one.
-                                    LoadingProvider.of(ref).dismissAll();
+                                    onAddNetwork: () {
+                                      ref
+                                          .watch(searchBarVisibilityNotifier.notifier)
+                                          .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
+                                    },
+                                    history: ref.watch(humHubProvider).history,
+                                    onSelectNetwork: (Manifest manifest) async {
+                                      UniversalOpenerController uniOpen =
+                                          UniversalOpenerController(url: manifest.baseUrl);
+                                      await uniOpen.initHumHub();
+                                      // Always pop the current instance and init the new one.
+                                      LoadingProvider.of(ref).dismissAll();
 
-                                    openerControlLer.animationNavigationWrapper(
-                                      navigate: () =>
-                                          navigatorKey.currentState!.pushNamed(WebView.path, arguments: uniOpen),
-                                    );
-                                  },
-                                  onDeleteNetwork: ref.watch(humHubProvider.notifier).removeHistory,
-                                ),
+                                      openerControlLer.animationNavigationWrapper(
+                                        navigate: () =>
+                                            navigatorKey.currentState!.pushNamed(WebView.path, arguments: uniOpen),
+                                      );
+                                    },
+                                    onDeleteNetwork: (manifest, isLast) {
+                                      ref.watch(humHubProvider.notifier).removeHistory(manifest);
+                                      if (isLast) {
+                                        ref
+                                            .watch(searchBarVisibilityNotifier.notifier)
+                                            .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
+                                      }
+                                    }),
                               ),
                       ),
                       Expanded(
