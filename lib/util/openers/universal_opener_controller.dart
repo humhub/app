@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
@@ -84,8 +83,7 @@ class UniversalOpenerController {
   }
 
   Future<HumHub?> getLastInstance() async {
-    const storage = FlutterSecureStorage();
-    var jsonStr = await storage.read(key: StorageKeys.humhubInstance);
+    var jsonStr = await InternalStorage.storage.read(key: InternalStorage.keyHumhubInstance);
     HumHub? humHub = jsonStr != null ? HumHub.fromJson(json.decode(jsonStr)) : null;
     return humHub;
   }
