@@ -34,6 +34,8 @@
 
   "enable_permissions": "Enable permissions.",
 
+  "add_network": "Add network",
+
   "downloading": "Downloading",
   "settings": "Settings",
   "connect": "Connect",
@@ -47,5 +49,9 @@
   "skip": "Skip",
   "ok": "ok",
   "no": "No",
-  "yes": "Yes"
+  "yes": "Yes",
+
+  "error_404": "Your HumHub installation does not exist",
+  "error_no_connection": "Please check your internet connection.",
+  "error_url_empty": "Specify you HumHub location."
 }

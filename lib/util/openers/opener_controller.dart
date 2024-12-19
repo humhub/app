@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:http/http.dart' as http;
 import 'package:loggy/loggy.dart';
@@ -10,10 +11,10 @@ import 'package:rive/rive.dart';
 import '../api_provider.dart';
 import '../connectivity_plugin.dart';
 import '../form_helper.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-// Create a notifier for visibility state
 class VisibilityNotifier extends StateNotifier<bool> {
-  VisibilityNotifier() : super(false); // Default to false
+  VisibilityNotifier() : super(false);
 
   void toggleVisibility(bool isVisible) {
     state = isVisible;
@@ -29,6 +30,10 @@ final languageSwitcherVisibilityProvider = StateNotifierProvider<VisibilityNotif
 );
 
 final visibilityProvider = StateNotifierProvider<VisibilityNotifier, bool>(
+  (ref) => VisibilityNotifier(),
+);
+
+final searchBarVisibilityNotifier = StateNotifierProvider<VisibilityNotifier, bool>(
   (ref) => VisibilityNotifier(),
 );
 
@@ -125,19 +130,18 @@ class OpenerController {
       String currentUrl = urlTextController.text;
       String hash = HumHub.generateHash(32);
       if (lastUrl == currentUrl) hash = ref.read(humHubProvider).randomHash ?? hash;
-      await ref
-          .read(humHubProvider)
-          .setInstance(HumHub(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl));
+      await ref.read(humHubProvider.notifier).addOrUpdateHistory(manifest);
+      HumHub instance = ref.read(humHubProvider).copyWith(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl);
+      ref.read(humHubProvider.notifier).setInstance(instance);
     }
   }
 
   bool get allOk => !(asyncData == null || asyncData!.hasError || !doesViewExist);
-  // TODO: Add localization
-  String? validateUrl(String? value) {
-    if (value == error404) return 'Your HumHub installation does not exist';
-    if (value == noConnection) return 'Please check your internet connection.';
+  String? validateUrl(String? value, BuildContext context) {
+    if (value == error404) return AppLocalizations.of(context)!.error_404;
+    if (value == noConnection) return AppLocalizations.of(context)!.error_no_connection;
     if (value == null || value.isEmpty) {
-      return 'Specify you HumHub location';
+      return AppLocalizations.of(context)!.error_url_empty;
     }
     return null;
   }
@@ -196,6 +200,19 @@ class OpenerController {
       _animationReverseController.isActive = true;
       _animationReverse.reset();
     });
+  }
+
+  Future<void> connect() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    await initHumHub();
+    if (allOk) {
+      ref.read(humHubProvider).getInstance().then((instance) {
+        FocusManager.instance.primaryFocus?.unfocus();
+        animationNavigationWrapper(
+          navigate: () => Navigator.pushNamed(ref.context, WebView.path, arguments: instance.manifest),
+        );
+      });
+    }
   }
 
   dispose() {

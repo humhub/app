@@ -8,14 +8,16 @@ class ManifestF extends Manifest {
       required String shortName,
       required String name,
       required String backgroundColor,
-      required String themeColor})
+      required String themeColor,
+      List<ManifestIcon>? icons})
       : super(
             display: display,
             startUrl: startUrl,
             shortName: shortName,
             name: name,
             backgroundColor: backgroundColor,
-            themeColor: themeColor);
+            themeColor: themeColor,
+            icons: icons);
 
   factory ManifestF.fromEnv() {
     return ManifestF(

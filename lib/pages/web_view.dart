@@ -10,7 +10,7 @@ import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/pages/opener.dart';
+import 'package:humhub/pages/opener/opener.dart';
 import 'package:humhub/util/black_list_rules.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/const.dart';
@@ -100,7 +100,8 @@ class WebViewAppState extends ConsumerState<WebView> {
               onProgressChanged: _onProgressChanged,
               onReceivedError: _onReceivedError,
               onDownloadStartRequest: _onDownloadStartRequest,
-              onLongPressHitTestResult: WebViewGlobalController.onLongPressHitTestResult,
+              onLongPressHitTestResult:
+                  WebViewGlobalController.onLongPressHitTestResult,
             ),
           )),
     );
@@ -128,12 +129,15 @@ class WebViewAppState extends ConsumerState<WebView> {
     }
     String? payloadFromPush = InitFromUrl.usePayload();
     if (payloadFromPush != null) url = payloadFromPush;
-    return URLRequest(url: WebUri(url ?? _manifest.startUrl), headers: ref.read(humHubProvider).customHeaders);
+    return URLRequest(
+        url: WebUri(url ?? _manifest.startUrl),
+        headers: ref.read(humHubProvider).customHeaders);
   }
 
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
-    WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
+    WebViewGlobalController.ajaxSetHeaders(
+        headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
 
@@ -152,14 +156,18 @@ class WebViewAppState extends ConsumerState<WebView> {
     if (!url.startsWith(_manifest.baseUrl) &&
         !action.isForMainFrame &&
         action.navigationType == NavigationType.LINK_ACTIVATED) {
-      await launchUrl(action.request.url!.uriValue, mode: LaunchMode.externalApplication);
+      await launchUrl(action.request.url!.uriValue,
+          mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
     if (Platform.isAndroid ||
         action.navigationType == NavigationType.LINK_ACTIVATED ||
         action.navigationType == NavigationType.FORM_SUBMITTED) {
-      Map<String, String> mergedMap = {...?_initialRequest.headers, ...?action.request.headers};
+      Map<String, String> mergedMap = {
+        ...?_initialRequest.headers,
+        ...?action.request.headers
+      };
       URLRequest newRequest = action.request.copyWith(headers: mergedMap);
       controller.loadUrl(urlRequest: newRequest);
       return NavigationActionPolicy.CANCEL;
@@ -174,7 +182,8 @@ class WebViewAppState extends ConsumerState<WebView> {
     await controller.addWebMessageListener(
       WebMessageListener(
         jsObjectName: "flutterChannel",
-        onPostMessage: (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
+        onPostMessage:
+            (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
           logInfo(inMessage);
           ChannelMessage message = ChannelMessage.fromJson(inMessage!.data);
           await _handleJSMessage(message, _headlessWebView!);
@@ -185,13 +194,15 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.setValue(controller);
   }
 
-  Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest request) async {
+  Future<FetchRequest?> _shouldInterceptFetchRequest(
+      InAppWebViewController controller, FetchRequest request) async {
     logDebug("_shouldInterceptFetchRequest");
     request.headers!.addAll(_initialRequest.headers!);
     return request;
   }
 
-  Future<bool?> _onCreateWindow(InAppWebViewController controller, CreateWindowAction createWindowAction) async {
+  Future<bool?> _onCreateWindow(InAppWebViewController controller,
+      CreateWindowAction createWindowAction) async {
     WebUri? urlToOpen = createWindowAction.request.url;
 
     if (urlToOpen == null) return Future.value(false);
@@ -215,20 +226,22 @@ class WebViewAppState extends ConsumerState<WebView> {
   _onLoadStop(InAppWebViewController controller, Uri? url) {
     // Disable remember me checkbox on login and set def. value to true: check if the page is actually login page, if it is inject JS that hides element
     if (url!.path.contains('/user/auth/login')) {
-      WebViewGlobalController.value!
-          .evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
+      WebViewGlobalController.value!.evaluateJavascript(
+          source: "document.querySelector('#login-rememberme').checked=true");
       WebViewGlobalController.value!.evaluateJavascript(
           source:
               "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
-    WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
+    WebViewGlobalController.ajaxSetHeaders(
+        headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
     LoadingProvider.of(ref).dismissAll();
   }
 
   void _onLoadStart(InAppWebViewController controller, Uri? url) async {
-    WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
+    WebViewGlobalController.ajaxSetHeaders(
+        headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
   }
@@ -239,7 +252,8 @@ class WebViewAppState extends ConsumerState<WebView> {
     }
   }
 
-  void _onReceivedError(InAppWebViewController controller, WebResourceRequest request, WebResourceError error) {
+  void _onReceivedError(InAppWebViewController controller,
+      WebResourceRequest request, WebResourceError error) {
     if (error.description == 'net::ERR_INTERNET_DISCONNECTED') {
       NoConnectionDialog.show(context);
     }
@@ -250,20 +264,21 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.value!.loadUrl(urlRequest: request);
   }
 
-  Future<void> _handleJSMessage(ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
+  Future<void> _handleJSMessage(
+      ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
     switch (message.action) {
       case ChannelAction.showOpener:
-        ref.read(humHubProvider).setIsHideOpener(false);
-        ref.read(humHubProvider).clearSafeStorage();
-        FlutterAppBadger.updateBadgeCount(0);
-        Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
+        ref.read(humHubProvider).setOpenerState(OpenerState.shown);
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            OpenerPage.path, (Route<dynamic> route) => false);
         break;
       case ChannelAction.hideOpener:
-        ref.read(humHubProvider).setIsHideOpener(true);
+        ref.read(humHubProvider).setOpenerState(OpenerState.hidden);
         ref.read(humHubProvider).setHash(HumHub.generateHash(32));
         break;
       case ChannelAction.registerFcmDevice:
-        String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
+        String? token = ref.read(pushTokenProvider).value ??
+            await FirebaseMessaging.instance.getToken();
         if (token != null) {
           WebViewGlobalController.ajaxPost(
             url: message.url!,
@@ -278,7 +293,8 @@ class WebViewAppState extends ConsumerState<WebView> {
         }
         break;
       case ChannelAction.unregisterFcmDevice:
-        String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
+        String? token = ref.read(pushTokenProvider).value ??
+            await FirebaseMessaging.instance.getToken();
         if (token != null) {
           WebViewGlobalController.ajaxPost(
             url: message.url!,
@@ -301,9 +317,11 @@ class WebViewAppState extends ConsumerState<WebView> {
       final exitConfirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0))),
           title: Text(AppLocalizations.of(context)!.web_view_exit_popup_title),
-          content: Text(AppLocalizations.of(context)!.web_view_exit_popup_content),
+          content:
+              Text(AppLocalizations.of(context)!.web_view_exit_popup_content),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -314,7 +332,8 @@ class WebViewAppState extends ConsumerState<WebView> {
                 var isHide = ref.read(humHubProvider).isHideDialog;
                 isHide
                     ? SystemNavigator.pop()
-                    : Navigator.of(context).pushNamedAndRemoveUntil(Opener.path, (Route<dynamic> route) => false);
+                    : Navigator.of(context).pushNamedAndRemoveUntil(
+                    OpenerPage.path, (Route<dynamic> route) => false);
               },
               child: Text(AppLocalizations.of(context)!.yes),
             ),
@@ -325,7 +344,8 @@ class WebViewAppState extends ConsumerState<WebView> {
     }
   }
 
-  void _onDownloadStartRequest(InAppWebViewController controller, DownloadStartRequest downloadStartRequest) async {
+  void _onDownloadStartRequest(InAppWebViewController controller,
+      DownloadStartRequest downloadStartRequest) async {
     PersistentBottomSheetController? persistentController;
     //bool isBottomSheetVisible = false;
 
@@ -345,7 +365,8 @@ class WebViewAppState extends ConsumerState<WebView> {
         isDone = true;
         scaffoldMessengerStateKey.currentState?.showSnackBar(
           SnackBar(
-            content: Text('${AppLocalizations.of(context)!.file_download}: $filename'),
+            content: Text(
+                '${AppLocalizations.of(context)!.file_download}: $filename'),
             action: SnackBarAction(
               label: AppLocalizations.of(context)!.open,
               onPressed: () {
@@ -362,19 +383,22 @@ class WebViewAppState extends ConsumerState<WebView> {
         downloadTimer = Timer(const Duration(seconds: 1), () {
           // Show the persistent bottom sheet if not already shown
           if (!isDone) {
-            persistentController = _scaffoldKey.currentState!.showBottomSheet((context) {
+            persistentController =
+                _scaffoldKey.currentState!.showBottomSheet((context) {
               return Container(
                 width: MediaQuery.of(context).size.width,
                 height: 100,
                 color: const Color(0xff313033),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         "${AppLocalizations.of(context)!.downloading}...",
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.white),
                       ),
                       Stack(
                         alignment: Alignment.center,
