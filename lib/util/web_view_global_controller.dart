@@ -132,7 +132,7 @@ class WebViewGlobalController {
   static InAppWebViewSettings settings({bool zoom = false}) {
     return InAppWebViewSettings(
       useShouldOverrideUrlLoading: true,
-      useShouldInterceptFetchRequest: true,
+      useShouldInterceptFetchRequest: false,
       javaScriptEnabled: true,
       javaScriptCanOpenWindowsAutomatically: true,
       supportMultipleWindows: true,

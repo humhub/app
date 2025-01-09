@@ -197,7 +197,7 @@ class WebViewAppState extends ConsumerState<WebView> {
   Future<FetchRequest?> _shouldInterceptFetchRequest(
       InAppWebViewController controller, FetchRequest request) async {
     logDebug("_shouldInterceptFetchRequest");
-    request.headers!.addAll(_initialRequest.headers!);
+    request.headers?.addAll(_initialRequest.headers!);
     return request;
   }
 
