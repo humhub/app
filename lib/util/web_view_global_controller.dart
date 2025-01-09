@@ -4,7 +4,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/global_user_agent.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:loggy/loggy.dart';
 
 class WebViewGlobalController {
   static InAppWebViewController? _value;
