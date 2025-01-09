@@ -159,7 +159,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   }
 
   Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest request) async {
-    request.headers!.addAll(_initialRequest.headers!);
+    request.headers?.addAll(instance.customHeaders);
     return request;
   }
 
