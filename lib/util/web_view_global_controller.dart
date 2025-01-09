@@ -105,9 +105,10 @@ class WebViewGlobalController {
 
     _value?.addJavaScriptHandler(
       handlerName: 'onImageClosed',
-      callback: (args) {
+      callback: (args) async {
         if (!opened) return;
         opened = false;
+        zoomOut();
         _value?.setSettings(settings: settings(zoom: opened));
       },
     );
@@ -128,6 +129,14 @@ class WebViewGlobalController {
     })();
   """);
   }
+
+  static Future<void> zoomOut() async {
+    bool? canZoomOut = true;
+    while (canZoomOut ?? false) {
+      canZoomOut = await value?.zoomOut();
+    }
+  }
+
 
   static InAppWebViewSettings settings({bool zoom = false}) {
     return InAppWebViewSettings(
