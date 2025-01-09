@@ -19,15 +19,15 @@ enum OpenerState {
   shown(true),
   hidden(false);
 
-  final bool value;
+  final bool isShown;
 
-  const OpenerState(this.value);
+  const OpenerState(this.isShown);
 
-  String get headerValue => value ? '1' : '0';
+  String get headerValue => isShown ? '1' : '0';
 
   @override
   String toString() {
-    return value ? "shown" : "hidden";
+    return isShown ? "shown" : "hidden";
   }
 }
 
@@ -55,7 +55,7 @@ class HumHub {
   Map<String, dynamic> toJson() => {
         'manifest': manifest?.toJson(),
         'manifestUri': manifestUrl,
-        'openerState': openerState.value,
+        'openerState': openerState.isShown,
         'randomHash': randomHash,
         'appVersion': appVersion,
         'pushToken': pushToken,
@@ -130,7 +130,7 @@ class HumHub {
   }
 
   Future<RedirectAction> action(ref) async {
-    if (openerState.value) {
+    if (openerState.isShown) {
       return RedirectAction.opener;
     } else {
       if (manifest != null) {
