@@ -4,6 +4,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/global_user_agent.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:loggy/loggy.dart';
 
 class WebViewGlobalController {
   static InAppWebViewController? _value;
@@ -105,9 +106,10 @@ class WebViewGlobalController {
 
     _value?.addJavaScriptHandler(
       handlerName: 'onImageClosed',
-      callback: (args) {
+      callback: (args) async {
         if (!opened) return;
         opened = false;
+        zoomOut();
         _value?.setSettings(settings: settings(zoom: opened));
       },
     );
@@ -128,6 +130,14 @@ class WebViewGlobalController {
     })();
   """);
   }
+
+  static Future<void> zoomOut() async {
+    bool? canZoomOut = true;
+    while (canZoomOut ?? false) {
+      canZoomOut = await value?.zoomOut();
+    }
+  }
+
 
   static InAppWebViewSettings settings({bool zoom = false}) {
     return InAppWebViewSettings(
