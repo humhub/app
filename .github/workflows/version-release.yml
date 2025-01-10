@@ -20,7 +20,7 @@ jobs:
       - name: Write version to file
         run: echo $version > version.txt
       - name: Upload version.txt
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: gitversion
           path: version.txt
@@ -97,7 +97,7 @@ jobs:
           commit: ${{ github.sha }}
           allowUpdates: true
       - name: Upload app bundle
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: appbundle
           path: build/app/outputs/bundle/release/app-release.aab
@@ -201,7 +201,7 @@ jobs:
           allowUpdates: true
 
       - name: Collect IPA artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: releaseipa
           path: build/ios/ipa/*.ipa
