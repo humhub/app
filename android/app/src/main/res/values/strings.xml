@@ -1,0 +1,18 @@
+<resources>
+    <!-- Strings for App Shortcuts -->
+    <string name="shortcut_settings_short_label">Settings</string>
+    <string name="shortcut_settings_long_label">Open Settings</string>
+    <string name="shortcut_settings_disabled_message">Settings unavailable</string>
+
+    <string name="shortcut_spaces_short_label">Spaces</string>
+    <string name="shortcut_spaces_long_label">View Spaces</string>
+    <string name="shortcut_spaces_disabled_message">Spaces unavailable</string>
+
+    <string name="shortcut_profile_short_label">Profile</string>
+    <string name="shortcut_profile_long_label">View Profile</string>
+    <string name="shortcut_profile_disabled_message">Profile unavailable</string>
+
+    <string name="shortcut_compose_short_label">Compose Post</string>
+    <string name="shortcut_compose_long_label">Create a New Post</string>
+    <string name="shortcut_compose_disabled_message">Compose unavailable</string>
+</resources>
