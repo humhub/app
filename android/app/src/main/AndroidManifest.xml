@@ -58,7 +58,7 @@
 
         </activity>
        <activity android:name=".Spaces" android:exported="true">
-           <intent-filter android:icon="@drawable/ic_chat" android:label="Spaces">
+           <intent-filter android:icon="@drawable/ic_spaces" android:label="Spaces">
                <action android:name="android.intent.action.SEND" />
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="image/*" />

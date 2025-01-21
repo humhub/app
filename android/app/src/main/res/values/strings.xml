@@ -15,4 +15,17 @@
     <string name="shortcut_compose_short_label">Compose Post</string>
     <string name="shortcut_compose_long_label">Create a New Post</string>
     <string name="shortcut_compose_disabled_message">Compose unavailable</string>
+
+
+    <string name="shortcut_omrade_short_label">Omrade</string>
+    <string name="shortcut_omrade_long_label">Open Omrade</string>
+    <string name="shortcut_omrade_disabled_message">Not available</string>
+
+    <string name="shortcut_community_short_label">Community</string>
+    <string name="shortcut_community_long_label">Open Community</string>
+    <string name="shortcut_community_disabled_message">Not available</string>
+
+    <string name="shortcut_inforisque_short_label">Inforisque</string>
+    <string name="shortcut_inforisque_long_label">Open Inforisque</string>
+    <string name="shortcut_inforisque_disabled_message">Not available</string>
 </resources>

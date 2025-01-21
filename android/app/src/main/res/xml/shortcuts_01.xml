@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="open_settings"
+        android:enabled="true"
+        android:icon="@drawable/ic_settings"
+        android:shortcutShortLabel="@string/shortcut_settings_short_label"
+        android:shortcutLongLabel="@string/shortcut_settings_long_label"
+        android:shortcutDisabledMessage="@string/shortcut_settings_disabled_message">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.humhub.app"
+            android:targetClass="com.humhub.app.MainActivity">
+            <extra android:name="shortcut" android:value="settings" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="spaces"
+        android:enabled="true"
+        android:icon="@drawable/ic_spaces"
+        android:shortcutShortLabel="@string/shortcut_spaces_short_label"
+        android:shortcutLongLabel="@string/shortcut_spaces_long_label"
+        android:shortcutDisabledMessage="@string/shortcut_spaces_disabled_message">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.humhub.app"
+            android:targetClass="com.humhub.app.MainActivity">
+            <extra android:name="shortcut" android:value="spaces" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="profile"
+        android:enabled="true"
+        android:icon="@drawable/ic_profile"
+        android:shortcutShortLabel="@string/shortcut_profile_short_label"
+        android:shortcutLongLabel="@string/shortcut_profile_long_label"
+        android:shortcutDisabledMessage="@string/shortcut_profile_disabled_message">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.humhub.app"
+            android:targetClass="com.humhub.app.MainActivity">
+            <extra android:name="shortcut" android:value="profile" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="compose_post"
+        android:enabled="true"
+        android:icon="@drawable/ic_compose"
+        android:shortcutShortLabel="@string/shortcut_compose_short_label"
+        android:shortcutLongLabel="@string/shortcut_compose_long_label"
+        android:shortcutDisabledMessage="@string/shortcut_compose_disabled_message">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.humhub.app"
+            android:targetClass="com.humhub.app.MainActivity">
+            <extra android:name="shortcut" android:value="compose_post" />
+        </intent>
+    </shortcut>
+</shortcuts>
