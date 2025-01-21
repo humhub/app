@@ -2,17 +2,35 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:loggy/loggy.dart';
 
-class MailProviderHandler {
+class UrlProviderHandler {
   static Future<Uri?> handleUniversalLink(Uri url) async {
-    if (_isBrevoUrl(url)) {
+    if (_isHumHubUrl(url)) {
+      return _handleHumHubUrl(url);
+    } else if (_isBrevoUrl(url)) {
       return await _handleUniversalLinkBrevo(url);
-    } else {
-      return null;
     }
+    return null;
+  }
+
+  static bool _isHumHubUrl(Uri url) {
+    return url.toString().contains('go.humhub.com');
   }
 
   static bool _isBrevoUrl(Uri url) {
     return url.toString().contains('r.mail.inforisque.fr');
+  }
+
+  static Uri? _handleHumHubUrl(Uri url) {
+    try {
+      final urlParam = url.queryParameters['url'];
+      if (urlParam != null) {
+        return Uri.parse(Uri.decodeComponent(urlParam));
+      }
+      return null;
+    } catch (e) {
+      logError('Error while handling HumHub URL: $e');
+      return null;
+    }
   }
 
   static Future<Uri?> _handleUniversalLinkBrevo(Uri url) async {
@@ -34,3 +52,4 @@ class MailProviderHandler {
     }
   }
 }
+

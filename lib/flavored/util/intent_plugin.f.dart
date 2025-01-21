@@ -57,7 +57,7 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
       // the foreground or in the background.
       _sub = uriLinkStream.listen((Uri? uri) async {
         if (!mounted && uri == null) return;
-        _latestUri = await MailProviderHandler.handleUniversalLink(uri!) ?? uri;
+        _latestUri = await UrlProviderHandler.handleUniversalLink(uri!) ?? uri;
         String? redirectUrl = _latestUri?.toString();
         if (redirectUrl != null && navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
@@ -88,7 +88,7 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
         Uri? uri = await getInitialUri();
         if (uri == null) return;
         setState(() => _initialUri = uri);
-        _latestUri = await MailProviderHandler.handleUniversalLink(uri) ?? uri;
+        _latestUri = await UrlProviderHandler.handleUniversalLink(uri) ?? uri;
         String? redirectUrl = _latestUri.toString();
         if (navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
