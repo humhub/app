@@ -156,7 +156,7 @@ class HumHub {
   }
 
   Map<String, String> get customHeaders => {
-        'x-humhub-app-token': randomHash!,
+        'x-humhub-app-token': randomHash ?? '',
         'x-humhub-app': appVersion ?? '1.0.0',
         'x-humhub-app-is-ios': isIos ? '1' : '0',
         'x-humhub-app-is-android': isAndroid ? '1' : '0',

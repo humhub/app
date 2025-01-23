@@ -8,6 +8,7 @@ import 'const.dart';
 
 class HumHubNotifier extends ChangeNotifier {
   final HumHub _humHubInstance;
+  late String lastUrl;
 
   HumHubNotifier(this._humHubInstance);
 
@@ -103,7 +104,7 @@ class HumHubNotifier extends ChangeNotifier {
 
   _updateSafeStorage() async {
     final jsonString = json.encode(_humHubInstance.toJson());
-    String lastUrl = _humHubInstance.manifestUrl != null ? _humHubInstance.manifestUrl! : await getLastUrl();
+    String lastUrl = _humHubInstance.manifestUrl != null ? _humHubInstance.manifestUrl! : this.lastUrl;
     await InternalStorage.storage.write(key: InternalStorage.keyHumhubInstance, value: jsonString);
     await InternalStorage.storage.write(key: InternalStorage.keyLastInstanceUrl, value: lastUrl);
   }
@@ -115,13 +116,9 @@ class HumHubNotifier extends ChangeNotifier {
   Future<HumHub> getInstance() async {
     var jsonStr = await InternalStorage.storage.read(key: InternalStorage.keyHumhubInstance);
     HumHub humHub = jsonStr != null ? HumHub.fromJson(json.decode(jsonStr)) : _humHubInstance;
+    lastUrl = await InternalStorage.storage.read(key: InternalStorage.keyLastInstanceUrl) ?? "";
     setInstance(humHub);
     return humHub;
-  }
-
-  Future<String> getLastUrl() async {
-    var lastUrl = await InternalStorage.storage.read(key: InternalStorage.keyLastInstanceUrl);
-    return lastUrl ?? "";
   }
 }
 

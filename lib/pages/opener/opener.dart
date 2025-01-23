@@ -37,14 +37,14 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Delay before showing text field
-      ref.read(visibilityProvider.notifier).toggleVisibility(true);
+      ref.read(visibilityProvider.notifier).setVisibility(true);
       Future.delayed(const Duration(milliseconds: 1000), () {
-        ref.read(textFieldVisibilityProvider.notifier).toggleVisibility(true);
+        ref.read(textFieldVisibilityProvider.notifier).setVisibility(true);
       });
 
       // Delay before showing language switcher
       Future.delayed(const Duration(milliseconds: 700), () {
-        ref.read(languageSwitcherVisibilityProvider.notifier).toggleVisibility(true);
+        ref.read(languageSwitcherVisibilityProvider.notifier).setVisibility(true);
       });
 
       String? urlIntent = InitFromUrl.usePayload();
@@ -54,7 +54,7 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
 
       /// If there is only one item in history that means we can show [SearchBarWidget] that is already prefilled with url or null if count is 0.
       if (ref.read(humHubProvider).history.isEmpty) {
-        ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility(true);
+        ref.watch(searchBarVisibilityNotifier.notifier).setVisibility(true);
       }
     });
   }
@@ -87,9 +87,7 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                           duration: const Duration(milliseconds: 300),
                           child: FloatingActionButton(
                             onPressed: () {
-                              ref
-                                  .watch(searchBarVisibilityNotifier.notifier)
-                                  .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
+                              ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
                             },
                             tooltip: 'Increment',
                             backgroundColor: Colors.white,
@@ -140,9 +138,7 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                                   duration: const Duration(milliseconds: 250),
                                   child: LastLoginWidget(
                                       onAddNetwork: () {
-                                        ref
-                                            .watch(searchBarVisibilityNotifier.notifier)
-                                            .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
+                                        ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
                                       },
                                       history: ref.watch(humHubProvider).history,
                                       onSelectNetwork: (Manifest manifest) async {
@@ -160,9 +156,7 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                                       onDeleteNetwork: (manifest, isLast) {
                                         ref.watch(humHubProvider.notifier).removeHistory(manifest);
                                         if (isLast) {
-                                          ref
-                                              .watch(searchBarVisibilityNotifier.notifier)
-                                              .toggleVisibility(!ref.watch(searchBarVisibilityNotifier));
+                                          ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
                                         }
                                       }),
                                 ),

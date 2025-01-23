@@ -16,7 +16,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class VisibilityNotifier extends StateNotifier<bool> {
   VisibilityNotifier() : super(false);
 
-  void toggleVisibility(bool isVisible) {
+  void toggleVisibility() {
+    state = !state;
+  }
+
+  void setVisibility(bool isVisible) {
     state = isVisible;
   }
 }
@@ -40,7 +44,7 @@ final searchBarVisibilityNotifier = StateNotifierProvider<VisibilityNotifier, bo
 class OpenerController {
   late AsyncValue<Manifest>? asyncData;
   bool doesViewExist = false;
-  TextEditingController urlTextController = TextEditingController();
+  late TextEditingController urlTextController = TextEditingController(text: ref.watch(humHubProvider).lastUrl);
   late String? postcodeErrorMessage;
   final String formUrlKey = "redirect_url";
   final String error404 = "404";
@@ -126,12 +130,13 @@ class OpenerController {
       // Set the manifestStateProvider with the manifest value so that it's globally accessible
       // Generate hash and save it to store
       String lastUrl = "";
-      lastUrl = await ref.read(humHubProvider).getLastUrl();
+      lastUrl = ref.read(humHubProvider).lastUrl;
       String currentUrl = urlTextController.text;
       String hash = HumHub.generateHash(32);
       if (lastUrl == currentUrl) hash = ref.read(humHubProvider).randomHash ?? hash;
       await ref.read(humHubProvider.notifier).addOrUpdateHistory(manifest);
-      HumHub instance = ref.read(humHubProvider).copyWith(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl);
+      HumHub instance =
+          ref.read(humHubProvider).copyWith(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl);
       ref.read(humHubProvider.notifier).setInstance(instance);
     }
   }
@@ -179,19 +184,19 @@ class OpenerController {
   void animationNavigationWrapper({required Future<void> Function() navigate}) {
     FocusManager.instance.primaryFocus?.unfocus();
     _animationForwardController.isActive = true;
-    ref.read(visibilityProvider.notifier).toggleVisibility(false);
-    ref.read(textFieldVisibilityProvider.notifier).toggleVisibility(false);
-    ref.read(languageSwitcherVisibilityProvider.notifier).toggleVisibility(false);
+    ref.read(visibilityProvider.notifier).setVisibility(false);
+    ref.read(textFieldVisibilityProvider.notifier).setVisibility(false);
+    ref.read(languageSwitcherVisibilityProvider.notifier).setVisibility(false);
 
     Future.delayed(const Duration(milliseconds: 700)).then((_) {
       navigate().then((value) {
         _animationForwardController.isActive = true;
         _animationForward.reset();
-        ref.read(visibilityProvider.notifier).toggleVisibility(true);
+        ref.read(visibilityProvider.notifier).setVisibility(true);
 
         Future.delayed(const Duration(milliseconds: 700), () {
-          ref.read(textFieldVisibilityProvider.notifier).toggleVisibility(true);
-          ref.read(languageSwitcherVisibilityProvider.notifier).toggleVisibility(true);
+          ref.read(textFieldVisibilityProvider.notifier).setVisibility(true);
+          ref.read(languageSwitcherVisibilityProvider.notifier).setVisibility(true);
         });
 
         _animationReverseController.isActive = true;
@@ -202,7 +207,7 @@ class OpenerController {
     });
   }
 
-  Future<void> connect() async {
+  Future<bool> connect() async {
     FocusManager.instance.primaryFocus?.unfocus();
     await initHumHub();
     if (allOk) {
@@ -213,6 +218,7 @@ class OpenerController {
         );
       });
     }
+    return allOk;
   }
 
   dispose() {
