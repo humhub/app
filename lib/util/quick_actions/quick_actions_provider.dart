@@ -1,8 +1,9 @@
-// quick_actions_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:loggy/loggy.dart';
+import 'package:humhub/util/providers.dart';
 import 'package:quick_actions/quick_actions.dart';
 
+/// Represents an internal shortcut that combines a platform shortcut item
+/// with its associated action callback
 class InternalShortcut {
   final ShortcutItem shortcut;
   final Function action;
@@ -10,76 +11,51 @@ class InternalShortcut {
   InternalShortcut({required this.shortcut, required this.action});
 }
 
+/// Manages quick actions (home screen shortcuts) functionality
+/// and their registration with the platform
 class QuickActionsService {
   final _quickActions = const QuickActions();
+  final List<InternalShortcut> shortcuts;
 
-  List<InternalShortcut> shortcuts = [
-    InternalShortcut(
-        shortcut: const ShortcutItem(
-          type: 'action_one',
-          localizedTitle: 'Action one',
-          localizedSubtitle: 'Action one subtitle',
-          icon: 'ic_launcher',
-        ),
-        action: () {
-          logInfo('action_one');
-        }),
-    InternalShortcut(
-        shortcut: const ShortcutItem(
-          type: 'action_two',
-          localizedTitle: 'Action two',
-          localizedSubtitle: 'Action two subtitle',
-          icon: 'ic_launcher',
-        ),
-        action: () {
-          logInfo('action_two');
-        }),
-    InternalShortcut(
-        shortcut: const ShortcutItem(
-          type: 'action_three',
-          localizedTitle: 'Action three',
-          localizedSubtitle: 'Action three subtitle',
-          icon: 'ic_launcher',
-        ),
-        action: () {
-          logInfo('action_three');
-        })
-  ];
+  QuickActionsService(this.shortcuts);
 
+  /// Initializes quick actions and registers them with the platform
+  ///
+  /// Takes an [onAction] callback that will be triggered when shortcuts are selected
   Future<void> initialize(Function(String) onAction) async {
     _quickActions.initialize(onAction);
     await _quickActions.setShortcutItems(shortcuts.map((e) => e.shortcut).toList());
   }
 }
 
+/// Manages the state of quick actions and handles their initialization and execution
 class QuickActionsNotifier extends StateNotifier<InternalShortcut?> {
   final QuickActionsService _service;
 
   QuickActionsNotifier(this._service) : super(null);
 
+  /// Initializes quick actions and sets up the action handler
+  ///
+  /// When a shortcut is triggered, finds and executes the corresponding action
   Future<void> initialize() async {
     await _service.initialize((actionType) {
-      // Find the shortcut by type and execute its action
-      final shortcut = _service.shortcuts
-          .firstWhere((s) => s.shortcut.type == actionType);
-
-      shortcut.action(); // Execute the action
-      state = shortcut; // Update the state with the InternalShortcut
+      final shortcut = _service.shortcuts.firstWhere((s) => s.shortcut.type == actionType);
+      shortcut.action();
+      state = shortcut;
     });
   }
 
+  /// Clears the current shortcut state after handling an action
   void clearAction() {
-    state = null; // Clear the state after handling the action
+    state = null;
   }
 }
 
-final quickActionsProvider =
-StateNotifierProvider<QuickActionsNotifier, InternalShortcut?>((ref) {
-  final service = QuickActionsService();
+/// Provider that creates and manages the QuickActionsNotifier
+/// Initializes quick actions with shortcuts from the app's history
+final quickActionsProvider = StateNotifierProvider<QuickActionsNotifier, InternalShortcut?>((ref) {
+  final service = QuickActionsService(ref.watch(humHubProvider).history.map((e) => e.shortcut).toList());
   final notifier = QuickActionsNotifier(service);
-
-  // Initialize the service on app start
   notifier.initialize();
-
   return notifier;
 });

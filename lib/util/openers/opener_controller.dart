@@ -4,6 +4,7 @@ import 'package:http/http.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/web_view.dart';
+import 'package:humhub/util/crypt.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:http/http.dart' as http;
 import 'package:loggy/loggy.dart';
@@ -132,7 +133,7 @@ class OpenerController {
       String lastUrl = "";
       lastUrl = ref.read(humHubProvider).lastUrl;
       String currentUrl = urlTextController.text;
-      String hash = HumHub.generateHash(32);
+      String hash = Crypt.generateRandomString(32);
       if (lastUrl == currentUrl) hash = ref.read(humHubProvider).randomHash ?? hash;
       await ref.read(humHubProvider.notifier).addOrUpdateHistory(manifest);
       HumHub instance =

@@ -1,4 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:humhub/pages/web_view.dart';
+import 'package:humhub/util/const.dart';
+import 'package:humhub/util/crypt.dart';
+import 'package:humhub/util/openers/universal_opener_controller.dart';
+import 'package:quick_actions/quick_actions.dart';
+import '../util/quick_actions/quick_actions_provider.dart';
 
 class ManifestIcon {
   final String src;
@@ -16,10 +22,10 @@ class ManifestIcon {
   }
 
   Map<String, dynamic> toJson() => {
-    'src': src,
-    'type': type,
-    'sizes': sizes,
-  };
+        'src': src,
+        'type': type,
+        'sizes': sizes,
+      };
 }
 
 class Manifest {
@@ -48,7 +54,8 @@ class Manifest {
 
   factory Manifest.fromJson(Map<String, dynamic> json) {
     var iconsJson = json['icons'] as List<dynamic>?;
-    List<ManifestIcon>? iconsList = iconsJson?.map((icon) => ManifestIcon.fromJson(icon as Map<String, dynamic>)).toList();
+    List<ManifestIcon>? iconsList =
+        iconsJson?.map((icon) => ManifestIcon.fromJson(icon as Map<String, dynamic>)).toList();
 
     return Manifest(
       display: json['display'] as String,
@@ -62,19 +69,19 @@ class Manifest {
   }
 
   Map<String, dynamic> toJson() => {
-    'display': display,
-    'start_url': startUrl,
-    'short_name': shortName,
-    'name': name,
-    'background_color': backgroundColor,
-    'theme_color': themeColor,
-    'icons': icons?.map((icon) => icon.toJson()).toList(),
-  };
+        'display': display,
+        'start_url': startUrl,
+        'short_name': shortName,
+        'name': name,
+        'background_color': backgroundColor,
+        'theme_color': themeColor,
+        'icons': icons?.map((icon) => icon.toJson()).toList(),
+      };
 
   static Future<Manifest> Function(Dio dio) get(String url) => (dio) async {
-    Response<dynamic> res = await dio.get(url);
-    return Manifest.fromJson(res.data);
-  };
+        Response<dynamic> res = await dio.get(url);
+        return Manifest.fromJson(res.data);
+      };
 
   static String getUriWithoutExtension(String url) {
     int lastSlashIndex = url.lastIndexOf('/');
@@ -88,5 +95,21 @@ class Manifest {
 
   static String defineUrl(String url, {bool isUriPretty = true}) {
     return !isUriPretty ? '$url/index.php?r=web%2Fpwa-manifest%2Findex' : '$url/manifest.json';
+  }
+
+  InternalShortcut get shortcut {
+    //const String hash = HumHub.generateHash(16);
+    return InternalShortcut(
+        shortcut: ShortcutItem(
+          type: Crypt.generateHash(startUrl, 16),
+          localizedTitle: name,
+          localizedSubtitle: name,
+          icon: 'ic_launcher',
+        ),
+        action: () async {
+          UniversalOpenerController opener = UniversalOpenerController(url: startUrl);
+          await opener.initHumHub();
+          navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
+        });
   }
 }

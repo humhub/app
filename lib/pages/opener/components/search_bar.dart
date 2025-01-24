@@ -72,7 +72,8 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
             child: AnimatedOpacity(
               opacity: ref.watch(visibilityProvider) ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 300),
-              child: Center(
+              child: Align(
+                alignment: Alignment.bottomCenter, // Aligns the child to the bottom
                 child: TextButton(
                   onPressed: connect,
                   style: TextButton.styleFrom(

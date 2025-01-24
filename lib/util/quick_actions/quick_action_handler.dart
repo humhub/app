@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'quick_actions_provider.dart';
 
 class QuickActionsHandler extends ConsumerWidget {
-  const QuickActionsHandler({Key? key}) : super(key: key);
+  final Widget child;
+  const QuickActionsHandler({Key? key, required this.child}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,6 +19,6 @@ class QuickActionsHandler extends ConsumerWidget {
       });
     }
 
-    return const SizedBox.shrink();
+    return child;
   }
 }

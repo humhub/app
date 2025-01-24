@@ -14,6 +14,7 @@ import 'package:humhub/pages/opener/opener.dart';
 import 'package:humhub/util/black_list_rules.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/const.dart';
+import 'package:humhub/util/crypt.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/file_handler.dart';
 import 'package:humhub/util/init_from_url.dart';
@@ -258,7 +259,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         break;
       case ChannelAction.hideOpener:
         ref.read(humHubProvider).setOpenerState(OpenerState.hidden);
-        ref.read(humHubProvider).setHash(HumHub.generateHash(32));
+        ref.read(humHubProvider).setHash(Crypt.generateRandomString(32));
         break;
       case ChannelAction.registerFcmDevice:
         String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
