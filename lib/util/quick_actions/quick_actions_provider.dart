@@ -23,8 +23,8 @@ class QuickActionsService {
   ///
   /// Takes an [onAction] callback that will be triggered when shortcuts are selected
   Future<void> initialize(Function(String) onAction) async {
-    _quickActions.initialize(onAction);
     await _quickActions.setShortcutItems(shortcuts.map((e) => e.shortcut).toList());
+    _quickActions.initialize(onAction);
   }
 }
 
@@ -41,6 +41,7 @@ class QuickActionsNotifier extends StateNotifier<InternalShortcut?> {
     await _service.initialize((actionType) {
       final shortcut = _service.shortcuts.firstWhere((s) => s.shortcut.type == actionType);
       shortcut.action();
+      clearAction();
       state = shortcut;
     });
   }
@@ -54,7 +55,7 @@ class QuickActionsNotifier extends StateNotifier<InternalShortcut?> {
 /// Provider that creates and manages the QuickActionsNotifier
 /// Initializes quick actions with shortcuts from the app's history
 final quickActionsProvider = StateNotifierProvider<QuickActionsNotifier, InternalShortcut?>((ref) {
-  final service = QuickActionsService(ref.watch(humHubProvider).history.map((e) => e.shortcut).toList());
+  final service = QuickActionsService(ref.read(humHubProvider).history.map((e) => e.shortcut).toList());
   final notifier = QuickActionsNotifier(service);
   notifier.initialize();
   return notifier;

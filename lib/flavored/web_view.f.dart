@@ -294,7 +294,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         // Hide the bottom sheet if it is visible
         Navigator.popUntil(context, ModalRoute.withName(WebViewF.path));
         isDone = true;
-        scaffoldMessengerStateKey.currentState?.showSnackBar(
+        Keys.scaffoldMessengerStateKey.currentState?.showSnackBar(
           SnackBar(
             content: Text('${AppLocalizations.of(context)!.file_download}: $filename'),
             action: SnackBarAction(
@@ -368,7 +368,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         if (persistentController != null) {
           Navigator.popUntil(context, ModalRoute.withName(WebViewF.path));
         }
-        scaffoldMessengerStateKey.currentState?.showSnackBar(
+        Keys.scaffoldMessengerStateKey.currentState?.showSnackBar(
           SnackBar(
             content: Text(AppLocalizations.of(context)!.generic_error),
           ),

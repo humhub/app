@@ -9,10 +9,8 @@ class QuickActionsHandler extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final quickAction = ref.watch(quickActionsProvider);
-
     if (quickAction != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Handle navigation or UI logic here, if needed
         quickAction.action();
         // Clear the action after handling
         ref.read(quickActionsProvider.notifier).clearAction();

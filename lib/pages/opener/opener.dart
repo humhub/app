@@ -150,7 +150,7 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
 
                                         openerControlLer.animationNavigationWrapper(
                                           navigate: () =>
-                                              navigatorKey.currentState!.pushNamed(WebView.path, arguments: uniOpen),
+                                              Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: uniOpen),
                                         );
                                       },
                                       onDeleteNetwork: (manifest, isLast) {

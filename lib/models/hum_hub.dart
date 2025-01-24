@@ -128,7 +128,7 @@ class HumHub {
     }
   }
 
-  Future<RedirectAction> action(ref) async {
+  Future<RedirectAction> get action async {
     if (openerState.isShown) {
       return RedirectAction.opener;
     } else {

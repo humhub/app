@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
-import 'package:humhub/util/crypt.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
+import 'package:loggy/loggy.dart';
 import 'package:quick_actions/quick_actions.dart';
 import '../util/quick_actions/quick_actions_provider.dart';
 
@@ -98,18 +98,18 @@ class Manifest {
   }
 
   InternalShortcut get shortcut {
-    //const String hash = HumHub.generateHash(16);
     return InternalShortcut(
         shortcut: ShortcutItem(
-          type: Crypt.generateHash(startUrl, 16),
+          type: startUrl,
           localizedTitle: name,
           localizedSubtitle: name,
           icon: 'ic_launcher',
         ),
         action: () async {
+          logInfo('MD222- shotcut on action');
           UniversalOpenerController opener = UniversalOpenerController(url: startUrl);
           await opener.initHumHub();
-          navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
+          Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
         });
   }
 }

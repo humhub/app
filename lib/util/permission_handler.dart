@@ -56,12 +56,12 @@ class PermissionHandler {
       action();
     } else {
       // Show a SnackBar indicating that permissions are missing
-      if (navigatorKey.currentState != null && navigatorKey.currentState!.mounted) {
-        scaffoldMessengerStateKey.currentState?.showSnackBar(
+      if (Keys.navigatorKey.currentState != null && Keys.navigatorKey.currentState!.mounted) {
+        Keys.scaffoldMessengerStateKey.currentState?.showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(navigatorKey.currentState!.context)!.enable_permissions),
+            content: Text(AppLocalizations.of(Keys.navigatorKey.currentState!.context)!.enable_permissions),
             action: SnackBarAction(
-              label: AppLocalizations.of(navigatorKey.currentState!.context)!.settings,
+              label: AppLocalizations.of(Keys.navigatorKey.currentState!.context)!.settings,
               onPressed: () {
                 openAppSettings();
               },

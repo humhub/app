@@ -20,9 +20,9 @@ class NotificationChannel {
   /// If app is already running in WebView mode then the state of [WebView] will be updated with new url.
   ///
   Future<void> onTap(String? payload) async {
-    if (payload != null && navigatorKey.currentState != null) {
+    if (payload != null && Keys.navigatorKey.currentState != null) {
       bool isNewRouteSameAsCurrent = false;
-      navigatorKey.currentState!.popUntil((route) {
+      Keys.navigatorKey.currentState!.popUntil((route) {
         if (route.settings.name == WebView.path) {
           isNewRouteSameAsCurrent = true;
         }
@@ -31,10 +31,10 @@ class NotificationChannel {
       UniversalOpenerController opener = UniversalOpenerController(url: payload);
       await opener.initHumHub();
       if (isNewRouteSameAsCurrent) {
-        navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
+        Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
         return;
       }
-      navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
+      Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
     } else {
       if (payload != null) {
         InitFromUrl.setPayload(payload);

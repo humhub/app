@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-final GlobalKey<ScaffoldMessengerState> scaffoldMessengerStateKey = GlobalKey<ScaffoldMessengerState>();
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+class Keys{
+  static GlobalKey<ScaffoldMessengerState> scaffoldMessengerStateKey = GlobalKey<ScaffoldMessengerState>();
+  static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+}
+
 
 class InternalStorage {
   static String keyHumhubInstance = "humHubInstance";
