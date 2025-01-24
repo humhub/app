@@ -276,7 +276,6 @@ class WebViewAppState extends ConsumerState<WebView> {
         if (message.count != null) {
           FlutterAppBadger.updateBadgeCount(message.count!);
         }
-        Navigator.of(context).pushNamed(ConsolePage.routeName);
         break;
       case ChannelAction.nativeConsole:
         Navigator.of(context).pushNamed(ConsolePage.routeName);
