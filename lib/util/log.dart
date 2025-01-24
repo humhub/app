@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:humhub/pages/console.dart';
 import 'package:loggy/loggy.dart';
+import 'package:talker_flutter/talker_flutter.dart' as tl;
 
 class GlobalLog extends LoggyPrinter {
   const GlobalLog({
@@ -34,6 +36,25 @@ class GlobalLog extends LoggyPrinter {
 
     final color = _colorize ? levelColor(record.level) ?? AnsiColor() : AnsiColor();
     final prefix = levelPrefix(record.level) ?? _defaultPrefix;
+    tl.Talker talker = ConsolePage.talker;
+    // Log to Talker
+    switch (record.level) {
+      case LogLevel.debug:
+        talker.debug(record.message, record.error, record.stackTrace);
+        break;
+      case LogLevel.info:
+        talker.info(record.message, record.error, record.stackTrace);
+        break;
+      case LogLevel.warning:
+        talker.warning(record.message, record.error, record.stackTrace);
+        break;
+      case LogLevel.error:
+        talker.error(record.message, record.error, record.stackTrace);
+        break;
+      default:
+        talker.log(record.message);
+        break;
+    }
 
     if (kDebugMode) {
       print(color('$prefix$time $logLevel GLOBAL $callerFrame ${record.message}'));

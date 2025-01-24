@@ -2,7 +2,15 @@ import 'dart:convert';
 
 part 'channel_message.g.dart';
 
-enum ChannelAction { showOpener, hideOpener, registerFcmDevice, unregisterFcmDevice, updateNotificationCount, none }
+enum ChannelAction {
+  showOpener,
+  hideOpener,
+  registerFcmDevice,
+  unregisterFcmDevice,
+  updateNotificationCount,
+  nativeConsole,
+  none
+}
 
 class ChannelMessage {
   final String type;
@@ -14,6 +22,7 @@ class ChannelMessage {
     if (type == "registerFcmDevice") return ChannelAction.registerFcmDevice;
     if (type == "unregisterFcmDevice") return ChannelAction.unregisterFcmDevice;
     if (type == "updateNotificationCount") return ChannelAction.updateNotificationCount;
+    if (type == "openNativeConsole") return ChannelAction.nativeConsole;
 
     return ChannelAction.none;
   }

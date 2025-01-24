@@ -59,6 +59,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
       _sub = uriLinkStream.listen((Uri? uri) async {
         if (!mounted && uri == null) return;
         _latestUri = await UrlProviderHandler.handleUniversalLink(uri!) ?? uri;
+        logInfo('IntentPlugin._subscribeToUriStream', _latestUri);
         String redirectUrl = _latestUri.toString();
         if (navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
@@ -91,6 +92,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         if (uri == null || !mounted) return;
         setState(() => _initialUri = uri);
         _latestUri = await UrlProviderHandler.handleUniversalLink(uri) ?? uri;
+        logInfo('IntentPlugin._handleInitialUri', _latestUri);
         String? redirectUrl = _latestUri.toString();
         if (navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
@@ -111,6 +113,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   }
 
   Future<bool> tryNavigateWithOpener(String redirectUrl) async {
+    logInfo('IntentPlugin.tryNavigateWithOpener', _latestUri);
     LoadingProvider.of(ref).showLoading();
     bool isNewRouteSameAsCurrent = false;
     navigatorKey.currentState!.popUntil((route) {

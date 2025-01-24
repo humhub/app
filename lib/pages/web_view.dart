@@ -29,6 +29,8 @@ import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'console.dart';
+
 class WebView extends ConsumerStatefulWidget {
   const WebView({super.key});
   static const String path = '/web_view';
@@ -274,6 +276,9 @@ class WebViewAppState extends ConsumerState<WebView> {
         if (message.count != null) {
           FlutterAppBadger.updateBadgeCount(message.count!);
         }
+        break;
+      case ChannelAction.nativeConsole:
+        Navigator.of(context).pushNamed(ConsolePage.routeName);
         break;
       case ChannelAction.unregisterFcmDevice:
         String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
