@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/pages/console.dart';
 import 'package:humhub/pages/help/help.dart';
 import 'package:humhub/pages/opener/opener.dart';
 import 'package:humhub/pages/web_view.dart';
@@ -50,6 +51,13 @@ class MyRouter {
         DeviceOrientation.portraitUp,
       ]);
       return const Help();
+    },
+
+    ConsolePage.routeName: (context) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+      return const ConsolePage();
     },
   };
 
