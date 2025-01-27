@@ -118,7 +118,7 @@ class WebViewAppState extends ConsumerState<WebView> {
       UniversalOpenerController controller = args;
       ref.read(humHubProvider).setInstance(controller.humhub);
       _manifest = controller.humhub.manifest!;
-      url = _manifest.startUrl;
+      url = controller.url;
     }
     if (args == null) {
       _manifest = m.MyRouter.initParams;
