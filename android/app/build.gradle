@@ -51,7 +51,7 @@ android {
 
     defaultConfig {
         applicationId "com.humhub.app"
-        minSdkVersion 21
+        minSdkVersion 31
         targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -86,4 +86,5 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation platform('com.google.firebase:firebase-bom:31.2.2')
+    implementation "androidx.annotation:annotation:1.5.0"
 }

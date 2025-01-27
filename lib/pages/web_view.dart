@@ -12,6 +12,7 @@ import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener/opener.dart';
 import 'package:humhub/util/black_list_rules.dart';
+import 'package:humhub/util/check_app_links.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
@@ -48,6 +49,17 @@ class WebViewAppState extends ConsumerState<WebView> {
   HeadlessInAppWebView? _headlessWebView;
   bool _isInit = false;
   late double downloadProgress = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(seconds: 2), () {
+        final appLinksManager = AppLinksManager(context);
+        appLinksManager.checkAndShowLinksDialog();
+      });
+    });
+  }
 
   @override
   void didChangeDependencies() {
