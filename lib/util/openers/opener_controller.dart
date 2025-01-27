@@ -44,7 +44,7 @@ final searchBarVisibilityNotifier = StateNotifierProvider<VisibilityNotifier, bo
 class OpenerController {
   late AsyncValue<Manifest>? asyncData;
   bool doesViewExist = false;
-  late TextEditingController urlTextController = TextEditingController(text: ref.watch(humHubProvider).lastUrl);
+  TextEditingController urlTextController = TextEditingController();
   late String? postcodeErrorMessage;
   final String formUrlKey = "redirect_url";
   final String error404 = "404";
