@@ -1,16 +1,14 @@
 import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:http/http.dart' as http;
-import 'package:humhub/util/const.dart';
 import 'package:humhub/util/crypt.dart';
+import 'package:humhub/util/storage_service.dart';
+import 'package:loggy/loggy.dart';
 import '../api_provider.dart';
 import '../connectivity_plugin.dart';
 
-// TODO: Rewrite openers so that the opener_controller will expand universal_opener_controller
 class UniversalOpenerController {
   late AsyncValue<Manifest>? asyncData;
   bool doesViewExist = false;
@@ -45,13 +43,26 @@ class UniversalOpenerController {
     return urls;
   }
 
-  checkHumHubModuleView(String url) async {
-    Response? response;
-    response = await http.Client().get(Uri.parse(url)).catchError((err) {
-      return Response("Found manifest but not humhub.modules.ui.view tag", 404);
-    });
+  Future<void> checkHumHubModuleView(String url) async {
+    try {
+      final response = await Dio().get(url);
 
-    doesViewExist = response.statusCode == 200 && response.body.contains('humhub.modules.ui.view');
+      // Check if the response contains the required tag
+      bool doesViewExist = response.statusCode == 200 &&
+          response.data.toString().contains('humhub.modules.ui.view');
+      logInfo('Does view exist: $doesViewExist');
+    } on DioException catch (e) {
+      // Handle Dio-specific errors
+      if (e.response != null) {
+        logError(
+            'Error: Found manifest but not humhub.modules.ui.view tag. Status code: ${e.response?.statusCode}');
+      } else {
+        logError('Error: ${e.message}');
+      }
+    } catch (e) {
+      // Handle other errors
+      logError('Unexpected error: $e');
+    }
   }
 
   Future<HumHub?> initHumHub() async {
@@ -84,7 +95,7 @@ class UniversalOpenerController {
   }
 
   Future<HumHub?> getLastInstance() async {
-    var jsonStr = await InternalStorage.storage.read(key: InternalStorage.keyHumhubInstance);
+    var jsonStr = await SecureStorageService.instance.read(key: StorageKey.instance.value);
     HumHub? humHub = jsonStr != null ? HumHub.fromJson(json.decode(jsonStr)) : null;
     return humHub;
   }

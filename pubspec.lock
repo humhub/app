@@ -182,14 +182,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.6"
-  cupertino_icons:
-    dependency: "direct main"
-    description:
-      name: cupertino_icons
-      sha256: ba631d1c7f7bef6b729a622b7b752645a2d076dba9976925b8f25725a30e1ee6
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.8"
   dart_style:
     dependency: transitive
     description:
@@ -523,7 +515,7 @@ packages:
     source: hosted
     version: "2.3.2"
   http:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: http
       sha256: fe7ab022b76f3034adc518fb6ea04a82387620e19977665ea18d30a1cf43442f
@@ -829,34 +821,30 @@ packages:
   quick_actions:
     dependency: "direct main"
     description:
-      name: quick_actions
-      sha256: "7e35dd6a21f5bbd21acf6899039eaf85001a5ac26d52cbd6a8a2814505b90798"
-      url: "https://pub.dev"
-    source: hosted
+      path: "/Users/pratej/Documents/repo/flutter/packages/packages/quick_actions/quick_actions"
+      relative: false
+    source: path
     version: "1.1.0"
   quick_actions_android:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: quick_actions_android
-      sha256: "926e50d6f879287b34d21934e6c9457f0d851f554179f2a9e8136c4acd1b7062"
-      url: "https://pub.dev"
-    source: hosted
+      path: "/Users/pratej/Documents/repo/flutter/packages/packages/quick_actions/quick_actions_android"
+      relative: false
+    source: path
     version: "1.0.18"
   quick_actions_ios:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: quick_actions_ios
-      sha256: "837b7e6b5973784d3da56b8c959b446b215914f20405d88cd7d22a2fb94e4e4c"
-      url: "https://pub.dev"
-    source: hosted
+      path: "/Users/pratej/Documents/repo/flutter/packages/packages/quick_actions/quick_actions_ios"
+      relative: false
+    source: path
     version: "1.2.0"
   quick_actions_platform_interface:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: quick_actions_platform_interface
-      sha256: "1fec7068db5122cd019e9340d3d7be5d36eab099695ef3402c7059ee058329a4"
-      url: "https://pub.dev"
-    source: hosted
+      path: "/Users/pratej/Documents/repo/flutter/packages/packages/quick_actions/quick_actions_platform_interface"
+      relative: false
+    source: path
     version: "1.1.0"
   receive_sharing_intent:
     dependency: "direct main"

@@ -1,19 +1,36 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum StorageKey {
+  instance("humhub_instance"),
+  lastUrl("humhub_last_url");
+
+  final String value;
+
+  const StorageKey(this.value);
+
+  static StorageKey? fromValue(String value) {
+    return StorageKey.values.firstWhere(
+          (element) => element.value == value,
+    );
+  }
+
+  // Method to return all storage keys
+  static List<String> getAllKeys() {
+    return StorageKey.values.map((e) => e.value).toList();
+  }
+}
+
+
 class SecureStorageService {
-  // Private constructor
   static const FlutterSecureStorage _instance = FlutterSecureStorage();
 
-  // Factory constructor that returns the single instance
   factory SecureStorageService() {
     return SecureStorageService._internal();
   }
 
-  // Private named constructor
   SecureStorageService._internal();
 
-  // Method to access the single instance of FlutterSecureStorage
   static FlutterSecureStorage get instance => _instance;
 
   static clearSecureStorageOnReinstall() async {

@@ -3,8 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
-
-import 'const.dart';
+import 'package:humhub/util/storage_service.dart';
 
 class HumHubNotifier extends ChangeNotifier {
   final HumHub _humHubInstance;
@@ -105,18 +104,18 @@ class HumHubNotifier extends ChangeNotifier {
   _updateSafeStorage() async {
     final jsonString = json.encode(_humHubInstance.toJson());
     String lastUrl = _humHubInstance.manifestUrl != null ? _humHubInstance.manifestUrl! : this.lastUrl;
-    await InternalStorage.storage.write(key: InternalStorage.keyHumhubInstance, value: jsonString);
-    await InternalStorage.storage.write(key: InternalStorage.keyLastInstanceUrl, value: lastUrl);
+    await SecureStorageService.instance.write(key: StorageKey.instance.value, value: jsonString);
+    await SecureStorageService.instance.write(key: StorageKey.lastUrl.value, value: lastUrl);
   }
 
   clearSafeStorage() async {
-    await InternalStorage.storage.delete(key: InternalStorage.keyHumhubInstance);
+    await SecureStorageService.instance.delete(key: StorageKey.instance.value);
   }
 
   Future<HumHub> getInstance() async {
-    var jsonStr = await InternalStorage.storage.read(key: InternalStorage.keyHumhubInstance);
+    var jsonStr = await SecureStorageService.instance.read(key: StorageKey.instance.value);
     HumHub humHub = jsonStr != null ? HumHub.fromJson(json.decode(jsonStr)) : _humHubInstance;
-    lastUrl = await InternalStorage.storage.read(key: InternalStorage.keyLastInstanceUrl) ?? "";
+    lastUrl = await SecureStorageService.instance.read(key: StorageKey.lastUrl.value) ?? "";
     setInstance(humHub);
     return humHub;
   }

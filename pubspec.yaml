@@ -35,9 +35,7 @@ dependencies:
     sdk: flutter
 
   url_launcher: ^6.1.7
-  cupertino_icons: ^1.0.2
   dio: ^5.7.0
-  http: ^1.3.0
   flutter_riverpod: ^2.1.3
   permission_handler: ^11.3.1
   flutter_secure_storage: ^10.0.0-beta.4
@@ -65,17 +63,17 @@ dependencies:
   cached_network_image: ^3.3.1
   quick_actions: ^1.1.0
 
-#dependency_overrides:
-#  quick_actions_platform_interface:
-#    path: '/Users/pratej/Documents/repo/flutter/packages/packages/quick_actions/quick_actions_platform_interface'
-#  quick_actions:
-#    path: '/Users/pratej/Documents/repo/flutter/packages/packages/quick_actions/quick_actions'
-#
-#  quick_actions_android:
-#    path: '/Users/pratej/Documents/repo/flutter/packages/packages/quick_actions/quick_actions_android'
-#
-#  quick_actions_ios:
-#    path: '/Users/pratej/Documents/repo/flutter/packages/packages/quick_actions/quick_actions_ios'
+dependency_overrides:
+  quick_actions_platform_interface:
+    path: '/Users/pratej/Documents/repo/flutter/packages/packages/quick_actions/quick_actions_platform_interface'
+  quick_actions:
+    path: '/Users/pratej/Documents/repo/flutter/packages/packages/quick_actions/quick_actions'
+
+  quick_actions_android:
+    path: '/Users/pratej/Documents/repo/flutter/packages/packages/quick_actions/quick_actions_android'
+
+  quick_actions_ios:
+    path: '/Users/pratej/Documents/repo/flutter/packages/packages/quick_actions/quick_actions_ios'
 dev_dependencies:
   flutter_test:
     sdk: flutter
