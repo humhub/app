@@ -4,7 +4,7 @@ import 'quick_actions_provider.dart';
 
 class QuickActionsHandler extends ConsumerWidget {
   final Widget child;
-  const QuickActionsHandler({Key? key, required this.child}) : super(key: key);
+  const QuickActionsHandler({super.key, required this.child});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

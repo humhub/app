@@ -7,12 +7,12 @@ class PageAnimationContainer extends StatefulWidget {
   final Function(int, int)? navigationCallback;
 
   const PageAnimationContainer({
-    Key? key,
+    super.key,
     required this.children,
     this.fadeDuration = const Duration(milliseconds: 500),
     this.fadeCurve = Curves.easeInOut,
     this.navigationCallback,
-  }) : super(key: key);
+  });
 
   @override
   PageAnimationContainerState createState() => PageAnimationContainerState();

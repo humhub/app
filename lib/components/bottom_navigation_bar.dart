@@ -17,7 +17,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
   Widget build(BuildContext context) {
     return PopScope(
       canPop: selectedIndex == 0,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, results) {
         setState(() {
           selectedIndex--;
           widget.onPageChange(selectedIndex);

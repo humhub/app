@@ -5,9 +5,9 @@ class OverrideLocale extends StatefulWidget {
   final Widget Function(Locale? locale) builder;
 
   const OverrideLocale({
-    Key? key,
+    super.key,
     required this.builder,
-  }) : super(key: key);
+  });
 
   @override
   OverrideLocaleState createState() => OverrideLocaleState();
@@ -71,11 +71,11 @@ class OverrideLocaleModel extends InheritedWidget {
   final ValueSetter<Locale?> changeLocale;
 
   const OverrideLocaleModel({
-    Key? key,
+    super.key,
     required this.locale,
     required this.changeLocale,
-    required Widget child,
-  }) : super(key: key, child: child);
+    required super.child,
+  });
 
   @override
   bool updateShouldNotify(covariant OverrideLocaleModel oldWidget) => locale != oldWidget.locale;

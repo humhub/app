@@ -6,7 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ThirdPage extends StatelessWidget {
   final bool fadeIn;
-  const ThirdPage({Key? key, required this.fadeIn}) : super(key: key);
+  const ThirdPage({super.key, required this.fadeIn});
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +52,8 @@ class ThirdPage extends StatelessWidget {
                   decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
                   child: TextButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                        (Set<MaterialState> states) {
+                      backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                        (Set<WidgetState> states) {
                           return HumhubTheme.primaryColor;
                         },
                       ),
