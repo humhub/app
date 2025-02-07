@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/app_flavored.dart';
@@ -229,7 +229,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         }
         break;
       case ChannelAction.updateNotificationCount:
-        if (message.count != null) FlutterAppBadger.updateBadgeCount(message.count!);
+        if (message.count != null) AppBadgePlus.updateBadge(message.count!);
         break;
       case ChannelAction.unregisterFcmDevice:
         String? token = ref.read(pushTokenProvider).value;

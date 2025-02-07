@@ -1,7 +1,7 @@
+import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/event.dart';
 import 'package:humhub/util/loading_provider.dart';
@@ -100,7 +100,7 @@ Future<void> _handleData(RemoteMessage message) async {
   PushEventData data = PushEvent(message).parsedData;
   try {
     // Set icon badge count if notificationCount exist in push.
-    FlutterAppBadger.updateBadgeCount(int.parse(data.notificationCount!));
+    AppBadgePlus.updateBadge(int.parse(data.notificationCount!));
   } catch (e) {
     logError(e);
   }
