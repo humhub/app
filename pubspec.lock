@@ -424,14 +424,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_native_timezone:
-    dependency: "direct main"
-    description:
-      name: flutter_native_timezone
-      sha256: ed7bfb982f036243de1c068e269182a877100c994f05143c8b26a325e28c1b02
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
   flutter_riverpod:
     dependency: "direct main"
     description:
@@ -538,14 +530,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.19.0"
-  js:
-    dependency: transitive
-    description:
-      name: js
-      sha256: c1b2e9b5ea78c45e1a0788d29606ba27dc5f71f019f32ca5140f61ef071838cf
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.1"
   leak_tracker:
     dependency: transitive
     description:
@@ -858,18 +842,18 @@ packages:
     dependency: "direct main"
     description:
       name: rive
-      sha256: "2551a44fa766a7ed3f52aa2b94feda6d18d00edc25dee5f66e72e9b365bb6d6c"
+      sha256: f2117a96a189758bc79bf7933865625c7a44a420ae537d2a8f6c492900136a71
       url: "https://pub.dev"
     source: hosted
-    version: "0.13.20"
+    version: "0.11.17"
   rive_common:
     dependency: transitive
     description:
       name: rive_common
-      sha256: "2ba42f80d37a4efd0696fb715787c4785f8a13361e8aea9227c50f1e78cf763a"
+      sha256: e41f12917cb58e0c9376836490ebaa431e12744da0c67e19dad8d4bee9fedd46
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.15"
+    version: "0.2.7"
   riverpod:
     dependency: transitive
     description:
@@ -1076,7 +1060,7 @@ packages:
     source: hosted
     version: "0.7.2"
   timezone:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: timezone
       sha256: ffc9d5f4d1193534ef051f9254063fa53d588609418c84299956c3db9383587d

@@ -13,16 +13,6 @@ if (localPropertiesFile.exists()) {
     }
 }
 
-def flutterVersionCode = '1'
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = '1.0.0'
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
-
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
@@ -30,8 +20,8 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 35
-    ndkVersion flutter.ndkVersion
+    compileSdk = 35
+    ndkVersion = 26
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -39,7 +29,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = JavaVersion.VERSION_1_8
     }
 
     sourceSets {
@@ -48,10 +38,9 @@ android {
 
     defaultConfig {
         applicationId "com.humhub.app"
-        minSdkVersion 25
-        targetSdkVersion 35
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        minSdk = 23
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
         multiDexEnabled true
     }
 
