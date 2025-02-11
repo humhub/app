@@ -42,7 +42,7 @@ class _LanguageSwitcherState extends State<LanguageSwitcher> {
             )
             .toList();
       },
-      dropdownColor: widget.forceLight ? Colors.white : Theme.of(context).colorScheme.background,
+      dropdownColor: widget.forceLight ? Colors.white : Theme.of(context).colorScheme.surface,
       decoration: widget.showTitle
           ? InputDecoration(
               labelText: AppLocalizations.of(context)!.cancel,

@@ -31,7 +31,7 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
             duration: const Duration(milliseconds: 250),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 35),
-              color: Theme.of(context).colorScheme.background.withOpacity(0.8),
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
               child: Column(
                 children: [
                   TextFormField(
