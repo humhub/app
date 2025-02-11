@@ -38,29 +38,38 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
                     keyboardType: TextInputType.url,
                     controller: widget.openerControlLer.urlTextController,
                     cursorColor: Theme.of(context).textTheme.bodySmall?.color,
-                    onSaved: widget.openerControlLer.helper.onSaved(widget.openerControlLer.formUrlKey),
+                    onSaved: widget.openerControlLer.helper
+                        .onSaved(widget.openerControlLer.formUrlKey),
                     onEditingComplete: connect,
                     onChanged: (value) {
-                      final cursorPosition = widget.openerControlLer.urlTextController.selection.baseOffset;
+                      final cursorPosition = widget.openerControlLer
+                          .urlTextController.selection.baseOffset;
                       final trimmedValue = value.trim();
-                      widget.openerControlLer.urlTextController.value = TextEditingValue(
+                      widget.openerControlLer.urlTextController.value =
+                          TextEditingValue(
                         text: trimmedValue,
                         selection: TextSelection.collapsed(
-                            offset: cursorPosition > trimmedValue.length ? trimmedValue.length : cursorPosition),
+                            offset: cursorPosition > trimmedValue.length
+                                ? trimmedValue.length
+                                : cursorPosition),
                       );
                     },
                     style: const TextStyle(
                       decoration: TextDecoration.none,
                     ),
                     decoration: _openerDecoration(context),
-                    validator: (value) => widget.openerControlLer.validateUrl(value, context),
+                    validator: (value) =>
+                        widget.openerControlLer.validateUrl(value, context),
                     autocorrect: false,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 5, bottom: 5),
                     child: Text(
                       AppLocalizations.of(context)!.opener_enter_url,
-                      style: const TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13),
+                      style: const TextStyle(
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 13),
                     ),
                   ),
                 ],
@@ -72,7 +81,8 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
             child: AnimatedOpacity(
               opacity: ref.watch(visibilityProvider) ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 300),
-              child: Center(
+              child: Align(
+                alignment: Alignment.bottomCenter,
                 child: TextButton(
                   onPressed: connect,
                   style: TextButton.styleFrom(
@@ -108,12 +118,14 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
       _isLoading = true;
     });
     try {
-      widget.openerControlLer.helper.onSaved(widget.openerControlLer.formUrlKey);
+      widget.openerControlLer.helper
+          .onSaved(widget.openerControlLer.formUrlKey);
       bool isSuc = await widget.openerControlLer.connect();
       Future.delayed(const Duration(seconds: 1), () {
-        if (isSuc) ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
+        if (isSuc) {
+          ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
+        }
       });
-
     } finally {
       setState(() {
         _isLoading = false;
@@ -147,6 +159,8 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
             : null,
         floatingLabelBehavior: FloatingLabelBehavior.always,
         labelText: AppLocalizations.of(context)!.url.toUpperCase(),
-        labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color),
+        labelStyle: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).textTheme.bodySmall?.color),
       );
 }

@@ -2,6 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:humhub/flavored/models/manifest.f.dart';
 import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/hum_hub.dart';
+import 'package:humhub/util/crypt.dart';
 
 class HumHubF extends HumHub {
   @override
@@ -16,7 +17,7 @@ class HumHubF extends HumHub {
     String? pushToken,
   }) : super(
             openerState: openerState,
-            randomHash: HumHub.generateHash(32),
+            randomHash: Crypt.generateRandomString(32),
             appVersion: appVersion,
             pushToken: pushToken);
 

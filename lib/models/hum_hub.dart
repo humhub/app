@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:humhub/app_flavored.dart';
@@ -129,7 +128,7 @@ class HumHub {
     }
   }
 
-  Future<RedirectAction> action(ref) async {
+  Future<RedirectAction> get action async {
     if (openerState.isShown) {
       return RedirectAction.opener;
     } else {
@@ -146,13 +145,6 @@ class HumHub {
       }
       return RedirectAction.webView;
     }
-  }
-
-  static String generateHash(int length) {
-    final random = Random.secure();
-    const characters = '0123456789abcdef';
-    return List.generate(
-        length, (_) => characters[random.nextInt(characters.length)]).join();
   }
 
   Map<String, String> get customHeaders => {

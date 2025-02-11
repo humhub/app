@@ -61,7 +61,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         _latestUri = await UrlProviderHandler.handleUniversalLink(uri!) ?? uri;
         logInfo('IntentPlugin._subscribeToUriStream', _latestUri);
         String redirectUrl = _latestUri.toString();
-        if (navigatorKey.currentState != null) {
+        if (Keys.navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         }
         _err = null;
@@ -94,12 +94,12 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         _latestUri = await UrlProviderHandler.handleUniversalLink(uri) ?? uri;
         logInfo('IntentPlugin._handleInitialUri', _latestUri);
         String? redirectUrl = _latestUri.toString();
-        if (navigatorKey.currentState != null) {
+        if (Keys.navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         } else {
           UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
           await opener.initHumHub();
-          navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
+          Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
         }
       } on PlatformException {
         // Platform messages may fail but we ignore the exception
@@ -116,7 +116,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     logInfo('IntentPlugin.tryNavigateWithOpener', _latestUri);
     LoadingProvider.of(ref).showLoading();
     bool isNewRouteSameAsCurrent = false;
-    navigatorKey.currentState!.popUntil((route) {
+    Keys.navigatorKey.currentState!.popUntil((route) {
       if (route.settings.name == WebView.path) {
         isNewRouteSameAsCurrent = true;
       }
@@ -126,7 +126,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     await opener.initHumHub();
     // Always pop the current instance and init the new one.
     LoadingProvider.of(ref).dismissAll();
-    navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
+    Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
     return isNewRouteSameAsCurrent;
   }
 }

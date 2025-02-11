@@ -20,7 +20,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <3.4.0'
+  sdk: ">=3.4.0 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -64,6 +64,20 @@ dependencies:
   open_file_plus: ^3.4.1+1
   cached_network_image: ^3.3.1
   talker_flutter: ^4.4.0
+  quick_actions: ^1.1.0
+
+
+dependency_overrides:
+  quick_actions_platform_interface:
+    path: '/Users/pratej/Documents/repo/humhub/packages/packages/quick_actions/quick_actions_platform_interface'
+  quick_actions:
+    path: '/Users/pratej/Documents/repo/humhub/packages/packages/quick_actions/quick_actions'
+
+  quick_actions_android:
+    path: '/Users/pratej/Documents/repo/humhub/packages/packages/quick_actions/quick_actions_android'
+
+  quick_actions_ios:
+    path: '/Users/pratej/Documents/repo/humhub/packages/packages/quick_actions/quick_actions_ios'
 
 dev_dependencies:
   flutter_test:

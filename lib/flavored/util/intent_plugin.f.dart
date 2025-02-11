@@ -59,7 +59,7 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
         if (!mounted && uri == null) return;
         _latestUri = await UrlProviderHandler.handleUniversalLink(uri!) ?? uri;
         String? redirectUrl = _latestUri?.toString();
-        if (redirectUrl != null && navigatorKey.currentState != null) {
+        if (redirectUrl != null && Keys.navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         }
         _err = null;
@@ -90,7 +90,7 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
         setState(() => _initialUri = uri);
         _latestUri = await UrlProviderHandler.handleUniversalLink(uri) ?? uri;
         String? redirectUrl = _latestUri.toString();
-        if (navigatorKey.currentState != null) {
+        if (Keys.navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         } else {
           InitFromUrl.setPayload(redirectUrl);
@@ -109,13 +109,13 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
   Future<bool> tryNavigateWithOpener(String redirectUrl) async {
     LoadingProvider.of(ref).showLoading();
     bool isNewRouteSameAsCurrent = false;
-    navigatorKey.currentState!.popUntil((route) {
+    Keys.navigatorKey.currentState!.popUntil((route) {
       if (route.settings.name == WebViewF.path) {
         isNewRouteSameAsCurrent = true;
       }
       return true;
     });
-    navigatorKey.currentState!.pushNamed(WebViewF.path, arguments: redirectUrl);
+    Keys.navigatorKey.currentState!.pushNamed(WebViewF.path, arguments: redirectUrl);
     return isNewRouteSameAsCurrent;
   }
 }
