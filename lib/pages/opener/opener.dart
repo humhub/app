@@ -156,6 +156,7 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                                       },
                                       onDeleteNetwork: (manifest, isLast) async {
                                         await ref.watch(humHubProvider.notifier).removeHistory(manifest);
+                                        // TODO: Listen on provider change rather than doing like this for every state change
                                         ref.read(quickActionsProvider.notifier).refresh(
                                             ref.read(humHubProvider).history.map((e) => e.shortcut).toList());
                                         if (isLast) {
