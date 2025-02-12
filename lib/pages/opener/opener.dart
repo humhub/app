@@ -13,6 +13,7 @@ import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/openers/opener_controller.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:humhub/util/quick_actions/quick_action_provider.dart';
 import 'package:rive/rive.dart';
 
 import 'components/last_login.dart';
@@ -153,8 +154,10 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                                               Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: uniOpen),
                                         );
                                       },
-                                      onDeleteNetwork: (manifest, isLast) {
-                                        ref.watch(humHubProvider.notifier).removeHistory(manifest);
+                                      onDeleteNetwork: (manifest, isLast) async {
+                                        await ref.watch(humHubProvider.notifier).removeHistory(manifest);
+                                        ref.read(quickActionsProvider.notifier).refresh(
+                                            ref.read(humHubProvider).history.map((e) => e.shortcut).toList());
                                         if (isLast) {
                                           ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
                                         }

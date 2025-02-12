@@ -15,7 +15,7 @@ class InternalShortcut {
 /// and their registration with the platform
 class QuickActionsService {
   final _quickActions = const QuickActions();
-  final List<InternalShortcut> shortcuts;
+  List<InternalShortcut> shortcuts;
 
   QuickActionsService(this.shortcuts);
 
@@ -25,6 +25,12 @@ class QuickActionsService {
   Future<void> initialize(Function(String) onAction) async {
     await _quickActions.setShortcutItems(shortcuts.map((e) => e.shortcut).toList());
     _quickActions.initialize(onAction);
+  }
+
+  /// Updates the list of shortcuts and reinitializes quick actions
+  Future<void> refreshShortcuts(List<InternalShortcut> newShortcuts, Function(String) onAction) async {
+    shortcuts = newShortcuts;
+    await initialize(onAction);
   }
 }
 
@@ -39,6 +45,17 @@ class QuickActionsNotifier extends StateNotifier<InternalShortcut?> {
   /// When a shortcut is triggered, finds and executes the corresponding action
   Future<void> initialize() async {
     await _service.initialize((actionType) {
+      final shortcut = _service.shortcuts.firstWhere((s) => s.shortcut.type == actionType);
+      shortcut.action();
+      clearAction();
+      state = shortcut;
+    });
+  }
+
+  /// Refreshes the shortcuts by updating the service's list of shortcuts
+  /// and reinitializing quick actions
+  Future<void> refresh(List<InternalShortcut> newShortcuts) async {
+    await _service.refreshShortcuts(newShortcuts, (actionType) {
       final shortcut = _service.shortcuts.firstWhere((s) => s.shortcut.type == actionType);
       shortcut.action();
       clearAction();
