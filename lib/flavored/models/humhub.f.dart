@@ -11,15 +11,12 @@ class HumHubF extends HumHub {
   String get manifestUrl => dotenv.env['MANIFEST_URL']!;
 
   HumHubF({
-    OpenerState openerState = OpenerState.shown,
+    super.openerState,
     String? randomHash,
-    String? appVersion,
-    String? pushToken,
+    super.appVersion,
+    super.pushToken,
   }) : super(
-            openerState: openerState,
-            randomHash: Crypt.generateRandomString(32),
-            appVersion: appVersion,
-            pushToken: pushToken);
+            randomHash: Crypt.generateRandomString(32));
 
   @override
   Map<String, String> get customHeaders => {

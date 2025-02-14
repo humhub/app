@@ -16,11 +16,9 @@ class PushPlugin extends ConsumerStatefulWidget {
   final Widget child;
 
   const PushPlugin({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(
-          key: key,
-        );
+  });
 
   @override
   PushPluginState createState() => PushPluginState();
@@ -39,7 +37,9 @@ class PushPluginState extends ConsumerState<PushPlugin> {
         message,
         NotificationPlugin.of(ref),
       );
-      _handleData(message, context, ref);
+      if(mounted){
+        _handleData(message, context, ref);
+      }
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {

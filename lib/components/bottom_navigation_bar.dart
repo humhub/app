@@ -17,7 +17,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
   Widget build(BuildContext context) {
     return PopScope(
       canPop: selectedIndex == 0,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         setState(() {
           selectedIndex--;
           widget.onPageChange(selectedIndex);
@@ -28,7 +28,7 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.transparent.withOpacity(0.0),
+              color: Colors.transparent.withValues(alpha: 0.0),
               offset: const Offset(0, -3),
             ),
           ],

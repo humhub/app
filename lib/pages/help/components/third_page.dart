@@ -6,7 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ThirdPage extends StatelessWidget {
   final bool fadeIn;
-  const ThirdPage({Key? key, required this.fadeIn}) : super(key: key);
+  const ThirdPage({super.key, required this.fadeIn});
 
   @override
   Widget build(BuildContext context) {

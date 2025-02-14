@@ -5,7 +5,7 @@ import 'package:humhub/util/notifications/service.dart';
 class NotificationPlugin extends StatefulWidget {
   final Widget child;
 
-  const NotificationPlugin({Key? key, required this.child}) : super(key: key);
+  const NotificationPlugin({super.key, required this.child});
 
   static NotificationService of(WidgetRef ref) {
     final plugin = ref.read(notificationProvider);

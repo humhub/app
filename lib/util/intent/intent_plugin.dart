@@ -19,9 +19,9 @@ class IntentPlugin extends ConsumerStatefulWidget {
   final Widget child;
 
   const IntentPlugin({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   IntentPluginState createState() => IntentPluginState();

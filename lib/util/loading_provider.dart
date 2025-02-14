@@ -10,9 +10,9 @@ class LoadingProvider extends StatelessWidget {
   final Widget child;
 
   const LoadingProvider({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +52,9 @@ class _Manager extends StatefulWidget {
   final Widget child;
 
   const _Manager({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   _ManagerState createState() => _ManagerState();

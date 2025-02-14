@@ -8,9 +8,9 @@ class SearchBarWidget extends ConsumerStatefulWidget {
   final OpenerController openerControlLer;
 
   const SearchBarWidget({
-    Key? key,
+    super.key,
     required this.openerControlLer,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<SearchBarWidget> createState() => _SearchBarWidgetState();
@@ -31,7 +31,7 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
             duration: const Duration(milliseconds: 250),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 35),
-              color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
               child: Column(
                 children: [
                   TextFormField(

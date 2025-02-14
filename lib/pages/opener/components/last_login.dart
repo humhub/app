@@ -57,11 +57,11 @@ class InstanceTile extends StatelessWidget {
   static const double borderRadius = 15;
 
   const InstanceTile({
-    Key? key,
+    super.key,
     required this.manifest,
     required this.onSelectNetwork,
     required this.onDeleteNetwork,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -144,9 +144,9 @@ class AddNetworkTile extends StatelessWidget {
   static const double borderRadius = 10;
 
   const AddNetworkTile({
-    Key? key,
+    super.key,
     required this.onAddNetwork,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

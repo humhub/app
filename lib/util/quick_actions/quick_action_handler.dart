@@ -8,7 +8,7 @@ import 'package:loggy/loggy.dart';
 class QuickActionsHandler extends ConsumerStatefulWidget {
   final Widget child;
 
-  const QuickActionsHandler({Key? key, required this.child}) : super(key: key);
+  const QuickActionsHandler({super.key, required this.child});
 
   @override
   ConsumerState<QuickActionsHandler> createState() =>

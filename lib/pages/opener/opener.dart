@@ -18,7 +18,7 @@ import 'package:rive/rive.dart' as rive;
 import 'components/last_login.dart';
 
 class OpenerPage extends ConsumerStatefulWidget {
-  const OpenerPage({Key? key}) : super(key: key);
+  const OpenerPage({super.key});
   static const String path = '/opener';
 
   @override

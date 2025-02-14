@@ -18,9 +18,9 @@ class IntentPluginF extends ConsumerStatefulWidget {
   final Widget child;
 
   const IntentPluginF({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   IntentPluginFState createState() => IntentPluginFState();

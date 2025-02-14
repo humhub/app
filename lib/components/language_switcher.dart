@@ -7,10 +7,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class LanguageSwitcher extends StatefulWidget {
   static Key userProfileLocaleDropdown = const Key('user_profile_locale_dropdown');
   const LanguageSwitcher({
-    Key? key,
+    super.key,
     this.showTitle = false,
     this.forceLight = false,
-  }) : super(key: key);
+  });
 
   final bool showTitle;
   final bool forceLight;
