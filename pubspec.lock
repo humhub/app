@@ -885,30 +885,38 @@ packages:
   quick_actions:
     dependency: "direct main"
     description:
-      path: "/Users/pratej/Documents/repo/humhub/packages/packages/quick_actions/quick_actions"
-      relative: false
-    source: path
+      path: "packages/quick_actions/quick_actions"
+      ref: main
+      resolved-ref: "7bec3aa6a17232d123162844679a1e1ead003dec"
+      url: "https://github.com/PrimozRatej/packages"
+    source: git
     version: "1.1.0"
   quick_actions_android:
     dependency: "direct overridden"
     description:
-      path: "/Users/pratej/Documents/repo/humhub/packages/packages/quick_actions/quick_actions_android"
-      relative: false
-    source: path
+      path: "packages/quick_actions/quick_actions_android"
+      ref: main
+      resolved-ref: "7bec3aa6a17232d123162844679a1e1ead003dec"
+      url: "https://github.com/PrimozRatej/packages"
+    source: git
     version: "1.0.18"
   quick_actions_ios:
     dependency: "direct overridden"
     description:
-      path: "/Users/pratej/Documents/repo/humhub/packages/packages/quick_actions/quick_actions_ios"
-      relative: false
-    source: path
+      path: "packages/quick_actions/quick_actions_ios"
+      ref: main
+      resolved-ref: "7bec3aa6a17232d123162844679a1e1ead003dec"
+      url: "https://github.com/PrimozRatej/packages"
+    source: git
     version: "1.2.0"
   quick_actions_platform_interface:
     dependency: "direct overridden"
     description:
-      path: "/Users/pratej/Documents/repo/humhub/packages/packages/quick_actions/quick_actions_platform_interface"
-      relative: false
-    source: path
+      path: "packages/quick_actions/quick_actions_platform_interface"
+      ref: main
+      resolved-ref: "7bec3aa6a17232d123162844679a1e1ead003dec"
+      url: "https://github.com/PrimozRatej/packages"
+    source: git
     version: "1.1.0"
   receive_sharing_intent:
     dependency: "direct main"

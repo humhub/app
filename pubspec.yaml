@@ -68,18 +68,28 @@ dependencies:
   talker_flutter: ^4.6.11
   quick_actions: ^1.1.0
 
-
 dependency_overrides:
   quick_actions_platform_interface:
-    path: '/Users/pratej/Documents/repo/humhub/packages/packages/quick_actions/quick_actions_platform_interface'
+    git:
+      url: https://github.com/PrimozRatej/packages
+      path: packages/quick_actions/quick_actions_platform_interface
+      ref: main
   quick_actions:
-    path: '/Users/pratej/Documents/repo/humhub/packages/packages/quick_actions/quick_actions'
-
+    git:
+      url: https://github.com/PrimozRatej/packages
+      path: packages/quick_actions/quick_actions
+      ref: main
   quick_actions_android:
-    path: '/Users/pratej/Documents/repo/humhub/packages/packages/quick_actions/quick_actions_android'
-
+    git:
+      url: https://github.com/PrimozRatej/packages
+      path: packages/quick_actions/quick_actions_android
+      ref: main
   quick_actions_ios:
-    path: '/Users/pratej/Documents/repo/humhub/packages/packages/quick_actions/quick_actions_ios'
+    git:
+      url: https://github.com/PrimozRatej/packages
+      path: packages/quick_actions/quick_actions_ios
+      ref: main
+
 
 dev_dependencies:
   flutter_test:
