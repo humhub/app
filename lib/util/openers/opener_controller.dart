@@ -7,7 +7,6 @@ import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/crypt.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:http/http.dart' as http;
-import 'package:humhub/util/quick_actions/quick_action_provider.dart';
 import 'package:loggy/loggy.dart';
 import 'package:rive/rive.dart';
 import '../api_provider.dart';
@@ -147,11 +146,7 @@ class OpenerController {
       await ref.read(humHubProvider.notifier).addOrUpdateHistory(manifest);
       HumHub instance = ref.read(humHubProvider).copyWith(
           manifest: manifest, randomHash: hash, manifestUrl: manifestUrl);
-
       await ref.read(humHubProvider.notifier).setInstance(instance);
-      // Refresh shortcuts on new instance
-      ref.read(quickActionsProvider.notifier).refresh(
-          ref.read(humHubProvider).history.map((e) => e.shortcut).toList());
     }
   }
 

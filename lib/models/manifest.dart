@@ -147,7 +147,6 @@ class Manifest {
           UniversalOpenerController opener =
               UniversalOpenerController(url: startUrl);
           await opener.initHumHub();
-          // TODO: WebView.path or WebViewF.path
           Keys.navigatorKey.currentState!
               .pushNamed(WebView.path, arguments: opener);
         });

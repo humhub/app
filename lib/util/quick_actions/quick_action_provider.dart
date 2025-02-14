@@ -46,19 +46,15 @@ class QuickActionsNotifier extends StateNotifier<InternalShortcut?> {
   Future<void> initialize() async {
     await _service.initialize((actionType) {
       final shortcut = _service.shortcuts.firstWhere((s) => s.shortcut.type == actionType);
-      shortcut.action();
-      clearAction();
       state = shortcut;
     });
   }
 
   /// Refreshes the shortcuts by updating the service's list of shortcuts
   /// and reinitializing quick actions
-  Future<void> refresh(List<InternalShortcut> newShortcuts) async {
+  Future<void> refreshQuickActions(List<InternalShortcut> newShortcuts) async {
     await _service.refreshShortcuts(newShortcuts, (actionType) {
       final shortcut = _service.shortcuts.firstWhere((s) => s.shortcut.type == actionType);
-      shortcut.action();
-      clearAction();
       state = shortcut;
     });
   }
