@@ -18,9 +18,9 @@ class ConsolePage extends StatelessWidget {
           backgroundColor: Colors.grey[800]!,
           textColor: Colors.white,
           logColors: {
-            TalkerLogType.error: Colors.red,
-            TalkerLogType.info: Colors.green,
-            TalkerLogType.warning: Colors.orange,
+            TalkerLogType.error.key: Colors.red,
+            TalkerLogType.info.key: Colors.green,
+            TalkerLogType.warning.key: Colors.orange,
           },
         ),
       ),

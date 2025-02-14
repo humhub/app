@@ -13,7 +13,7 @@ import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/openers/opener_controller.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/providers.dart';
-import 'package:rive/rive.dart';
+import 'package:rive/rive.dart' as rive;
 
 import 'components/last_login.dart';
 
@@ -32,8 +32,8 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
   void initState() {
     super.initState();
     openerControlLer = OpenerController(ref: ref);
-    openerControlLer.setForwardAnimation(SimpleAnimation('animation', autoplay: false));
-    openerControlLer.setReverseAnimation(SimpleAnimation('animation', autoplay: true));
+    openerControlLer.setForwardAnimation(rive.SimpleAnimation('animation', autoplay: false));
+    openerControlLer.setReverseAnimation(rive.SimpleAnimation('animation', autoplay: true));
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Delay before showing text field
@@ -67,12 +67,12 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
         color: Colors.white,
         child: Stack(
           children: [
-            RiveAnimation.asset(
+            rive.RiveAnimation.asset(
               Assets.openerAnimationForward,
               fit: BoxFit.fill,
               controllers: [openerControlLer.animationForwardController],
             ),
-            RiveAnimation.asset(
+            rive.RiveAnimation.asset(
               Assets.openerAnimationReverse,
               fit: BoxFit.fill,
               controllers: [openerControlLer.animationReverseController],

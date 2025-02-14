@@ -97,10 +97,17 @@ PODS:
   - permission_handler_apple (9.3.0):
     - Flutter
   - PromisesObjC (2.4.0)
+  - quick_actions_ios (0.0.1):
+    - Flutter
   - ReachabilitySwift (5.2.3)
   - receive_sharing_intent (0.0.1):
     - Flutter
+  - share_plus (0.0.1):
+    - Flutter
   - shared_preferences_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - sqflite (0.0.3):
     - Flutter
     - FlutterMacOS
   - uni_links (0.0.1):
@@ -123,8 +130,11 @@ DEPENDENCIES:
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - quick_actions_ios (from `.symlinks/plugins/quick_actions_ios/ios`)
   - receive_sharing_intent (from `.symlinks/plugins/receive_sharing_intent/ios`)
+  - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - sqflite (from `.symlinks/plugins/sqflite/darwin`)
   - uni_links (from `.symlinks/plugins/uni_links/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
@@ -171,46 +181,55 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
+  quick_actions_ios:
+    :path: ".symlinks/plugins/quick_actions_ios/ios"
   receive_sharing_intent:
     :path: ".symlinks/plugins/receive_sharing_intent/ios"
+  share_plus:
+    :path: ".symlinks/plugins/share_plus/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
+  sqflite:
+    :path: ".symlinks/plugins/sqflite/darwin"
   uni_links:
     :path: ".symlinks/plugins/uni_links/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
-  app_settings: d103828c9f5d515c4df9ee754dabd443f7cedcf3
-  connectivity_plus: 07c49e96d7fc92bc9920617b83238c4d178b446a
+  app_settings: dec48968acca6472cfb9f487d8a366afffd3d1a1
+  connectivity_plus: 4d5101c5877bedcda6cd1ccb825307911667d6b0
   Firebase: 07150e75d142fb9399f6777fa56a187b17f833a0
-  firebase_core: 4a3246a02f828a01c74a2c26427037786d90f17f
-  firebase_messaging: 0b4f7997f491343b90d9300af54fe55c72135833
+  firebase_core: 88c367d9a5d5bc217c0ffdf7bfa79b083446868d
+  firebase_messaging: 00c0f99bd711d9d58c8e4d912fda8e9d8f8d9e1a
   FirebaseCore: f86a1394906b97ac445ae49c92552a9425831bed
   FirebaseCoreInternal: df84dd300b561c27d5571684f389bf60b0a5c934
   FirebaseInstallations: 913cf60d0400ebd5d6b63a28b290372ab44590dd
   FirebaseMessaging: bb2c4f6422a753038fe137d90ae7c1af57251316
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_app_badger: b87fc231847b03b92ce1412aa351842e7e97932f
-  flutter_inappwebview_ios: 97215cf7d4677db55df76782dbd2930c5e1c1ea0
-  flutter_local_notifications: 4cde75091f6327eb8517fa068a0a5950212d2086
-  flutter_native_timezone: 5f05b2de06c9776b4cc70e1839f03de178394d22
-  flutter_secure_storage: 23fc622d89d073675f2eaa109381aefbcf5a49be
+  flutter_app_badger: 16b371e989d04cd265df85be2c3851b49cb68d18
+  flutter_inappwebview_ios: 25b61a1b550d1068e4ddaf490fc1d03c2ce6828d
+  flutter_local_notifications: ad39620c743ea4c15127860f4b5641649a988100
+  flutter_native_timezone: 5fe32678d72d1894880e94303ef41c2919f014e5
+  flutter_secure_storage: 2c2ff13db9e0a5647389bff88b0ecac56e3f3418
   GoogleDataTransport: 6c09b596d841063d76d4288cc2d2f42cc36e1e2a
   GoogleUtilities: ea963c370a38a8069cc5f7ba4ca849a60b6d7d15
   nanopb: d4d75c12cd1316f4a64e3c6963f879ecd4b5e0d5
-  open_file_plus: 05737718530c14cf02868e3b7754d7fe4df76d8b
+  open_file_plus: b0a12f9db69dfdab3b4751761753d2ba229ae6c1
   OrderedSet: aaeb196f7fef5a9edf55d89760da9176ad40b93c
-  package_info_plus: 6c92f08e1f853dc01228d6f553146438dafcd14e
-  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
-  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
+  package_info_plus: ae4a63389b62b5be8544b36bfc5b069617938813
+  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
+  quick_actions_ios: 4b07fb49d8d8f3518d7565fbb7a91014067a7d82
   ReachabilitySwift: 7f151ff156cea1481a8411701195ac6a984f4979
-  receive_sharing_intent: c0d87310754e74c0f9542947e7cbdf3a0335a3b1
-  shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
-  uni_links: d97da20c7701486ba192624d99bffaaffcfc298a
-  url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
+  receive_sharing_intent: bbbab6c22538c99fa709fa50c34cfe9c90c5cf03
+  share_plus: 011d6fb4f9d2576b83179a3a5c5e323202cdabcf
+  shared_preferences_foundation: 4e65c567e7877037d328829a522222c938bf308c
+  sqflite: c35dad70033b8862124f8337cc994a809fcd9fa3
+  uni_links: ed8c961e47ed9ce42b6d91e1de8049e38a4b3152
+  url_launcher_ios: 2d16952b3a69ce3f0b2c7b12d38ba18ff5177fc0
 
 PODFILE CHECKSUM: 72745f028dd7c562fb767fd9cb1eb339265e62f6
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

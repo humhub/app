@@ -3,15 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/notifications/channel.dart';
-import 'package:timezone/data/latest.dart';
-import 'package:timezone/timezone.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
-
-Future<void> initializeTimeZone() async {
-  initializeTimeZones();
-  final String currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
-  setLocalLocation(getLocation(currentTimeZone));
-}
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin plugin;

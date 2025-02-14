@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,7 +11,6 @@ import 'package:humhub/util/init_from_url.dart';
 import 'package:humhub/util/intent/mail_link_provider.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:loggy/loggy.dart';
-import 'package:uni_links/uni_links.dart';
 
 bool _initialUriIsHandled = false;
 
@@ -32,6 +32,7 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
   Uri? _initialUri;
   Uri? _latestUri;
   StreamSubscription? _sub;
+  final appLinks = AppLinks();
 
   @override
   void initState() {
@@ -55,7 +56,7 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
     if (!kIsWeb) {
       // It will handle app links while the app is already started - be it in
       // the foreground or in the background.
-      _sub = uriLinkStream.listen((Uri? uri) async {
+      _sub = appLinks.uriLinkStream.listen((Uri? uri) async {
         if (!mounted && uri == null) return;
         _latestUri = await UrlProviderHandler.handleUniversalLink(uri!) ?? uri;
         String? redirectUrl = _latestUri?.toString();
@@ -85,7 +86,7 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
     if (!_initialUriIsHandled) {
       _initialUriIsHandled = true;
       try {
-        Uri? uri = await getInitialUri();
+        Uri? uri = await appLinks.getInitialLink();
         if (uri == null) return;
         setState(() => _initialUri = uri);
         _latestUri = await UrlProviderHandler.handleUniversalLink(uri) ?? uri;

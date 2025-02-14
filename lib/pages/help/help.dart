@@ -31,8 +31,8 @@ class HelpState extends State<Help> {
     return SwipeTo(
       offsetDx: 0,
       animationDuration: const Duration(milliseconds: 100),
-      onRightSwipe: () => bottomNavigationStateKey.currentState?.navigateBack(),
-      onLeftSwipe: () => bottomNavigationStateKey.currentState?.navigateForth(),
+      onRightSwipe: (details) => bottomNavigationStateKey.currentState?.navigateBack(),
+      onLeftSwipe: (details) => bottomNavigationStateKey.currentState?.navigateForth(),
       child: Scaffold(
         backgroundColor: Colors.white,
         extendBody: true,

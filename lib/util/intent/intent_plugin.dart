@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,6 @@ import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
-import 'package:uni_links/uni_links.dart';
 
 bool _initialUriIsHandled = false;
 
@@ -34,6 +34,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   Uri? _initialUri;
   Uri? _latestUri;
   StreamSubscription? _sub;
+  final appLinks = AppLinks();
 
   @override
   void initState() {
@@ -56,7 +57,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     if (!kIsWeb) {
       // It will handle app links while the app is already started - be it in
       // the foreground or in the background.
-      _sub = uriLinkStream.listen((Uri? uri) async {
+      _sub = appLinks.uriLinkStream.listen((Uri? uri) async {
         if (!mounted && uri == null) return;
         _latestUri = await UrlProviderHandler.handleUniversalLink(uri!) ?? uri;
         logInfo('IntentPlugin._subscribeToUriStream', _latestUri);
@@ -88,7 +89,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     if (!_initialUriIsHandled) {
       _initialUriIsHandled = true;
       try {
-        final uri = await getInitialUri();
+        final uri = await appLinks.getInitialLink();
         if (uri == null || !mounted) return;
         setState(() => _initialUri = uri);
         _latestUri = await UrlProviderHandler.handleUniversalLink(uri) ?? uri;
