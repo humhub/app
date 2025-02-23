@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/app_flavored.dart';
@@ -229,7 +229,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         }
         break;
       case ChannelAction.updateNotificationCount:
-        if (message.count != null) FlutterAppBadger.updateBadgeCount(message.count!);
+        if (message.count != null) AppBadgePlus.updateBadge(message.count!);
         break;
       case ChannelAction.unregisterFcmDevice:
         String? token = ref.read(pushTokenProvider).value;
@@ -294,7 +294,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         // Hide the bottom sheet if it is visible
         Navigator.popUntil(context, ModalRoute.withName(WebViewF.path));
         isDone = true;
-        scaffoldMessengerStateKey.currentState?.showSnackBar(
+        Keys.scaffoldMessengerStateKey.currentState?.showSnackBar(
           SnackBar(
             content: Text('${AppLocalizations.of(context)!.file_download}: $filename'),
             action: SnackBarAction(
@@ -368,7 +368,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         if (persistentController != null) {
           Navigator.popUntil(context, ModalRoute.withName(WebViewF.path));
         }
-        scaffoldMessengerStateKey.currentState?.showSnackBar(
+        Keys.scaffoldMessengerStateKey.currentState?.showSnackBar(
           SnackBar(
             content: Text(AppLocalizations.of(context)!.generic_error),
           ),

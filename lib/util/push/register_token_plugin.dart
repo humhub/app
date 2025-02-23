@@ -14,9 +14,9 @@ class RegisterToken extends ConsumerWidget {
   final Widget child;
 
   const RegisterToken({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(context, ref) {
@@ -34,10 +34,9 @@ class _RegisterToken extends ConsumerStatefulWidget {
   final Widget child;
 
   const _RegisterToken({
-    Key? key,
     required this.ready,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   _RegisterTokenState createState() => _RegisterTokenState();

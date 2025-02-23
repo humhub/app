@@ -1,7 +1,7 @@
+import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/event.dart';
 import 'package:humhub/util/loading_provider.dart';
@@ -16,11 +16,9 @@ class PushPlugin extends ConsumerStatefulWidget {
   final Widget child;
 
   const PushPlugin({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(
-          key: key,
-        );
+  });
 
   @override
   PushPluginState createState() => PushPluginState();
@@ -39,7 +37,9 @@ class PushPluginState extends ConsumerState<PushPlugin> {
         message,
         NotificationPlugin.of(ref),
       );
-      _handleData(message, context, ref);
+      if(mounted){
+        _handleData(message, context, ref);
+      }
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -101,8 +101,8 @@ Future<void> _handleData(RemoteMessage message, BuildContext context, WidgetRef 
   // Here we handle the data that we get form an push notification.
   PushEventData data = PushEvent(message).parsedData;
   try {
+    AppBadgePlus.updateBadge(int.parse(data.notificationCount!));
     // Set icon badge count if notificationCount exist in push.
-    FlutterAppBadger.updateBadgeCount(int.parse(data.notificationCount!));
   } catch (e) {
     logError(e);
   }

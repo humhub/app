@@ -2,6 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:humhub/flavored/models/manifest.f.dart';
 import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/hum_hub.dart';
+import 'package:humhub/util/crypt.dart';
 
 class HumHubF extends HumHub {
   @override
@@ -10,15 +11,12 @@ class HumHubF extends HumHub {
   String get manifestUrl => dotenv.env['MANIFEST_URL']!;
 
   HumHubF({
-    OpenerState openerState = OpenerState.shown,
+    super.openerState,
     String? randomHash,
-    String? appVersion,
-    String? pushToken,
+    super.appVersion,
+    super.pushToken,
   }) : super(
-            openerState: openerState,
-            randomHash: HumHub.generateHash(32),
-            appVersion: appVersion,
-            pushToken: pushToken);
+            randomHash: Crypt.generateRandomString(32));
 
   @override
   Map<String, String> get customHeaders => {

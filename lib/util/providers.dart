@@ -117,6 +117,12 @@ class HumHubNotifier extends ChangeNotifier {
     var jsonStr = await InternalStorage.storage.read(key: InternalStorage.keyHumhubInstance);
     HumHub humHub = jsonStr != null ? HumHub.fromJson(json.decode(jsonStr)) : _humHubInstance;
     lastUrl = await InternalStorage.storage.read(key: InternalStorage.keyLastInstanceUrl) ?? "";
+    /// Download icons for shortcuts if not yet saved in internal storage
+    for (var value in humHub.history) {
+      if (value.shortcutIcon == null) {
+        await value.getBase64Icon();
+      }
+    }
     setInstance(humHub);
     return humHub;
   }

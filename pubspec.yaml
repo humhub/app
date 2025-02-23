@@ -20,7 +20,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <3.4.0'
+  sdk: ">=3.6.0 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -36,26 +36,28 @@ dependencies:
 
   url_launcher: ^6.1.7
   cupertino_icons: ^1.0.2
-  dio: ^4.0.6
-  http: ^0.13.5
+  dio: ^5.8.0+1
+  http: ^1.3.0
   flutter_riverpod: ^2.1.3
   permission_handler: ^11.3.1
-  flutter_secure_storage: ^7.0.1
+  flutter_secure_storage: ^10.0.0-beta.4
   flutter_inappwebview: ^6.0.0
-  receive_sharing_intent: ^1.4.5
-  package_info_plus: ^3.0.3
-  uni_links: ^0.5.1
-  firebase_messaging: ^14.6.7
-  firebase_core: ^2.15.1
-  timezone: ^0.9.1
-  flutter_native_timezone: ^2.0.0
-  flutter_local_notifications: ^17.1.1
+  receive_sharing_intent:
+    git:
+      url: https://github.com/KasemJaffer/receive_sharing_intent
+      ref: master
+  package_info_plus: ^8.2.1
+  app_links: ^6.3.3
+  firebase_messaging: ^15.2.2
+  firebase_core: ^3.11.0
+  timezone: ^0.10.0
+  flutter_local_notifications: ^18.0.1
   loggy: ^2.0.3
-  app_settings: ^4.2.0
-  flutter_app_badger: ^1.5.0
-  rive: 0.9.0
+  app_settings: ^5.2.0
+  app_badge_plus: ^1.1.6
+  rive: ^0.13.20
   auto_size_text: ^3.0.0
-  connectivity_plus: ^4.0.1
+  connectivity_plus: ^6.1.3
   swipe_to: ^1.0.2
   shared_preferences: ^2.2.2
   intl: any
@@ -63,7 +65,31 @@ dependencies:
   path_provider: ^2.1.4
   open_file_plus: ^3.4.1+1
   cached_network_image: ^3.3.1
-  talker_flutter: ^4.4.0
+  talker_flutter: ^4.6.11
+  quick_actions: ^1.1.0
+
+dependency_overrides:
+  quick_actions_platform_interface:
+    git:
+      url: https://github.com/PrimozRatej/packages
+      path: packages/quick_actions/quick_actions_platform_interface
+      ref: main
+  quick_actions:
+    git:
+      url: https://github.com/PrimozRatej/packages
+      path: packages/quick_actions/quick_actions
+      ref: main
+  quick_actions_android:
+    git:
+      url: https://github.com/PrimozRatej/packages
+      path: packages/quick_actions/quick_actions_android
+      ref: main
+  quick_actions_ios:
+    git:
+      url: https://github.com/PrimozRatej/packages
+      path: packages/quick_actions/quick_actions_ios
+      ref: main
+
 
 dev_dependencies:
   flutter_test:
@@ -75,7 +101,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

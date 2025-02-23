@@ -6,6 +6,7 @@ import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:http/http.dart' as http;
 import 'package:humhub/util/const.dart';
+import 'package:humhub/util/crypt.dart';
 import '../api_provider.dart';
 import '../connectivity_plugin.dart';
 
@@ -68,7 +69,7 @@ class UniversalOpenerController {
       return null;
     } else {
       Manifest manifest = asyncData!.value!;
-      String hash = HumHub.generateHash(32);
+      String hash = Crypt.generateRandomString(32);
       HumHub? lastInstance = await getLastInstance();
       HumHub instance =
           HumHub(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl, history: lastInstance?.history);

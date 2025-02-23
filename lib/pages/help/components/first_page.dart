@@ -6,9 +6,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class FirstPage extends StatelessWidget {
   final bool fadeIn;
   const FirstPage({
-    Key? key,
+    super.key,
     required this.fadeIn,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/auth_in_app_browser.dart';
@@ -14,6 +14,7 @@ import 'package:humhub/pages/opener/opener.dart';
 import 'package:humhub/util/black_list_rules.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/const.dart';
+import 'package:humhub/util/crypt.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/file_handler.dart';
 import 'package:humhub/util/init_from_url.dart';
@@ -260,7 +261,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         break;
       case ChannelAction.hideOpener:
         ref.read(humHubProvider).setOpenerState(OpenerState.hidden);
-        ref.read(humHubProvider).setHash(HumHub.generateHash(32));
+        ref.read(humHubProvider).setHash(Crypt.generateRandomString(32),);
         break;
       case ChannelAction.registerFcmDevice:
         String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
@@ -274,7 +275,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         break;
       case ChannelAction.updateNotificationCount:
         if (message.count != null) {
-          FlutterAppBadger.updateBadgeCount(message.count!);
+          AppBadgePlus.updateBadge(message.count!);
         }
         break;
       case ChannelAction.nativeConsole:
@@ -346,7 +347,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         // Hide the bottom sheet if it is visible
         Navigator.popUntil(context, ModalRoute.withName(WebView.path));
         isDone = true;
-        scaffoldMessengerStateKey.currentState?.showSnackBar(
+        Keys.scaffoldMessengerStateKey.currentState?.showSnackBar(
           SnackBar(
             content: Text('${AppLocalizations.of(context)!.file_download}: $filename'),
             action: SnackBarAction(
@@ -421,7 +422,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         if (persistentController != null) {
           Navigator.popUntil(context, ModalRoute.withName(WebView.path));
         }
-        scaffoldMessengerStateKey.currentState?.showSnackBar(
+        Keys.scaffoldMessengerStateKey.currentState?.showSnackBar(
           SnackBar(
             content: Text(AppLocalizations.of(context)!.generic_error),
           ),

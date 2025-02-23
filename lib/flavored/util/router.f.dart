@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:humhub/flavored/web_view.f.dart';
 import 'package:humhub/util/const.dart';
 
-NavigatorState? get navigator => navigatorKey.currentState;
+NavigatorState? get navigator => Keys.navigatorKey.currentState;
 
 class RouterF {
   static String? initRoute = WebViewF.path;

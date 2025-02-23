@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,6 @@ import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
-import 'package:uni_links/uni_links.dart';
 
 bool _initialUriIsHandled = false;
 
@@ -19,9 +19,9 @@ class IntentPlugin extends ConsumerStatefulWidget {
   final Widget child;
 
   const IntentPlugin({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   IntentPluginState createState() => IntentPluginState();
@@ -34,6 +34,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   Uri? _initialUri;
   Uri? _latestUri;
   StreamSubscription? _sub;
+  final appLinks = AppLinks();
 
   @override
   void initState() {
@@ -56,12 +57,12 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     if (!kIsWeb) {
       // It will handle app links while the app is already started - be it in
       // the foreground or in the background.
-      _sub = uriLinkStream.listen((Uri? uri) async {
+      _sub = appLinks.uriLinkStream.listen((Uri? uri) async {
         if (!mounted && uri == null) return;
         _latestUri = await UrlProviderHandler.handleUniversalLink(uri!) ?? uri;
         logInfo('IntentPlugin._subscribeToUriStream', _latestUri);
         String redirectUrl = _latestUri.toString();
-        if (navigatorKey.currentState != null) {
+        if (Keys.navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         }
         _err = null;
@@ -88,18 +89,18 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     if (!_initialUriIsHandled) {
       _initialUriIsHandled = true;
       try {
-        final uri = await getInitialUri();
+        final uri = await appLinks.getInitialLink();
         if (uri == null || !mounted) return;
         setState(() => _initialUri = uri);
         _latestUri = await UrlProviderHandler.handleUniversalLink(uri) ?? uri;
         logInfo('IntentPlugin._handleInitialUri', _latestUri);
         String? redirectUrl = _latestUri.toString();
-        if (navigatorKey.currentState != null) {
+        if (Keys.navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         } else {
           UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
           await opener.initHumHub();
-          navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
+          Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
         }
       } on PlatformException {
         // Platform messages may fail but we ignore the exception
@@ -116,7 +117,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     logInfo('IntentPlugin.tryNavigateWithOpener', _latestUri);
     LoadingProvider.of(ref).showLoading();
     bool isNewRouteSameAsCurrent = false;
-    navigatorKey.currentState!.popUntil((route) {
+    Keys.navigatorKey.currentState!.popUntil((route) {
       if (route.settings.name == WebView.path) {
         isNewRouteSameAsCurrent = true;
       }
@@ -126,7 +127,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     await opener.initHumHub();
     // Always pop the current instance and init the new one.
     LoadingProvider.of(ref).dismissAll();
-    navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
+    Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
     return isNewRouteSameAsCurrent;
   }
 }

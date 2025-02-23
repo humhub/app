@@ -3,21 +3,13 @@ import 'package:humhub/models/manifest.dart';
 
 class ManifestF extends Manifest {
   ManifestF(
-      {required String display,
-      required String startUrl,
-      required String shortName,
-      required String name,
-      required String backgroundColor,
-      required String themeColor,
-      List<ManifestIcon>? icons})
-      : super(
-            display: display,
-            startUrl: startUrl,
-            shortName: shortName,
-            name: name,
-            backgroundColor: backgroundColor,
-            themeColor: themeColor,
-            icons: icons);
+      {required super.display,
+      required super.startUrl,
+      required super.shortName,
+      required super.name,
+      required super.backgroundColor,
+      required super.themeColor,
+      super.icons});
 
   factory ManifestF.fromEnv() {
     return ManifestF(

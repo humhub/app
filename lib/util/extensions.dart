@@ -14,7 +14,7 @@ class HexColor extends Color {
       return int.parse(hexColor, radix: 16);
     } catch (e) {
       logError("Color from manifest is not valid use primary color");
-      return HumhubTheme.primaryColor.value;
+      return HumhubTheme.primaryColor.colorSpace.index;
     }
   }
 

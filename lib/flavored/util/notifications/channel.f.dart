@@ -14,19 +14,19 @@ class NotificationChannelF extends NotificationChannel {
   ///
   @override
   Future<void> onTap(String? payload) async {
-    if (payload != null && navigatorKey.currentState != null) {
+    if (payload != null && Keys.navigatorKey.currentState != null) {
       bool isNewRouteSameAsCurrent = false;
-      navigatorKey.currentState!.popUntil((route) {
+      Keys.navigatorKey.currentState!.popUntil((route) {
         if (route.settings.name == WebViewF.path) {
           isNewRouteSameAsCurrent = true;
         }
         return true;
       });
       if (isNewRouteSameAsCurrent) {
-        navigatorKey.currentState!.pushNamed(WebViewF.path, arguments: payload);
+        Keys.navigatorKey.currentState!.pushNamed(WebViewF.path, arguments: payload);
         return;
       }
-      navigatorKey.currentState!.pushNamed(WebViewF.path, arguments: payload);
+      Keys.navigatorKey.currentState!.pushNamed(WebViewF.path, arguments: payload);
     } else {
       if (payload != null) {
         InitFromUrl.setPayload(payload);

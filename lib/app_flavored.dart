@@ -29,13 +29,13 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
             child: OverrideLocale(
               builder: (overrideLocale) => Builder(
                 builder: (context) => MaterialApp(
-                  scaffoldMessengerKey: scaffoldMessengerStateKey,
+                  scaffoldMessengerKey: Keys.scaffoldMessengerStateKey,
                   debugShowCheckedModeBanner: false,
                   initialRoute: RouterF.initRoute,
                   routes: RouterF.routes,
                   localizationsDelegates: AppLocalizations.localizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
-                  navigatorKey: navigatorKey,
+                  navigatorKey: Keys.navigatorKey,
                   builder: (context, child) => child!,
                   theme: ThemeData(
                     fontFamily: 'OpenSans',
