@@ -137,13 +137,13 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                                   opacity: ref.watch(textFieldVisibilityProvider) ? 1.0 : 0.0,
                                   duration: const Duration(milliseconds: 250),
                                   child: LastLoginWidget(
+                                      history: ref.watch(humHubProvider).history,
                                       onAddNetwork: () {
                                         ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
                                       },
-                                      history: ref.watch(humHubProvider).history,
                                       onSelectNetwork: (Manifest manifest) async {
                                         UniversalOpenerController uniOpen =
-                                            UniversalOpenerController(url: manifest.baseUrl);
+                                            UniversalOpenerController(url: manifest.startUrl);
                                         await uniOpen.initHumHub();
                                         // Always pop the current instance and init the new one.
                                         LoadingProvider.of(ref).dismissAll();
