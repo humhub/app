@@ -16,13 +16,6 @@ class QuickActionsHandler extends ConsumerStatefulWidget {
 }
 
 class _QuickActionsHandlerState extends ConsumerState<QuickActionsHandler> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
