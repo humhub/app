@@ -35,41 +35,95 @@ class WebViewGlobalController {
     _value = newValue;
   }
 
-  static Future<Map<String, dynamic>?> ajaxPost({
+  static Future<void> ajaxPost({
     required String url,
-    required String data,
+    required Map<String, dynamic> data,
     Map<String, String>? headers,
+    Function(Map<String, dynamic>? response)? onResponse,
   }) async {
     String jsonHeaders = jsonEncode(headers);
+    String jsonData = jsonEncode(data);
+    // Corrected JavaScript code
+    // \$
     String jsCode = """
-    new Promise((resolve, reject) => {
-      \$.ajax({
-        url: '$url',
-        type: 'POST',
-        data: $data,
-        headers: $jsonHeaders,
-        async: true, // Use async for non-blocking behavior
-        success: function(response) {
-          resolve(response);
-        },
-        error: function(xhr, status, error) {
-          reject({ status: status, error: error });
-        }
-      });
+new Promise((resolve, reject) => {
+  try {
+    var formData = new FormData();
+    
+    // Parse JSON data into an object
+    var parsedData = JSON.parse('$jsonData');
+    
+    // Append each key-value pair to FormData
+    for (var key in parsedData) {
+      if (parsedData[key] instanceof File) {
+        formData.append(key, parsedData[key]);
+      } else {
+        formData.append(key, parsedData[key]);
+      }
+    }
+    
+    // Log FormData contents for debugging
+    console.log('FormData contents:');
+    for (var pair of formData.entries()) {
+      console.log(pair[0] + ': ' + pair[1]);
+    }
+    
+    // Make AJAX POST request
+    \$.ajax({
+      url: '$url',
+      type: 'POST',
+      data: formData,
+      headers: JSON.parse('$jsonHeaders'),
+      processData: false,
+      mimeType: "multipart/form-data",
+      contentType: false,
+      success: function(response) {
+        const jsonString = JSON.stringify(response);
+        console.log('Response:', jsonString);
+        window.flutter_inappwebview.callHandler('onAjaxSuccess', response);
+        resolve(response);
+      },
+      error: function(xhr, status, error) {
+        console.error('AJAX Error:', status, error);
+        window.flutter_inappwebview.callHandler('onAjaxError', { status: status, error: error });
+        reject({ status: status, error: error });
+      }
     });
-  """;
+  } catch (e) {
+    console.error('Error in AJAX request:', e);
+    reject(e);
+  }
+});
+""";
 
     try {
-      // Evaluate the JavaScript code and get the result
-      Map<String, dynamic> result = await value?.evaluateJavascript(source: jsCode);
-      logDebug(result);
-      // Decode the JSON response from the JavaScript execution
-      return result;
+      await value?.evaluateJavascript(source: jsCode);
+      if (onResponse != null) {
+        value?.addJavaScriptHandler(
+          handlerName: 'onAjaxSuccess',
+          callback: (args) {
+            if (args.isNotEmpty) {
+              final response = jsonDecode(args[0].toString());
+              onResponse(response);
+            } else {
+              onResponse(null);
+            }
+          },
+        );
+        value?.addJavaScriptHandler(
+          handlerName: 'onAjaxError',
+          callback: (args) {
+            logError('AJAX Error: ${args[0]}');
+            onResponse(null);
+          },
+        );
+      }
     } catch (e) {
-      print('Error during ajaxPost execution: $e');
+      logError('Error during ajaxPost execution: $e');
+      if (onResponse != null) {
+        onResponse(null);
+      }
     }
-
-    return null;
   }
 
   static void ajaxSetHeaders({Map<String, String>? headers}) {

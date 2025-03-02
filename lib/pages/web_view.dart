@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -29,6 +30,7 @@ import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'package:humhub/util/router.dart' as m;
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -85,12 +87,37 @@ class WebViewAppState extends ConsumerState<WebView> {
   Widget build(BuildContext context) {
     ref.listen(
       intentProvider,
-          (previous, next) {
+      (previous, next) async {
+        if (next.sharedFiles == null) return;
+
         FileUploadSettings? settings = ref.read(humHubProvider).fileUploadSettings;
-        if(settings == null) return;
-        print('Counter changed from $previous to $next');
+        if (settings == null) return;
+
+        Map<String, dynamic> data = {};
+
+        for (SharedMediaFile sharedMediaFile in next.sharedFiles!) {
+          // Read the file as bytes
+          Uint8List byteData = await File(sharedMediaFile.path).readAsBytes();
+
+          // Add file data to the map
+          data.addAll({
+            'files[]': byteData,
+          });
+        }
+
+        // Call ajaxPost with the prepared data
+        WebViewGlobalController.ajaxPost(
+          url: settings.fileUploadUrl,
+          data: data,
+          headers: ref.read(humHubProvider).customHeaders,
+          onResponse: (response) {
+            logDebug('Upload Response:');
+            logDebug(response);
+          },
+        );
       },
     );
+
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: HexColor(_manifest.themeColor),
@@ -272,7 +299,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         if (token != null) {
           WebViewGlobalController.ajaxPost(
             url: message.url!,
-            data: '{ token: \'$token\' }',
+            data: {'token': token},
             headers: ref.read(humHubProvider).customHeaders,
           );
         }
@@ -289,7 +316,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         if (token != null) {
           WebViewGlobalController.ajaxPost(
             url: message.url!,
-            data: '{ token: \'$token\' }',
+            data: {'token': token},
             headers: ref.read(humHubProvider).customHeaders,
           );
         }
@@ -297,6 +324,8 @@ class WebViewAppState extends ConsumerState<WebView> {
       case ChannelAction.fileUploadSettings:
         FileUploadSettingsChannelData data = message.data as FileUploadSettingsChannelData;
         ref.read(humHubProvider.notifier).setFileUploadSettings(data.settings);
+        // TODO: When user opens and app from terminated state wait for it to set the settings after that it is safe to upload files if thez exists in intentProvider
+        // TODO: Change intentProvider in a way that the files are saved. But when the app use it are deleted (use files)
         break;
       case ChannelAction.none:
         break;
