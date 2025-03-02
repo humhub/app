@@ -5,11 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/models/file_upload_settings.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/intent/mail_link_provider.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
+import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
@@ -133,11 +135,12 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
       },
     );
 
-    ReceiveSharingIntent.instance.getInitialMedia().then((value) {
-      // Update shared files using the provider
-      ref.read(intentProvider.notifier).setSharedFiles(value);
+    ReceiveSharingIntent.instance.getInitialMedia().then((mediaList) {
+      if(mediaList.isEmpty) return;
+      FileUploadSettings? settings = ref.read(humHubProvider).fileUploadSettings;
+      if(settings == null) return;
 
-      logInfo('Initial shared files: $value');
+      logInfo('Initial shared files: $mediaList');
     });
   }
 

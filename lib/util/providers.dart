@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/models/file_upload_settings.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 
@@ -20,6 +21,7 @@ class HumHubNotifier extends ChangeNotifier {
   String? get manifestUrl => _humHubInstance.manifestUrl;
   Map<String, String> get customHeaders => _humHubInstance.customHeaders;
   List<Manifest> get history => _humHubInstance.history;
+  FileUploadSettings? get fileUploadSettings => _humHubInstance.fileUploadSettings;
 
   void setOpenerState(OpenerState state) {
     _humHubInstance.openerState = state;
@@ -37,6 +39,7 @@ class HumHubNotifier extends ChangeNotifier {
       customHeaders: instance.customHeaders,
       history: instance.history,
       manifestUrl: instance.manifestUrl,
+      fileUploadSettings: instance.fileUploadSettings,
     );
     _humHubInstance.manifest = copy.manifest;
     _humHubInstance.openerState = copy.openerState;
@@ -44,11 +47,18 @@ class HumHubNotifier extends ChangeNotifier {
     _humHubInstance.appVersion = copy.appVersion;
     _humHubInstance.manifestUrl = copy.manifestUrl;
     _humHubInstance.history = copy.history;
+    _humHubInstance.history = copy.history;
+    _humHubInstance.fileUploadSettings = copy.fileUploadSettings;
     _updateSafeStorage();
     notifyListeners();
   }
 
-  // Add a copyWith method
+  void setFileUploadSettings(FileUploadSettings settings) {
+    _humHubInstance.fileUploadSettings = settings;
+    _updateSafeStorage();
+    notifyListeners();
+  }
+
   HumHub copyWith({
     OpenerState? openerState,
     Manifest? manifest,
@@ -58,6 +68,7 @@ class HumHubNotifier extends ChangeNotifier {
     Map<String, String>? customHeaders,
     List<Manifest>? history,
     String? manifestUrl,
+    FileUploadSettings? fileUploadSettings,
   }) {
     HumHub instance = HumHub(
       openerState: openerState ?? this.openerState,
@@ -67,12 +78,14 @@ class HumHubNotifier extends ChangeNotifier {
       pushToken: pushToken ?? this.pushToken,
       history: history ?? this.history,
       manifestUrl: manifestUrl ?? this.manifestUrl,
+      fileUploadSettings: fileUploadSettings ?? this.fileUploadSettings,
     );
     _humHubInstance.manifest = instance.manifest;
     _humHubInstance.openerState = instance.openerState;
     _humHubInstance.randomHash = instance.randomHash;
     _humHubInstance.manifestUrl = instance.manifestUrl;
     _humHubInstance.history = instance.history;
+    _humHubInstance.fileUploadSettings = instance.fileUploadSettings;
     _updateSafeStorage();
     notifyListeners();
     return instance;
@@ -102,14 +115,7 @@ class HumHubNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  _updateSafeStorage() async {
-    final jsonString = json.encode(_humHubInstance.toJson());
-    String lastUrl = _humHubInstance.manifestUrl != null ? _humHubInstance.manifestUrl! : this.lastUrl;
-    await InternalStorage.storage.write(key: InternalStorage.keyHumhubInstance, value: jsonString);
-    await InternalStorage.storage.write(key: InternalStorage.keyLastInstanceUrl, value: lastUrl);
-  }
-
-  clearSafeStorage() async {
+  Future<void> clearSafeStorage() async {
     await InternalStorage.storage.delete(key: InternalStorage.keyHumhubInstance);
   }
 
@@ -117,14 +123,27 @@ class HumHubNotifier extends ChangeNotifier {
     var jsonStr = await InternalStorage.storage.read(key: InternalStorage.keyHumhubInstance);
     HumHub humHub = jsonStr != null ? HumHub.fromJson(json.decode(jsonStr)) : _humHubInstance;
     lastUrl = await InternalStorage.storage.read(key: InternalStorage.keyLastInstanceUrl) ?? "";
+
     /// Download icons for shortcuts if not yet saved in internal storage
     for (var value in humHub.history) {
       if (value.shortcutIcon == null) {
         await value.getBase64Icon();
       }
     }
+
     setInstance(humHub);
+
     return humHub;
+  }
+
+  Future<void> _updateSafeStorage() async {
+    final jsonString = json.encode(_humHubInstance.toJson());
+
+    String lastUrl = (_humHubInstance.manifestUrl != null ? _humHubInstance.manifestUrl! : this.lastUrl);
+
+    await InternalStorage.storage.write(key: InternalStorage.keyHumhubInstance, value: jsonString);
+
+    await InternalStorage.storage.write(key: InternalStorage.keyLastInstanceUrl, value: lastUrl);
   }
 }
 

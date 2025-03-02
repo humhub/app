@@ -48,15 +48,50 @@ class WebViewGlobalController {
     value?.evaluateJavascript(source: jsCode4);
   }
 
+  /*static Future<Map<String, dynamic>?> ajaxPost({
+    required String url,
+    required String data,
+    Map<String, String>? headers,
+  }) async {
+    String jsonHeaders = jsonEncode(headers);
+    String jsCode = """
+    new Promise((resolve, reject) => {
+      \$.ajax({
+        url: '$url',
+        type: 'POST',
+        data: $data,
+        headers: $jsonHeaders,
+        async: true, // Use async for non-blocking behavior
+        success: function(response) {
+          resolve(response);
+        },
+        error: function(xhr, status, error) {
+          reject({ status: status, error: error });
+        }
+      });
+    });
+  """;
+
+    try {
+      // Evaluate the JavaScript code and get the result
+      Map<String, dynamic> result = await value?.evaluateJavascript(source: jsCode);
+      logDebug(result);
+      // Decode the JSON response from the JavaScript execution
+      return result;
+    } catch (e) {
+      print('Error during ajaxPost execution: $e');
+    }
+
+    return null;
+  }*/
+
   static void ajaxSetHeaders({Map<String, String>? headers}) {
     String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(headers).toString()}});";
     value?.evaluateJavascript(source: jsCode);
   }
 
   static void onLongPressHitTestResult(InAppWebViewController controller, InAppWebViewHitTestResult hitResult) async {
-    if (hitResult.extra != null &&
-        ([InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE, InAppWebViewHitTestResultType.EMAIL_TYPE]
-            .contains(hitResult.type))) {
+    if (hitResult.extra != null && ([InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE, InAppWebViewHitTestResultType.EMAIL_TYPE].contains(hitResult.type))) {
       Clipboard.setData(
         ClipboardData(text: hitResult.extra!),
       );
@@ -136,7 +171,6 @@ class WebViewGlobalController {
       canZoomOut = await value?.zoomOut();
     }
   }
-
 
   static InAppWebViewSettings settings({bool zoom = false}) {
     return InAppWebViewSettings(
