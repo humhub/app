@@ -274,9 +274,8 @@ class WebViewAppState extends ConsumerState<WebView> {
         }
         break;
       case ChannelAction.updateNotificationCount:
-        if (message.count != null) {
-          AppBadgePlus.updateBadge(message.count!);
-        }
+        UpdateNotificationCountChannelData data = message.data as UpdateNotificationCountChannelData;
+        AppBadgePlus.updateBadge(data.count);
         break;
       case ChannelAction.nativeConsole:
         Navigator.of(context).pushNamed(ConsolePage.routeName);
@@ -290,6 +289,9 @@ class WebViewAppState extends ConsumerState<WebView> {
             headers: ref.read(humHubProvider).customHeaders,
           );
         }
+        break;
+      case ChannelAction.fileUploadSettings:
+        logInfo(message);
         break;
       case ChannelAction.none:
         break;
