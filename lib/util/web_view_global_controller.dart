@@ -4,6 +4,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/global_user_agent.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:loggy/loggy.dart';
 
 class WebViewGlobalController {
   static InAppWebViewController? _value;
@@ -34,21 +35,7 @@ class WebViewGlobalController {
     _value = newValue;
   }
 
-  static void ajaxPost({required String url, required String data, Map<String, String>? headers}) {
-    String jsonHeaders = jsonEncode(headers);
-    String jsCode4 = """
-          \$.ajax({
-              url: '$url',
-              type: 'POST',
-              data: $data,
-              headers: $jsonHeaders,
-              async: false, // IMPORTANT: it needs to be sync
-          });
-    """;
-    value?.evaluateJavascript(source: jsCode4);
-  }
-
-  /*static Future<Map<String, dynamic>?> ajaxPost({
+  static Future<Map<String, dynamic>?> ajaxPost({
     required String url,
     required String data,
     Map<String, String>? headers,
@@ -83,7 +70,7 @@ class WebViewGlobalController {
     }
 
     return null;
-  }*/
+  }
 
   static void ajaxSetHeaders({Map<String, String>? headers}) {
     String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(headers).toString()}});";
