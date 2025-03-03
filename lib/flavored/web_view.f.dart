@@ -216,7 +216,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         if (token != null) {
           WebViewGlobalController.ajaxPost(
             url: message.url!,
-            data: { 'token': token },
+            data: '{ token: \'$token\' }',
             headers: instance.customHeaders,
           );
         }
@@ -230,7 +230,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         if (token != null) {
           WebViewGlobalController.ajaxPost(
             url: message.url!,
-            data: { 'token': token },
+            data: '{ token: \'$token\' }',
             headers: instance.customHeaders,
           );
         }

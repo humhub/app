@@ -35,66 +35,82 @@ class WebViewGlobalController {
     _value = newValue;
   }
 
-  static Future<void> ajaxPost({
+  static void ajaxPost({required String url, required String data, Map<String, String>? headers}) {
+    String jsonHeaders = jsonEncode(headers);
+    String jsCode4 = """
+          \$.ajax({
+              url: '$url',
+              type: 'POST',
+              data: $data,
+              headers: $jsonHeaders,
+              async: false, // IMPORTANT: it needs to be sync
+          });
+    """;
+    value?.evaluateJavascript(source: jsCode4);
+  }
+
+  static Future<void> ajaxPostFiles({
     required String url,
-    required Map<String, dynamic> data,
+    required List<dynamic> data,
     Map<String, String>? headers,
     Function(Map<String, dynamic>? response)? onResponse,
   }) async {
-    String jsonHeaders = jsonEncode(headers);
+    String jsonHeaders = jsonEncode(headers ?? {});
     String jsonData = jsonEncode(data);
-    // Corrected JavaScript code
-    // \$
+
     String jsCode = """
-new Promise((resolve, reject) => {
-  try {
-    var formData = new FormData();
-    
-    // Parse JSON data into an object
-    var parsedData = JSON.parse('$jsonData');
-    
-    // Append each key-value pair to FormData
-    for (var key in parsedData) {
-      if (parsedData[key] instanceof File) {
-        formData.append(key, parsedData[key]);
-      } else {
-        formData.append(key, parsedData[key]);
-      }
-    }
-    
-    // Log FormData contents for debugging
-    console.log('FormData contents:');
-    for (var pair of formData.entries()) {
-      console.log(pair[0] + ': ' + pair[1]);
-    }
-    
-    // Make AJAX POST request
-    \$.ajax({
-      url: '$url',
-      type: 'POST',
-      data: formData,
-      headers: JSON.parse('$jsonHeaders'),
-      processData: false,
-      mimeType: "multipart/form-data",
-      contentType: false,
-      success: function(response) {
-        const jsonString = JSON.stringify(response);
-        console.log('Response:', jsonString);
-        window.flutter_inappwebview.callHandler('onAjaxSuccess', response);
-        resolve(response);
-      },
-      error: function(xhr, status, error) {
-        console.error('AJAX Error:', status, error);
-        window.flutter_inappwebview.callHandler('onAjaxError', { status: status, error: error });
-        reject({ status: status, error: error });
-      }
-    });
-  } catch (e) {
-    console.error('Error in AJAX request:', e);
-    reject(e);
-  }
-});
-""";
+        new Promise((resolve, reject) => {
+        try {
+          var formData = new FormData();
+          var parsedData = JSON.parse('$jsonData');
+      
+          for (var key in parsedData) {
+            var value = parsedData[key];
+      
+            // Decode Base64 string to binary data
+            var binaryString = atob(value.base64);
+            var binaryLength = binaryString.length;
+            var binaryArray = new Uint8Array(binaryLength);
+      
+            for (var i = 0; i < binaryLength; i++) {
+              binaryArray[i] = binaryString.charCodeAt(i);
+            }
+      
+            // Create Blob and File from the decoded binary data
+            var blob = new Blob([binaryArray], { type: value.mimeType });
+            var file = new File([blob], value.filename, { type: value.mimeType });
+      
+            // Append file to FormData
+            formData.append('files[]', file);
+          }
+      
+          // Make AJAX POST request using fetch
+          fetch('$url', {
+            method: 'POST',
+            body: formData,
+            headers: JSON.parse('$jsonHeaders')
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: \${response.status}`);
+              }
+              return response.json(); // Assuming the server responds with JSON
+            })
+            .then(data => {
+              const jsonString = JSON.stringify(data);
+              window.flutter_inappwebview.callHandler('onAjaxSuccess', data);
+              resolve(data);
+            })
+            .catch(error => {
+              window.flutter_inappwebview.callHandler('onAjaxError', { status: error.status || 'unknown', error: error.message });
+              reject({ status: error.status || 'unknown', error: error.message });
+            });
+        } catch (e) {
+          console.error('Error in AJAX request:', e);
+          reject(e);
+        }
+      });
+     """;
 
     try {
       await value?.evaluateJavascript(source: jsCode);
@@ -110,6 +126,7 @@ new Promise((resolve, reject) => {
             }
           },
         );
+
         value?.addJavaScriptHandler(
           handlerName: 'onAjaxError',
           callback: (args) {

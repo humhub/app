@@ -93,26 +93,26 @@ class WebViewAppState extends ConsumerState<WebView> {
         FileUploadSettings? settings = ref.read(humHubProvider).fileUploadSettings;
         if (settings == null) return;
 
-        Map<String, dynamic> data = {};
+        List<dynamic> data = [];
 
         for (SharedMediaFile sharedMediaFile in next.sharedFiles!) {
-          // Read the file as bytes
           Uint8List byteData = await File(sharedMediaFile.path).readAsBytes();
+          String base64String = base64Encode(byteData);
+          String filename = sharedMediaFile.path.split('/').last;
 
-          // Add file data to the map
-          data.addAll({
-            'files[]': byteData,
+          data.add({
+            'base64': base64String,
+            'filename': filename,
+            'mimeType': sharedMediaFile.mimeType ?? 'application/octet-stream',
           });
         }
 
-        // Call ajaxPost with the prepared data
-        WebViewGlobalController.ajaxPost(
+        WebViewGlobalController.ajaxPostFiles(
           url: settings.fileUploadUrl,
           data: data,
           headers: ref.read(humHubProvider).customHeaders,
           onResponse: (response) {
-            logDebug('Upload Response:');
-            logDebug(response);
+            logDebug('Upload Response: $response');
           },
         );
       },
@@ -299,7 +299,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         if (token != null) {
           WebViewGlobalController.ajaxPost(
             url: message.url!,
-            data: {'token': token},
+            data: '{ token: \'$token\' }',
             headers: ref.read(humHubProvider).customHeaders,
           );
         }
@@ -316,7 +316,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         if (token != null) {
           WebViewGlobalController.ajaxPost(
             url: message.url!,
-            data: {'token': token},
+            data: '{ token: \'$token\' }',
             headers: ref.read(humHubProvider).customHeaders,
           );
         }
