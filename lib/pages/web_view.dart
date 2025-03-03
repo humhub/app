@@ -96,6 +96,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         List<dynamic> data = [];
 
         for (SharedMediaFile sharedMediaFile in next.sharedFiles!) {
+          // TODO: chunk it
           Uint8List byteData = await File(sharedMediaFile.path).readAsBytes();
           String base64String = base64Encode(byteData);
           String filename = sharedMediaFile.path.split('/').last;
