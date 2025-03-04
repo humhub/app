@@ -4,6 +4,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/global_user_agent.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/models/remote_file.dart';
 import 'package:loggy/loggy.dart';
 
 class WebViewGlobalController {
@@ -24,7 +25,7 @@ class WebViewGlobalController {
   /// [url] is the URL to evaluate.
   /// @return `true` if the URL should open in a new window, `false` otherwise.
   static bool openCreateWindowInWebView({required String url, required Manifest manifest}) {
-    String? baseUrl = manifest.baseUrl;
+    String? baseUrl = manifest.startUrl;
     if (url.startsWith('$baseUrl/file/file/download')) return true;
     if (url.startsWith('$baseUrl/u')) return true;
     if (url.startsWith('$baseUrl/s')) return true;
@@ -53,7 +54,7 @@ class WebViewGlobalController {
     required String url,
     required List<dynamic> data,
     Map<String, String>? headers,
-    Function(Map<String, dynamic>? response)? onResponse,
+    Function(List<FileItem>? files)? onResponse,
   }) async {
     String jsonHeaders = jsonEncode(headers ?? {});
     String jsonData = jsonEncode(data);
@@ -119,8 +120,7 @@ class WebViewGlobalController {
           handlerName: 'onAjaxSuccess',
           callback: (args) {
             if (args.isNotEmpty) {
-              final response = jsonDecode(args[0].toString());
-              onResponse(response);
+              onResponse(FileItem.listFromJson(args[0]));
             } else {
               onResponse(null);
             }
@@ -141,6 +141,20 @@ class WebViewGlobalController {
         onResponse(null);
       }
     }
+  }
+
+  static triggerFileShareModal(List<FileItem> files) async {
+    String guids = files.asMap().entries.map((entry) {
+      int index = entry.key;
+      FileItem file = entry.value;
+      return 'fileList[$index]=${file.guid}';
+    }).join('&');
+
+    String jsCode = """
+    \$('#globalModal').modal('show');
+    \$('#globalModal .modal-content').load('https://cuzy.app/hhtest/content/content/create?$guids');
+    """;
+    await value?.evaluateJavascript(source: jsCode);
   }
 
   static void ajaxSetHeaders({Map<String, String>? headers}) {

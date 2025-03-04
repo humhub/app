@@ -112,8 +112,10 @@ class WebViewAppState extends ConsumerState<WebView> {
           url: settings.fileUploadUrl,
           data: data,
           headers: ref.read(humHubProvider).customHeaders,
-          onResponse: (response) {
-            logDebug('Upload Response: $response');
+          onResponse: (files) {
+            if (files == null) return;
+            WebViewGlobalController.triggerFileShareModal(files);
+            logDebug('Upload Response: $files');
           },
         );
       },
