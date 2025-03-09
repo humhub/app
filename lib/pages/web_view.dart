@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/models/file_upload_settings.dart';
 import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/hum_hub.dart';
@@ -18,6 +20,7 @@ import 'package:humhub/util/crypt.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/file_handler.dart';
 import 'package:humhub/util/init_from_url.dart';
+import 'package:humhub/util/intent/intent_state.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
@@ -27,6 +30,7 @@ import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'package:humhub/util/router.dart' as m;
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -53,6 +57,7 @@ class WebViewAppState extends ConsumerState<WebView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // Listen to the provider's state changes
     if (!_isInit) {
       _initialRequest = _initRequest;
       _pullToRefreshController = PullToRefreshController(
@@ -63,10 +68,8 @@ class WebViewAppState extends ConsumerState<WebView> {
           if (Platform.isAndroid) {
             WebViewGlobalController.value?.reload();
           } else if (Platform.isIOS) {
-            WebViewGlobalController.value?.loadUrl(
-                urlRequest: URLRequest(
-                    url: await WebViewGlobalController.value?.getUrl(),
-                    headers: ref.read(humHubProvider).customHeaders));
+            WebViewGlobalController.value
+                ?.loadUrl(urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl(), headers: ref.read(humHubProvider).customHeaders));
           }
         },
       );
@@ -82,6 +85,42 @@ class WebViewAppState extends ConsumerState<WebView> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(
+      intentProvider,
+      (previous, next) async {
+        if (next.sharedFiles == null) return;
+
+        FileUploadSettings? settings = ref.read(humHubProvider).fileUploadSettings;
+        if (settings == null) return;
+
+        List<dynamic> data = [];
+
+        for (SharedMediaFile sharedMediaFile in next.sharedFiles!) {
+          // TODO: chunk it
+          Uint8List byteData = await File(sharedMediaFile.path).readAsBytes();
+          String base64String = base64Encode(byteData);
+          String filename = sharedMediaFile.path.split('/').last;
+
+          data.add({
+            'base64': base64String,
+            'filename': filename,
+            'mimeType': sharedMediaFile.mimeType ?? 'application/octet-stream',
+          });
+        }
+
+        WebViewGlobalController.ajaxPostFiles(
+          url: settings.fileUploadUrl,
+          data: data,
+          headers: ref.read(humHubProvider).customHeaders,
+          onResponse: (files) {
+            if (files == null) return;
+            WebViewGlobalController.triggerFileShareModal(files);
+            logDebug('Upload Response: $files');
+          },
+        );
+      },
+    );
+
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: HexColor(_manifest.themeColor),
@@ -134,8 +173,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     return URLRequest(url: WebUri(url ?? _manifest.startUrl), headers: ref.read(humHubProvider).customHeaders);
   }
 
-  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
-      InAppWebViewController controller, NavigationAction action) async {
+  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(InAppWebViewController controller, NavigationAction action) async {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
@@ -152,16 +190,12 @@ class WebViewAppState extends ConsumerState<WebView> {
       return NavigationActionPolicy.CANCEL;
     }
     // For all other external links
-    if (!url.startsWith(_manifest.baseUrl) &&
-        !action.isForMainFrame &&
-        action.navigationType == NavigationType.LINK_ACTIVATED) {
+    if (!url.startsWith(_manifest.baseUrl) && !action.isForMainFrame && action.navigationType == NavigationType.LINK_ACTIVATED) {
       await launchUrl(action.request.url!.uriValue, mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
-    if (Platform.isAndroid ||
-        action.navigationType == NavigationType.LINK_ACTIVATED ||
-        action.navigationType == NavigationType.FORM_SUBMITTED) {
+    if (Platform.isAndroid || action.navigationType == NavigationType.LINK_ACTIVATED || action.navigationType == NavigationType.FORM_SUBMITTED) {
       Map<String, String> mergedMap = {...?_initialRequest.headers, ...?action.request.headers};
       URLRequest newRequest = action.request.copyWith(headers: mergedMap);
       controller.loadUrl(urlRequest: newRequest);
@@ -218,11 +252,9 @@ class WebViewAppState extends ConsumerState<WebView> {
   _onLoadStop(InAppWebViewController controller, Uri? url) {
     // Disable remember me checkbox on login and set def. value to true: check if the page is actually login page, if it is inject JS that hides element
     if (url!.path.contains('/user/auth/login')) {
+      WebViewGlobalController.value!.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
       WebViewGlobalController.value!
-          .evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
-      WebViewGlobalController.value!.evaluateJavascript(
-          source:
-              "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+          .evaluateJavascript(source: "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
@@ -261,7 +293,9 @@ class WebViewAppState extends ConsumerState<WebView> {
         break;
       case ChannelAction.hideOpener:
         ref.read(humHubProvider).setOpenerState(OpenerState.hidden);
-        ref.read(humHubProvider).setHash(Crypt.generateRandomString(32),);
+        ref.read(humHubProvider).setHash(
+              Crypt.generateRandomString(32),
+            );
         break;
       case ChannelAction.registerFcmDevice:
         String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
@@ -274,9 +308,8 @@ class WebViewAppState extends ConsumerState<WebView> {
         }
         break;
       case ChannelAction.updateNotificationCount:
-        if (message.count != null) {
-          AppBadgePlus.updateBadge(message.count!);
-        }
+        UpdateNotificationCountChannelData data = message.data as UpdateNotificationCountChannelData;
+        AppBadgePlus.updateBadge(data.count);
         break;
       case ChannelAction.nativeConsole:
         Navigator.of(context).pushNamed(ConsolePage.routeName);
@@ -290,6 +323,12 @@ class WebViewAppState extends ConsumerState<WebView> {
             headers: ref.read(humHubProvider).customHeaders,
           );
         }
+        break;
+      case ChannelAction.fileUploadSettings:
+        FileUploadSettingsChannelData data = message.data as FileUploadSettingsChannelData;
+        ref.read(humHubProvider.notifier).setFileUploadSettings(data.settings);
+        // TODO: When user opens and app from terminated state wait for it to set the settings after that it is safe to upload files if thez exists in intentProvider
+        // TODO: Change intentProvider in a way that the files are saved. But when the app use it are deleted (use files)
         break;
       case ChannelAction.none:
         break;

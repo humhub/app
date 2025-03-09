@@ -4,6 +4,8 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/global_user_agent.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/models/remote_file.dart';
+import 'package:loggy/loggy.dart';
 
 class WebViewGlobalController {
   static InAppWebViewController? _value;
@@ -23,7 +25,7 @@ class WebViewGlobalController {
   /// [url] is the URL to evaluate.
   /// @return `true` if the URL should open in a new window, `false` otherwise.
   static bool openCreateWindowInWebView({required String url, required Manifest manifest}) {
-    String? baseUrl = manifest.baseUrl;
+    String? baseUrl = manifest.startUrl;
     if (url.startsWith('$baseUrl/file/file/download')) return true;
     if (url.startsWith('$baseUrl/u')) return true;
     if (url.startsWith('$baseUrl/s')) return true;
@@ -48,15 +50,120 @@ class WebViewGlobalController {
     value?.evaluateJavascript(source: jsCode4);
   }
 
+  static Future<void> ajaxPostFiles({
+    required String url,
+    required List<dynamic> data,
+    Map<String, String>? headers,
+    Function(List<FileItem>? files)? onResponse,
+  }) async {
+    String jsonHeaders = jsonEncode(headers ?? {});
+    String jsonData = jsonEncode(data);
+
+    String jsCode = """
+        new Promise((resolve, reject) => {
+        try {
+          var formData = new FormData();
+          var parsedData = JSON.parse('$jsonData');
+      
+          for (var key in parsedData) {
+            var value = parsedData[key];
+      
+            // Decode Base64 string to binary data
+            var binaryString = atob(value.base64);
+            var binaryLength = binaryString.length;
+            var binaryArray = new Uint8Array(binaryLength);
+      
+            for (var i = 0; i < binaryLength; i++) {
+              binaryArray[i] = binaryString.charCodeAt(i);
+            }
+      
+            // Create Blob and File from the decoded binary data
+            var blob = new Blob([binaryArray], { type: value.mimeType });
+            var file = new File([blob], value.filename, { type: value.mimeType });
+      
+            // Append file to FormData
+            formData.append('files[]', file);
+          }
+      
+          // Make AJAX POST request using fetch
+          fetch('$url', {
+            method: 'POST',
+            body: formData,
+            headers: JSON.parse('$jsonHeaders')
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: \${response.status}`);
+              }
+              return response.json(); // Assuming the server responds with JSON
+            })
+            .then(data => {
+              const jsonString = JSON.stringify(data);
+              window.flutter_inappwebview.callHandler('onAjaxSuccess', data);
+              resolve(data);
+            })
+            .catch(error => {
+              window.flutter_inappwebview.callHandler('onAjaxError', { status: error.status || 'unknown', error: error.message });
+              reject({ status: error.status || 'unknown', error: error.message });
+            });
+        } catch (e) {
+          console.error('Error in AJAX request:', e);
+          reject(e);
+        }
+      });
+     """;
+
+    try {
+      await value?.evaluateJavascript(source: jsCode);
+      if (onResponse != null) {
+        value?.addJavaScriptHandler(
+          handlerName: 'onAjaxSuccess',
+          callback: (args) {
+            if (args.isNotEmpty) {
+              onResponse(FileItem.listFromJson(args[0]));
+            } else {
+              onResponse(null);
+            }
+          },
+        );
+
+        value?.addJavaScriptHandler(
+          handlerName: 'onAjaxError',
+          callback: (args) {
+            logError('AJAX Error: ${args[0]}');
+            onResponse(null);
+          },
+        );
+      }
+    } catch (e) {
+      logError('Error during ajaxPost execution: $e');
+      if (onResponse != null) {
+        onResponse(null);
+      }
+    }
+  }
+
+  static triggerFileShareModal(List<FileItem> files) async {
+    String guids = files.asMap().entries.map((entry) {
+      int index = entry.key;
+      FileItem file = entry.value;
+      return 'fileList[$index]=${file.guid}';
+    }).join('&');
+
+    String jsCode = """
+    \$('#globalModal').modal('show');
+    \$('#globalModal .modal-content').load('https://cuzy.app/hhtest/content/content/create?$guids');
+    """;
+    await value?.evaluateJavascript(source: jsCode);
+  }
+
   static void ajaxSetHeaders({Map<String, String>? headers}) {
     String jsCode = "\$.ajaxSetup({headers: ${jsonEncode(headers).toString()}});";
     value?.evaluateJavascript(source: jsCode);
   }
 
   static void onLongPressHitTestResult(InAppWebViewController controller, InAppWebViewHitTestResult hitResult) async {
-    if (hitResult.extra != null &&
-        ([InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE, InAppWebViewHitTestResultType.EMAIL_TYPE]
-            .contains(hitResult.type))) {
+    if (hitResult.extra != null && ([InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE, InAppWebViewHitTestResultType.EMAIL_TYPE].contains(hitResult.type))) {
       Clipboard.setData(
         ClipboardData(text: hitResult.extra!),
       );
@@ -136,7 +243,6 @@ class WebViewGlobalController {
       canZoomOut = await value?.zoomOut();
     }
   }
-
 
   static InAppWebViewSettings settings({bool zoom = false}) {
     return InAppWebViewSettings(
