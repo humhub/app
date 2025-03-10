@@ -140,16 +140,19 @@ jobs:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.APPSTORE_BUILD_CERTIFICATE_BASE64 }}
           P12_PASSWORD: ${{ secrets.APPSTORE_P12_PASSWORD }}
           BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.APPSTORE_BUILD_PROVISION_PROFILE_BASE64 }}
+          BUILD_SHARE_EXT_PROVISION_PROFILE_BASE64: ${{ secrets.APPSTORE_BUILD_SHARE_EXT_PROVISION_PROFILE_BASE64 }}
           KEYCHAIN_PASSWORD: ${{ secrets.APPSTORE_KEYCHAIN_PASSWORD }}
         run: |
           # create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+          SE_PP_PATH=$RUNNER_TEMP/se_build_pp.mobileprovision
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
           
           # import certificate and provisioning profile from secrets
           echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
           echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+          echo -n "BUILD_SHARE_EXT_PROVISION_PROFILE_BASE64" | base64 --decode -o $SE_PP_PATH
           
           # create temporary keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
@@ -163,6 +166,7 @@ jobs:
           # apply provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $SE_PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Install Flutter
         uses: subosito/flutter-action@v1
@@ -212,6 +216,7 @@ jobs:
         run: |
           security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
           rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
+          rm ~/Library/MobileDevice/Provisioning\ Profiles/se_build_pp.mobileprovision
 
   release_ios:
     name: Release IPA to TestFlight
