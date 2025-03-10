@@ -53,6 +53,7 @@ class WebViewAppState extends ConsumerState<WebView> {
   late URLRequest _initialRequest;
   late PullToRefreshController _pullToRefreshController;
   HeadlessInAppWebView? _headlessWebView;
+  bool initialIntentLock = false;
   bool _isInit = false;
   late double downloadProgress = 0;
 
@@ -106,6 +107,14 @@ class WebViewAppState extends ConsumerState<WebView> {
         );
       },
     );
+  }
+
+  void _handleInitialIntent() {
+    final intentState = ref.read(intentProvider);
+    if (intentState.sharedFiles != null && intentState.sharedFiles!.isNotEmpty) {
+      handleSharedFiles(ref, intentState);
+    }
+    initialIntentLock = true;
   }
 
   @override
@@ -323,8 +332,8 @@ class WebViewAppState extends ConsumerState<WebView> {
       case ChannelAction.fileUploadSettings:
         FileUploadSettingsChannelData data = message.data as FileUploadSettingsChannelData;
         ref.read(humHubProvider.notifier).setFileUploadSettings(data.settings);
-        // TODO: When user opens and app from terminated state wait for it to set the settings after that it is safe to upload files if thez exists in intentProvider
-        // TODO: Change intentProvider in a way that the files are saved. But when the app use it are deleted (use files)
+        if (initialIntentLock) break;
+        _handleInitialIntent();
         break;
       case ChannelAction.none:
         break;
@@ -473,10 +482,10 @@ class WebViewAppState extends ConsumerState<WebView> {
     });
   }
 
-  void handleSharedFiles(WidgetRef ref, IntentState next) async {
+  void handleSharedFiles(WidgetRef ref, IntentState state) async {
     List<String> errors = [];
     try {
-      if (next.sharedFiles == null) return;
+      if (state.sharedFiles == null) return;
 
       FileUploadSettings? settings = ref.read(humHubProvider).fileUploadSettings;
       if (settings == null) {
@@ -484,7 +493,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         return;
       }
 
-      List<dynamic> data = await processSharedFiles(next.sharedFiles!, settings, errors);
+      List<dynamic> data = await processSharedFiles(state.sharedFiles!, settings, errors);
 
       if (data.isNotEmpty) {
         WebViewGlobalController.ajaxPostFiles(
