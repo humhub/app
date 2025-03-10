@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:loggy/loggy.dart';
 
 class UrlProviderHandler {
@@ -35,12 +35,12 @@ class UrlProviderHandler {
 
   static Future<Uri?> _handleUniversalLinkBrevo(Uri url) async {
     try {
-      final response = await http.get(
-        url,
-        headers: {'Accept': 'application/json'},
+      final response = await Dio().get(
+        url.toString(),
+        options: Options(headers: {'Accept': 'application/json'}),
       );
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
+        final Map<String, dynamic> data = jsonDecode(response.data);
         return Uri.parse(data['url']);
       } else {
         logError('Failed to retrieve deep link. Status code: ${response.statusCode}');
@@ -52,4 +52,3 @@ class UrlProviderHandler {
     }
   }
 }
-

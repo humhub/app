@@ -12,6 +12,8 @@ import 'package:humhub/util/storage_service.dart';
 import 'package:loggy/loggy.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'file_upload_settings.dart';
+
 enum RedirectAction { opener, webView }
 
 enum OpenerState {
@@ -40,6 +42,7 @@ class HumHub {
   final bool isIos = Platform.isIOS || Platform.isMacOS;
   final bool isAndroid = Platform.isAndroid;
   List<Manifest> history;
+  FileUploadSettings? fileUploadSettings;
 
   HumHub({
     this.manifest,
@@ -49,33 +52,37 @@ class HumHub {
     this.appVersion,
     this.pushToken,
     List<Manifest>? history,
+    this.fileUploadSettings,
   }) : history = history ?? [];
 
   Map<String, dynamic> toJson() => {
-        'manifest': manifest?.toJson(),
-        'manifestUri': manifestUrl,
-        'openerState': openerState.isShown,
-        'randomHash': randomHash,
-        'appVersion': appVersion,
-        'pushToken': pushToken,
-        'history': history
-            .map((manifest) => manifest.toJson())
-            .toList(),
-      };
+    'manifest': manifest?.toJson(),
+    'manifestUri': manifestUrl,
+    'openerState': openerState.isShown,
+    'randomHash': randomHash,
+    'appVersion': appVersion,
+    'pushToken': pushToken,
+    'history': history.map((manifest) => manifest.toJson()).toList(),
+    'fileUploadSettings': fileUploadSettings?.toJson(),
+  };
 
   factory HumHub.fromJson(Map<String, dynamic> json) {
     return HumHub(
       manifest:
-          json['manifest'] != null ? Manifest.fromJson(json['manifest']) : null,
+      json['manifest'] != null ? Manifest.fromJson(json['manifest']) : null,
       manifestUrl: json['manifestUri'],
-      openerState: (json['openerState'] as bool?) ?? true ? OpenerState.shown : OpenerState.hidden,
+      openerState:
+      (json['openerState'] as bool?) ?? true ? OpenerState.shown : OpenerState.hidden,
       randomHash: json['randomHash'],
       appVersion: json['appVersion'],
       pushToken: json['pushToken'],
       history: json['history'] != null
           ? List<Manifest>.from(
-              json['history'].map((json) => Manifest.fromJson(json)))
-          : [], // Deserialize history
+          json['history'].map((json) => Manifest.fromJson(json)))
+          : [],
+      fileUploadSettings: json['fileUploadSettings'] != null
+          ? FileUploadSettings.fromJson(json['fileUploadSettings'])
+          : null,
     );
   }
 
@@ -95,7 +102,7 @@ class HumHub {
   /// !!! This method should only be called inside a [HumHubNotifier] because it also needs to update secure storage.
   void addOrUpdateHistory(Manifest newManifest) {
     final existingManifestIndex =
-        history.indexWhere((item) => item.startUrl == newManifest.startUrl);
+    history.indexWhere((item) => item.startUrl == newManifest.startUrl);
 
     if (existingManifestIndex >= 0) {
       history[existingManifestIndex] = newManifest;
@@ -118,7 +125,7 @@ class HumHub {
   /// !!! This method should only be called inside a [HumHubNotifier] because it also needs to update secure storage.
   bool removeFromHistory(Manifest manifest) {
     final existingManifestIndex =
-        history.indexWhere((item) => item == manifest);
+    history.indexWhere((item) => item == manifest);
 
     if (existingManifestIndex >= 0) {
       history.removeAt(existingManifestIndex);
@@ -134,9 +141,9 @@ class HumHub {
     } else {
       if (manifest != null) {
         UniversalOpenerController openerController =
-            UniversalOpenerController(url: manifest!.baseUrl);
+        UniversalOpenerController(url: manifest!.baseUrl);
         String? manifestUrl =
-            await openerController.findManifest(manifest!.baseUrl);
+        await openerController.findManifest(manifest!.baseUrl);
         if (manifestUrl == null) {
           return RedirectAction.opener;
         } else {
@@ -148,13 +155,13 @@ class HumHub {
   }
 
   Map<String, String> get customHeaders => {
-        'x-humhub-app-token': randomHash ?? '',
-        'x-humhub-app': appVersion ?? '1.0.0',
-        'x-humhub-app-is-ios': isIos ? '1' : '0',
-        'x-humhub-app-is-android': isAndroid ? '1' : '0',
-        'x-humhub-app-opener-state': openerState.headerValue,
-        'x-humhub-app-is-multi-instance': '1',
-      };
+    'x-humhub-app-token': randomHash ?? '',
+    'x-humhub-app': appVersion ?? '1.0.0',
+    'x-humhub-app-is-ios': isIos ? '1' : '0',
+    'x-humhub-app-is-android': isAndroid ? '1' : '0',
+    'x-humhub-app-opener-state': openerState.headerValue,
+    'x-humhub-app-is-multi-instance': '1',
+  };
 
   static Future<Widget> init() async {
     Loggy.initLoggy(

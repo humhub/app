@@ -3,7 +3,8 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/const.dart';
 import 'package:loggy/loggy.dart';
-
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:mime/mime.dart';
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
     try {
@@ -104,3 +105,12 @@ extension IterableX<E> on Iterable<E> {
     });
   }
 }
+
+extension SharedMediaFileExtension on SharedMediaFile {
+  String? getExtension() {
+    if (mimeType == null) return null;
+    return extensionFromMime(mimeType!);
+  }
+}
+
+
