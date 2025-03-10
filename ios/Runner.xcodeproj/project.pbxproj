@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,6 +15,7 @@
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		A85C76A18D0E8F69F04AA401 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C42986942265DBF922E58364 /* Pods_Runner.framework */; };
 		D9EB115029D4BEFD00B77775 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D9EB114F29D4BEFD00B77775 /* GoogleService-Info.plist */; };
+		E7AE64ACF5577C0D1E66FBDD /* Pods_Share_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B03843264CCCC8DDF7B189B /* Pods_Share_Extension.framework */; };
 		F65851052AC2EF210036C268 /* RunnerProfile.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = F6025A732AC02D3D001D4FD8 /* RunnerProfile.entitlements */; };
 		F65851062AC2EF210036C268 /* Runner.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = D9895F6A29D4AEFD00F6E619 /* Runner.entitlements */; };
 		F6AD2E792D74B07A00161496 /* Share Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F6AD2E6F2D74B07A00161496 /* Share Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -55,6 +56,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		04A1DA73F4CD01017B88941B /* Pods-Share Extension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Share Extension.debug.xcconfig"; path = "Target Support Files/Pods-Share Extension/Pods-Share Extension.debug.xcconfig"; sourceTree = "<group>"; };
+		06CAE6ABC4EBED22AF55D006 /* Pods-Share Extension.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Share Extension.profile.xcconfig"; path = "Target Support Files/Pods-Share Extension/Pods-Share Extension.profile.xcconfig"; sourceTree = "<group>"; };
+		095EAD5D1CFA9591A05E2957 /* Pods-Share Extension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Share Extension.release.xcconfig"; path = "Target Support Files/Pods-Share Extension/Pods-Share Extension.release.xcconfig"; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
@@ -63,6 +67,7 @@
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		7B03843264CCCC8DDF7B189B /* Pods_Share_Extension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Share_Extension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -79,7 +84,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		F6AD2E7E2D74B07A00161496 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		F6AD2E7E2D74B07A00161496 /* Exceptions for "Share Extension" folder in "Share Extension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -89,7 +94,18 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		F6AD2E702D74B07A00161496 /* Share Extension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (F6AD2E7E2D74B07A00161496 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "Share Extension"; sourceTree = "<group>"; };
+		F6AD2E702D74B07A00161496 /* Share Extension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F6AD2E7E2D74B07A00161496 /* Exceptions for "Share Extension" folder in "Share Extension" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = "Share Extension";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +121,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E7AE64ACF5577C0D1E66FBDD /* Pods_Share_Extension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -117,6 +134,9 @@
 				B0923C99B3D7D830E060FB78 /* Pods-Runner.debug.xcconfig */,
 				51D9E5C372C450446E9E9AFD /* Pods-Runner.release.xcconfig */,
 				51928F160581B0A70D51E7A1 /* Pods-Runner.profile.xcconfig */,
+				04A1DA73F4CD01017B88941B /* Pods-Share Extension.debug.xcconfig */,
+				095EAD5D1CFA9591A05E2957 /* Pods-Share Extension.release.xcconfig */,
+				06CAE6ABC4EBED22AF55D006 /* Pods-Share Extension.profile.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -125,6 +145,7 @@
 			isa = PBXGroup;
 			children = (
 				C42986942265DBF922E58364 /* Pods_Runner.framework */,
+				7B03843264CCCC8DDF7B189B /* Pods_Share_Extension.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -211,6 +232,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F6AD2E7F2D74B07A00161496 /* Build configuration list for PBXNativeTarget "Share Extension" */;
 			buildPhases = (
+				8ACED5C29474F0D58E48AC08 /* [CP] Check Pods Manifest.lock */,
 				F6AD2E6B2D74B07A00161496 /* Sources */,
 				F6AD2E6C2D74B07A00161496 /* Frameworks */,
 				F6AD2E6D2D74B07A00161496 /* Resources */,
@@ -223,8 +245,6 @@
 				F6AD2E702D74B07A00161496 /* Share Extension */,
 			);
 			name = "Share Extension";
-			packageProductDependencies = (
-			);
 			productName = "Share Extension";
 			productReference = F6AD2E6F2D74B07A00161496 /* Share Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -363,6 +383,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin\n";
+		};
+		8ACED5C29474F0D58E48AC08 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Share Extension-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
 		};
 		9740EEB61CF901F6004384FC /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -705,6 +747,7 @@
 		};
 		F6AD2E7B2D74B07A00161496 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 04A1DA73F4CD01017B88941B /* Pods-Share Extension.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -749,6 +792,7 @@
 		};
 		F6AD2E7C2D74B07A00161496 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 095EAD5D1CFA9591A05E2957 /* Pods-Share Extension.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -790,6 +834,7 @@
 		};
 		F6AD2E7D2D74B07A00161496 /* Profile */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 06CAE6ABC4EBED22AF55D006 /* Pods-Share Extension.profile.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;

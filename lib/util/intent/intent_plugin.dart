@@ -136,9 +136,9 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     );
 
     ReceiveSharingIntent.instance.getInitialMedia().then((mediaList) {
-      if(mediaList.isEmpty) return;
+      if (mediaList.isEmpty) return;
       FileUploadSettings? settings = ref.read(humHubProvider).fileUploadSettings;
-      if(settings == null) return;
+      if (settings == null) return;
 
       logInfo('Initial shared files: $mediaList');
     });

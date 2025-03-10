@@ -512,6 +512,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     if (errors.isNotEmpty) {
       showErrorDialog(errors);
     }
+    LoadingProvider.of(ref).dismissAll();
   }
 
   Future<List<dynamic>> processSharedFiles(List<SharedMediaFile> sharedFiles, FileUploadSettings settings, List<String> errors) async {
