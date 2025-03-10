@@ -5,9 +5,11 @@ import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/file_upload_settings.dart';
+import 'package:humhub/models/remote_file.dart';
 import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/hum_hub.dart';
@@ -83,41 +85,35 @@ class WebViewAppState extends ConsumerState<WebView> {
     }
   }
 
+  // Method to show the error dialog
+  void showErrorDialog(List<String> errors) {
+    showDialog(
+      context: context, // Ensure you have access to BuildContext
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Errors"),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: errors.map((error) => Text(error)).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.listen(
       intentProvider,
       (previous, next) async {
-        if (next.sharedFiles == null) return;
-
-        FileUploadSettings? settings = ref.read(humHubProvider).fileUploadSettings;
-        if (settings == null) return;
-
-        List<dynamic> data = [];
-
-        for (SharedMediaFile sharedMediaFile in next.sharedFiles!) {
-          // TODO: chunk it
-          Uint8List byteData = await File(sharedMediaFile.path).readAsBytes();
-          String base64String = base64Encode(byteData);
-          String filename = sharedMediaFile.path.split('/').last;
-
-          data.add({
-            'base64': base64String,
-            'filename': filename,
-            'mimeType': sharedMediaFile.mimeType ?? 'application/octet-stream',
-          });
-        }
-
-        WebViewGlobalController.ajaxPostFiles(
-          url: settings.fileUploadUrl,
-          data: data,
-          headers: ref.read(humHubProvider).customHeaders,
-          onResponse: (files) {
-            if (files == null) return;
-            WebViewGlobalController.triggerFileShareModal(files);
-            logDebug('Upload Response: $files');
-          },
-        );
+        handleSharedFiles(ref, next);
       },
     );
 
@@ -475,6 +471,101 @@ class WebViewAppState extends ConsumerState<WebView> {
         downloadTimer?.cancel();
       }
     });
+  }
+
+  void handleSharedFiles(WidgetRef ref, IntentState next) async {
+    List<String> errors = [];
+    try {
+      if (next.sharedFiles == null) return;
+
+      FileUploadSettings? settings = ref.read(humHubProvider).fileUploadSettings;
+      if (settings == null) {
+        errors.add('Sharing files for this instance is not supported');
+        return;
+      }
+
+      List<dynamic> data = await processSharedFiles(next.sharedFiles!, settings, errors);
+
+      if (data.isNotEmpty) {
+        WebViewGlobalController.ajaxPostFiles(
+          url: settings.fileUploadUrl,
+          data: data,
+          headers: ref.read(humHubProvider).customHeaders,
+          onResponse: (files) {
+            handleUploadResponse(files, errors);
+          },
+        );
+      }
+    } catch (er) {
+      logError(er);
+    }
+
+    if (errors.isNotEmpty) {
+      showErrorDialog(errors);
+    }
+  }
+
+  Future<List<dynamic>> processSharedFiles(List<SharedMediaFile> sharedFiles, FileUploadSettings settings, List<String> errors) async {
+    List<dynamic> data = [];
+
+    for (SharedMediaFile sharedMediaFile in sharedFiles) {
+      if (settings.allowedExtensions == null) {
+        errors.add('No file types allowed for this instance');
+        continue;
+      }
+      if (!settings.allowedExtensions!.contains(sharedMediaFile.getExtension())) {
+        errors.add('File ${sharedMediaFile.thumbnail} of type ${sharedMediaFile.type.value} is not supported');
+        continue;
+      }
+
+      Uint8List? byteData;
+      String filename = sharedMediaFile.path.split('/').last;
+
+      if (sharedMediaFile.type == SharedMediaType.image) {
+        File file = File(sharedMediaFile.path);
+        byteData = await FlutterImageCompress.compressWithFile(
+          file.path,
+          quality: settings.imageJpegQuality ?? 60,
+          numberOfRetries: 3,
+        );
+      } else {
+        byteData = await File(sharedMediaFile.path).readAsBytes();
+      }
+
+      if (byteData == null) {
+        errors.add('File ${sharedMediaFile.thumbnail} is empty');
+        continue;
+      }
+
+      String base64String = base64Encode(byteData);
+
+      data.add({
+        'base64': base64String,
+        'filename': filename,
+        'mimeType': sharedMediaFile.mimeType ?? 'application/octet-stream',
+      });
+    }
+
+    return data;
+  }
+
+  void handleUploadResponse(List<dynamic>? files, List<String> errors) {
+    if (files == null) return;
+
+    List<FileItemSuccessResponse> successFiles = files.whereType<FileItemSuccessResponse>().toList();
+    List<FileItemErrorResponse> errorFiles = files.whereType<FileItemErrorResponse>().toList();
+
+    if (successFiles.isNotEmpty) {
+      WebViewGlobalController.triggerFileShareModal(successFiles);
+    }
+    if (errorFiles.isNotEmpty) {
+      for (var errorFile in errorFiles) {
+        errors.addAll(errorFile.errors);
+      }
+      showErrorDialog(errors.toSet().toList());
+    }
+
+    logDebug('Upload Response: $files');
   }
 
   @override

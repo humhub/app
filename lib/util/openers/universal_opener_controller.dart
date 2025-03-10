@@ -1,10 +1,9 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:http/http.dart' as http;
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/crypt.dart';
 import '../api_provider.dart';
@@ -47,11 +46,11 @@ class UniversalOpenerController {
 
   checkHumHubModuleView(String url) async {
     Response? response;
-    response = await http.Client().get(Uri.parse(url)).catchError((err) {
-      return Response("Found manifest but not humhub.modules.ui.view tag", 404);
+    response = await Dio().get(Uri.parse(url).toString()).catchError((err) {
+      return Response(data: "Found manifest but not humhub.modules.ui.view tag", statusCode: 404, requestOptions: RequestOptions());
     });
 
-    doesViewExist = response.statusCode == 200 && response.body.contains('humhub.modules.ui.view');
+    doesViewExist = response.statusCode == 200 && response.data.contains('humhub.modules.ui.view');
   }
 
   Future<HumHub?> initHumHub() async {

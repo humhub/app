@@ -65,6 +65,8 @@ dependencies:
   cached_network_image: ^3.3.1
   talker_flutter: ^4.6.11
   quick_actions: ^1.1.0
+  mime: ^2.0.0
+  flutter_image_compress: ^2.4.0
 
 dependency_overrides:
   quick_actions_platform_interface:

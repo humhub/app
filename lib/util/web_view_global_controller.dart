@@ -54,7 +54,7 @@ class WebViewGlobalController {
     required String url,
     required List<dynamic> data,
     Map<String, String>? headers,
-    Function(List<FileItem>? files)? onResponse,
+    Function(List<FileItemBase>? files)? onResponse,
   }) async {
     String jsonHeaders = jsonEncode(headers ?? {});
     String jsonData = jsonEncode(data);
@@ -120,7 +120,7 @@ class WebViewGlobalController {
           handlerName: 'onAjaxSuccess',
           callback: (args) {
             if (args.isNotEmpty) {
-              onResponse(FileItem.listFromJson(args[0]));
+              onResponse(FileItemBase.listFromJson(args[0]['files']));
             } else {
               onResponse(null);
             }
@@ -143,17 +143,19 @@ class WebViewGlobalController {
     }
   }
 
-  static triggerFileShareModal(List<FileItem> files) async {
-    String guids = files.asMap().entries.map((entry) {
+  static triggerFileShareModal(List<FileItemSuccessResponse> successFiles) async {
+    // Use asMap after converting to List
+    String guids = successFiles.asMap().entries.map((entry) {
       int index = entry.key;
-      FileItem file = entry.value;
+      FileItemSuccessResponse file = entry.value;
       return 'fileList[$index]=${file.guid}';
     }).join('&');
 
     String jsCode = """
     \$('#globalModal').modal('show');
     \$('#globalModal .modal-content').load('https://cuzy.app/hhtest/content/content/create?$guids');
-    """;
+  """;
+
     await value?.evaluateJavascript(source: jsCode);
   }
 
