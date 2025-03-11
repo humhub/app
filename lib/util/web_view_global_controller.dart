@@ -143,7 +143,7 @@ class WebViewGlobalController {
     }
   }
 
-  static triggerFileShareModal(List<FileItemSuccessResponse> successFiles) async {
+  static triggerFileShareModal(List<FileItemSuccessResponse> successFiles, String shareIntentTargetUrl) async {
     // Use asMap after converting to List
     String guids = successFiles.asMap().entries.map((entry) {
       int index = entry.key;
@@ -153,7 +153,7 @@ class WebViewGlobalController {
 
     String jsCode = """
     \$('#globalModal').modal('show');
-    \$('#globalModal .modal-content').load('https://cuzy.app/hhtest/content/content/create?$guids');
+    \$('#globalModal .modal-content').load('$shareIntentTargetUrl?$guids');
   """;
 
     await value?.evaluateJavascript(source: jsCode);

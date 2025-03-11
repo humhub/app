@@ -565,8 +565,11 @@ class WebViewAppState extends ConsumerState<WebView> {
     List<FileItemSuccessResponse> successFiles = files.whereType<FileItemSuccessResponse>().toList();
     List<FileItemErrorResponse> errorFiles = files.whereType<FileItemErrorResponse>().toList();
 
+    String? shareIntendTargetUrl = ref.read(humHubProvider).fileUploadSettings?.shareIntendTargetUrl;
+    if(shareIntendTargetUrl == null) return;
+
     if (successFiles.isNotEmpty) {
-      WebViewGlobalController.triggerFileShareModal(successFiles);
+      WebViewGlobalController.triggerFileShareModal(successFiles, shareIntendTargetUrl);
     }
     if (errorFiles.isNotEmpty) {
       for (var errorFile in errorFiles) {

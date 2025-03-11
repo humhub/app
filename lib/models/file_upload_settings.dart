@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class FileUploadSettings {
   final String fileUploadUrl;
-  final String contentCreateUrl;
+  final String shareIntendTargetUrl;
   final int maxFileSize;
   final List<String>? allowedExtensions;
   final Size? imageMaxResolution;
@@ -15,7 +15,7 @@ class FileUploadSettings {
 
   FileUploadSettings({
     required this.fileUploadUrl,
-    required this.contentCreateUrl,
+    required this.shareIntendTargetUrl,
     required this.maxFileSize,
     this.allowedExtensions,
     this.imageMaxResolution,
@@ -30,7 +30,7 @@ class FileUploadSettings {
   factory FileUploadSettings.fromJson(Map<String, dynamic> json) {
     return FileUploadSettings(
       fileUploadUrl: json['fileUploadUrl'] as String,
-      contentCreateUrl: json['contentCreateUrl'] as String,
+      shareIntendTargetUrl: json['shareIntendTargetUrl'] ?? json['contentCreateUrl'] as String,
       maxFileSize: json['maxFileSize'] as int,
       allowedExtensions: (json['allowedExtensions'] as String?)
           ?.split(',')
@@ -57,7 +57,7 @@ class FileUploadSettings {
   Map<String, dynamic> toJson() {
     return {
       'fileUploadUrl': fileUploadUrl,
-      'contentCreateUrl': contentCreateUrl,
+      'contentCreateUrl': shareIntendTargetUrl,
       'maxFileSize': maxFileSize,
       'allowedExtensions': allowedExtensions?.join(','),
       'imageMaxResolution': imageMaxResolution != null
