@@ -10,7 +10,7 @@
  <dict>
  <key>com.humhub.app</key>
  <string>humhub_distribution_profile</string>
- <key>com.humhub.app.share.extension</key>
+ <key>com.humhub.app.shareextension</key>
  <string>humhub_share_extension_distribution_profile</string>
  </dict>
  </dict>
