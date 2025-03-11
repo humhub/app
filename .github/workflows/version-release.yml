@@ -169,7 +169,7 @@ jobs:
           cp $SE_PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Install Flutter
-        uses: subosito/flutter-action@v1
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.27.0'
           channel: 'stable'
