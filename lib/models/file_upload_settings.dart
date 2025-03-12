@@ -11,7 +11,7 @@ class FileUploadSettings {
   final int? imageWebpQuality;
   final int imageMaxProcessingMP;
   final bool denyDoubleFileExtensions;
-  final List<dynamic> converterOptions;
+  final List<dynamic>? converterOptions;
 
   FileUploadSettings({
     required this.fileUploadUrl,
@@ -24,7 +24,7 @@ class FileUploadSettings {
     this.imageWebpQuality,
     required this.imageMaxProcessingMP,
     required this.denyDoubleFileExtensions,
-    required this.converterOptions,
+    this.converterOptions,
   });
 
   factory FileUploadSettings.fromJson(Map<String, dynamic> json) {
@@ -50,7 +50,7 @@ class FileUploadSettings {
       imageWebpQuality: json['imageWebpQuality'] as int?,
       imageMaxProcessingMP: json['imageMaxProcessingMP'] as int,
       denyDoubleFileExtensions: json['denyDoubleFileExtensions'] as bool,
-      converterOptions: (json['converterOptions'] as List<dynamic>).map((e) => e).toList(),
+      converterOptions: json['converterOptions'] != null ? (json['converterOptions'] as List<dynamic>).map((e) => e).toList() : null,
     );
   }
 
@@ -60,9 +60,7 @@ class FileUploadSettings {
       'contentCreateUrl': shareIntendTargetUrl,
       'maxFileSize': maxFileSize,
       'allowedExtensions': allowedExtensions?.join(','),
-      'imageMaxResolution': imageMaxResolution != null
-          ? '${imageMaxResolution!.width.toInt()}x${imageMaxResolution!.height.toInt()}'
-          : null,
+      'imageMaxResolution': imageMaxResolution != null ? '${imageMaxResolution!.width.toInt()}x${imageMaxResolution!.height.toInt()}' : null,
       'imageJpegQuality': imageJpegQuality,
       'imagePngCompressionLevel': imagePngCompressionLevel,
       'imageWebpQuality': imageWebpQuality,
