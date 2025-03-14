@@ -2,21 +2,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 class IntentState {
-  final List<SharedMediaFile>? sharedFiles;
+  final List<SharedMediaFile>? _sharedFiles;
   final String? sharedText;
   final Object? error;
   final Uri? initialUri;
   final Uri? latestUri;
 
   IntentState({
-    this.sharedFiles,
+    List<SharedMediaFile>? sharedFiles,
     this.sharedText,
     this.error,
     this.initialUri,
     this.latestUri,
-  });
+  }) : _sharedFiles = sharedFiles;
 
-  // Create a copyWith method to update specific properties
+  bool isSharedFilesNullOrEmpty() {
+    return _sharedFiles == null || _sharedFiles.isEmpty;
+  }
+
   IntentState copyWith({
     List<SharedMediaFile>? sharedFiles,
     String? sharedText,
@@ -25,7 +28,7 @@ class IntentState {
     Uri? latestUri,
   }) {
     return IntentState(
-      sharedFiles: sharedFiles ?? this.sharedFiles,
+      sharedFiles: sharedFiles ?? _sharedFiles,
       sharedText: sharedText ?? this.sharedText,
       error: error ?? this.error,
       initialUri: initialUri ?? this.initialUri,
@@ -56,10 +59,17 @@ class IntentNotifier extends StateNotifier<IntentState> {
   void setLatestUri(Uri? uri) {
     state = state.copyWith(latestUri: uri);
   }
+
+  List<SharedMediaFile>? useSharedFiles() {
+    final files = state._sharedFiles;
+    if (files != null) {
+      state = state.copyWith(sharedFiles: []);
+    }
+    return files;
+  }
+
 }
 
 final intentProvider = StateNotifierProvider<IntentNotifier, IntentState>(
       (ref) => IntentNotifier(),
 );
-
-
