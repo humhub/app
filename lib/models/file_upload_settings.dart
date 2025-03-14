@@ -32,7 +32,7 @@ class FileUploadSettings {
       fileUploadUrl: json['fileUploadUrl'] as String,
       shareIntendTargetUrl: json['shareIntendTargetUrl'] ?? json['contentCreateUrl'] as String,
       maxFileSize: json['maxFileSize'] as int,
-      allowedExtensions: (json['allowedExtensions'] as String?)?.isNotEmpty == true ? json['allowedExtensions'].split(',').map((e) => e.trim()).toList() : null,
+      allowedExtensions: json['allowedExtensions'] != null ? processExtensions(extensionsString: json['allowedExtensions']) : null,
       imageMaxResolution: json['imageMaxResolution'] != null
           ? (() {
               final parts = (json['imageMaxResolution'] as String).split('x');
@@ -65,5 +65,15 @@ class FileUploadSettings {
       'denyDoubleFileExtensions': denyDoubleFileExtensions,
       'converterOptions': converterOptions,
     };
+  }
+
+  static List<String>? processExtensions({required String extensionsString}) {
+    if (extensionsString.trim().isEmpty) {
+      return null;
+    }
+
+    final List<String> result = extensionsString.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+
+    return result.isEmpty ? null : result;
   }
 }

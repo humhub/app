@@ -135,20 +135,22 @@ class WebViewAppState extends ConsumerState<WebView> {
           child: WillPopScope(
             onWillPop: () => exitApp(context, ref),
             child: InAppWebView(
-              initialUrlRequest: _initialRequest,
-              initialSettings: WebViewGlobalController.settings(),
-              pullToRefreshController: _pullToRefreshController,
-              shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
-              onWebViewCreated: _onWebViewCreated,
-              shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
-              onCreateWindow: _onCreateWindow,
-              onLoadStop: _onLoadStop,
-              onLoadStart: _onLoadStart,
-              onProgressChanged: _onProgressChanged,
-              onReceivedError: _onReceivedError,
-              onDownloadStartRequest: _onDownloadStartRequest,
-              onLongPressHitTestResult: WebViewGlobalController.onLongPressHitTestResult,
-            ),
+                initialUrlRequest: _initialRequest,
+                initialSettings: WebViewGlobalController.settings(),
+                pullToRefreshController: _pullToRefreshController,
+                shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
+                onWebViewCreated: _onWebViewCreated,
+                shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
+                onCreateWindow: _onCreateWindow,
+                onLoadStop: _onLoadStop,
+                onLoadStart: _onLoadStart,
+                onProgressChanged: _onProgressChanged,
+                onReceivedError: _onReceivedError,
+                onDownloadStartRequest: _onDownloadStartRequest,
+                onLongPressHitTestResult: WebViewGlobalController.onLongPressHitTestResult,
+                onReceivedHttpError: (controller, request, errorResponse) {
+                  logError(errorResponse);
+                }),
           )),
     );
   }
