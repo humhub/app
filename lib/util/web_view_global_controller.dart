@@ -60,58 +60,58 @@ class WebViewGlobalController {
     String jsonData = jsonEncode(data);
 
     String jsCode = """
-        new Promise((resolve, reject) => {
+    new Promise((resolve, reject) => {
         try {
           var formData = new FormData();
           var parsedData = JSON.parse('$jsonData');
-      
+
+          // File processing remains the same
           for (var key in parsedData) {
             var value = parsedData[key];
-      
-            // Decode Base64 string to binary data
             var binaryString = atob(value.base64);
             var binaryLength = binaryString.length;
             var binaryArray = new Uint8Array(binaryLength);
-      
+
             for (var i = 0; i < binaryLength; i++) {
               binaryArray[i] = binaryString.charCodeAt(i);
             }
-      
-            // Create Blob and File from the decoded binary data
+
             var blob = new Blob([binaryArray], { type: value.mimeType });
             var file = new File([blob], value.filename, { type: value.mimeType });
-      
-            // Append file to FormData
             formData.append('files[]', file);
           }
-      
-          // Make AJAX POST request using fetch
-          fetch('$url', {
+
+          // jQuery AJAX implementation
+          \$.ajax({
+            url: '$url',
             method: 'POST',
-            body: formData,
-            headers: JSON.parse('$jsonHeaders')
-          })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error(`HTTP error! status: \${response.status}`);
-              }
-              return response.json(); // Assuming the server responds with JSON
-            })
-            .then(data => {
-              const jsonString = JSON.stringify(data);
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: JSON.parse('$jsonHeaders'),
+            success: function(data) {
               window.flutter_inappwebview.callHandler('onAjaxSuccess', data);
               resolve(data);
-            })
-            .catch(error => {
-              window.flutter_inappwebview.callHandler('onAjaxError', { status: error.status || 'unknown', error: error.message });
-              reject({ status: error.status || 'unknown', error: error.message });
-            });
+            },
+            error: function(xhr) {
+              var error = {
+                status: xhr.status || 'unknown',
+                error: xhr.responseText || xhr.statusText
+              };
+              window.flutter_inappwebview.callHandler('onAjaxError', error);
+              reject(error);
+            }
+          });
         } catch (e) {
           console.error('Error in AJAX request:', e);
+          window.flutter_inappwebview.callHandler('onAjaxError', { 
+            status: 'exception', 
+            error: e.message 
+          });
           reject(e);
         }
       });
-     """;
+""";
 
     try {
       await value?.evaluateJavascript(source: jsCode);
