@@ -519,11 +519,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     List<dynamic> data = [];
 
     for (SharedMediaFile sharedMediaFile in sharedFiles) {
-      if (settings.allowedExtensions == null) {
-        errors.add('No file types allowed for this instance');
-        continue;
-      }
-      if (!settings.allowedExtensions!.contains(sharedMediaFile.getExtension())) {
+      if (settings.allowedExtensions != null && !settings.allowedExtensions!.contains(sharedMediaFile.getExtension())) {
         errors.add('File ${sharedMediaFile.thumbnail} of type ${sharedMediaFile.type.value} is not supported');
         continue;
       }
@@ -566,7 +562,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     List<FileItemErrorResponse> errorFiles = files.whereType<FileItemErrorResponse>().toList();
 
     String? shareIntendTargetUrl = ref.read(humHubProvider).fileUploadSettings?.shareIntendTargetUrl;
-    if(shareIntendTargetUrl == null) return;
+    if (shareIntendTargetUrl == null) return;
 
     if (successFiles.isNotEmpty) {
       WebViewGlobalController.triggerFileShareModal(successFiles, shareIntendTargetUrl);

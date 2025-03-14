@@ -32,10 +32,7 @@ class FileUploadSettings {
       fileUploadUrl: json['fileUploadUrl'] as String,
       shareIntendTargetUrl: json['shareIntendTargetUrl'] ?? json['contentCreateUrl'] as String,
       maxFileSize: json['maxFileSize'] as int,
-      allowedExtensions: (json['allowedExtensions'] as String?)
-          ?.split(',')
-          .map((e) => e.trim()) // Optional: To remove any extra spaces
-          .toList(),
+      allowedExtensions: (json['allowedExtensions'] as String?)?.isNotEmpty == true ? json['allowedExtensions'].split(',').map((e) => e.trim()).toList() : null,
       imageMaxResolution: json['imageMaxResolution'] != null
           ? (() {
               final parts = (json['imageMaxResolution'] as String).split('x');
