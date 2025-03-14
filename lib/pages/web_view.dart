@@ -30,6 +30,7 @@ import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/router.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
+import 'package:mime/mime.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'package:humhub/util/router.dart' as m;
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
@@ -490,7 +491,13 @@ class WebViewAppState extends ConsumerState<WebView> {
         errors.add('Sharing files for this instance is not supported');
         return;
       }
+
+      if (ref.read(intentProvider.notifier).filesSumSizeMb > 70) {
+        errors.add('Files to big to share, limit is 70MB');
+        return;
+      }
       List<SharedMediaFile>? files = ref.read(intentProvider.notifier).useSharedFiles()!;
+
       List<dynamic> data = await processSharedFiles(files, settings, errors);
 
       if (data.isNotEmpty) {
@@ -510,7 +517,6 @@ class WebViewAppState extends ConsumerState<WebView> {
     if (errors.isNotEmpty) {
       showErrorDialog(errors);
     }
-    LoadingProvider.of(ref).dismissAll();
   }
 
   Future<List<dynamic>> processSharedFiles(List<SharedMediaFile> sharedFiles, FileUploadSettings settings, List<String> errors) async {
@@ -546,7 +552,7 @@ class WebViewAppState extends ConsumerState<WebView> {
       data.add({
         'base64': base64String,
         'filename': filename,
-        'mimeType': sharedMediaFile.mimeType ?? 'application/octet-stream',
+        'mimeType': lookupMimeType(sharedMediaFile.path) ?? 'application/octet-stream',
       });
     }
 

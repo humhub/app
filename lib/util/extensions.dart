@@ -108,8 +108,9 @@ extension IterableX<E> on Iterable<E> {
 
 extension SharedMediaFileExtension on SharedMediaFile {
   String? getExtension() {
-    if (mimeType == null) return null;
-    return extensionFromMime(mimeType!);
+    String? mimeType = lookupMimeType(path);
+    if(mimeType == null) return null;
+    return extensionFromMime(mimeType);
   }
 }
 
