@@ -106,12 +106,26 @@ extension IterableX<E> on Iterable<E> {
   }
 }
 
+/// Extension on SharedMediaFile to improve MIME type and file extension handling.
+///
+/// This extension ensures that MIME types are always specific (e.g., 'image/jpeg')
+/// and provides the corresponding file extension using the `mime` package.
 extension SharedMediaFileExtension on SharedMediaFile {
-  String? getExtension() {
+
+  /// Gets the file extension based on the MIME type of the file.
+  String? get fileExtension {
     String? mimeType = lookupMimeType(path);
-    if(mimeType == null) return null;
+    if (mimeType == null) return null;
     return extensionFromMime(mimeType);
   }
+
+  /// Retrieves the MIME type of the file based on its path.
+  String? get mimeTypeFromPath => lookupMimeType(path);
 }
+
+extension ListExtension<T> on List<T>? {
+  bool get isNullOrEmpty => this == null || this!.isEmpty;
+}
+
 
 

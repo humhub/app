@@ -6,7 +6,7 @@ import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/util/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 
-class FileHandler {
+class FileDownloadManager {
   final InAppWebViewController controller;
   final DownloadStartRequest downloadStartRequest;
   final String? filename;
@@ -65,7 +65,7 @@ class FileHandler {
     }
   """;
 
-  const FileHandler({
+  const FileDownloadManager({
     required this.controller,
     required this.downloadStartRequest,
     required this.onSuccess,

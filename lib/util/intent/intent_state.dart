@@ -42,6 +42,9 @@ class IntentState {
 class IntentNotifier extends StateNotifier<IntentState> {
   IntentNotifier() : super(IntentState());
 
+  IntentState get currentState => state;
+
+
   void setSharedFiles(List<SharedMediaFile>? files) {
     state = state.copyWith(sharedFiles: files);
   }

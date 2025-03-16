@@ -21,7 +21,7 @@ import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:humhub/util/file_handler.dart';
+import 'package:humhub/util/file_download_manager.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 
 class WebViewF extends ConsumerStatefulWidget {
@@ -281,7 +281,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     Timer? downloadTimer;
     bool isDone = false;
 
-    FileHandler(
+    FileDownloadManager(
       downloadStartRequest: downloadStartRequest,
       controller: controller,
       onSuccess: (File file, String filename) async {

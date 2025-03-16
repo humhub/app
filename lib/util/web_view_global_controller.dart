@@ -4,8 +4,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/global_user_agent.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/models/remote_file.dart';
-import 'package:loggy/loggy.dart';
 
 class WebViewGlobalController {
   static InAppWebViewController? _value;
@@ -48,115 +46,6 @@ class WebViewGlobalController {
           });
     """;
     value?.evaluateJavascript(source: jsCode4);
-  }
-
-  static Future<void> ajaxPostFiles({
-    required String url,
-    required List<dynamic> data,
-    Map<String, String>? headers,
-    Function(List<FileItemBase>? files)? onResponse,
-  }) async {
-    String jsonHeaders = jsonEncode(headers ?? {});
-    String jsonData = jsonEncode(data);
-
-    String jsCode = """
-    new Promise((resolve, reject) => {
-        try {
-          var formData = new FormData();
-          var parsedData = JSON.parse('$jsonData');
-
-          // File processing remains the same
-          for (var key in parsedData) {
-            var value = parsedData[key];
-            var binaryString = atob(value.base64);
-            var binaryLength = binaryString.length;
-            var binaryArray = new Uint8Array(binaryLength);
-
-            for (var i = 0; i < binaryLength; i++) {
-              binaryArray[i] = binaryString.charCodeAt(i);
-            }
-
-            var blob = new Blob([binaryArray], { type: value.mimeType });
-            var file = new File([blob], value.filename, { type: value.mimeType });
-            formData.append('files[]', file);
-          }
-
-          // jQuery AJAX implementation
-          \$.ajax({
-            url: '$url',
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            headers: JSON.parse('$jsonHeaders'),
-            success: function(data) {
-              window.flutter_inappwebview.callHandler('onAjaxSuccess', data);
-              resolve(data);
-            },
-            error: function(xhr) {
-              var error = {
-                status: xhr.status || 'unknown',
-                error: xhr.responseText || xhr.statusText
-              };
-              window.flutter_inappwebview.callHandler('onAjaxError', error);
-              reject(error);
-            }
-          });
-        } catch (e) {
-          console.error('Error in AJAX request:', e);
-          window.flutter_inappwebview.callHandler('onAjaxError', { 
-            status: 'exception', 
-            error: e.message 
-          });
-          reject(e);
-        }
-      });
-""";
-
-    try {
-      await value?.evaluateJavascript(source: jsCode);
-      if (onResponse != null) {
-        value?.addJavaScriptHandler(
-          handlerName: 'onAjaxSuccess',
-          callback: (args) {
-            if (args.isNotEmpty) {
-              onResponse(FileItemBase.listFromJson(args[0]['files']));
-            } else {
-              onResponse(null);
-            }
-          },
-        );
-
-        value?.addJavaScriptHandler(
-          handlerName: 'onAjaxError',
-          callback: (args) {
-            logError('AJAX Error: ${args[0]}');
-            onResponse(null);
-          },
-        );
-      }
-    } catch (e) {
-      logError('Error during ajaxPost execution: $e');
-      if (onResponse != null) {
-        onResponse(null);
-      }
-    }
-  }
-
-  static triggerFileShareModal(List<FileItemSuccessResponse> successFiles, String shareIntentTargetUrl) async {
-    // Use asMap after converting to List
-    String guids = successFiles.asMap().entries.map((entry) {
-      int index = entry.key;
-      FileItemSuccessResponse file = entry.value;
-      return 'fileList[$index]=${file.guid}';
-    }).join('&');
-
-    String jsCode = """
-    \$('#globalModal').modal('show');
-    \$('#globalModal .modal-content').load('$shareIntentTargetUrl?$guids');
-  """;
-
-    await value?.evaluateJavascript(source: jsCode);
   }
 
   static void ajaxSetHeaders({Map<String, String>? headers}) {
