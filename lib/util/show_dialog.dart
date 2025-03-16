@@ -79,7 +79,7 @@ class ErrorListPopup extends StatelessWidget {
         ),
       ),
       actions: [
-        Container(
+        SizedBox(
           width: double.infinity,
           height: 30,
           child: OutlinedButton(
