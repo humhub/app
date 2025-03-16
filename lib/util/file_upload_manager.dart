@@ -14,6 +14,7 @@ import 'package:humhub/util/show_dialog.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'intent/intent_state.dart';
 
@@ -43,7 +44,7 @@ class FileUploadManager {
     List<dynamic> requestData = await _getRequestData(files, fileUploadSettings!);
     if (requestData.isNullOrEmpty) {
       if (context.mounted) {
-        ShowDialog.of(context).intentErrors(errors!);
+        ShowDialog.of(context).intentErrors([AppLocalizations.of(context)!.unexpected_error]);
       }
       return;
     }
@@ -66,25 +67,25 @@ class FileUploadManager {
   List<String>? _validateRequest(List<SharedMediaFile>? files) {
     List<String> errors = [];
     if (fileUploadSettings == null) {
-      errors.add('Sharing files for this instance is not supported, contact admin');
+      errors.add(AppLocalizations.of(context)!.sharing_not_supported);
       logError(errors);
       return errors;
     }
 
     if (files.isNullOrEmpty) {
-      errors.add('No files found to share');
+      errors.add(AppLocalizations.of(context)!.no_files_to_share);
       logError(errors);
       return errors;
     }
     if (intentNotifier.filesSumSizeMb > 70) {
-      errors.add('Files to big to share, limit is 70MB');
+      errors.add(AppLocalizations.of(context)!.files_too_gig);
       logError(errors);
       return errors;
     }
 
     for (SharedMediaFile file in files!) {
       if (fileUploadSettings!.allowedExtensions != null && !fileUploadSettings!.allowedExtensions!.contains(file.fileExtension)) {
-        errors.add('File ${file.thumbnail} of type ${file.type.value} is not supported');
+        errors.add(AppLocalizations.of(context)!.file_type_not_supported(file.thumbnail ?? '', file.type.value));
         logError(errors);
         continue;
       }
@@ -95,7 +96,7 @@ class FileUploadManager {
   List<String>? _validateResponse(List<SharedFileItem>? files) {
     List<String> errors = [];
     if (files.isNullOrEmpty) {
-      errors.add('No files were uploaded, contact admin for support');
+      errors.add(AppLocalizations.of(context)!.no_files_uploaded);
       logError(errors);
       return errors;
     }
@@ -107,7 +108,7 @@ class FileUploadManager {
     }
 
     if (successFiles.isNullOrEmpty) {
-      errors.add('No files were uploaded, contact admin for support');
+      errors.add(AppLocalizations.of(context)!.no_files_uploaded);
       logError(errors);
     }
     return errors.isNullOrEmpty ? null : errors;
@@ -131,7 +132,6 @@ class FileUploadManager {
       } else {
         byteData = await File(sharedMediaFile.path).readAsBytes();
       }
-
       String base64String = base64Encode(byteData);
 
       data.add({
@@ -157,7 +157,6 @@ class FileUploadManager {
               var formData = new FormData();
               var parsedData = JSON.parse('$jsonData');
     
-              // File processing remains the same
               for (var key in parsedData) {
                 var value = parsedData[key];
                 var binaryString = atob(value.base64);
@@ -173,7 +172,6 @@ class FileUploadManager {
                 formData.append('files[]', file);
               }
     
-              // jQuery AJAX implementation
               \$.ajax({
                 url: '${fileUploadSettings!.fileUploadUrl}',
                 method: 'POST',
@@ -228,7 +226,6 @@ class FileUploadManager {
   }
 
   _showFileShareModal(List<SharedFileItemSuccess> successFiles) async {
-    // Use asMap after converting to List
     String guids = successFiles.asMap().entries.map((entry) {
       int index = entry.key;
       SharedFileItemSuccess file = entry.value;

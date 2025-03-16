@@ -52,5 +52,22 @@
 
   "error_404": "Ihre HumHub-Installation existiert nicht.",
   "error_no_connection": "Bitte überprüfen Sie Ihre Internetverbindung.",
-  "error_url_empty": "Geben Sie den Standort Ihrer HumHub-Installation an."
+  "error_url_empty": "Geben Sie den Standort Ihrer HumHub-Installation an.",
+
+  "sharing_not_supported": "Das Teilen von Dateien ist für diese Instanz nicht unterstützt, kontaktieren Sie den Administrator",
+  "no_files_to_share": "Keine Dateien zum Teilen gefunden",
+  "files_too_gig": "Dateien zu groß zum Teilen, Limit ist 70 MB",
+  "no_files_uploaded": "Es wurden keine Dateien hochgeladen, kontaktieren Sie den Administrator für Unterstützung",
+  "unexpected_error": "Unerwarteter Fehler",
+  "file_type_not_supported": "Datei {filename} vom Typ {fileType} wird nicht unterstützt",
+  "@file_type_not_supported": {
+    "placeholders": {
+      "filename": {
+        "type": "String"
+      },
+      "fileType": {
+        "type": "String"
+      }
+    }
+  }
 }
