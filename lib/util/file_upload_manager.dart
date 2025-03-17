@@ -6,7 +6,6 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/file_upload_settings.dart';
-import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/shared_file_item.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/providers.dart';
@@ -18,21 +17,32 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'intent/intent_state.dart';
 
+/// Manages file uploads in the application
 class FileUploadManager {
   final InAppWebViewController webViewController;
   final IntentNotifier intentNotifier;
   final FileUploadSettings? fileUploadSettings;
-  final HumHub? humhub;
+  final Map<String, String>? requestHeaders;
   final BuildContext context;
 
+  /// Constructor for FileUploadManager
+  ///
+  /// [webViewController] is required for interacting with the web view
+  /// [intentNotifier] is needed to access shared files
+  /// [fileUploadSettings] contains configuration for file uploads
+  /// [context] is necessary for showing dialogs and accessing localizations
+  /// [requestHeaders] is optional and adds custom headers for requests
   const FileUploadManager({
     required this.webViewController,
     required this.intentNotifier,
     required this.fileUploadSettings,
     required this.context,
-    this.humhub,
+    this.requestHeaders,
   });
 
+  /// Initiates the file upload process
+  ///
+  /// [showShareModal] determines whether to show a web share modal after upload
   Future<void> upload({bool showShareModal = true}) async {
     if (!context.mounted || intentNotifier.currentState.isSharedFilesNullOrEmpty()) return;
     List<SharedMediaFile>? files = intentNotifier.useSharedFiles()!;
@@ -64,6 +74,10 @@ class FileUploadManager {
     );
   }
 
+  /// Validates the upload request
+  ///
+  /// [files] is the list of shared media files to be validated
+  /// Returns a list of error messages, or null if no errors
   List<String>? _validateRequest(List<SharedMediaFile>? files) {
     List<String> errors = [];
     if (fileUploadSettings == null) {
@@ -93,6 +107,10 @@ class FileUploadManager {
     return errors.isEmpty ? null : errors;
   }
 
+  /// Validates the upload response
+  ///
+  /// [files] is the list of shared file items returned from the upload
+  /// Returns a list of error messages, or null if no errors
   List<String>? _validateResponse(List<SharedFileItem>? files) {
     List<String> errors = [];
     if (files.isNullOrEmpty) {
@@ -114,6 +132,11 @@ class FileUploadManager {
     return errors.isNullOrEmpty ? null : errors;
   }
 
+  /// Prepares the request data for file upload
+  ///
+  /// [sharedFiles] is the list of shared media files to be uploaded
+  /// [settings] contains the file upload configuration
+  /// Returns a list of maps containing file data
   Future<List<Map<String, String>>> _getRequestData(List<SharedMediaFile> sharedFiles, FileUploadSettings settings) async {
     List<Map<String, String>> data = [];
 
@@ -144,11 +167,15 @@ class FileUploadManager {
     return data;
   }
 
+  /// Performs an AJAX POST request to upload files
+  ///
+  /// [data] is the file data to be uploaded
+  /// [onResponse] is a callback function to handle the response
   Future<void> ajaxPostFiles({
     required List<dynamic> data,
     Function(List<SharedFileItem>? files)? onResponse,
   }) async {
-    String jsonHeaders = jsonEncode(humhub?.customHeaders ?? {});
+    String jsonHeaders = jsonEncode(requestHeaders ?? {});
     String jsonData = jsonEncode(data);
 
     String jsCode = """
@@ -225,6 +252,9 @@ class FileUploadManager {
     }
   }
 
+  /// Shows a modal dialog for sharing uploaded files
+  ///
+  /// [successFiles] is a list of successfully uploaded files
   _showFileShareModal(List<SharedFileItemSuccess> successFiles) async {
     String guids = successFiles.asMap().entries.map((entry) {
       int index = entry.key;
@@ -241,6 +271,7 @@ class FileUploadManager {
   }
 }
 
+/// Widget that manages file uploads in the context of the widget tree
 class FileUploadManagerWidget extends ConsumerStatefulWidget {
   final Widget child;
   const FileUploadManagerWidget({super.key, required this.child});
