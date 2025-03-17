@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
@@ -71,18 +69,6 @@ class IntentNotifier extends StateNotifier<IntentState> {
       state = state.copyWith(sharedFiles: []);
     }
     return files;
-  }
-
-  double  get filesSumSizeMb  {
-    if (state._sharedFiles == null) return 0;
-    double totalSizeMB = 0.0;
-    for (var file in state._sharedFiles!) {
-      File fileObj = File(file.path);
-      int fileSizeBytes = fileObj.lengthSync();
-      double fileSizeMB = fileSizeBytes / (1024 * 1024);
-      totalSizeMB += fileSizeMB;
-    }
-    return totalSizeMB;
   }
 }
 

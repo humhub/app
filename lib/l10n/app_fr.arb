@@ -56,7 +56,14 @@
 
   "sharing_not_supported": "Le partage de fichiers n'est pas pris en charge pour cette instance, contactez l'administrateur",
   "no_files_to_share": "Aucun fichier trouvé à partager",
-  "files_too_gig": "Fichiers trop volumineux pour être partagés, la limite est de 70 Mo",
+  "files_too_big": "Fichiers trop volumineux pour être partagés, la limite est de {limit} Mo",
+  "@files_too_big": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
   "no_files_uploaded": "Aucun fichier n'a été téléchargé, contactez l'administrateur pour obtenir de l'aide",
   "unexpected_error": "Erreur inattendue",
   "file_type_not_supported": "Le fichier {filename} de type {fileType} n'est pas pris en charge",

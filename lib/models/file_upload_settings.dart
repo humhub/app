@@ -27,6 +27,14 @@ class FileUploadSettings {
     this.converterOptions,
   });
 
+  double get maxFileSizeInMB => maxFileSize / (1024 * 1024);
+
+  double get effectiveMaxFileSize {
+    const double mobileMaxLimit = 70.0;
+    double backendLimit = maxFileSizeInMB;
+    return backendLimit < mobileMaxLimit ? backendLimit : mobileMaxLimit;
+  }
+
   factory FileUploadSettings.fromJson(Map<String, dynamic> json) {
     return FileUploadSettings(
       fileUploadUrl: json['fileUploadUrl'] as String,

@@ -91,8 +91,9 @@ class FileUploadManager {
       logError(errors);
       return errors;
     }
-    if (intentNotifier.filesSumSizeMb > 70) {
-      errors.add(AppLocalizations.of(context)!.files_too_gig);
+    if (_filesSizeMb(files) > fileUploadSettings!.effectiveMaxFileSize) {
+      int limit = fileUploadSettings!.effectiveMaxFileSize.round();
+      errors.add(AppLocalizations.of(context)!.files_too_big(limit));
       logError(errors);
       return errors;
     }
@@ -268,6 +269,18 @@ class FileUploadManager {
   """;
 
     await webViewController.evaluateJavascript(source: jsCode);
+  }
+
+  double _filesSizeMb(List<SharedMediaFile>? files) {
+    if (files.isNullOrEmpty) return 0;
+    double totalSizeMB = 0.0;
+    for (var file in files!) {
+      File fileObj = File(file.path);
+      int fileSizeBytes = fileObj.lengthSync();
+      double fileSizeMB = fileSizeBytes / (1024 * 1024);
+      totalSizeMB += fileSizeMB;
+    }
+    return totalSizeMB;
   }
 }
 
