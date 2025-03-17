@@ -9,7 +9,6 @@ import 'package:humhub/models/file_upload_settings.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/intent/mail_link_provider.dart';
-import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
