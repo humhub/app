@@ -16,8 +16,10 @@ import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/crypt.dart';
 import 'package:humhub/util/extensions.dart';
-import 'package:humhub/util/file_handler.dart';
+import 'package:humhub/util/file_download_manager.dart';
+import 'package:humhub/util/file_upload_manager.dart';
 import 'package:humhub/util/init_from_url.dart';
+import 'package:humhub/util/intent/intent_state.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
@@ -48,11 +50,11 @@ class WebViewAppState extends ConsumerState<WebView> {
   late PullToRefreshController _pullToRefreshController;
   HeadlessInAppWebView? _headlessWebView;
   bool _isInit = false;
-  late double downloadProgress = 0;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // Listen to the provider's state changes
     if (!_isInit) {
       _initialRequest = _initRequest;
       _pullToRefreshController = PullToRefreshController(
@@ -63,10 +65,8 @@ class WebViewAppState extends ConsumerState<WebView> {
           if (Platform.isAndroid) {
             WebViewGlobalController.value?.reload();
           } else if (Platform.isIOS) {
-            WebViewGlobalController.value?.loadUrl(
-                urlRequest: URLRequest(
-                    url: await WebViewGlobalController.value?.getUrl(),
-                    headers: ref.read(humHubProvider).customHeaders));
+            WebViewGlobalController.value
+                ?.loadUrl(urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl(), headers: ref.read(humHubProvider).customHeaders));
           }
         },
       );
@@ -90,20 +90,24 @@ class WebViewAppState extends ConsumerState<WebView> {
           // ignore: deprecated_member_use
           child: WillPopScope(
             onWillPop: () => exitApp(context, ref),
-            child: InAppWebView(
-              initialUrlRequest: _initialRequest,
-              initialSettings: WebViewGlobalController.settings(),
-              pullToRefreshController: _pullToRefreshController,
-              shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
-              onWebViewCreated: _onWebViewCreated,
-              shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
-              onCreateWindow: _onCreateWindow,
-              onLoadStop: _onLoadStop,
-              onLoadStart: _onLoadStart,
-              onProgressChanged: _onProgressChanged,
-              onReceivedError: _onReceivedError,
-              onDownloadStartRequest: _onDownloadStartRequest,
-              onLongPressHitTestResult: WebViewGlobalController.onLongPressHitTestResult,
+            child: FileUploadManagerWidget(
+              child: InAppWebView(
+                  initialUrlRequest: _initialRequest,
+                  initialSettings: WebViewGlobalController.settings(),
+                  pullToRefreshController: _pullToRefreshController,
+                  shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
+                  onWebViewCreated: _onWebViewCreated,
+                  shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
+                  onCreateWindow: _onCreateWindow,
+                  onLoadStop: _onLoadStop,
+                  onLoadStart: _onLoadStart,
+                  onProgressChanged: _onProgressChanged,
+                  onReceivedError: _onReceivedError,
+                  onDownloadStartRequest: _onDownloadStartRequest,
+                  onLongPressHitTestResult: WebViewGlobalController.onLongPressHitTestResult,
+                  onReceivedHttpError: (controller, request, errorResponse) {
+                    logError(errorResponse);
+                  }),
             ),
           )),
     );
@@ -134,8 +138,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     return URLRequest(url: WebUri(url ?? _manifest.startUrl), headers: ref.read(humHubProvider).customHeaders);
   }
 
-  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
-      InAppWebViewController controller, NavigationAction action) async {
+  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(InAppWebViewController controller, NavigationAction action) async {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
@@ -152,16 +155,12 @@ class WebViewAppState extends ConsumerState<WebView> {
       return NavigationActionPolicy.CANCEL;
     }
     // For all other external links
-    if (!url.startsWith(_manifest.baseUrl) &&
-        !action.isForMainFrame &&
-        action.navigationType == NavigationType.LINK_ACTIVATED) {
+    if (!url.startsWith(_manifest.baseUrl) && !action.isForMainFrame && action.navigationType == NavigationType.LINK_ACTIVATED) {
       await launchUrl(action.request.url!.uriValue, mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
-    if (Platform.isAndroid ||
-        action.navigationType == NavigationType.LINK_ACTIVATED ||
-        action.navigationType == NavigationType.FORM_SUBMITTED) {
+    if (Platform.isAndroid || action.navigationType == NavigationType.LINK_ACTIVATED || action.navigationType == NavigationType.FORM_SUBMITTED) {
       Map<String, String> mergedMap = {...?_initialRequest.headers, ...?action.request.headers};
       URLRequest newRequest = action.request.copyWith(headers: mergedMap);
       controller.loadUrl(urlRequest: newRequest);
@@ -218,11 +217,9 @@ class WebViewAppState extends ConsumerState<WebView> {
   _onLoadStop(InAppWebViewController controller, Uri? url) {
     // Disable remember me checkbox on login and set def. value to true: check if the page is actually login page, if it is inject JS that hides element
     if (url!.path.contains('/user/auth/login')) {
+      WebViewGlobalController.value!.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
       WebViewGlobalController.value!
-          .evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
-      WebViewGlobalController.value!.evaluateJavascript(
-          source:
-              "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+          .evaluateJavascript(source: "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
@@ -261,7 +258,9 @@ class WebViewAppState extends ConsumerState<WebView> {
         break;
       case ChannelAction.hideOpener:
         ref.read(humHubProvider).setOpenerState(OpenerState.hidden);
-        ref.read(humHubProvider).setHash(Crypt.generateRandomString(32),);
+        ref.read(humHubProvider).setHash(
+              Crypt.generateRandomString(32),
+            );
         break;
       case ChannelAction.registerFcmDevice:
         String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
@@ -274,9 +273,8 @@ class WebViewAppState extends ConsumerState<WebView> {
         }
         break;
       case ChannelAction.updateNotificationCount:
-        if (message.count != null) {
-          AppBadgePlus.updateBadge(message.count!);
-        }
+        UpdateNotificationCountChannelData data = message.data as UpdateNotificationCountChannelData;
+        AppBadgePlus.updateBadge(data.count);
         break;
       case ChannelAction.nativeConsole:
         Navigator.of(context).pushNamed(ConsolePage.routeName);
@@ -290,6 +288,16 @@ class WebViewAppState extends ConsumerState<WebView> {
             headers: ref.read(humHubProvider).customHeaders,
           );
         }
+        break;
+      case ChannelAction.fileUploadSettings:
+        FileUploadSettingsChannelData data = message.data as FileUploadSettingsChannelData;
+        ref.read(humHubProvider.notifier).setFileUploadSettings(data.settings);
+        FileUploadManager(
+                webViewController: WebViewGlobalController.value!,
+                intentNotifier: ref.read(intentProvider.notifier),
+                fileUploadSettings: ref.read(humHubProvider).fileUploadSettings,
+                context: context)
+            .upload();
         break;
       case ChannelAction.none:
         break;
@@ -334,13 +342,13 @@ class WebViewAppState extends ConsumerState<WebView> {
     //bool isBottomSheetVisible = false;
 
     // Initialize the download progress
-    downloadProgress = 0;
+    double downloadProgress = 0;
 
     // Timer to control when to show the bottom sheet
     Timer? downloadTimer;
     bool isDone = false;
 
-    FileHandler(
+    FileDownloadManager(
       downloadStartRequest: downloadStartRequest,
       controller: controller,
       onSuccess: (File file, String filename) async {
@@ -441,7 +449,7 @@ class WebViewAppState extends ConsumerState<WebView> {
   @override
   void dispose() {
     if (_headlessWebView != null) _headlessWebView!.dispose();
-    //_pullToRefreshController.dispose();
+    _pullToRefreshController.dispose();
     super.dispose();
   }
 }
