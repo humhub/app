@@ -148,8 +148,6 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     final latestUri = ref.read(intentProvider).latestUri;
     logInfo('IntentPlugin.tryNavigateWithOpener', latestUri);
 
-    LoadingProvider.of(ref).showLoading();
-
     bool isNewRouteSameAsCurrent = false;
     Keys.navigatorKey.currentState!.popUntil((route) {
       if (route.settings.name == WebView.path) {
@@ -161,7 +159,6 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
     await opener.initHumHub();
 
-    LoadingProvider.of(ref).dismissAll();
     Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
 
     return isNewRouteSameAsCurrent;
