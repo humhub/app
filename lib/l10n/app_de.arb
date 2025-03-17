@@ -76,5 +76,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "file_sharing_error": "Fehler beim Dateiaustausch",
+  "close": "Schließen"
 }

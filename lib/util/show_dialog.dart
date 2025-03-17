@@ -34,7 +34,7 @@ class ShowDialog {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return ErrorListPopup(title: "File sharing error", errors: errors);
+          return ErrorListPopup(title: AppLocalizations.of(context)!.file_sharing_error, errors: errors);
         });
   }
 }
@@ -84,16 +84,16 @@ class ErrorListPopup extends StatelessWidget {
           height: 30,
           child: OutlinedButton(
             style: OutlinedButton.styleFrom(
-              backgroundColor: Colors.blue, // Background color
-              foregroundColor: Colors.white, // Text color
-              side: const BorderSide(color: Colors.blue), // Border color
+              backgroundColor: Colors.grey.shade400,
+              foregroundColor: Colors.black,
+              side: const BorderSide(color: Colors.transparent),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4.0),
               ),
             ),
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
-              'Close',
+              AppLocalizations.of(context)!.close,
               style: TextStyle(fontSize: 14),
             ),
           ),
