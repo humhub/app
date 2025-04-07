@@ -45,12 +45,14 @@ class UniversalOpenerController {
   }
 
   checkHumHubModuleView(String url) async {
+    String authUrl = '/user/auth/external';
     Response? response;
-    response = await Dio().get(Uri.parse(url).toString()).catchError((err) {
+    response = await Dio().get(Uri.parse(url).toString(), options: Options(maxRedirects: 10)).catchError((err) {
       return Response(data: "Found manifest but not humhub.modules.ui.view tag", statusCode: 404, requestOptions: RequestOptions());
     });
 
-    doesViewExist = response.statusCode == 200 && response.data.contains('humhub.modules.ui.view');
+    doesViewExist = response.statusCode == 200 &&
+        (response.data.contains('humhub.modules.ui.view') || response.data.contains(authUrl) || response.data.contains(Uri.encodeComponent(authUrl)));
   }
 
   Future<HumHub?> initHumHub() async {
@@ -70,8 +72,7 @@ class UniversalOpenerController {
       Manifest manifest = asyncData!.value!;
       String hash = Crypt.generateRandomString(32);
       HumHub? lastInstance = await getLastInstance();
-      HumHub instance =
-          HumHub(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl, history: lastInstance?.history);
+      HumHub instance = HumHub(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl, history: lastInstance?.history);
       humhub = instance;
       return instance;
     }
