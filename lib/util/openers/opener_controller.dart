@@ -88,16 +88,18 @@ class OpenerController {
   }
 
   checkHumHubModuleView(String url) async {
-    List<String> substrings = ['/user/auth/external', 'humhub.modules.ui.view', '/user/auth/microsoft'];
-    List<String> encodedSubstrings = substrings.map((e) => Uri.encodeComponent(e)).toList();
-
-    List<String> allSubstrings = [...substrings, ...encodedSubstrings];
-
+    List<String> substrings = [
+      '/user/auth/external',
+      'humhub.modules.ui.view',
+      '/user/auth/microsoft',
+      '%2Fuser%2Fauth%2Fexternal',
+      '%2Fuser%2Fauth%2Fmicrosoft'
+    ];
     Response? response;
     response = await Dio().get(Uri.parse(url).toString(), options: Options(maxRedirects: 10)).catchError((err) {
       return Response(data: "Did not find any of the validation substrings", statusCode: 404, requestOptions: RequestOptions());
     });
-    doesViewExist = response.statusCode == 200 && allSubstrings.any((substring) => response?.data.contains(substring));
+    doesViewExist = response.statusCode == 200 && substrings.any((substring) => response?.data.contains(substring));
   }
 
   initHumHub() async {
