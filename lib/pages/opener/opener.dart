@@ -19,7 +19,7 @@ import 'components/last_login.dart';
 
 class OpenerPage extends ConsumerStatefulWidget {
   const OpenerPage({super.key});
-  static const String path = '/opener';
+  static const String path = '/';
 
   @override
   OpenerPageState createState() => OpenerPageState();
