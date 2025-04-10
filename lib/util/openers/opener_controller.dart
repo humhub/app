@@ -92,8 +92,8 @@ class OpenerController {
       '/user/auth/external',
       'humhub.modules.ui.view',
       '/user/auth/microsoft',
-      '%2Fuser%2Fauth%2Fexternal',
-      '%2Fuser%2Fauth%2Fmicrosoft'
+      'user%2Fauth%2Fexternal',
+      'user%2Fauth%2Fmicrosoft'
     ];
     Response? response;
     response = await Dio().get(Uri.parse(url).toString(), options: Options(maxRedirects: 10)).catchError((err) {
