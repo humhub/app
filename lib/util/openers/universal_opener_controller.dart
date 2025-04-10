@@ -9,7 +9,6 @@ import 'package:humhub/util/crypt.dart';
 import '../api_provider.dart';
 import '../connectivity_plugin.dart';
 
-// TODO: Rewrite openers so that the opener_controller will expand universal_opener_controller
 class UniversalOpenerController {
   late AsyncValue<Manifest>? asyncData;
   bool doesViewExist = false;
@@ -45,12 +44,18 @@ class UniversalOpenerController {
   }
 
   checkHumHubModuleView(String url) async {
+    List<String> substrings = [
+      '/user/auth/external',
+      'humhub.modules.ui.view',
+      '/user/auth/microsoft',
+      'user%2Fauth%2Fexternal',
+      'user%2Fauth%2Fmicrosoft'
+    ];
     Response? response;
-    response = await Dio().get(Uri.parse(url).toString()).catchError((err) {
-      return Response(data: "Found manifest but not humhub.modules.ui.view tag", statusCode: 404, requestOptions: RequestOptions());
+    response = await Dio().get(Uri.parse(url).toString(), options: Options(maxRedirects: 10)).catchError((err) {
+      return Response(data: "Did not find any of the validation substrings", statusCode: 404, requestOptions: RequestOptions());
     });
-
-    doesViewExist = response.statusCode == 200 && response.data.contains('humhub.modules.ui.view');
+    doesViewExist = response.statusCode == 200 && substrings.any((substring) => response?.data.contains(substring));
   }
 
   Future<HumHub?> initHumHub() async {
@@ -70,8 +75,7 @@ class UniversalOpenerController {
       Manifest manifest = asyncData!.value!;
       String hash = Crypt.generateRandomString(32);
       HumHub? lastInstance = await getLastInstance();
-      HumHub instance =
-          HumHub(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl, history: lastInstance?.history);
+      HumHub instance = HumHub(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl, history: lastInstance?.history);
       humhub = instance;
       return instance;
     }
