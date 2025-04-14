@@ -143,6 +143,10 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
 
+    if (WebViewGlobalController.isCommonURIScheme(webUri: action.request.url!)) {
+      return WebViewGlobalController.handleCommonURISchemes(webUri: action.request.url!);
+    }
+
     final url = action.request.url!.rawValue;
 
     /// First BLOCK everything that rules out as blocked.

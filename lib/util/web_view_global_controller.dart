@@ -4,6 +4,8 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/global_user_agent.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:loggy/loggy.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WebViewGlobalController {
   static InAppWebViewController? _value;
@@ -29,6 +31,17 @@ class WebViewGlobalController {
     if (url.startsWith('$baseUrl/s')) return true;
     return false;
   }
+
+  static List<String> commonSchemes = [
+    'tel',
+    'mailto',
+    'sms',
+    'sip',
+    'whatsapp',
+    'viber',
+    'slack',
+    'msteams',
+  ];
 
   static void setValue(InAppWebViewController newValue) {
     _value = newValue;
@@ -59,6 +72,47 @@ class WebViewGlobalController {
         ClipboardData(text: hitResult.extra!),
       );
     }
+  }
+
+  /// [handleCommonURISchemes]
+  ///
+  /// Intercepts and handles specific URI schemes to launch external apps or services.
+  ///
+  /// - Supported URI schemes:
+  ///   - Communication: `tel:`, `mailto:`, `sms:`, `sip:`
+  ///   - Messaging/Social Apps: `whatsapp:`, `viber:`, `slack:`, `msteams:`
+  ///
+  /// [webUri] : The URI to evaluate and handle. Must use a supported scheme.
+  ///
+  /// - Behavior:
+  ///   - Launches the appropriate app or service for supported schemes.
+  ///   - Logs an error if the URI cannot be handled or the scheme is unsupported.
+  ///
+  /// @return [NavigationActionPolicy.CANCEL] if handled, otherwise [NavigationActionPolicy.ALLOW].
+  static handleCommonURISchemes({required Uri webUri}) async {
+    // Extract the scheme from the URI
+    final scheme = webUri.scheme;
+    try {
+      if (commonSchemes.contains(scheme)) {
+        // Try launching the URI
+        bool canLaunch = await canLaunchUrl(webUri);
+        if (canLaunch) {
+          await launchUrl(webUri);
+        } else {
+          logError('Could not launch ${webUri.toString()}');
+        }
+
+        // Return cancel navigation policy
+        return NavigationActionPolicy.CANCEL;
+      }
+    } catch (er) {
+      logError(er);
+      return NavigationActionPolicy.CANCEL;
+    }
+  }
+
+  static bool isCommonURIScheme({required Uri webUri}) {
+    return commonSchemes.contains(webUri.scheme) ? true : false;
   }
 
   static Future<void> listenToImageOpen() async {
