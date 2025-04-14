@@ -90,5 +90,18 @@
                 </array>
             </dict>
         </array>
+    <key>LSApplicationCategoryType</key>
+    <string></string>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>sms</string>
+        <string>tel</string>
+        <string>mailto</string>
+        <string>sip</string>
+        <string>whatsapp</string>
+        <string>viber</string>
+        <string>slack</string>
+        <string>msteams</string>
+    </array>
 </dict>
 </plist>
