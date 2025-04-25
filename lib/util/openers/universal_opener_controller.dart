@@ -6,6 +6,7 @@ import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/crypt.dart';
+import 'package:loggy/loggy.dart';
 import '../api_provider.dart';
 import '../connectivity_plugin.dart';
 
@@ -18,12 +19,18 @@ class UniversalOpenerController {
   UniversalOpenerController({required this.url});
 
   Future<String?> findManifest(String url) async {
+    logInfo('UniversalOpener: Searching manifest for $url');
     List<String> possibleUrls = generatePossibleManifestsUrls(url);
+    logDebug('Generated ${possibleUrls.length} possible manifest URLs');
     String? manifestUrl;
     for (var url in possibleUrls) {
+      logDebug('Checking manifest at: $url');
       asyncData = await APIProvider.requestBasic(Manifest.get(url));
       manifestUrl = Manifest.getUriWithoutExtension(url);
       if (!asyncData!.hasError) break;
+    }
+    if (manifestUrl == null) {
+      logWarning('No valid manifest found in ${possibleUrls.length} attempts');
     }
     return manifestUrl;
   }
