@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:humhub/pages/console.dart';
 import 'package:loggy/loggy.dart';
 import 'package:talker_flutter/talker_flutter.dart' as tl;
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 class GlobalLog extends LoggyPrinter {
   const GlobalLog({
@@ -28,6 +29,8 @@ class GlobalLog extends LoggyPrinter {
 
   static const _defaultPrefix = '🤔 ';
 
+  static final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
+
   @override
   void onLog(LogRecord record) {
     final time = record.time.toIso8601String().split('T')[1];
@@ -37,6 +40,7 @@ class GlobalLog extends LoggyPrinter {
     final color = _colorize ? levelColor(record.level) ?? AnsiColor() : AnsiColor();
     final prefix = levelPrefix(record.level) ?? _defaultPrefix;
     tl.Talker talker = ConsolePage.talker;
+
     // Log to Talker
     switch (record.level) {
       case LogLevel.debug:
@@ -55,6 +59,19 @@ class GlobalLog extends LoggyPrinter {
         talker.log(record.message);
         break;
     }
+
+    // Log to Firebase Analytics
+    _analytics.logEvent(
+      name: 'app_log',
+      parameters: {
+        'level': record.level.toString(),
+        'message': record.message.toString(),
+        'error': record.error.toString(),
+        'stack_trace': record.stackTrace.toString(),
+        'caller': record.callerFrame.toString(),
+        'time': record.time.toIso8601String(),
+      },
+    );
 
     if (kDebugMode) {
       print(color('$prefix$time $logLevel GLOBAL $callerFrame ${record.message}'));
