@@ -13,6 +13,7 @@ import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/openers/opener_controller.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:loggy/loggy.dart';
 import 'package:rive/rive.dart' as rive;
 
 import 'components/last_login.dart';
@@ -49,11 +50,13 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
 
       String? urlIntent = InitFromUrl.usePayload();
       if (urlIntent != null) {
+        logInfo('Intent URL detected: $urlIntent');
         await ref.read(notificationChannelProvider).value!.onTap(urlIntent);
       }
 
       /// If there is only one item in history that means we can show [SearchBarWidget] that is already prefilled with url or null if count is 0.
       if (ref.read(humHubProvider).history.isEmpty) {
+        logDebug('History empty, showing search bar');
         ref.watch(searchBarVisibilityNotifier.notifier).setVisibility(true);
       }
     });
@@ -87,6 +90,7 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                           duration: const Duration(milliseconds: 300),
                           child: FloatingActionButton(
                             onPressed: () {
+                              logInfo('FAB pressed: toggling search bar visibility');
                               ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
                             },
                             tooltip: 'Increment',
@@ -139,9 +143,11 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                                   child: LastLoginWidget(
                                       history: ref.watch(humHubProvider).history,
                                       onAddNetwork: () {
+                                        logInfo('User tapped Add Network');
                                         ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
                                       },
                                       onSelectNetwork: (Manifest manifest) async {
+                                        logInfo('User selected network: ${manifest.name}');
                                         UniversalOpenerController uniOpen =
                                             UniversalOpenerController(url: manifest.startUrl);
                                         await uniOpen.initHumHub();
@@ -154,6 +160,7 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                                         );
                                       },
                                       onDeleteNetwork: (manifest, isLast) async {
+                                        logInfo('User deleted network: ${manifest.name}');
                                         ref.watch(humHubProvider.notifier).removeHistory(manifest);
                                         if (isLast) {
                                           ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
@@ -167,6 +174,7 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                             padding: const EdgeInsets.only(top: 30),
                             child: GestureDetector(
                               onTap: () {
+                                logInfo('User tapped help link');
                                 openerControlLer.animationNavigationWrapper(
                                   navigate: () => Navigator.push(
                                     context,
