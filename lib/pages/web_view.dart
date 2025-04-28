@@ -69,10 +69,9 @@ class WebViewAppState extends ConsumerState<WebView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Listen to the provider's state changes
     if (!_isInit) {
-      logInfo('Initializing WebView with manifest: ${_manifest.name}');
       _initialRequest = _initRequest;
+      logInfo('Initializing WebView with manifest: ${_manifest.name}');
       _pullToRefreshController = PullToRefreshController(
         settings: PullToRefreshSettings(
           color: HexColor(_manifest.themeColor),
