@@ -83,10 +83,11 @@ class WebViewAppState extends ConsumerState<WebView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       key: _scaffoldKey,
       backgroundColor: HexColor(_manifest.themeColor),
       body: SafeArea(
-          bottom: false,
+          bottom: hasSystemNavigationBar(context),
           // ignore: deprecated_member_use
           child: WillPopScope(
             onWillPop: () => exitApp(context, ref),
@@ -455,5 +456,13 @@ class WebViewAppState extends ConsumerState<WebView> {
     if (_headlessWebView != null) _headlessWebView!.dispose();
     _pullToRefreshController.dispose();
     super.dispose();
+  }
+
+  bool hasSystemNavigationBar(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final bottomPadding = mediaQuery.viewPadding.bottom;
+    // Gesture navigation typically has a small bottom inset (around 16-20dp)
+    // Traditional nav buttons are taller (around 48dp)
+    return bottomPadding > 30; // A threshold that works for most devices
   }
 }
