@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/const.dart';
@@ -34,8 +35,7 @@ class OpenerAppState extends ConsumerState<OpenerApp> {
                   debugShowCheckedModeBanner: false,
                   initialRoute: MyRouter.initRoute,
                   routes: MyRouter.routes,
-                  localizationsDelegates:
-                      AppLocalizations.localizationsDelegates,
+                  localizationsDelegates: AppLocalizations.localizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
                   locale: overrideLocale,
                   builder: (context, child) => child!,
