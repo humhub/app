@@ -67,7 +67,7 @@ dependencies:
   quick_actions: ^1.1.0
   mime: ^2.0.0
   flutter_image_compress: ^2.4.0
-  firebase_analytics: ^11.4.5
+  firebase_crashlytics: ^4.3.5
 
 dependency_overrides:
   quick_actions_platform_interface:

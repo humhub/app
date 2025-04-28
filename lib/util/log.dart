@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:humhub/pages/console.dart';
 import 'package:loggy/loggy.dart';
 import 'package:talker_flutter/talker_flutter.dart' as tl;
-import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 class GlobalLog extends LoggyPrinter {
   const GlobalLog({
@@ -28,8 +28,6 @@ class GlobalLog extends LoggyPrinter {
   };
 
   static const _defaultPrefix = '🤔 ';
-
-  static final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
 
   @override
   void onLog(LogRecord record) {
@@ -60,18 +58,21 @@ class GlobalLog extends LoggyPrinter {
         break;
     }
 
-    // Log to Firebase Analytics
-    _analytics.logEvent(
-      name: 'app_log',
-      parameters: {
-        'level': record.level.toString(),
-        'message': record.message.toString(),
-        'error': record.error.toString(),
-        'stack_trace': record.stackTrace.toString(),
-        'caller': record.callerFrame.toString(),
-        'time': record.time.toIso8601String(),
-      },
+    FirebaseCrashlytics.instance.log(
+        '[${record.level}] ${record.message} | error: ${record.error} | stack: ${record.stackTrace} | caller: $callerFrame | time: ${record.time.toIso8601String()}'
     );
+
+    if (record.level == LogLevel.error) {
+      FirebaseCrashlytics.instance.recordError(
+        record.error ?? record.message,
+        record.stackTrace,
+        reason: 'GlobalLog error log',
+        information: [
+          'caller: $callerFrame',
+          'time: ${record.time.toIso8601String()}'
+        ],
+      );
+    }
 
     if (kDebugMode) {
       print(color('$prefix$time $logLevel GLOBAL $callerFrame ${record.message}'));
