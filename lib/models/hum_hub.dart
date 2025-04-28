@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:humhub/app_flavored.dart';
 import 'package:humhub/app_opener.dart';
@@ -167,6 +168,9 @@ class HumHub {
     Loggy.initLoggy(
       logPrinter: const GlobalLog(),
     );
+
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: [SystemUiOverlay.top]);
+
     WidgetsFlutterBinding.ensureInitialized();
     await SecureStorageService.clearSecureStorageOnReinstall();
     await GlobalPackageInfo.init();
