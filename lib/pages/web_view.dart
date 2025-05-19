@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:app_badge_plus/app_badge_plus.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -50,6 +51,20 @@ class WebViewAppState extends ConsumerState<WebView> {
   late PullToRefreshController _pullToRefreshController;
   HeadlessInAppWebView? _headlessWebView;
   bool _isInit = false;
+
+  StreamSubscription<List<ConnectivityResult>>? _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _subscription = Connectivity().onConnectivityChanged.listen((results) {
+      final hasConnection = results.any((r) => r != ConnectivityResult.none);
+      if (hasConnection) {
+        // Internet is back
+        WebViewGlobalController.value?.reload();
+      }
+    });
+  }
 
   @override
   void didChangeDependencies() {
@@ -240,12 +255,15 @@ class WebViewAppState extends ConsumerState<WebView> {
   _onProgressChanged(InAppWebViewController controller, int progress) {
     if (progress == 100) {
       _pullToRefreshController.endRefreshing();
+      LoadingProvider.of(ref).dismissAll();
     }
   }
 
   void _onReceivedError(InAppWebViewController controller, WebResourceRequest request, WebResourceError error) {
-    if (error.description == 'net::ERR_INTERNET_DISCONNECTED') {
+    logError("some error");
+    if ([WebResourceErrorType.NOT_CONNECTED_TO_INTERNET, WebResourceErrorType.TIMEOUT].contains(error.type)) {
       NoConnectionDialog.show(context);
+      LoadingProvider.of(ref).dismissAll();
     }
   }
 
@@ -454,6 +472,7 @@ class WebViewAppState extends ConsumerState<WebView> {
   void dispose() {
     if (_headlessWebView != null) _headlessWebView!.dispose();
     _pullToRefreshController.dispose();
+    _subscription?.cancel();
     super.dispose();
   }
 }
