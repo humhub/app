@@ -260,7 +260,6 @@ class WebViewAppState extends ConsumerState<WebView> {
   }
 
   void _onReceivedError(InAppWebViewController controller, WebResourceRequest request, WebResourceError error) {
-    logError("some error");
     if ([WebResourceErrorType.NOT_CONNECTED_TO_INTERNET, WebResourceErrorType.TIMEOUT].contains(error.type)) {
       NoConnectionDialog.show(context);
       LoadingProvider.of(ref).dismissAll();
