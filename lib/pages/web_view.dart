@@ -98,7 +98,6 @@ class WebViewAppState extends ConsumerState<WebView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //resizeToAvoidBottomInset: true,
       key: _scaffoldKey,
       backgroundColor: HexColor(_manifest.themeColor),
       body: SafeArea(
