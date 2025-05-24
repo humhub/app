@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SecureStorageService {
   // Private constructor
+  static var keys = _Keys();
   static const FlutterSecureStorage _instance = FlutterSecureStorage();
 
   // Factory constructor that returns the single instance
@@ -21,9 +22,15 @@ class SecureStorageService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool hasRunBefore = prefs.getBool(key) ?? false;
     if (!hasRunBefore) {
-      FlutterSecureStorage storage = const FlutterSecureStorage();
-      await storage.deleteAll();
+      await _instance.deleteAll();
       prefs.setBool(key, true);
     }
   }
+}
+
+class _Keys {
+  String humhubInstance = "humHubInstance";
+  String lastInstanceUrl = "humHubLastUrl";
+  String keyErrorReports = 'send_error_reports';
+  String keyDeviceIdentifiers = 'send_device_identifiers';
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/util/const.dart';
 import 'package:humhub/util/openers/opener_controller.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -83,7 +82,7 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                       side: BorderSide(
-                        color: HumhubTheme.primaryColor,
+                        color: Theme.of(context).primaryColor,
                         width: 2,
                       ),
                     ),
@@ -93,7 +92,7 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
                   child: Text(
                     AppLocalizations.of(context)!.connect,
                     style: TextStyle(
-                      color: HumhubTheme.primaryColor,
+                      color: Theme.of(context).primaryColor,
                       fontSize: 20,
                     ),
                   ),
@@ -145,7 +144,7 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
                 height: 4,
                 child: CircularProgressIndicator(
                   strokeWidth: 4,
-                  color: HumhubTheme.primaryColor,
+                  color: Theme.of(context).primaryColor,
                 ),
               )
             : null,
