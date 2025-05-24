@@ -4,11 +4,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/util/const.dart';
 import 'package:humhub/util/crypt.dart';
 import 'package:loggy/loggy.dart';
 import '../api_provider.dart';
 import '../connectivity_plugin.dart';
+import '../storage_service.dart';
 
 class UniversalOpenerController {
   late AsyncValue<Manifest>? asyncData;
@@ -94,7 +94,7 @@ class UniversalOpenerController {
   }
 
   Future<HumHub?> getLastInstance() async {
-    var jsonStr = await InternalStorage.storage.read(key: InternalStorage.keyHumhubInstance);
+    var jsonStr = await SecureStorageService.instance.read(key: SecureStorageService.keys.humhubInstance);
     HumHub? humHub = jsonStr != null ? HumHub.fromJson(json.decode(jsonStr)) : null;
     return humHub;
   }

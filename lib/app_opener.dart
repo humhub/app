@@ -29,19 +29,25 @@ class OpenerAppState extends ConsumerState<OpenerApp> {
             child: PushPlugin(
               child: OverrideLocale(
                 builder: (overrideLocale) => MaterialApp(
-                  navigatorKey: Keys.navigatorKey,
-                  scaffoldMessengerKey: Keys.scaffoldMessengerStateKey,
-                  debugShowCheckedModeBanner: false,
-                  initialRoute: MyRouter.initRoute,
-                  routes: MyRouter.routes,
-                  localizationsDelegates: AppLocalizations.localizationsDelegates,
-                  supportedLocales: AppLocalizations.supportedLocales,
-                  locale: overrideLocale,
-                  builder: (context, child) => child!,
-                  theme: ThemeData(
-                    fontFamily: 'OpenSans',
-                  ),
-                ),
+                    navigatorKey: Keys.navigatorKey,
+                    scaffoldMessengerKey: Keys.scaffoldMessengerStateKey,
+                    debugShowCheckedModeBanner: false,
+                    initialRoute: MyRouter.initRoute,
+                    routes: MyRouter.routes,
+                    localizationsDelegates: AppLocalizations.localizationsDelegates,
+                    supportedLocales: AppLocalizations.supportedLocales,
+                    locale: overrideLocale,
+                    builder: (context, child) => child!,
+                    theme: ThemeData(
+                      fontFamily: 'OpenSans',
+                      primaryColor: const Color(0xFF21a1b3),
+                      scaffoldBackgroundColor: Colors.white,
+                      appBarTheme: const AppBarTheme(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Color(0xFF21a1b3),
+                        elevation: 0,
+                      ),
+                    )),
               ),
             ),
           ),

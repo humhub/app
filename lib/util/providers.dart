@@ -4,8 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/file_upload_settings.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
-
-import 'const.dart';
+import 'package:humhub/util/storage_service.dart';
 
 class HumHubNotifier extends ChangeNotifier {
   final HumHub _humHubInstance;
@@ -116,13 +115,13 @@ class HumHubNotifier extends ChangeNotifier {
   }
 
   Future<void> clearSafeStorage() async {
-    await InternalStorage.storage.delete(key: InternalStorage.keyHumhubInstance);
+    await SecureStorageService.instance.delete(key: SecureStorageService.keys.humhubInstance);
   }
 
   Future<HumHub> getInstance() async {
-    var jsonStr = await InternalStorage.storage.read(key: InternalStorage.keyHumhubInstance);
+    var jsonStr = await SecureStorageService.instance.read(key: SecureStorageService.keys.humhubInstance);
     HumHub humHub = jsonStr != null ? HumHub.fromJson(json.decode(jsonStr)) : _humHubInstance;
-    lastUrl = await InternalStorage.storage.read(key: InternalStorage.keyLastInstanceUrl) ?? "";
+    lastUrl = await SecureStorageService.instance.read(key: SecureStorageService.keys.lastInstanceUrl) ?? "";
 
     /// Download icons for shortcuts if not yet saved in internal storage
     for (var value in humHub.history) {
@@ -141,9 +140,9 @@ class HumHubNotifier extends ChangeNotifier {
 
     String lastUrl = (_humHubInstance.manifestUrl != null ? _humHubInstance.manifestUrl! : this.lastUrl);
 
-    await InternalStorage.storage.write(key: InternalStorage.keyHumhubInstance, value: jsonString);
+    await SecureStorageService.instance.write(key: SecureStorageService.keys.humhubInstance, value: jsonString);
 
-    await InternalStorage.storage.write(key: InternalStorage.keyLastInstanceUrl, value: lastUrl);
+    await SecureStorageService.instance.write(key: SecureStorageService.keys.lastInstanceUrl, value: lastUrl);
   }
 }
 
