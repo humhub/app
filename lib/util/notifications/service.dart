@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/notifications/channel.dart';
+import 'package:loggy/loggy.dart';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin plugin;
@@ -29,16 +30,23 @@ class NotificationService {
   }
 
   static Future<void> init(WidgetRef ref) async {
-    NotificationService service = await NotificationService.create();
-    var provider = ref.read(notificationProvider);
-    if (provider == null) {
-      ref.read(notificationProvider.notifier).state = service;
+    logInfo('NotificationService: Initializing provider');
+    try {
+      NotificationService service = await NotificationService.create();
+      var provider = ref.read(notificationProvider);
+      if (provider == null) {
+        logDebug('NotificationService: Setting provider state');
+        ref.read(notificationProvider.notifier).state = service;
+      }
+    } catch (e, st) {
+      logError('NotificationService: Provider initialization failed - $e\n$st');
     }
   }
 
   static void handleNotification(NotificationResponse response) async {
     final parsed = response.payload != null ? json.decode(response.payload!) : {};
     if (parsed["redirectUrl"] != null) {
+      logInfo('NotificationService: Redirecting to ${parsed['redirectUrl']}');
       var channel = await NotificationChannel.getChannel();
       channel.onTap(parsed['redirectUrl']);
       return;

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/util/extensions.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 class IntentState {
@@ -16,9 +17,7 @@ class IntentState {
     this.latestUri,
   }) : _sharedFiles = sharedFiles;
 
-  bool isSharedFilesNullOrEmpty() {
-    return _sharedFiles == null || _sharedFiles.isEmpty;
-  }
+  bool get isSharedFilesNullOrEmpty => _sharedFiles.isNullOrEmpty;
 
   IntentState copyWith({
     List<SharedMediaFile>? sharedFiles,
@@ -41,7 +40,6 @@ class IntentNotifier extends StateNotifier<IntentState> {
   IntentNotifier() : super(IntentState());
 
   IntentState get currentState => state;
-
 
   void setSharedFiles(List<SharedMediaFile>? files) {
     state = state.copyWith(sharedFiles: files);

@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -164,7 +166,7 @@ class HumHub {
     'x-humhub-app-is-multi-instance': '1',
   };
 
-  static Future<Widget> init() async {
+  static Future<Widget> initApp() async {
     Loggy.initLoggy(
       logPrinter: const GlobalLog(),
     );
@@ -173,6 +175,8 @@ class HumHub {
 
     WidgetsFlutterBinding.ensureInitialized();
     await SecureStorageService.clearSecureStorageOnReinstall();
+    await Firebase.initializeApp();
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
     await GlobalPackageInfo.init();
     await PermissionHandler.requestPermissions(
       [

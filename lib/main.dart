@@ -11,7 +11,7 @@ void main() async {
 
   try {
     // Initialize HumHub instance early
-    final app = await HumHub.init();
+    final app = await HumHub.initApp();
     HumHub instance = await ref.read(humHubProvider).getInstance();
     await MyRouter.initInitialRoute(instance);
 

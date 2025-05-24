@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:humhub/models/manifest.dart';
-import 'package:humhub/util/const.dart';
 
 class LastLoginWidget extends StatelessWidget {
   final List<Manifest> history;
@@ -67,8 +66,8 @@ class InstanceTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(borderRadius),
-      splashColor: HumhubTheme.primaryColor,
-      highlightColor: HumhubTheme.primaryColor,
+      splashColor: Theme.of(context).primaryColor,
+      highlightColor: Theme.of(context).primaryColor,
       onTap: () => onSelectNetwork(manifest),
       child: Container(
         margin: const EdgeInsets.all(1),
@@ -164,11 +163,11 @@ class AddNetworkTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add, size: 28, color: HumhubTheme.primaryColor),
+            Icon(Icons.add, size: 28, color: Theme.of(context).primaryColor),
             const SizedBox(width: 10),
             Text(
               AppLocalizations.of(context)!.add_network,
-              style: TextStyle(fontSize: 16, color: HumhubTheme.primaryColor, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
             ),
           ],
         ),

@@ -129,7 +129,6 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
       onError: (err) {
         // Update error using the provider
         ref.read(intentProvider.notifier).setError(err);
-
         logError('Error receiving shared files: $err');
       },
     );
@@ -146,7 +145,6 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   Future<bool> tryNavigateWithOpener(String redirectUrl) async {
     final latestUri = ref.read(intentProvider).latestUri;
     logInfo('IntentPlugin.tryNavigateWithOpener', latestUri);
-
     bool isNewRouteSameAsCurrent = false;
     Keys.navigatorKey.currentState!.popUntil((route) {
       if (route.settings.name == WebView.path) {
@@ -154,12 +152,9 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
       }
       return true;
     });
-
     UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
     await opener.initHumHub();
-
     Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
-
     return isNewRouteSameAsCurrent;
   }
 

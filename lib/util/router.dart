@@ -6,6 +6,7 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/console.dart';
 import 'package:humhub/pages/help/help.dart';
 import 'package:humhub/pages/opener/opener.dart';
+import 'package:humhub/pages/settings/settings.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 
@@ -50,16 +51,21 @@ class MyRouter {
       ]);
       return const Help();
     },
-
     ConsolePage.routeName: (context) {
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
       ]);
       return const ConsolePage();
     },
+    SettingsPage.path: (context) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+      return const SettingsPage();
+    },
   };
 
-  static Future<String> initInitialRoute(HumHub humhub)  async {
+  static Future<String> initInitialRoute(HumHub humhub) async {
     RedirectAction action = await humhub.action;
     switch (action) {
       case RedirectAction.opener:

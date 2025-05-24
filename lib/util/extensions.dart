@@ -1,7 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/util/const.dart';
 import 'package:loggy/loggy.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:mime/mime.dart';
@@ -15,7 +15,7 @@ class HexColor extends Color {
       return int.parse(hexColor, radix: 16);
     } catch (e) {
       logError("Color from manifest is not valid use primary color");
-      return HumhubTheme.primaryColor.colorSpace.index;
+      return Colors.white.colorSpace.index;
     }
   }
 

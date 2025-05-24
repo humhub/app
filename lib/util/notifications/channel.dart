@@ -5,6 +5,7 @@ import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/init_from_url.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
+import 'package:loggy/loggy.dart';
 
 class NotificationChannel {
   final String id;
@@ -21,6 +22,7 @@ class NotificationChannel {
   ///
   Future<void> onTap(String? payload) async {
     if (payload != null && Keys.navigatorKey.currentState != null) {
+      logDebug('NotificationChannel: Received payload: $payload');
       bool isNewRouteSameAsCurrent = false;
       Keys.navigatorKey.currentState!.popUntil((route) {
         if (route.settings.name == WebView.path) {
@@ -45,8 +47,10 @@ class NotificationChannel {
   static Future<NotificationChannel> getChannel() async {
     switch (GlobalPackageInfo.info.packageName) {
       case 'com.humhub.app':
+        logInfo('NotificationChannel: Using default channel');
         return const NotificationChannel();
       default:
+        logInfo('NotificationChannel: Using flavored channel');
         return const NotificationChannelF();
     }
   }

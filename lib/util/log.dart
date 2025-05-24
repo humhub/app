@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:humhub/pages/console.dart';
 import 'package:loggy/loggy.dart';
 import 'package:talker_flutter/talker_flutter.dart' as tl;
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 class GlobalLog extends LoggyPrinter {
   const GlobalLog({
@@ -37,6 +38,7 @@ class GlobalLog extends LoggyPrinter {
     final color = _colorize ? levelColor(record.level) ?? AnsiColor() : AnsiColor();
     final prefix = levelPrefix(record.level) ?? _defaultPrefix;
     tl.Talker talker = ConsolePage.talker;
+
     // Log to Talker
     switch (record.level) {
       case LogLevel.debug:
@@ -54,6 +56,22 @@ class GlobalLog extends LoggyPrinter {
       default:
         talker.log(record.message);
         break;
+    }
+
+    FirebaseCrashlytics.instance.log(
+        '[${record.level}] ${record.message} | error: ${record.error} | stack: ${record.stackTrace} | caller: $callerFrame | time: ${record.time.toIso8601String()}'
+    );
+
+    if (record.level == LogLevel.error) {
+      FirebaseCrashlytics.instance.recordError(
+        record.error ?? record.message,
+        record.stackTrace,
+        reason: 'GlobalLog error log',
+        information: [
+          'caller: $callerFrame',
+          'time: ${record.time.toIso8601String()}'
+        ],
+      );
     }
 
     if (kDebugMode) {

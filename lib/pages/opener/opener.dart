@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/components/language_switcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/help/help.dart';
 import 'package:humhub/pages/opener/components/search_bar.dart';
+import 'package:humhub/pages/settings/settings.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/init_from_url.dart';
@@ -13,6 +14,7 @@ import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/openers/opener_controller.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:loggy/loggy.dart';
 import 'package:rive/rive.dart' as rive;
 
 import 'components/last_login.dart';
@@ -49,11 +51,13 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
 
       String? urlIntent = InitFromUrl.usePayload();
       if (urlIntent != null) {
+        logInfo('Intent URL detected: $urlIntent');
         await ref.read(notificationChannelProvider).value!.onTap(urlIntent);
       }
 
       /// If there is only one item in history that means we can show [SearchBarWidget] that is already prefilled with url or null if count is 0.
       if (ref.read(humHubProvider).history.isEmpty) {
+        logDebug('History empty, showing search bar');
         ref.watch(searchBarVisibilityNotifier.notifier).setVisibility(true);
       }
     });
@@ -80,21 +84,21 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
             Scaffold(
               resizeToAvoidBottomInset: true,
               backgroundColor: Colors.transparent,
-              floatingActionButton:
-                  ref.watch(searchBarVisibilityNotifier) && ref.watch(humHubProvider.notifier).history.isNotEmpty
-                      ? AnimatedOpacity(
-                          opacity: ref.watch(languageSwitcherVisibilityProvider) ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 300),
-                          child: FloatingActionButton(
-                            onPressed: () {
-                              ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
-                            },
-                            tooltip: 'Increment',
-                            backgroundColor: Colors.white,
-                            child: Icon(Icons.arrow_back, color: HumhubTheme.primaryColor),
-                          ),
-                        )
-                      : null,
+              floatingActionButton: ref.watch(searchBarVisibilityNotifier) && ref.watch(humHubProvider.notifier).history.isNotEmpty
+                  ? AnimatedOpacity(
+                      opacity: ref.watch(languageSwitcherVisibilityProvider) ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          logInfo('FAB pressed: toggling search bar visibility');
+                          ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
+                        },
+                        tooltip: 'Increment',
+                        backgroundColor: Colors.white,
+                        child: Icon(Icons.arrow_back, color: Theme.of(context).primaryColor),
+                      ),
+                    )
+                  : null,
               body: SafeArea(
                 bottom: false,
                 top: false,
@@ -110,13 +114,28 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                         AnimatedOpacity(
                           opacity: ref.watch(languageSwitcherVisibilityProvider) ? 1.0 : 0.0,
                           duration: const Duration(milliseconds: 300),
-                          child: const Padding(
+                          child: Padding(
                             padding: EdgeInsets.only(top: 10, right: 16),
                             child: Align(
                               alignment: Alignment.centerRight,
-                              child: SizedBox(
-                                width: 110,
-                                child: LanguageSwitcher(),
+                              child: IconButton(
+                                onPressed: () => Navigator.of(context).pushNamed(SettingsPage.path),
+                                style: ButtonStyle(
+                                  overlayColor: WidgetStateProperty.all(Color(0xFFF5F5F5)),
+                                  shape: WidgetStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                                icon: Padding(
+                                  padding: const EdgeInsets.all(3.0),
+                                  child: SvgPicture.asset(
+                                    Assets.settings,
+                                    width: 26,
+                                    height: 26,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -139,21 +158,22 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                                   child: LastLoginWidget(
                                       history: ref.watch(humHubProvider).history,
                                       onAddNetwork: () {
+                                        logInfo('User tapped Add Network');
                                         ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
                                       },
                                       onSelectNetwork: (Manifest manifest) async {
-                                        UniversalOpenerController uniOpen =
-                                            UniversalOpenerController(url: manifest.startUrl);
+                                        logInfo('User selected network: ${manifest.name}');
+                                        UniversalOpenerController uniOpen = UniversalOpenerController(url: manifest.startUrl);
                                         await uniOpen.initHumHub();
                                         // Always pop the current instance and init the new one.
                                         LoadingProvider.of(ref).dismissAll();
 
                                         openerControlLer.animationNavigationWrapper(
-                                          navigate: () =>
-                                              Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: uniOpen),
+                                          navigate: () => Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: uniOpen),
                                         );
                                       },
                                       onDeleteNetwork: (manifest, isLast) async {
+                                        logInfo('User deleted network: ${manifest.name}');
                                         ref.watch(humHubProvider.notifier).removeHistory(manifest);
                                         if (isLast) {
                                           ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
@@ -167,6 +187,7 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                             padding: const EdgeInsets.only(top: 30),
                             child: GestureDetector(
                               onTap: () {
+                                logInfo('User tapped help link');
                                 openerControlLer.animationNavigationWrapper(
                                   navigate: () => Navigator.push(
                                     context,
