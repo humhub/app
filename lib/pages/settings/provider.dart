@@ -22,6 +22,11 @@ class DataSharingConsentState {
 }
 
 class DataSharingConsentNotifier extends AutoDisposeNotifier<DataSharingConsentState> {
+  static Future<bool> get isErrorCollectionEnabled async => await SecureStorageService.instance.read(key: SecureStorageService.keys.keyErrorReports) == 'true';
+
+  static Future<bool> get isDeviceIdentifiersEnabled async =>
+      await SecureStorageService.instance.read(key: SecureStorageService.keys.keyErrorReports) == 'true';
+
   @override
   DataSharingConsentState build() {
     _loadFromStorage();
