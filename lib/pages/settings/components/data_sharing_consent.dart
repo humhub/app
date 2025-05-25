@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:humhub/components/toast.dart';
 import 'package:humhub/pages/settings/provider.dart';
 
@@ -7,34 +8,32 @@ class DataSharingConsent extends ConsumerWidget {
   const DataSharingConsent({super.key});
 
   TextStyle get headerTextStyle => const TextStyle(
-        fontWeight: FontWeight.w600,
-        fontSize: 16.0,
-        height: 24 / 16,
-        letterSpacing: 0.0,
-      );
+    fontWeight: FontWeight.w600,
+    fontSize: 16.0,
+    height: 24 / 16,
+    letterSpacing: 0.0,
+  );
 
   TextStyle get contentTextStyle => const TextStyle(
-        fontWeight: FontWeight.w500,
-        fontSize: 14.0,
-        height: 22 / 14,
-        letterSpacing: 0.25,
-      );
+    fontWeight: FontWeight.w500,
+    fontSize: 14.0,
+    height: 22 / 14,
+    letterSpacing: 0.25,
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final consent = ref.watch(dataSharingConsentProvider);
     final notifier = ref.read(dataSharingConsentProvider.notifier);
+    final loc = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Help us improve the HumHub App', style: headerTextStyle),
+        Text(loc.data_sharing_title, style: headerTextStyle),
         const SizedBox(height: 12),
         Text(
-          "To help us improve the app experience consider enabling the options below. "
-          "This allows HumHub to receive anonymous error reports and basic device information, "
-          "which helps us detect bugs faster, understand how the app performs in real conditions, "
-          "and prioritize improvements.",
+          loc.data_sharing_content,
           style: contentTextStyle,
         ),
         const SizedBox(height: 20),
@@ -55,14 +54,14 @@ class DataSharingConsent extends ConsumerWidget {
             ),
             onChanged: (value) {
               notifier.setSendErrorReports(value ?? false);
-              Toast.show(context, "Your choice has been saved.");
+              Toast.show(context, loc.data_sharing_saved);
             },
             title: Padding(
               padding: const EdgeInsets.only(top: 6),
-              child: Text('Send anonymous error reports', style: headerTextStyle),
+              child: Text(loc.data_sharing_error_reports_title, style: headerTextStyle),
             ),
             subtitle: Text(
-              'Includes crash logs and technical errors. No personal data is shared.',
+              loc.data_sharing_error_reports_subtitle,
               style: contentTextStyle,
             ),
             controlAffinity: ListTileControlAffinity.leading,
@@ -86,14 +85,14 @@ class DataSharingConsent extends ConsumerWidget {
             ),
             onChanged: (value) {
               notifier.setSendDeviceIdentifiers(value ?? false);
-              Toast.show(context, "Your choice has been saved.");
+              Toast.show(context, loc.data_sharing_saved);
             },
             title: Padding(
               padding: const EdgeInsets.only(top: 6),
-              child: Text('Send device and session identifiers', style: headerTextStyle),
+              child: Text(loc.data_sharing_device_id_title, style: headerTextStyle),
             ),
             subtitle: Text(
-              'Used to trace issues across devices and sessions. Helps reproduce bugs more accurately.',
+              loc.data_sharing_device_id_subtitle,
               style: contentTextStyle,
             ),
             controlAffinity: ListTileControlAffinity.leading,
