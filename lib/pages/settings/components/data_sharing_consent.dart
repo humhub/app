@@ -26,6 +26,18 @@ class DataSharingConsent extends ConsumerWidget {
         width: 2,
       );
 
+  ListTileThemeData get tileThemeData => ListTileThemeData(
+        selectedColor: Color(0xFFF5F5F5),
+        selectedTileColor: Color(0xFFF5F5F5),
+        titleAlignment: ListTileTitleAlignment.top,
+        contentPadding: const EdgeInsets.only(top: 10, bottom: 10, right: 5),
+        minVerticalPadding: 0,
+        visualDensity: const VisualDensity(horizontal: -4.0, vertical: 0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      );
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final consent = ref.watch(dataSharingConsentProvider);
@@ -41,14 +53,9 @@ class DataSharingConsent extends ConsumerWidget {
           loc.data_sharing_content,
           style: contentTextStyle,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         ListTileTheme(
-          data: const ListTileThemeData(
-            titleAlignment: ListTileTitleAlignment.top,
-            contentPadding: EdgeInsets.zero,
-            minVerticalPadding: 0,
-            visualDensity: VisualDensity(horizontal: -4.0, vertical: 0),
-          ),
+          data: tileThemeData,
           child: CheckboxListTile(
             value: consent.sendErrorReports,
             activeColor: Theme.of(context).primaryColor,
@@ -69,14 +76,9 @@ class DataSharingConsent extends ConsumerWidget {
             controlAffinity: ListTileControlAffinity.leading,
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         ListTileTheme(
-          data: const ListTileThemeData(
-            titleAlignment: ListTileTitleAlignment.top,
-            contentPadding: EdgeInsets.zero,
-            minVerticalPadding: 0,
-            visualDensity: VisualDensity(horizontal: -4.0, vertical: 0),
-          ),
+          data: tileThemeData,
           child: CheckboxListTile(
             value: consent.sendDeviceIdentifiers,
             activeColor: Theme.of(context).primaryColor,
