@@ -157,16 +157,13 @@ class HumHub {
       };
 
   static Future<Widget> initApp() async {
+    await Firebase.initializeApp();
     Loggy.initLoggy(
       logPrinter: const GlobalLog(),
     );
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(await DataSharingConsentNotifier.isErrorCollectionEnabled);
-
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: [SystemUiOverlay.top]);
-
-    WidgetsFlutterBinding.ensureInitialized();
     await SecureStorageService.clearSecureStorageOnReinstall();
-    await Firebase.initializeApp();
     await GlobalPackageInfo.init();
     await PermissionHandler.requestPermissions(
       [Permission.notification, Permission.camera, Permission.microphone, Permission.storage, Permission.photos],

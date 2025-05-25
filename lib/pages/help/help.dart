@@ -37,7 +37,7 @@ class HelpState extends State<Help> {
         backgroundColor: Colors.white,
         extendBody: true,
         bottomNavigationBar: Container(
-          padding: Platform.isIOS ? const EdgeInsets.only(bottom: 20) : const EdgeInsets.only(bottom: 5),
+          padding: const EdgeInsets.only(bottom: 25),
           margin: const EdgeInsets.symmetric(horizontal: 10),
           child: BottomNavigation(
             key: bottomNavigationStateKey,
