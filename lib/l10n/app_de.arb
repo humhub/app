@@ -78,5 +78,9 @@
     }
   },
   "file_sharing_error": "Fehler beim Dateiaustausch",
-  "close": "Schließen"
+  "close": "Schließen",
+
+  "language_en": "Englisch",
+  "language_de": "Deutsch",
+  "language_fr": "Französisch"
 }

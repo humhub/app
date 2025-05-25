@@ -21,13 +21,32 @@ class SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPro
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: true),
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          style: ButtonStyle(
+            overlayColor: WidgetStateProperty.all(Color(0xFFF5F5F5)),
+            shape: WidgetStateProperty.all(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+          icon: Padding(padding: const EdgeInsets.all(3.0), child: Icon(Icons.arrow_back)),
+        ),
+      ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
+              SizedBox(
+                height: 10,
+              ),
               LanguageSwitcher(),
+              SizedBox(
+                height: 35,
+              ),
               DataSharingConsent(),
             ],
           ),
