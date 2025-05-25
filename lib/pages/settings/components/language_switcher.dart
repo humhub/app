@@ -116,8 +116,7 @@ class _LanguageSwitcherState extends State<LanguageSwitcher> {
                       OverrideLocale.of(context).changeLocale(newLocale);
 
                       if (oldLocale != newLocale) {
-                        // TODO: locale
-                        Toast.show(context, "The selected language is saved.");
+                        Toast.show(context, AppLocalizations.of(context)!.language_saved);
                       }
                     },
                     child: Text(languageNameGetters[localeString]?.call(AppLocalizations.of(context)!) ?? localeString, style: textStyle),

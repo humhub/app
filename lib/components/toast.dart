@@ -61,7 +61,7 @@ class Toast {
             ),
           ],
         ),
-        child: Container(
+        child: SizedBox(
           width: MediaQuery.of(context).size.width * 0.77,
           child: Row(
             children: [
