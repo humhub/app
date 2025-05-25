@@ -8,18 +8,23 @@ class DataSharingConsent extends ConsumerWidget {
   const DataSharingConsent({super.key});
 
   TextStyle get headerTextStyle => const TextStyle(
-    fontWeight: FontWeight.w600,
-    fontSize: 16.0,
-    height: 24 / 16,
-    letterSpacing: 0.0,
-  );
+        fontWeight: FontWeight.w600,
+        fontSize: 16.0,
+        height: 24 / 16,
+        letterSpacing: 0.0,
+      );
 
   TextStyle get contentTextStyle => const TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 14.0,
-    height: 22 / 14,
-    letterSpacing: 0.25,
-  );
+        fontWeight: FontWeight.w500,
+        fontSize: 14.0,
+        height: 22 / 14,
+        letterSpacing: 0.25,
+      );
+
+  BorderSide get borderSide => const BorderSide(
+        color: Color(0xFFE5E5E5),
+        width: 2,
+      );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -48,10 +53,7 @@ class DataSharingConsent extends ConsumerWidget {
             value: consent.sendErrorReports,
             activeColor: Theme.of(context).primaryColor,
             checkColor: Theme.of(context).primaryColor,
-            side: const BorderSide(
-              color: Color(0xFFE5E5E5),
-              width: 2,
-            ),
+            side: borderSide,
             onChanged: (value) {
               notifier.setSendErrorReports(value ?? false);
               Toast.show(context, loc.data_sharing_saved);
@@ -79,10 +81,7 @@ class DataSharingConsent extends ConsumerWidget {
             value: consent.sendDeviceIdentifiers,
             activeColor: Theme.of(context).primaryColor,
             checkColor: Theme.of(context).primaryColor,
-            side: const BorderSide(
-              color: Color(0xFFE5E5E5),
-              width: 2,
-            ),
+            side: borderSide,
             onChanged: (value) {
               notifier.setSendDeviceIdentifiers(value ?? false);
               Toast.show(context, loc.data_sharing_saved);

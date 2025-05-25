@@ -7,7 +7,6 @@ import 'package:humhub/util/override_locale.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LanguageSwitcher extends StatefulWidget {
-  static Key userProfileLocaleDropdown = const Key('user_profile_locale_dropdown');
   const LanguageSwitcher({
     super.key,
     this.showTitle = false,
@@ -59,25 +58,18 @@ class _LanguageSwitcherState extends State<LanguageSwitcher> {
         child: MenuAnchor(
           style: MenuStyle(
             backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
-            elevation: WidgetStateProperty.all<double>(0), // Optional: shadow
+            elevation: WidgetStateProperty.all<double>(0),
             shape: WidgetStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0), side: BorderSide(color: borderColor, width: borderWidth)),
             ),
-            // You can add more style properties if needed
           ),
           alignmentOffset: Offset(-13, 12),
           builder: (BuildContext context, MenuController controller, Widget? child) {
             return InkWell(
               onTap: () {
-                if (controller.isOpen) {
-                  setState(() {
-                    controller.close();
-                  });
-                } else {
-                  setState(() {
-                    controller.open();
-                  });
-                }
+                setState(() {
+                  controller.isOpen ? controller.close() : controller.open();
+                });
               },
               child: Row(
                 children: [
