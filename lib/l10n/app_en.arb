@@ -83,5 +83,13 @@
 
   "language_en": "English",
   "language_de": "German",
-  "language_fr": "French"
+  "language_fr": "French",
+
+  "data_sharing_title": "Help us improve the HumHub App",
+  "data_sharing_content": "To help us improve the app experience consider enabling the options below. This allows HumHub to receive anonymous error reports and basic device information, which helps us detect bugs faster, understand how the app performs in real conditions, and prioritize improvements.",
+  "data_sharing_error_reports_title": "Send anonymous error reports",
+  "data_sharing_error_reports_subtitle": "Includes crash logs and technical errors. No personal data is shared.",
+  "data_sharing_device_id_title": "Send device and session identifiers",
+  "data_sharing_device_id_subtitle": "Used to trace issues across devices and sessions. Helps reproduce bugs more accurately.",
+  "data_sharing_saved": "Your choice has been saved."
 }
