@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/components/toast.dart';
 import 'package:humhub/pages/settings/provider.dart';
 
 class DataSharingConsent extends ConsumerWidget {
@@ -54,6 +55,7 @@ class DataSharingConsent extends ConsumerWidget {
             ),
             onChanged: (value) {
               notifier.setSendErrorReports(value ?? false);
+              Toast.show(context, "Your choice has been saved.");
             },
             title: Padding(
               padding: const EdgeInsets.only(top: 6),
@@ -84,6 +86,7 @@ class DataSharingConsent extends ConsumerWidget {
             ),
             onChanged: (value) {
               notifier.setSendDeviceIdentifiers(value ?? false);
+              Toast.show(context, "Your choice has been saved.");
             },
             title: Padding(
               padding: const EdgeInsets.only(top: 6),
