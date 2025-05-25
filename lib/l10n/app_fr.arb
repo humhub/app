@@ -78,5 +78,9 @@
     }
   },
   "file_sharing_error": "Erreur de partage de fichier",
-  "close": "Fermer"
+  "close": "Fermer",
+
+  "language_en": "Anglais",
+  "language_de": "Allemand",
+  "language_fr": "Français"
 }

@@ -79,5 +79,9 @@
     }
   },
   "file_sharing_error": "File sharing error",
-  "close": "Close"
+  "close": "Close",
+
+  "language_en": "English",
+  "language_de": "German",
+  "language_fr": "French"
 }
