@@ -83,6 +83,7 @@
   "language_en": "Anglais",
   "language_de": "Allemand",
   "language_fr": "Français",
+  "language_saved": "La langue sélectionnée a été enregistrée.",
 
   "data_sharing_title": "Aidez-nous à améliorer l'application HumHub",
   "data_sharing_content": "Pour nous aider à améliorer l'expérience de l'application, veuillez activer les options ci-dessous. Cela permet à HumHub de recevoir des rapports d'erreurs anonymes et des informations de base sur l'appareil, ce qui nous aide à détecter les bugs plus rapidement, à comprendre les performances de l'application dans des conditions réelles et à prioriser les améliorations.",
