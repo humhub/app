@@ -7,6 +7,7 @@ class Keys{
 class Assets {
   static String logo = "assets/images/logo.png";
   static String settings = "assets/images/icons/settings.svg";
+  static String circleCheck = "assets/images/icons/circle-check.svg";
   static String helpImg = "assets/images/help.png";
   static String openerAnimationForward = "assets/animations/opener_animation.riv";
   static String openerAnimationReverse = "assets/animations/opener_animation_reverse.riv";
