@@ -66,6 +66,7 @@ dependencies:
   flutter_image_compress: ^2.4.0
   firebase_crashlytics: ^4.3.5
   flutter_svg: ^2.0.9
+  flutter_styled_toast: ^2.2.1
 
 dependency_overrides:
   quick_actions_platform_interface:

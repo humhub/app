@@ -1,7 +1,6 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:humhub/components/toast.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/override_locale.dart';
@@ -13,10 +12,12 @@ class LanguageSwitcher extends StatefulWidget {
     super.key,
     this.showTitle = false,
     this.forceLight = false,
+    this.onChange,
   });
 
   final bool showTitle;
   final bool forceLight;
+  final void Function(Locale oldLocale, Locale newLocale)? onChange;
 
   @override
   State<LanguageSwitcher> createState() => _LanguageSwitcherState();
@@ -60,10 +61,7 @@ class _LanguageSwitcherState extends State<LanguageSwitcher> {
             backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
             elevation: WidgetStateProperty.all<double>(0), // Optional: shadow
             shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
-                side: BorderSide(color: borderColor, width: borderWidth)
-              ),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0), side: BorderSide(color: borderColor, width: borderWidth)),
             ),
             // You can add more style properties if needed
           ),
@@ -110,11 +108,17 @@ class _LanguageSwitcherState extends State<LanguageSwitcher> {
                       height: 27,
                     ),
                     onPressed: () {
+                      final oldLocale = AppLocalizations.supportedLocales[selectedIndex ?? 0];
                       setState(() {
                         selectedIndex = index;
                       });
-                      Locale? locale = AppLocalizations.supportedLocales.elementAt(index);
-                      OverrideLocale.of(context).changeLocale(locale);
+                      final newLocale = AppLocalizations.supportedLocales[index];
+                      OverrideLocale.of(context).changeLocale(newLocale);
+
+                      if (oldLocale != newLocale) {
+                        // TODO: locale
+                        Toast.show(context, "The selected language is saved.");
+                      }
                     },
                     child: Text(languageNameGetters[localeString]?.call(AppLocalizations.of(context)!) ?? localeString, style: textStyle),
                   ),
