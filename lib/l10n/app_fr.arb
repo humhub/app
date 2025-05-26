@@ -91,5 +91,7 @@
   "data_sharing_error_reports_subtitle": "Inclut les journaux de plantage et les erreurs techniques. Aucune donnée personnelle n'est partagée.",
   "data_sharing_device_id_title": "Envoyer les identifiants de l'appareil et de session",
   "data_sharing_device_id_subtitle": "Utilisé pour tracer les problèmes sur différents appareils et sessions. Aide à reproduire les bugs plus précisément.",
-  "data_sharing_saved": "Votre choix a été enregistré."
+  "data_sharing_saved": "Votre choix a été enregistré.",
+
+  "accept_all": "Tout accepter"
 }

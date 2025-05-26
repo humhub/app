@@ -91,5 +91,7 @@
   "data_sharing_error_reports_subtitle": "Enthält Absturzprotokolle und technische Fehler. Es werden keine persönlichen Daten weitergegeben.",
   "data_sharing_device_id_title": "Geräte- und Sitzungskennungen senden",
   "data_sharing_device_id_subtitle": "Wird verwendet, um Probleme über Geräte und Sitzungen hinweg nachzuvollziehen. Hilft, Fehler genauer zu reproduzieren.",
-  "data_sharing_saved": "Ihre Auswahl wurde gespeichert."
+  "data_sharing_saved": "Ihre Auswahl wurde gespeichert.",
+
+  "accept_all": "Alle akzeptieren"
 }

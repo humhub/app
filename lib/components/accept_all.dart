@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:humhub/util/const.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AcceptAllButton extends StatelessWidget {
   final VoidCallback onPressed;
-  final String label;
 
   const AcceptAllButton({
     super.key,
     required this.onPressed,
-    this.label = "Accept all",
   });
 
   @override
@@ -37,7 +34,7 @@ class AcceptAllButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                label,
+                AppLocalizations.of(context)!.accept_all,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 15,
