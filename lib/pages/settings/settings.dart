@@ -24,11 +24,12 @@ class SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPro
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await SecureStorageService.setVisitedSettings();
-      if (!context.mounted) return;
-      final showBut = ModalRoute.of(context)?.settings.arguments as bool? ?? false;
-      setState(() {
-        showButton = showBut;
-      });
+      if (mounted) {
+        final showBut = ModalRoute.of(context)?.settings.arguments as bool? ?? false;
+        setState(() {
+          showButton = showBut;
+        });
+      }
     });
   }
 

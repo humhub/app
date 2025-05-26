@@ -92,5 +92,7 @@
   "data_sharing_error_reports_subtitle": "Includes crash logs and technical errors. No personal data is shared.",
   "data_sharing_device_id_title": "Send device and session identifiers",
   "data_sharing_device_id_subtitle": "Used to trace issues across devices and sessions. Helps reproduce bugs more accurately.",
-  "data_sharing_saved": "Your choice has been saved."
+  "data_sharing_saved": "Your choice has been saved.",
+
+  "accept_all": "Accept all"
 }

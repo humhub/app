@@ -119,7 +119,7 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                     children: <Widget>[
                       // Language Switcher visibility
                       Padding(
-                        padding: const EdgeInsets.only(top: 40),
+                        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
                         child: AnimatedOpacity(
                           opacity: ref.watch(languageSwitcherVisibilityProvider) ? 1.0 : 0.0,
                           duration: const Duration(milliseconds: 300),
