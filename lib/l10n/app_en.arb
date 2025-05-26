@@ -94,5 +94,6 @@
   "data_sharing_device_id_subtitle": "Used to trace issues across devices and sessions. Helps reproduce bugs more accurately.",
   "data_sharing_saved": "Your choice has been saved.",
 
-  "accept_all": "Accept all"
+  "accept_all": "Accept all",
+  "decline_all": "Decline all"
 }

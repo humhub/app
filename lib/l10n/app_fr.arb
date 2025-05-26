@@ -93,5 +93,6 @@
   "data_sharing_device_id_subtitle": "Utilisé pour tracer les problèmes sur différents appareils et sessions. Aide à reproduire les bugs plus précisément.",
   "data_sharing_saved": "Votre choix a été enregistré.",
 
-  "accept_all": "Tout accepter"
+  "accept_all": "Tout accepter",
+  "decline_all": "Tout refuser"
 }

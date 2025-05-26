@@ -93,5 +93,6 @@
   "data_sharing_device_id_subtitle": "Wird verwendet, um Probleme über Geräte und Sitzungen hinweg nachzuvollziehen. Hilft, Fehler genauer zu reproduzieren.",
   "data_sharing_saved": "Ihre Auswahl wurde gespeichert.",
 
-  "accept_all": "Alle akzeptieren"
+  "accept_all": "Alle akzeptieren",
+  "decline_all": "Alle ablehnen"
 }
