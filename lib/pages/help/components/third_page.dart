@@ -54,7 +54,7 @@ class ThirdPage extends StatelessWidget {
                     style: ButtonStyle(
                       backgroundColor: WidgetStateProperty.resolveWith<Color>(
                         (Set<WidgetState> states) {
-                          return HumhubTheme.primaryColor;
+                          return Theme.of(context).primaryColor;
                         },
                       ),
                     ),

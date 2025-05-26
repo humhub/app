@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:humhub/components/bottom_navigation_bar.dart';
 import 'package:humhub/components/ease_out_container.dart';
@@ -37,7 +36,7 @@ class HelpState extends State<Help> {
         backgroundColor: Colors.white,
         extendBody: true,
         bottomNavigationBar: Container(
-          padding: Platform.isIOS ? const EdgeInsets.only(bottom: 20) : const EdgeInsets.only(bottom: 5),
+          padding: const EdgeInsets.only(bottom: 25),
           margin: const EdgeInsets.symmetric(horizontal: 10),
           child: BottomNavigation(
             key: bottomNavigationStateKey,

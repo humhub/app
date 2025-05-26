@@ -1,9 +1,10 @@
 import 'package:app_badge_plus/app_badge_plus.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/event.dart';
+import 'package:humhub/pages/settings/provider.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/notifications/plugin.dart';
@@ -27,9 +28,11 @@ class PushPlugin extends ConsumerStatefulWidget {
 class PushPluginState extends ConsumerState<PushPlugin> {
   Future<void> _init() async {
     logInfo("Init PushPlugin");
-    await Firebase.initializeApp();
     final token = await FirebaseMessaging.instance.getToken();
-    if (token != null) logInfo('PushPlugin with token: $token');
+    if (token != null && await DataSharingConsentNotifier.isDeviceIdentifiersEnabled) {
+      logInfo('PushPlugin with token: $token');
+      FirebaseCrashlytics.instance.setUserIdentifier(token);
+    }
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       logInfo("Firebase messaging onMessage");
@@ -37,7 +40,7 @@ class PushPluginState extends ConsumerState<PushPlugin> {
         message,
         NotificationPlugin.of(ref),
       );
-      if(mounted){
+      if (mounted) {
         _handleData(message, context, ref);
       }
     });
