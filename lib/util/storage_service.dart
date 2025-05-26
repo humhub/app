@@ -28,14 +28,13 @@ class SecureStorageService {
   }
 
   static Future<bool> hasVisitedSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(keys.hasVisitedSettings) ?? false;
+    final value = await _instance.read(key: keys.hasVisitedSettings);
+    return value == 'true';
   }
 
   /// Marks that user has visited settings.
   static Future<void> setVisitedSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(keys.hasVisitedSettings, true);
+    await _instance.write(key: keys.hasVisitedSettings, value: 'true');
   }
 }
 

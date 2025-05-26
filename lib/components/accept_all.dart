@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class AcceptAllButton extends StatelessWidget {
+class SettingsButton extends StatelessWidget {
+  final String title;
+  final Color backgroundColor;
+  final Color? textColor;
   final VoidCallback onPressed;
 
-  const AcceptAllButton({
+  const SettingsButton({
     super.key,
     required this.onPressed,
+    required this.title,
+    required this.backgroundColor,
+    this.textColor,
   });
 
   @override
@@ -18,15 +23,15 @@ class AcceptAllButton extends StatelessWidget {
         onTap: onPressed,
         child: Container(
           width: MediaQuery.of(context).size.width * 0.90,
-          padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 14.0),
+          padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
           decoration: BoxDecoration(
-            color: Color(0xFF78A808),
+            color: backgroundColor,
             borderRadius: BorderRadius.circular(8.0),
             boxShadow: [
               BoxShadow(
                 color: Colors.black26,
-                blurRadius: 8,
-                offset: Offset(2, 2),
+                blurRadius: 1,
+                //offset: Offset(2, 2),
               ),
             ],
           ),
@@ -34,9 +39,9 @@ class AcceptAllButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                AppLocalizations.of(context)!.accept_all,
+                title,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: textColor ?? Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),

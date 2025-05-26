@@ -3,13 +3,17 @@ import 'package:talker_flutter/talker_flutter.dart';
 
 class ConsolePage extends StatelessWidget {
   static const String routeName = '/console';
-  static Talker talker = TalkerFlutter.init();
+  static Talker talker = TalkerFlutter.init(
+    settings: TalkerSettings(
+      useConsoleLogs: false,
+      useHistory: true,
+    ),
+  );
 
   const ConsolePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: TalkerView(
         talker: talker,

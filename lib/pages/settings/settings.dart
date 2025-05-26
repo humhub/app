@@ -68,23 +68,53 @@ class SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPro
                   DataSharingConsent(),
                 ],
               ),
-              Visibility(
-                visible: showButton,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
-                  child: AcceptAllButton(onPressed: () {
-                    ref.read(dataSharingConsentProvider.notifier).setSendDeviceIdentifiers(true);
-                    ref.read(dataSharingConsentProvider.notifier).setSendErrorReports(true);
-                    setState(() {
-                      showButton = false;
-                    });
-                    Toast.show(context, AppLocalizations.of(context)!.data_sharing_saved);
-                    Future.delayed(Duration(seconds: 4), () {
-                      if (!context.mounted) return;
-                      Navigator.of(context).pop();
-                    });
-                  }),
-                ),
+              Column(
+                children: [
+                  Visibility(
+                    visible: showButton,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                      child: SettingsButton(
+                          title: AppLocalizations.of(context)!.accept_all,
+                          backgroundColor: Theme.of(context).primaryColor,
+                          onPressed: () {
+                        ref.read(dataSharingConsentProvider.notifier).setSendDeviceIdentifiers(true);
+                        ref.read(dataSharingConsentProvider.notifier).setSendErrorReports(true);
+                        setState(() {
+                          showButton = false;
+                        });
+                        Toast.show(context, AppLocalizations.of(context)!.data_sharing_saved);
+                        Future.delayed(Duration(seconds: 4), () {
+                          if (!context.mounted) return;
+                          Navigator.of(context).pop();
+                        });
+                      }),
+                    ),
+                  ),
+                  Visibility(
+                    visible: showButton,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                      child: SettingsButton(
+                          title: AppLocalizations.of(context)!.decline_all,
+                          backgroundColor: Color(0xFFF5F5F5),
+                          textColor: Color(0xFF555555),
+                          onPressed: () {
+                            ref.read(dataSharingConsentProvider.notifier).setSendDeviceIdentifiers(false);
+                            ref.read(dataSharingConsentProvider.notifier).setSendErrorReports(false);
+                            setState(() {
+                              showButton = false;
+                            });
+                            Toast.show(context, AppLocalizations.of(context)!.data_sharing_saved);
+                            Future.delayed(Duration(seconds: 4), () {
+                              if (!context.mounted) return;
+                              Navigator.of(context).pop();
+                            });
+                          }),
+                    ),
+                  ),
+                  SizedBox(height: 20,)
+                ],
               )
             ],
           ),
