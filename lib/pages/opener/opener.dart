@@ -14,6 +14,7 @@ import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/openers/opener_controller.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:humhub/util/storage_service.dart';
 import 'package:loggy/loggy.dart';
 import 'package:rive/rive.dart' as rive;
 
@@ -38,6 +39,14 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
     openerControlLer.setReverseAnimation(rive.SimpleAnimation('animation', autoplay: true));
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final hasVisited = await SecureStorageService.hasVisitedSettings();
+      if (!hasVisited) {
+        Future.delayed(const Duration(seconds: 3), () {
+          if (mounted) {
+            Navigator.of(context).pushNamed(SettingsPage.path, arguments: true);
+          }
+        });
+      }
       // Delay before showing text field
       ref.read(visibilityProvider.notifier).setVisibility(true);
       Future.delayed(const Duration(milliseconds: 1000), () {
@@ -104,14 +113,14 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                 top: false,
                 child: Form(
                   key: openerControlLer.helper.key,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 50),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        // Language Switcher visibility
-                        AnimatedOpacity(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      // Language Switcher visibility
+                      Padding(
+                        padding: const EdgeInsets.only(top: 40),
+                        child: AnimatedOpacity(
                           opacity: ref.watch(languageSwitcherVisibilityProvider) ? 1.0 : 0.0,
                           duration: const Duration(milliseconds: 300),
                           child: Padding(
@@ -140,87 +149,87 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                             ),
                           ),
                         ),
-                        Expanded(
-                          flex: 3,
-                          child: SizedBox(
-                            height: 100,
-                            width: 230,
-                            child: Image.asset(Assets.logo),
-                          ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: SizedBox(
+                          height: 100,
+                          width: 230,
+                          child: Image.asset(Assets.logo),
                         ),
-                        Expanded(
-                          flex: 9,
-                          child: ref.watch(searchBarVisibilityNotifier)
-                              ? SearchBarWidget(openerControlLer: openerControlLer)
-                              : AnimatedOpacity(
-                                  opacity: ref.watch(textFieldVisibilityProvider) ? 1.0 : 0.0,
-                                  duration: const Duration(milliseconds: 250),
-                                  child: LastLoginWidget(
-                                      history: ref.watch(humHubProvider).history,
-                                      onAddNetwork: () {
-                                        logInfo('User tapped Add Network');
-                                        ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
-                                      },
-                                      onSelectNetwork: (Manifest manifest) async {
-                                        logInfo('User selected network: ${manifest.name}');
-                                        UniversalOpenerController uniOpen = UniversalOpenerController(url: manifest.startUrl);
-                                        await uniOpen.initHumHub();
-                                        // Always pop the current instance and init the new one.
-                                        LoadingProvider.of(ref).dismissAll();
+                      ),
+                      Expanded(
+                        flex: 9,
+                        child: ref.watch(searchBarVisibilityNotifier)
+                            ? SearchBarWidget(openerControlLer: openerControlLer)
+                            : AnimatedOpacity(
+                                opacity: ref.watch(textFieldVisibilityProvider) ? 1.0 : 0.0,
+                                duration: const Duration(milliseconds: 250),
+                                child: LastLoginWidget(
+                                    history: ref.watch(humHubProvider).history,
+                                    onAddNetwork: () {
+                                      logInfo('User tapped Add Network');
+                                      ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
+                                    },
+                                    onSelectNetwork: (Manifest manifest) async {
+                                      logInfo('User selected network: ${manifest.name}');
+                                      UniversalOpenerController uniOpen = UniversalOpenerController(url: manifest.startUrl);
+                                      await uniOpen.initHumHub();
+                                      // Always pop the current instance and init the new one.
+                                      LoadingProvider.of(ref).dismissAll();
 
-                                        openerControlLer.animationNavigationWrapper(
-                                          navigate: () => Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: uniOpen),
-                                        );
-                                      },
-                                      onDeleteNetwork: (manifest, isLast) async {
-                                        logInfo('User deleted network: ${manifest.name}');
-                                        ref.watch(humHubProvider.notifier).removeHistory(manifest);
-                                        if (isLast) {
-                                          ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
-                                        }
-                                      }),
+                                      openerControlLer.animationNavigationWrapper(
+                                        navigate: () => Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: uniOpen),
+                                      );
+                                    },
+                                    onDeleteNetwork: (manifest, isLast) async {
+                                      logInfo('User deleted network: ${manifest.name}');
+                                      ref.watch(humHubProvider.notifier).removeHistory(manifest);
+                                      if (isLast) {
+                                        ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
+                                      }
+                                    }),
+                              ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 30),
+                          child: GestureDetector(
+                            onTap: () {
+                              logInfo('User tapped help link');
+                              openerControlLer.animationNavigationWrapper(
+                                navigate: () => Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    transitionDuration: const Duration(milliseconds: 500),
+                                    pageBuilder: (context, animation, secondaryAnimation) => const Help(),
+                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      );
+                                    },
+                                  ),
                                 ),
-                        ),
-                        Expanded(
-                          flex: 3,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 30),
-                            child: GestureDetector(
-                              onTap: () {
-                                logInfo('User tapped help link');
-                                openerControlLer.animationNavigationWrapper(
-                                  navigate: () => Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      transitionDuration: const Duration(milliseconds: 500),
-                                      pageBuilder: (context, animation, secondaryAnimation) => const Help(),
-                                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                        return FadeTransition(
-                                          opacity: animation,
-                                          child: child,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: AnimatedOpacity(
-                                opacity: ref.watch(visibilityProvider) ? 1.0 : 0.0,
-                                duration: const Duration(milliseconds: 300),
-                                child: Text(
-                                  AppLocalizations.of(context)!.opener_need_help,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500,
-                                    decoration: TextDecoration.underline,
-                                  ),
+                              );
+                            },
+                            child: AnimatedOpacity(
+                              opacity: ref.watch(visibilityProvider) ? 1.0 : 0.0,
+                              duration: const Duration(milliseconds: 300),
+                              child: Text(
+                                AppLocalizations.of(context)!.opener_need_help,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  decoration: TextDecoration.underline,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),

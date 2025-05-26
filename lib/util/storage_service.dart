@@ -26,6 +26,17 @@ class SecureStorageService {
       prefs.setBool(key, true);
     }
   }
+
+  static Future<bool> hasVisitedSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(keys.hasVisitedSettings) ?? false;
+  }
+
+  /// Marks that user has visited settings.
+  static Future<void> setVisitedSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(keys.hasVisitedSettings, true);
+  }
 }
 
 class _Keys {
@@ -33,4 +44,5 @@ class _Keys {
   String lastInstanceUrl = "humHubLastUrl";
   String keyErrorReports = 'send_error_reports';
   String keyDeviceIdentifiers = 'send_device_identifiers';
+  String hasVisitedSettings = 'hasVisitedSettings';
 }
