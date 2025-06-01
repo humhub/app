@@ -8,6 +8,7 @@ import 'package:humhub/pages/opener/components/search_bar.dart';
 import 'package:humhub/pages/settings/settings.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
+import 'package:humhub/util/headless_background_request.dart';
 import 'package:humhub/util/init_from_url.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/channel.dart';
