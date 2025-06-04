@@ -77,6 +77,22 @@
       }
     }
   },
-  "file_sharing_error": "Fehler beim Dateiaustausch",
-  "close": "Schließen"
+  "file_sharing_error": "Fehler bei Dateifreigabe",
+  "close": "Schließen",
+
+  "language_en": "Englisch",
+  "language_de": "Deutsch",
+  "language_fr": "Französisch",
+  "language_saved": "Die ausgewählte Sprache wurde gespeichert.",
+
+  "data_sharing_title": "Helfe uns, die HumHub-App zu verbessern",
+  "data_sharing_content": "Um uns zu helfen, die App-Erfahrung zu verbessern, aktiviere bitte die nachfolgenden Optionen. Dadurch kann HumHub anonyme Fehlerberichte und grundlegende Geräteinformationen erhalten, was uns hilft, Fehler schneller zu erkennen, die Leistung der App unter realen Bedingungen zu verstehen und Verbesserungen zu priorisieren.",
+  "data_sharing_error_reports_title": "Anonyme Fehlerberichte senden",
+  "data_sharing_error_reports_subtitle": "Enthält Absturzprotokolle und technische Fehler. Es werden keine persönlichen Daten weitergegeben.",
+  "data_sharing_device_id_title": "Geräte- und Sitzungskennungen senden",
+  "data_sharing_device_id_subtitle": "Wird verwendet, um Probleme über Geräte und Sitzungen hinweg nachzuvollziehen. Hilft, Fehler genauer zu reproduzieren.",
+  "data_sharing_saved": "Deine Auswahl wurde gespeichert.",
+
+  "accept_all": "Alle akzeptieren",
+  "decline_all": "Alle ablehnen"
 }

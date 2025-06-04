@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/util/const.dart';
 import 'package:humhub/util/openers/opener_controller.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -31,48 +30,41 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
             duration: const Duration(milliseconds: 250),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 35),
-              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
-              child: Column(
-                children: [
-                  TextFormField(
-                    keyboardType: TextInputType.url,
-                    controller: widget.openerControlLer.urlTextController,
-                    cursorColor: Theme.of(context).textTheme.bodySmall?.color,
-                    onSaved: widget.openerControlLer.helper
-                        .onSaved(widget.openerControlLer.formUrlKey),
-                    onEditingComplete: connect,
-                    onChanged: (value) {
-                      final cursorPosition = widget.openerControlLer
-                          .urlTextController.selection.baseOffset;
-                      final trimmedValue = value.trim();
-                      widget.openerControlLer.urlTextController.value =
-                          TextEditingValue(
-                        text: trimmedValue,
-                        selection: TextSelection.collapsed(
-                            offset: cursorPosition > trimmedValue.length
-                                ? trimmedValue.length
-                                : cursorPosition),
-                      );
-                    },
-                    style: const TextStyle(
-                      decoration: TextDecoration.none,
-                    ),
-                    decoration: _openerDecoration(context),
-                    validator: (value) =>
-                        widget.openerControlLer.validateUrl(value, context),
-                    autocorrect: false,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5, bottom: 5),
-                    child: Text(
-                      AppLocalizations.of(context)!.opener_enter_url,
+              color: Colors.white.withValues(alpha: 0.8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      keyboardType: TextInputType.url,
+                      controller: widget.openerControlLer.urlTextController,
+                      cursorColor: Theme.of(context).textTheme.bodySmall?.color,
+                      onSaved: widget.openerControlLer.helper.onSaved(widget.openerControlLer.formUrlKey),
+                      onEditingComplete: connect,
+                      onChanged: (value) {
+                        final cursorPosition = widget.openerControlLer.urlTextController.selection.baseOffset;
+                        final trimmedValue = value.trim();
+                        widget.openerControlLer.urlTextController.value = TextEditingValue(
+                          text: trimmedValue,
+                          selection: TextSelection.collapsed(offset: cursorPosition > trimmedValue.length ? trimmedValue.length : cursorPosition),
+                        );
+                      },
                       style: const TextStyle(
-                          color: Colors.grey,
-                          fontStyle: FontStyle.italic,
-                          fontSize: 13),
+                        decoration: TextDecoration.none,
+                      ),
+                      decoration: _openerDecoration(context),
+                      validator: (value) => widget.openerControlLer.validateUrl(value, context),
+                      autocorrect: false,
                     ),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5, bottom: 5),
+                      child: Text(
+                        AppLocalizations.of(context)!.opener_enter_url,
+                        style: const TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -90,7 +82,7 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                       side: BorderSide(
-                        color: HumhubTheme.primaryColor,
+                        color: Theme.of(context).primaryColor,
                         width: 2,
                       ),
                     ),
@@ -100,7 +92,7 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
                   child: Text(
                     AppLocalizations.of(context)!.connect,
                     style: TextStyle(
-                      color: HumhubTheme.primaryColor,
+                      color: Theme.of(context).primaryColor,
                       fontSize: 20,
                     ),
                   ),
@@ -118,8 +110,7 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
       _isLoading = true;
     });
     try {
-      widget.openerControlLer.helper
-          .onSaved(widget.openerControlLer.formUrlKey);
+      widget.openerControlLer.helper.onSaved(widget.openerControlLer.formUrlKey);
       bool isSuc = await widget.openerControlLer.connect();
       Future.delayed(const Duration(seconds: 1), () {
         if (isSuc) {
@@ -137,13 +128,13 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
         focusedBorder: const OutlineInputBorder(
           borderSide: BorderSide(
             color: Colors.grey,
-            width: 1.0,
+            width: 1.5,
           ),
         ),
         border: const OutlineInputBorder(
           borderSide: BorderSide(
             color: Colors.grey,
-            width: 1.0,
+            width: 1.5,
           ),
         ),
         suffixIcon: _isLoading
@@ -153,14 +144,12 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
                 height: 4,
                 child: CircularProgressIndicator(
                   strokeWidth: 4,
-                  color: HumhubTheme.primaryColor,
+                  color: Theme.of(context).primaryColor,
                 ),
               )
             : null,
         floatingLabelBehavior: FloatingLabelBehavior.always,
         labelText: AppLocalizations.of(context)!.url.toUpperCase(),
-        labelStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).textTheme.bodySmall?.color),
+        labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
       );
 }
