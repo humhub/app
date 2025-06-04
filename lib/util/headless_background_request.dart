@@ -5,13 +5,15 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class HeadlessBackgroundRequest {
   final String targetUrl;
-  final Map<String, dynamic> postData;
+  final String postUrl;
+  final Map<String, dynamic>? postData;
   final Map<String, String>? headers;
   final Duration timeout;
 
   HeadlessBackgroundRequest({
     required this.targetUrl,
-    required this.postData,
+    required this.postUrl,
+    this.postData,
     this.headers,
     this.timeout = const Duration(seconds: 30),
   });
@@ -22,7 +24,7 @@ class HeadlessBackgroundRequest {
 
     try {
       headlessWebView = HeadlessInAppWebView(
-        initialUrlRequest: URLRequest(url: WebUri.uri(Uri.parse(targetUrl))),
+        initialUrlRequest: URLRequest(url: WebUri.uri(Uri.parse(targetUrl)), headers: headers),
         onWebViewCreated: (controller) async {
           await _setupJavaScriptHandlers(controller, completer, headlessWebView);
         },
@@ -79,48 +81,46 @@ class HeadlessBackgroundRequest {
   }
 
   Future<void> _executePostRequest(InAppWebViewController controller) async {
-    String jsonData = jsonEncode(postData);
+    String jsonData = jsonEncode(postData ?? {});
     String jsonHeaders = jsonEncode(headers ?? {});
 
     String jsCode = """
-      (function() {
-        try {
-          const postData = JSON.parse('$jsonData');
-          const headers = JSON.parse('$jsonHeaders');
-          
-          // Wait for page to be fully loaded
-          if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', performRequest);
-          } else {
-            performRequest();
-          }
-          
-          function performRequest() {
-            fetch('$targetUrl', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                ...headers
-              },
-              body: JSON.stringify(postData)
-            })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error(`HTTP \${response.status}: \${response.statusText}`);
-              }
-              return response.json();
-            })
-            .then(data => {
-              window.flutter_inappwebview.callHandler('onPostSuccess', data);
-            })
-            .catch(error => {
-              window.flutter_inappwebview.callHandler('onPostError', error.message);
-            });
-          }
-        } catch (e) {
-          window.flutter_inappwebview.callHandler('onPostError', e.message);
+    (function() {
+      try {
+        var postData = $jsonData;
+        var headers = $jsonHeaders;
+    
+        // Wait for page to be fully loaded
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', performRequest);
+        } else {
+          performRequest();
         }
-      })();
+    
+        function performRequest() {
+          if (typeof \$ === 'undefined') {
+            window.flutter_inappwebview.callHandler('onPostError', 'jQuery is not loaded');
+            return;
+          }
+          \$.ajax({
+            url: '$postUrl',
+            type: 'POST',
+            data: JSON.stringify(postData),
+            contentType: 'application/json',
+            headers: headers,
+            success: function(data) {
+              window.flutter_inappwebview.callHandler('onPostSuccess', data);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+              var errorMsg = 'AJAX Error: ' + textStatus + ' ' + errorThrown + ' ' + jqXHR.responseText;
+              window.flutter_inappwebview.callHandler('onPostError', errorMsg);
+            }
+          });
+        }
+      } catch (e) {
+        window.flutter_inappwebview.callHandler('onPostError', e.message);
+      }
+    })();
     """;
 
     await controller.evaluateJavascript(source: jsCode);
