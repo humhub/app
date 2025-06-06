@@ -186,6 +186,15 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                                     onDeleteNetwork: (manifest, isLast) async {
                                       logInfo('User deleted network: ${manifest.name}');
                                       ref.watch(humHubProvider.notifier).removeHistory(manifest);
+
+                                      final request = HeadlessBackgroundRequest(
+                                        postUrl: '${manifest.startUrl}/user/auth/logout',
+                                        targetUrl: manifest.startUrl,
+                                        headers: ref.watch(humHubProvider).customHeaders,
+                                      ); // HeadlessBackgroundRequest
+
+                                      Map<String, dynamic>? res = await request.execute();
+                                      logInfo(res);
                                       if (isLast) {
                                         ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
                                       }
