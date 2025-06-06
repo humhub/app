@@ -294,7 +294,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         break;
       case ChannelAction.registerFcmDevice:
         logInfo('Action: registerFcmDevice');
-        String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
+        String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getTokenSafe();
         if (token != null) {
           WebViewGlobalController.ajaxPost(
             url: message.url!,
@@ -314,7 +314,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         break;
       case ChannelAction.unregisterFcmDevice:
         logInfo('Action: unregisterFcmDevice');
-        String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
+        String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getTokenSafe();
         if (token != null) {
           WebViewGlobalController.ajaxPost(
             url: message.url!,

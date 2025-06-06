@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loggy/loggy.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:mime/mime.dart';
+
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
     try {
@@ -111,7 +113,6 @@ extension IterableX<E> on Iterable<E> {
 /// This extension ensures that MIME types are always specific (e.g., 'image/jpeg')
 /// and provides the corresponding file extension using the `mime` package.
 extension SharedMediaFileExtension on SharedMediaFile {
-
   /// Gets the file extension based on the MIME type of the file.
   String? get fileExtension {
     String? mimeType = lookupMimeType(path);
@@ -127,5 +128,15 @@ extension ListExtension<T> on List<T>? {
   bool get isNullOrEmpty => this == null || this!.isEmpty;
 }
 
-
-
+extension FirebaseMessagingExtension on FirebaseMessaging {
+  Future<String?> getTokenSafe({
+    String? vapidKey,
+  }) async {
+    try {
+      return await getToken(vapidKey: vapidKey);
+    } catch (e, s) {
+      logError(e.toString(), e, s);
+      return null;
+    }
+  }
+}

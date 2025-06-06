@@ -212,7 +212,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   Future<void> _handleJSMessage(ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
     switch (message.action) {
       case ChannelAction.registerFcmDevice:
-        String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getToken();
+        String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getTokenSafe();
         if (token != null) {
           WebViewGlobalController.ajaxPost(
             url: message.url!,
