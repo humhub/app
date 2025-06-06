@@ -75,7 +75,7 @@ class HeadlessBackgroundRequest {
       handlerName: 'onPostError',
       callback: (args) {
         if (!completer.isCompleted) {
-          completer.complete({'error': args.isNotEmpty ? args[0] : 'Unknown error'});
+          completer.complete();
         }
         headlessWebView?.dispose();
       },

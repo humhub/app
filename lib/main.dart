@@ -32,6 +32,6 @@ void main() {
       child: app,
     ));
   }, (error, stack) {
-    logError('Global error: $error', stack);
+    logError('Global error: $error', error, stack);
   });
 }

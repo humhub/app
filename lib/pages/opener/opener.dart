@@ -193,6 +193,12 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                                         headers: ref.watch(humHubProvider).customHeaders,
                                       ).execute();
 
+                                      HeadlessBackgroundRequest(
+                                        postUrl: '${manifest.startUrl}index.php?r=user%2Fauth%2Flogout',
+                                        targetUrl: manifest.startUrl,
+                                        headers: ref.watch(humHubProvider).customHeaders,
+                                      ).execute();
+
                                       if (isLast) {
                                         ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
                                       }
