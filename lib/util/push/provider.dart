@@ -11,7 +11,7 @@ final _pushTokenProvider = FutureProvider<AsyncValue<String?>>(
   (ref) async {
     var initialized = ref.watch(firebaseInitialized.notifier).state;
     if (initialized.isLoaded) {
-      return AsyncValue.guard(FirebaseMessaging.instance.getToken);
+      return AsyncValue.guard(FirebaseMessaging.instance.getTokenSafe);
     }
     return const AsyncValue.loading();
   },

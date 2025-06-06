@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/event.dart';
 import 'package:humhub/pages/settings/provider.dart';
+import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/notifications/plugin.dart';
@@ -28,7 +29,7 @@ class PushPlugin extends ConsumerStatefulWidget {
 class PushPluginState extends ConsumerState<PushPlugin> {
   Future<void> _init() async {
     logInfo("Init PushPlugin");
-    final token = await FirebaseMessaging.instance.getToken();
+    final token = await FirebaseMessaging.instance.getTokenSafe();
     if (token != null && await DataSharingConsentNotifier.isDeviceIdentifiersEnabled) {
       logInfo('PushPlugin with token: $token');
       FirebaseCrashlytics.instance.setUserIdentifier(token);

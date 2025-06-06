@@ -44,7 +44,7 @@ class _RegisterToken extends ConsumerStatefulWidget {
 
 class _RegisterTokenState extends ConsumerState<_RegisterToken> {
   Future<void> _maybeRegisterToken() async {
-    final token = await FirebaseMessaging.instance.getToken();
+    final token = await FirebaseMessaging.instance.getTokenSafe();
     if (token == null) {
       logInfo('Firebase reported null token.');
       return;
