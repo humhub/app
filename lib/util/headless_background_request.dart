@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:loggy/loggy.dart';
 
 class HeadlessBackgroundRequest {
   final String targetUrl;
@@ -18,8 +19,8 @@ class HeadlessBackgroundRequest {
     this.timeout = const Duration(seconds: 30),
   });
 
-  Future<Map<String, dynamic>?> execute() async {
-    final completer = Completer<Map<String, dynamic>?>();
+  Future<void> execute() async {
+    final completer = Completer<void>();
     HeadlessInAppWebView? headlessWebView;
 
     try {
@@ -33,7 +34,8 @@ class HeadlessBackgroundRequest {
         },
         onReceivedError: (controller, request, error) {
           if (!completer.isCompleted) {
-            completer.complete({'error': 'Load error: ${error.description}'});
+            completer.complete();
+            logError({'error': 'Exception: ${error.toString()}', 'request': request.toString()}, error, StackTrace.current);
           }
           headlessWebView?.dispose();
         },
@@ -45,18 +47,18 @@ class HeadlessBackgroundRequest {
         timeout,
         onTimeout: () {
           headlessWebView?.dispose();
-          return {'error': 'Request timeout after ${timeout.inSeconds} seconds'};
+          logError('Request timeout after ${timeout.inSeconds} seconds');
         },
       );
-    } catch (e) {
+    } catch (error, stackTrace) {
       headlessWebView?.dispose();
-      return {'error': 'Exception: ${e.toString()}'};
+      logError('Exception: ${error.toString()}', error, stackTrace);
     }
   }
 
   Future<void> _setupJavaScriptHandlers(
     InAppWebViewController controller,
-    Completer<Map<String, dynamic>?> completer,
+    Completer<void> completer,
     HeadlessInAppWebView? headlessWebView,
   ) async {
     controller.addJavaScriptHandler(
