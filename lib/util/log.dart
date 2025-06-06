@@ -66,7 +66,8 @@ class GlobalLog extends LoggyPrinter {
       FirebaseCrashlytics.instance.recordError(
         record.error ?? record.message,
         record.stackTrace,
-        reason: 'GlobalLog error log',
+        printDetails: true,
+        fatal: true,
         information: [
           'caller: $callerFrame',
           'time: ${record.time.toIso8601String()}'
