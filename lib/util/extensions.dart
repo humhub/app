@@ -128,5 +128,15 @@ extension ListExtension<T> on List<T>? {
   bool get isNullOrEmpty => this == null || this!.isEmpty;
 }
 
-
-
+extension FirebaseMessagingExtension on FirebaseMessaging {
+  Future<String?> getTokenSafe({
+    String? vapidKey,
+  }) async {
+    try {
+      return await getToken(vapidKey: vapidKey);
+    } catch (e, s) {
+      logError(e.toString(), e, s);
+      return null;
+    }
+  }
+}
