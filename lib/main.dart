@@ -16,7 +16,7 @@ void main() {
   };
 
   PlatformDispatcher.instance.onError = (error, stack) {
-    logError('PlatformDispatcher caught: $error', error, stack);
+    logError('PlatformDispatcher error: $error', error, stack);
     return true;
   };
 

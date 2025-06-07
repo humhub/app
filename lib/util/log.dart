@@ -67,7 +67,6 @@ class GlobalLog extends LoggyPrinter {
         record.error ?? record.message,
         record.stackTrace,
         printDetails: true,
-        fatal: true,
         information: [
           'caller: $callerFrame',
           'time: ${record.time.toIso8601String()}'

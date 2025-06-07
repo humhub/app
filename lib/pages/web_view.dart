@@ -491,7 +491,6 @@ class WebViewAppState extends ConsumerState<WebView> {
   void dispose() {
     logInfo('Disposing WebView and controllers');
     if (_headlessWebView != null) _headlessWebView!.dispose();
-    _pullToRefreshController.dispose();
     _subscription?.cancel();
     super.dispose();
   }

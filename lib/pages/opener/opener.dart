@@ -103,7 +103,6 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                           logInfo('FAB pressed: toggling search bar visibility');
                           ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
                         },
-                        tooltip: 'Increment',
                         backgroundColor: Colors.white,
                         child: Icon(Icons.arrow_back, color: Theme.of(context).primaryColor),
                       ),
