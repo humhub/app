@@ -16,7 +16,7 @@ void main() {
   };
 
   PlatformDispatcher.instance.onError = (error, stack) {
-    logError('PlatformDispatcher caught: $error', error, stack);
+    logError('PlatformDispatcher error: $error', error, stack);
     return true;
   };
 
@@ -32,6 +32,6 @@ void main() {
       child: app,
     ));
   }, (error, stack) {
-    logError('Global error: $error', stack);
+    logError('Global error: $error', error, stack);
   });
 }

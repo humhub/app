@@ -8,6 +8,7 @@ import 'package:humhub/pages/opener/components/search_bar.dart';
 import 'package:humhub/pages/settings/settings.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
+import 'package:humhub/util/headless_background_request.dart';
 import 'package:humhub/util/init_from_url.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/channel.dart';
@@ -102,7 +103,6 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                           logInfo('FAB pressed: toggling search bar visibility');
                           ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
                         },
-                        tooltip: 'Increment',
                         backgroundColor: Colors.white,
                         child: Icon(Icons.arrow_back, color: Theme.of(context).primaryColor),
                       ),
@@ -185,6 +185,19 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
                                     onDeleteNetwork: (manifest, isLast) async {
                                       logInfo('User deleted network: ${manifest.name}');
                                       ref.watch(humHubProvider.notifier).removeHistory(manifest);
+
+                                      HeadlessBackgroundRequest(
+                                        postUrl: '${manifest.startUrl}/user/auth/logout',
+                                        targetUrl: manifest.startUrl,
+                                        headers: ref.watch(humHubProvider).customHeaders,
+                                      ).execute();
+
+                                      HeadlessBackgroundRequest(
+                                        postUrl: '${manifest.startUrl}index.php?r=user%2Fauth%2Flogout',
+                                        targetUrl: manifest.startUrl,
+                                        headers: ref.watch(humHubProvider).customHeaders,
+                                      ).execute();
+
                                       if (isLast) {
                                         ref.watch(searchBarVisibilityNotifier.notifier).toggleVisibility();
                                       }
