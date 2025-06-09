@@ -51,72 +51,74 @@ class SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPro
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  SizedBox(
-                    height: 10,
-                  ),
-                  LanguageSwitcher(),
-                  SizedBox(
-                    height: 35,
-                  ),
-                  DataSharingConsent(),
-                ],
-              ),
-              Column(
-                children: [
-                  Visibility(
-                    visible: showButton,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-                      child: SettingsButton(
-                          title: AppLocalizations.of(context)!.accept_all,
-                          backgroundColor: Theme.of(context).primaryColor,
-                          onPressed: () {
-                        ref.read(dataSharingConsentProvider.notifier).setSendDeviceIdentifiers(true);
-                        ref.read(dataSharingConsentProvider.notifier).setSendErrorReports(true);
-                        setState(() {
-                          showButton = false;
-                        });
-                        Toast.show(context, AppLocalizations.of(context)!.data_sharing_saved);
-                        Future.delayed(Duration(seconds: 4), () {
-                          if (!context.mounted) return;
-                          Navigator.of(context).pop();
-                        });
-                      }),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    SizedBox(
+                      height: 10,
                     ),
-                  ),
-                  Visibility(
-                    visible: showButton,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                      child: SettingsButton(
-                          title: AppLocalizations.of(context)!.decline_all,
-                          backgroundColor: Color(0xFFF5F5F5),
-                          textColor: Color(0xFF555555),
-                          onPressed: () {
-                            ref.read(dataSharingConsentProvider.notifier).setSendDeviceIdentifiers(false);
-                            ref.read(dataSharingConsentProvider.notifier).setSendErrorReports(false);
-                            setState(() {
-                              showButton = false;
-                            });
-                            Toast.show(context, AppLocalizations.of(context)!.data_sharing_saved);
-                            Future.delayed(Duration(seconds: 4), () {
-                              if (!context.mounted) return;
-                              Navigator.of(context).pop();
-                            });
-                          }),
+                    LanguageSwitcher(),
+                    SizedBox(
+                      height: 35,
                     ),
-                  ),
-                  SizedBox(height: 20,)
-                ],
-              )
-            ],
+                    DataSharingConsent(),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Visibility(
+                      visible: showButton,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                        child: SettingsButton(
+                            title: AppLocalizations.of(context)!.accept_all,
+                            backgroundColor: Theme.of(context).primaryColor,
+                            onPressed: () {
+                          ref.read(dataSharingConsentProvider.notifier).setSendDeviceIdentifiers(true);
+                          ref.read(dataSharingConsentProvider.notifier).setSendErrorReports(true);
+                          setState(() {
+                            showButton = false;
+                          });
+                          Toast.show(context, AppLocalizations.of(context)!.data_sharing_saved);
+                          Future.delayed(Duration(seconds: 4), () {
+                            if (!context.mounted) return;
+                            Navigator.of(context).pop();
+                          });
+                        }),
+                      ),
+                    ),
+                    Visibility(
+                      visible: showButton,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                        child: SettingsButton(
+                            title: AppLocalizations.of(context)!.decline_all,
+                            backgroundColor: Color(0xFFF5F5F5),
+                            textColor: Color(0xFF555555),
+                            onPressed: () {
+                              ref.read(dataSharingConsentProvider.notifier).setSendDeviceIdentifiers(false);
+                              ref.read(dataSharingConsentProvider.notifier).setSendErrorReports(false);
+                              setState(() {
+                                showButton = false;
+                              });
+                              Toast.show(context, AppLocalizations.of(context)!.data_sharing_saved);
+                              Future.delayed(Duration(seconds: 4), () {
+                                if (!context.mounted) return;
+                                Navigator.of(context).pop();
+                              });
+                            }),
+                      ),
+                    ),
+                    SizedBox(height: 20,)
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
