@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/global_package_info.dart';
@@ -180,6 +181,23 @@ class WebViewGlobalController {
       }
     })();
   """);
+  }
+
+  // Android: env(safe-area-*) does not return the correct value when the device has the system navigation enabled
+  // iOS: OK
+  static void setWebViewSafeAreaPadding({
+    required double bottomInset,
+  }) {
+    if (Platform.isAndroid) {
+      value?.evaluateJavascript(source: """
+    (function() {
+      const element = document.querySelector('#topbar > .container #top-menu-nav');
+      if (element) {
+        element.style.paddingBottom = '${bottomInset}px';
+      }
+    })();
+  """);
+    }
   }
 
   static Future<void> zoomOut() async {

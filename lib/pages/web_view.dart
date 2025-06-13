@@ -157,6 +157,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
+    WebViewGlobalController.setWebViewSafeAreaPadding(bottomInset: MediaQuery.of(context).padding.bottom);
 
     if (WebViewGlobalController.isCommonURIScheme(webUri: action.request.url!)) {
       return WebViewGlobalController.handleCommonURISchemes(webUri: action.request.url!);
@@ -165,6 +166,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     final url = action.request.url!.rawValue;
 
     logDebug('Navigation attempt: ${action.request.url}');
+
     /// First BLOCK everything that rules out as blocked.
     if (BlackListRules.check(url)) {
       logInfo('Blocked navigation to $url by blacklist rules');
@@ -248,6 +250,8 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
+    WebViewGlobalController.setWebViewSafeAreaPadding(bottomInset: MediaQuery.of(context).padding.bottom);
+
     LoadingProvider.of(ref).dismissAll();
   }
 
@@ -256,6 +260,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
+    WebViewGlobalController.setWebViewSafeAreaPadding(bottomInset: MediaQuery.of(context).padding.bottom);
   }
 
   _onProgressChanged(InAppWebViewController controller, int progress) {
