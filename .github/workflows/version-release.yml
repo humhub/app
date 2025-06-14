@@ -96,11 +96,13 @@ jobs:
           token: ${{ github.token }}
           commit: ${{ github.sha }}
           allowUpdates: true
-      - name: Upload app bundle
+      - name: Upload app bundle and APKs
         uses: actions/upload-artifact@v4
         with:
-          name: appbundle
-          path: build/app/outputs/bundle/release/app-release.aab
+          name: appbundle-and-apks
+          path: |
+            build/app/outputs/bundle/release/app-release.aab
+            build/app/outputs/flutter-apk/*.apk
 
   release_android:
     name: Release APK to Google Play
