@@ -190,13 +190,12 @@ class WebViewGlobalController {
   }) {
     if (Platform.isAndroid) {
       value?.evaluateJavascript(source: """
-    (function() {
-      const element = document.querySelector('#topbar > .container #top-menu-nav');
-      if (element) {
-        element.style.paddingBottom = '${bottomInset}px';
-      }
-    })();
-  """);
+      (function() {
+        const element = document.querySelector('#topbar > .container #top-menu-nav');
+        if (element) {
+          element.style.paddingBottom = '${bottomInset}px';
+        }
+      })();""");
     }
   }
 
