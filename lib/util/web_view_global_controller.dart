@@ -188,7 +188,6 @@ class WebViewGlobalController {
   // iOS: OK
   static void setWebViewSafeAreaPadding({required EdgeInsets safeArea}) {
     if (Platform.isAndroid) {
-      // Only inject if menu is at bottom and device is mobile
       value?.evaluateJavascript(source: """
       (function() {
         var style = document.createElement('style');
