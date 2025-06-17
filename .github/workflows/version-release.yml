@@ -76,7 +76,7 @@ jobs:
           java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.0'
+          flutter-version: '3.29.0'
           channel: 'stable'
       - uses: chkfung/android-version-actions@v1.2.1
         with:
@@ -180,7 +180,7 @@ jobs:
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.0'
+          flutter-version: '3.29.0'
           channel: 'stable'
 
       - name: Install pub dependencies
