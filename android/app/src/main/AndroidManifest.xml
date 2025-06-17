@@ -84,14 +84,6 @@
                 android:name="android.app.category"
                 android:value="productivity"/>
 
-            <meta-data
-                android:name="com.samsung.android.gamemanager.force_disabled"
-                android:value="true"/>
-
-            <meta-data
-                android:name="com.samsung.android.sm.policy"
-                android:value="exclude_from_agg_auto_restriction"/>
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
