@@ -1,0 +1,2 @@
+/Users/pratej/Documents/repo/Humhub/app/android/app/.cxx/Debug/u1i4y425/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/pratej/Documents/repo/Humhub/app/android/app/.cxx/Debug/u1i4y425/armeabi-v7a/CMakeFiles/rebuild_cache.dir

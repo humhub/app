@@ -28,7 +28,7 @@ import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/router.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
-import 'package:open_file_plus/open_file_plus.dart';
+import 'package:open_file/open_file.dart';
 import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';

@@ -58,7 +58,6 @@ dependencies:
   intl: any
   flutter_dotenv: ^5.1.0
   path_provider: ^2.1.4
-  open_file_plus: ^3.4.1+1
   cached_network_image: ^3.3.1
   talker_flutter: ^4.6.11
   quick_actions: ^1.1.0
@@ -67,6 +66,7 @@ dependencies:
   firebase_crashlytics: ^4.3.5
   flutter_svg: ^2.0.9
   flutter_styled_toast: ^2.2.1
+  open_file: ^3.5.10
 
 dependency_overrides:
   url_launcher_android: 6.3.9
