@@ -1,2 +1,0 @@
-/Users/pratej/Documents/repo/Humhub/app/android/app/.cxx/Debug/u1i4y425/arm64-v8a/CMakeFiles/edit_cache.dir
-/Users/pratej/Documents/repo/Humhub/app/android/app/.cxx/Debug/u1i4y425/arm64-v8a/CMakeFiles/rebuild_cache.dir
