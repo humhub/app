@@ -101,30 +101,32 @@ class WebViewAppState extends ConsumerState<WebView> {
       key: _scaffoldKey,
       backgroundColor: HexColor(_manifest.themeColor),
       body: SafeArea(
-          bottom: false,
-          // ignore: deprecated_member_use
-          child: WillPopScope(
-            onWillPop: () => exitApp(context, ref),
-            child: FileUploadManagerWidget(
-              child: InAppWebView(
-                  initialUrlRequest: _initialRequest,
-                  initialSettings: WebViewGlobalController.settings(),
-                  pullToRefreshController: _pullToRefreshController,
-                  shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
-                  onWebViewCreated: _onWebViewCreated,
-                  shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
-                  onCreateWindow: _onCreateWindow,
-                  onLoadStop: _onLoadStop,
-                  onLoadStart: _onLoadStart,
-                  onProgressChanged: _onProgressChanged,
-                  onReceivedError: _onReceivedError,
-                  onDownloadStartRequest: _onDownloadStartRequest,
-                  onLongPressHitTestResult: WebViewGlobalController.onLongPressHitTestResult,
-                  onReceivedHttpError: (controller, request, errorResponse) {
-                    logError(errorResponse);
-                  }),
+        bottom: false,
+        // ignore: deprecated_member_use
+        child: WillPopScope(
+          onWillPop: () => exitApp(context, ref),
+          child: FileUploadManagerWidget(
+            child: InAppWebView(
+              initialUrlRequest: _initialRequest,
+              initialSettings: WebViewGlobalController.settings(),
+              pullToRefreshController: _pullToRefreshController,
+              shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
+              onWebViewCreated: _onWebViewCreated,
+              shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
+              onCreateWindow: _onCreateWindow,
+              onLoadStop: _onLoadStop,
+              onLoadStart: _onLoadStart,
+              onProgressChanged: _onProgressChanged,
+              onReceivedError: _onReceivedError,
+              onDownloadStartRequest: _onDownloadStartRequest,
+              onLongPressHitTestResult: WebViewGlobalController.onLongPressHitTestResult,
+              onReceivedHttpError: (controller, request, errorResponse) {
+                logError(errorResponse);
+              },
             ),
-          )),
+          ),
+        ),
+      ),
     );
   }
 
@@ -157,6 +159,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
+    WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: MediaQuery.of(context).padding);
 
     if (WebViewGlobalController.isCommonURIScheme(webUri: action.request.url!)) {
       return WebViewGlobalController.handleCommonURISchemes(webUri: action.request.url!);
@@ -165,6 +168,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     final url = action.request.url!.rawValue;
 
     logDebug('Navigation attempt: ${action.request.url}');
+
     /// First BLOCK everything that rules out as blocked.
     if (BlackListRules.check(url)) {
       logInfo('Blocked navigation to $url by blacklist rules');
@@ -239,15 +243,12 @@ class WebViewAppState extends ConsumerState<WebView> {
 
   _onLoadStop(InAppWebViewController controller, Uri? url) {
     logDebug('Page load stopped: $url');
-    // Disable remember me checkbox on login and set def. value to true: check if the page is actually login page, if it is inject JS that hides element
-    if (url!.path.contains('/user/auth/login')) {
-      WebViewGlobalController.value!.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
-      WebViewGlobalController.value!
-          .evaluateJavascript(source: "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
-    }
+    if (url!.path.contains('/user/auth/login')) WebViewGlobalController.setLoginForm();
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
+    WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: MediaQuery.of(context).padding);
+
     LoadingProvider.of(ref).dismissAll();
   }
 
@@ -256,6 +257,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
+    WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: MediaQuery.of(context).padding);
   }
 
   _onProgressChanged(InAppWebViewController controller, int progress) {
@@ -349,29 +351,31 @@ class WebViewAppState extends ConsumerState<WebView> {
       return Future.value(false);
     } else {
       logDebug('Showing exit confirmation dialog');
-      final exitConfirmed = await showDialog<bool>(
-        // ignore: use_build_context_synchronously
-        context: context,
-        builder: (context) => AlertDialog(
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
-          title: Text(AppLocalizations.of(context)!.web_view_exit_popup_title),
-          content: Text(AppLocalizations.of(context)!.web_view_exit_popup_content),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(AppLocalizations.of(context)!.no),
-            ),
-            TextButton(
-              onPressed: () {
-                ref.read(humHubProvider).openerState.isShown
-                    ? Navigator.of(context).pushNamedAndRemoveUntil(OpenerPage.path, (Route<dynamic> route) => false)
-                    : SystemNavigator.pop();
-              },
-              child: Text(AppLocalizations.of(context)!.yes),
-            ),
-          ],
-        ),
-      );
+      bool? exitConfirmed;
+      if (context.mounted) {
+        exitConfirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
+            title: Text(AppLocalizations.of(context)!.web_view_exit_popup_title),
+            content: Text(AppLocalizations.of(context)!.web_view_exit_popup_content),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(AppLocalizations.of(context)!.no),
+              ),
+              TextButton(
+                onPressed: () {
+                  ref.read(humHubProvider).openerState.isShown
+                      ? Navigator.of(context).pushNamedAndRemoveUntil(OpenerPage.path, (Route<dynamic> route) => false)
+                      : SystemNavigator.pop();
+                },
+                child: Text(AppLocalizations.of(context)!.yes),
+              ),
+            ],
+          ),
+        );
+      }
       return exitConfirmed ?? false;
     }
   }

@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/global_package_info.dart';
@@ -180,6 +182,33 @@ class WebViewGlobalController {
       }
     })();
   """);
+  }
+
+  // Android: env(safe-area-*) does not return the correct value when the device has the system navigation enabled
+  // iOS: OK
+  static void setWebViewSafeAreaPadding({required EdgeInsets safeArea}) {
+    if (Platform.isAndroid) {
+      value?.evaluateJavascript(source: """
+      (function() {
+        var style = document.createElement('style');
+        style.innerHTML = `
+          :root {
+            --hh-mobile-app-safe-area-inset-top: ${safeArea.top}px;
+            --hh-mobile-app-safe-area-inset-right: ${safeArea.right}px;
+            --hh-mobile-app-safe-area-inset-bottom: ${safeArea.bottom}px;
+            --hh-mobile-app-safe-area-inset-left: ${safeArea.left}px;
+          }
+        `;
+        document.head.appendChild(style);
+      })();
+    """);
+    }
+  }
+
+  static void setLoginForm() {
+    // Disable remember me checkbox on login and set def. value to true: check if the page is actually login page, if it is inject JS that hides element
+    value!.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
+    value!.evaluateJavascript(source: "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
   }
 
   static Future<void> zoomOut() async {

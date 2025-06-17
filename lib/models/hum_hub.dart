@@ -164,6 +164,12 @@ class HumHub {
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(await DataSharingConsentNotifier.isErrorCollectionEnabled);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: [SystemUiOverlay.top]);
     await SecureStorageService.clearSecureStorageOnReinstall();
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
+    );
     await GlobalPackageInfo.init();
     await PermissionHandler.requestPermissions(
       [Permission.notification, Permission.camera, Permission.microphone, Permission.storage, Permission.photos],
