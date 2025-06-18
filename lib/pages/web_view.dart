@@ -31,7 +31,7 @@ import 'package:loggy/loggy.dart';
 import 'package:open_file/open_file.dart';
 import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:humhub/l10n/generated/app_localizations.dart';
 
 import 'console.dart';
 
@@ -102,9 +102,8 @@ class WebViewAppState extends ConsumerState<WebView> {
       backgroundColor: HexColor(_manifest.themeColor),
       body: SafeArea(
         bottom: false,
-        // ignore: deprecated_member_use
-        child: WillPopScope(
-          onWillPop: () => exitApp(context, ref),
+        child: PopScope(
+          onPopInvokedWithResult: (didPop, result) => exitApp(context, ref),
           child: FileUploadManagerWidget(
             child: InAppWebView(
               initialUrlRequest: _initialRequest,

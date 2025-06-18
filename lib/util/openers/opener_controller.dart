@@ -11,7 +11,7 @@ import 'package:rive/rive.dart';
 import '../api_provider.dart';
 import '../connectivity_plugin.dart';
 import '../form_helper.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:humhub/l10n/generated/app_localizations.dart';
 
 class VisibilityNotifier extends StateNotifier<bool> {
   VisibilityNotifier() : super(false);

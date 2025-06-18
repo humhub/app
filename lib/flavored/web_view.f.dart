@@ -21,7 +21,7 @@ import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:open_file/open_file.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:humhub/l10n/generated/app_localizations.dart';
 import 'package:humhub/util/file_download_manager.dart';
 
 class WebViewF extends ConsumerStatefulWidget {
@@ -67,9 +67,8 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
 
   @override
   Widget build(BuildContext context) {
-    // ignore: deprecated_member_use
-    return WillPopScope(
-      onWillPop: () => exitApp(context, ref),
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) => exitApp(context, ref),
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: HexColor(instance.manifest.themeColor),

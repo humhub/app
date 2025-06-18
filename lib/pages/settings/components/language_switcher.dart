@@ -4,7 +4,7 @@ import 'package:humhub/components/toast.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/override_locale.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:humhub/l10n/generated/app_localizations.dart';
 
 class LanguageSwitcher extends StatefulWidget {
   const LanguageSwitcher({
