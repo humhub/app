@@ -1,3 +1,5 @@
 # HumHub Mobile App
 
-In development 
+In development
+
+Bump code version
