@@ -59,10 +59,11 @@
     <application
         android:label="HumHub"
         android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher"
         android:allowBackup="false"
         android:fullBackupOnly="false"
         android:usesCleartextTraffic="true"
-        android:icon="@mipmap/ic_launcher">
+        android:hardwareAccelerated="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -77,8 +78,12 @@
                  to determine the Window background behind the Flutter UI. -->
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
-              android:resource="@style/NormalTheme"
-              />
+              android:resource="@style/NormalTheme"/>
+
+            <meta-data
+                android:name="android.app.category"
+                android:value="productivity"/>
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

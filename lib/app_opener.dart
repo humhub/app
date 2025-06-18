@@ -9,7 +9,7 @@ import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/quick_actions/quick_action_handler.dart';
 import 'package:humhub/util/router.dart';
 import 'package:humhub/util/storage_service.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:humhub/l10n/generated/app_localizations.dart';
 
 class OpenerApp extends ConsumerStatefulWidget {
   const OpenerApp({super.key});

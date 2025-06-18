@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/openers/opener_controller.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:humhub/l10n/generated/app_localizations.dart';
 
 class SearchBarWidget extends ConsumerStatefulWidget {
   final OpenerController openerControlLer;

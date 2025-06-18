@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/components/accept_all.dart';
 import 'package:humhub/components/toast.dart';
 import 'package:humhub/pages/settings/components/language_switcher.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:humhub/l10n/generated/app_localizations.dart';
 import 'package:humhub/pages/settings/provider.dart';
 import 'package:humhub/util/storage_service.dart';
 

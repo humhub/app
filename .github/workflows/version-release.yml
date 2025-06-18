@@ -76,7 +76,7 @@ jobs:
           java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.0'
+          flutter-version: '3.29.0'
           channel: 'stable'
       - uses: chkfung/android-version-actions@v1.2.1
         with:
@@ -101,6 +101,11 @@ jobs:
         with:
           name: appbundle
           path: build/app/outputs/bundle/release/app-release.aab
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: APKs
+          path: build/app/outputs/flutter-apk/*.apk
 
   release_android:
     name: Release APK to Google Play
@@ -175,7 +180,7 @@ jobs:
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.0'
+          flutter-version: '3.29.0'
           channel: 'stable'
 
       - name: Install pub dependencies

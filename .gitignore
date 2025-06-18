@@ -33,6 +33,8 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+/android/app/.cxx/
+lib/l10n/generated/
 
 # Symbolication related
 app.*.symbols
