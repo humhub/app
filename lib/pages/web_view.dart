@@ -103,6 +103,7 @@ class WebViewAppState extends ConsumerState<WebView> {
       body: SafeArea(
         bottom: false,
         child: PopScope(
+          canPop: false,
           onPopInvokedWithResult: (didPop, result) => exitApp(context, ref),
           child: FileUploadManagerWidget(
             child: InAppWebView(

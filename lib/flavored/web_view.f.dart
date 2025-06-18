@@ -68,6 +68,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) => exitApp(context, ref),
       child: Scaffold(
         key: _scaffoldKey,
