@@ -67,6 +67,7 @@ dependencies:
   flutter_svg: ^2.0.9
   flutter_styled_toast: ^2.2.1
   open_file: ^3.5.10
+  flutter_keyboard_visibility: ^6.0.0
 
 dependency_overrides:
   url_launcher_android: 6.3.9
