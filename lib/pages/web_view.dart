@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
@@ -50,9 +51,12 @@ class WebViewAppState extends ConsumerState<WebView> {
   late URLRequest _initialRequest;
   late PullToRefreshController _pullToRefreshController;
   HeadlessInAppWebView? _headlessWebView;
+  late EdgeInsets initSafeArea = MediaQuery.of(context).padding;
+  bool keyboardVisible = false;
   bool _isInit = false;
 
   StreamSubscription<List<ConnectivityResult>>? _subscription;
+  final KeyboardVisibilityController _keyboardVisibilityController = KeyboardVisibilityController();
 
   @override
   void initState() {
@@ -63,6 +67,12 @@ class WebViewAppState extends ConsumerState<WebView> {
         // Internet is back
         WebViewGlobalController.value?.reload();
       }
+    });
+
+    _keyboardVisibilityController.onChange.listen((bool visible) {
+      if (!mounted) return;
+      keyboardVisible = visible;
+      WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: !keyboardVisible ? initSafeArea : MediaQuery.of(context).padding.copyWith(bottom: 0));
     });
   }
 
@@ -159,7 +169,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
-    WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: MediaQuery.of(context).padding);
+    WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: !keyboardVisible ? initSafeArea : MediaQuery.of(context).padding.copyWith(bottom: 0));
 
     if (WebViewGlobalController.isCommonURIScheme(webUri: action.request.url!)) {
       return WebViewGlobalController.handleCommonURISchemes(webUri: action.request.url!);
@@ -247,7 +257,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
-    WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: MediaQuery.of(context).padding);
+    WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: !keyboardVisible ? initSafeArea : MediaQuery.of(context).padding.copyWith(bottom: 0));
 
     LoadingProvider.of(ref).dismissAll();
   }
@@ -257,7 +267,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
-    WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: MediaQuery.of(context).padding);
+    WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: !keyboardVisible ? initSafeArea : MediaQuery.of(context).padding.copyWith(bottom: 0));
   }
 
   _onProgressChanged(InAppWebViewController controller, int progress) {
