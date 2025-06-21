@@ -133,6 +133,11 @@ class WebViewAppState extends ConsumerState<WebView> {
               onReceivedHttpError: (controller, request, errorResponse) {
                 logError(errorResponse);
               },
+              onPermissionRequest: (controller, request) async {
+                return PermissionResponse(
+                    resources: request.resources,
+                    action: PermissionResponseAction.GRANT);
+              },
             ),
           ),
         ),
