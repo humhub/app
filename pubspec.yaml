@@ -46,8 +46,8 @@ dependencies:
       ref: master
   package_info_plus: ^8.2.1
   app_links: ^6.3.3
-  firebase_messaging: ^15.2.2
-  firebase_core: ^3.11.0
+  firebase_messaging: ^15.2.7
+  firebase_core: ^3.14.0
   flutter_local_notifications: ^18.0.1
   loggy: ^2.0.3
   app_badge_plus: ^1.1.6
@@ -63,7 +63,7 @@ dependencies:
   quick_actions: ^1.1.0
   mime: ^2.0.0
   flutter_image_compress: ^2.4.0
-  firebase_crashlytics: ^4.3.5
+  firebase_crashlytics: ^4.3.7
   flutter_svg: ^2.0.9
   flutter_styled_toast: ^2.2.1
   open_file: ^3.5.10
