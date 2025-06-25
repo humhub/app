@@ -228,9 +228,12 @@ class WebViewGlobalController {
       useHybridComposition: true,
       allowsInlineMediaPlayback: true,
       mediaPlaybackRequiresUserGesture: false,
+      domStorageEnabled: true,
       supportZoom: zoom ? true : false,
       userAgent: GlobalUserAgent.value,
       applicationNameForUserAgent: GlobalPackageInfo.info.appName,
+      allowFileAccessFromFileURLs: true,
+      allowUniversalAccessFromFileURLs: true,
     );
   }
 }
