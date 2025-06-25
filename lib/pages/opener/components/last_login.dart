@@ -19,10 +19,13 @@ class LastLoginWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double listHeight = MediaQuery.of(context).size.height * 0.33;
+    double tileHeight = listHeight * 0.23;
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(
+        SizedBox(
+          height: listHeight,
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
             shrinkWrap: true,
@@ -31,6 +34,7 @@ class LastLoginWidget extends StatelessWidget {
               return Container(
                 margin: const EdgeInsets.symmetric(vertical: 6),
                 child: InstanceTile(
+                  height: tileHeight,
                   manifest: history[index],
                   onSelectNetwork: onSelectNetwork,
                   onDeleteNetwork: (manifest) => onDeleteNetwork(manifest, history.length == 1),
@@ -50,6 +54,7 @@ class LastLoginWidget extends StatelessWidget {
 
 class InstanceTile extends StatelessWidget {
   final Manifest manifest;
+  final double height;
   final void Function(Manifest manifest) onSelectNetwork;
   final void Function(Manifest manifest) onDeleteNetwork;
 
@@ -60,6 +65,7 @@ class InstanceTile extends StatelessWidget {
     required this.manifest,
     required this.onSelectNetwork,
     required this.onDeleteNetwork,
+    this.height = 65,
   });
 
   @override
@@ -96,7 +102,7 @@ class InstanceTile extends StatelessWidget {
             onDeleteNetwork(manifest);
           },
           child: Container(
-            height: 65,
+            height: height,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               color: Colors.white,
