@@ -15,7 +15,7 @@ class EnvConfig {
 
   factory EnvConfig.fromJson(Map<String, dynamic> json) {
     return EnvConfig(
-      intentProviders: json['intent_providers'].map((item) => IntentProvider.fromJson(item as Map<String, dynamic>)).toList(),
+      intentProviders: (json['intent_providers'] as List).map((item) => IntentProvider.fromJson(item as Map<String, dynamic>)).toList(),
     );
   }
 

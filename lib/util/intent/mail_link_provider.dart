@@ -4,17 +4,17 @@ import 'package:humhub/models/env_config.dart';
 import 'package:loggy/loggy.dart';
 
 abstract class UniversalLinkHandler {
-  bool canHandle(Uri url);
+  final RegExp urlPattern;
+
+  UniversalLinkHandler(this.urlPattern);
+
+  bool canHandle(Uri url) => urlPattern.hasMatch(url.toString());
+
   Future<Uri?> handle(Uri url);
 }
 
-class HumHubLinkHandler implements UniversalLinkHandler {
-  final RegExp urlPattern;
-
-  HumHubLinkHandler(this.urlPattern);
-
-  @override
-  bool canHandle(Uri url) => urlPattern.hasMatch(url.toString());
+class HumHubLinkHandler extends UniversalLinkHandler {
+  HumHubLinkHandler(super.urlPattern);
 
   @override
   Future<Uri?> handle(Uri url) async {
@@ -28,13 +28,8 @@ class HumHubLinkHandler implements UniversalLinkHandler {
   }
 }
 
-class BrevoLinkHandler implements UniversalLinkHandler {
-  final RegExp urlPattern;
-
-  BrevoLinkHandler(this.urlPattern);
-
-  @override
-  bool canHandle(Uri url) => urlPattern.hasMatch(url.toString());
+class BrevoLinkHandler extends UniversalLinkHandler {
+  BrevoLinkHandler(super.urlPattern);
 
   @override
   Future<Uri?> handle(Uri url) async {
@@ -59,16 +54,23 @@ class BrevoLinkHandler implements UniversalLinkHandler {
 }
 
 class UrlProviderHandler {
-  final List<UniversalLinkHandler> _handlers = EnvConfig.instance!.intentProviders!.map((provider) {
-    switch (provider.type) {
-      case 'HumHubLinkHandler':
-        return HumHubLinkHandler(RegExp(provider.shouldHandleRegex));
-      case 'BrevoLinkHandler':
-        return BrevoLinkHandler(RegExp(provider.shouldHandleRegex));
-      default:
-        throw Exception('Unknown handler type: ${provider.type}');
-    }
-  }).toList();
+  final List<UniversalLinkHandler> _handlers;
+
+  UrlProviderHandler() : _handlers = _createHandlers();
+
+  static List<UniversalLinkHandler> _createHandlers() {
+    List<UniversalLinkHandler> handlers = EnvConfig.instance!.intentProviders!.map((provider) {
+      switch (provider.type) {
+        case 'HumHubLinkHandler':
+          return HumHubLinkHandler(RegExp(provider.shouldHandleRegex));
+        case 'BrevoLinkHandler':
+          return BrevoLinkHandler(RegExp(provider.shouldHandleRegex));
+        default:
+          throw Exception('Unknown handler type: ${provider.type}');
+      }
+    }).toList();
+    return handlers;
+  }
 
   Future<Uri?> handleUniversalLink(Uri url) async {
     for (final handler in _handlers) {
