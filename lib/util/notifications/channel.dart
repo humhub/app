@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/flavored/util/notifications/channel.f.dart';
-import 'package:humhub/models/global_package_info.dart';
+import 'package:humhub/models/env_config.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/init_from_url.dart';
@@ -44,19 +44,15 @@ class NotificationChannel {
     }
   }
 
-  static Future<NotificationChannel> getChannel() async {
-    switch (GlobalPackageInfo.info.packageName) {
-      case 'com.humhub.app':
-        logInfo('NotificationChannel: Using default channel');
-        return const NotificationChannel();
-      default:
-        logInfo('NotificationChannel: Using flavored channel');
-        return const NotificationChannelF();
+  static NotificationChannel getChannel() {
+    if (EnvConfig.instance!.isWhiteLabeled) {
+      logInfo('NotificationChannel: Using flavored channel');
+      return const NotificationChannelF();
     }
+    return const NotificationChannel();
   }
 }
 
-// Providers for NotificationChannel and NotificationChannelF
-final notificationChannelProvider = FutureProvider<NotificationChannel>((ref) {
+final notificationChannelProvider = Provider<NotificationChannel>((ref) {
   return NotificationChannel.getChannel();
 });

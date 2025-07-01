@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:humhub/models/global_package_info.dart';
+import 'package:humhub/models/env_config.dart';
 import 'package:humhub/util/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -161,7 +161,7 @@ class FileDownloadManager {
   }
 
   Future<String> _generateFilename() async {
-    String appName = GlobalPackageInfo.info.appName.replaceAll(' ', '_');
+    String appName = EnvConfig.instance!.appName.replaceAll(' ', '_');
     return '${appName}file';
   }
 

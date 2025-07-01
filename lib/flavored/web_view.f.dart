@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/app_flavored.dart';
-import 'package:humhub/flavored/models/humhub.f.dart';
+import 'package:humhub/models/env_config.dart';
 import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/util/black_list_rules.dart';
@@ -35,16 +34,15 @@ class WebViewF extends ConsumerStatefulWidget {
 class FlavoredWebViewState extends ConsumerState<WebViewF> {
   late AuthInAppBrowser _authBrowser;
   HeadlessInAppWebView? headlessWebView;
-  late HumHubF instance;
+  HumHubConfig instance = EnvConfig.instance!.humhubConfig!;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late PullToRefreshController pullToRefreshController;
   late double downloadProgress = 0;
 
   @override
   void initState() {
-    instance = ref.read(humHubFProvider);
     _authBrowser = AuthInAppBrowser(
-      manifest: ref.read(humHubFProvider).manifest,
+      manifest: instance.manifest!,
       concludeAuth: (URLRequest request) {
         _concludeAuth(request);
       },
@@ -53,7 +51,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
 
     pullToRefreshController = PullToRefreshController(
       settings: PullToRefreshSettings(
-        color: HexColor(instance.manifest.themeColor),
+        color: HexColor(instance.manifest!.themeColor),
       ),
       onRefresh: () async {
         if (Platform.isAndroid) {
@@ -72,7 +70,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       onPopInvokedWithResult: (didPop, result) => exitApp(context, ref),
       child: Scaffold(
         key: _scaffoldKey,
-        backgroundColor: HexColor(instance.manifest.themeColor),
+        backgroundColor: HexColor(instance.manifest!.themeColor),
         body: SafeArea(
           bottom: false,
           child: InAppWebView(
@@ -97,7 +95,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
 
   URLRequest get _initialRequest {
     var payload = ModalRoute.of(context)!.settings.arguments;
-    String? url = instance.manifest.startUrl;
+    String? url = instance.manifest!.startUrl;
     String? payloadForInitFromPush = InitFromUrl.usePayload();
     String? payloadFromPush;
     if (payload is String) payloadFromPush = payload;
@@ -118,12 +116,12 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       return NavigationActionPolicy.CANCEL;
     }
     // For SSO
-    if (!url.startsWith(instance.manifest.baseUrl) && action.isForMainFrame) {
+    if (!url.startsWith(instance.manifest!.baseUrl) && action.isForMainFrame) {
       _authBrowser.launchUrl(action.request);
       return NavigationActionPolicy.CANCEL;
     }
     // For all other external links
-    if (!url.startsWith(instance.manifest.baseUrl) && !action.isForMainFrame) {
+    if (!url.startsWith(instance.manifest!.baseUrl) && !action.isForMainFrame) {
       await launchUrl(action.request.url!.uriValue, mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
     }
@@ -161,7 +159,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   Future<bool> _onCreateWindow(InAppWebViewController controller, CreateWindowAction createWindowAction) async {
     final urlToOpen = createWindowAction.request.url;
     if (urlToOpen == null) return Future.value(false);
-    if (WebViewGlobalController.openCreateWindowInWebView(url: urlToOpen.rawValue, manifest: instance.manifest)) {
+    if (WebViewGlobalController.openCreateWindowInWebView(url: urlToOpen.rawValue, manifest: instance.manifest!)) {
       controller.loadUrl(urlRequest: createWindowAction.request);
       return Future.value(false);
     }

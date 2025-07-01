@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:humhub/models/global_package_info.dart';
+import 'package:humhub/models/env_config.dart';
 import 'package:humhub/models/global_user_agent.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:loggy/loggy.dart';
@@ -231,7 +231,7 @@ class WebViewGlobalController {
       domStorageEnabled: true,
       supportZoom: zoom ? true : false,
       userAgent: GlobalUserAgent.value,
-      applicationNameForUserAgent: GlobalPackageInfo.info.appName,
+      applicationNameForUserAgent: EnvConfig.instance!.appName,
       allowFileAccessFromFileURLs: true,
       allowUniversalAccessFromFileURLs: true,
     );

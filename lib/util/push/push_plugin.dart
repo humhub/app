@@ -49,7 +49,7 @@ class PushPluginState extends ConsumerState<PushPlugin> {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       logInfo("Firebase messaging onMessageOpenedApp");
       final data = PushEvent(message).parsedData;
-      ref.read(notificationChannelProvider).value!.onTap(data.redirectUrl);
+      ref.read(notificationChannelProvider).onTap(data.redirectUrl);
     });
 
     //When the app is terminated, i.e., app is neither in foreground or background.
@@ -60,7 +60,7 @@ class PushPluginState extends ConsumerState<PushPlugin> {
         final data = PushEvent(message).parsedData;
         if (data.redirectUrl != null) {
           await Future.delayed(const Duration(milliseconds: 500));
-          ref.read(notificationChannelProvider).value!.onTap(data.redirectUrl);
+          ref.read(notificationChannelProvider).onTap(data.redirectUrl);
         }
       }
     });
@@ -85,7 +85,7 @@ class PushPluginState extends ConsumerState<PushPlugin> {
     final body = message.notification?.body;
     if (title == null || body == null) return;
     await notificationService.showNotification(
-      ref.read(notificationChannelProvider).value!,
+      ref.read(notificationChannelProvider),
       title,
       body,
       payload: data.channelPayload,

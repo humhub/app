@@ -44,7 +44,6 @@ dependencies:
     git:
       url: https://github.com/KasemJaffer/receive_sharing_intent
       ref: master
-  package_info_plus: ^8.2.1
   app_links: ^6.3.3
   firebase_messaging: ^15.2.7
   firebase_core: ^3.14.0
@@ -56,7 +55,6 @@ dependencies:
   swipe_to: ^1.0.2
   shared_preferences: ^2.2.2
   intl: any
-  flutter_dotenv: ^5.1.0
   path_provider: ^2.1.4
   cached_network_image: ^3.3.1
   talker_flutter: ^4.6.11

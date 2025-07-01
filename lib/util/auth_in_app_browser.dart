@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:humhub/models/global_package_info.dart';
+import 'package:humhub/models/env_config.dart';
 import 'package:humhub/models/global_user_agent.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:loggy/loggy.dart';
@@ -26,7 +26,7 @@ class AuthInAppBrowser extends InAppBrowser {
           javaScriptEnabled: true,
           useShouldOverrideUrlLoading: true,
           userAgent: GlobalUserAgent.value,
-          applicationNameForUserAgent: GlobalPackageInfo.info.appName),
+          applicationNameForUserAgent: EnvConfig.instance!.appName),
     );
   }
 

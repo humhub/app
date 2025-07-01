@@ -62,7 +62,7 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
       String? urlIntent = InitFromUrl.usePayload();
       if (urlIntent != null) {
         logInfo('Intent URL detected: $urlIntent');
-        await ref.read(notificationChannelProvider).value!.onTap(urlIntent);
+        await ref.read(notificationChannelProvider).onTap(urlIntent);
       }
 
       /// If there is only one item in history that means we can show [SearchBarWidget] that is already prefilled with url or null if count is 0.

@@ -4,11 +4,9 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:humhub/app_flavored.dart';
 import 'package:humhub/app_opener.dart';
 import 'package:humhub/models/env_config.dart';
-import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/settings/provider.dart';
 import 'package:humhub/util/log.dart';
@@ -174,16 +172,9 @@ class HumHub {
         systemNavigationBarDividerColor: Colors.transparent,
       ),
     );
-    await GlobalPackageInfo.init();
     await PermissionHandler.requestPermissions(
       [Permission.notification, Permission.camera, Permission.microphone, Permission.storage, Permission.photos],
     );
-    switch (GlobalPackageInfo.info.packageName) {
-      case 'com.humhub.app':
-        return const OpenerApp();
-      default:
-        await dotenv.load(fileName: "assets/.env");
-        return const FlavoredApp();
-    }
+    return EnvConfig.instance!.isWhiteLabeled ? const FlavoredApp() : const OpenerApp();
   }
 }

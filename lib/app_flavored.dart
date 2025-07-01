@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/flavored/models/humhub.f.dart';
 import 'package:humhub/flavored/util/intent_plugin.f.dart';
 import 'package:humhub/flavored/util/router.f.dart';
 import 'package:humhub/util/const.dart';
@@ -49,7 +48,3 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
     );
   }
 }
-
-final humHubFProvider = Provider<HumHubF>((ref) {
-  return HumHubF();
-});
