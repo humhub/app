@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:humhub/components/bottom_navigation_bar.dart';
+import 'package:humhub/components/bottom_navigation.dart';
 import 'package:humhub/components/ease_out_container.dart';
 import 'package:humhub/components/help_safe_area.dart';
-import 'package:humhub/components/page_animation_container.dart';
+import 'package:humhub/components/page_animation.dart';
 import 'package:humhub/pages/help/components/first_page.dart';
 import 'package:humhub/pages/help/components/third_page.dart';
 import 'package:humhub/util/const.dart';
@@ -22,7 +22,7 @@ class HelpState extends State<Help> {
   final ValueNotifier<bool> fadeInSecond = ValueNotifier<bool>(false);
   final ValueNotifier<bool> fadeInThird = ValueNotifier<bool>(false);
   final ValueNotifier<int> currentPage = ValueNotifier<int>(0);
-  GlobalKey<PageAnimationContainerState> statePagesKey = GlobalKey<PageAnimationContainerState>();
+  GlobalKey<PageAnimationState> statePagesKey = GlobalKey<PageAnimationState>();
   GlobalKey<BottomNavigationState> bottomNavigationStateKey = GlobalKey<BottomNavigationState>();
 
   @override
@@ -59,7 +59,7 @@ class HelpState extends State<Help> {
                   ),
                 ),
               ),
-              PageAnimationContainer(
+              PageAnimation(
                 key: statePagesKey,
                 fadeDuration: const Duration(milliseconds: 500),
                 fadeCurve: Curves.easeInOut,

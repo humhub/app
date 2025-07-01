@@ -130,6 +130,7 @@ class Manifest {
     return url.substring(0, lastSlashIndex);
   }
 
+  //TODO https://github.com/humhub/app-internal/issues/112
   static String defineUrl(String url, {bool isUriPretty = true}) {
     return !isUriPretty
         ? '$url/index.php?r=web%2Fpwa-manifest%2Findex'

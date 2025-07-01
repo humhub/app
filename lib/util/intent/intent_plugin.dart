@@ -34,6 +34,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   StreamSubscription? intentDataStreamSubscription;
   StreamSubscription? _sub;
   final appLinks = AppLinks();
+  final UrlProviderHandler urlProviderHandler = UrlProviderHandler();
 
   @override
   void initState() {
@@ -57,7 +58,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
       _sub = appLinks.uriLinkStream.listen((Uri? uri) async {
         if (!mounted || uri == null) return;
 
-        final latestUri = await UrlProviderHandler.handleUniversalLink(uri) ?? uri;
+        final latestUri = await urlProviderHandler.handleUniversalLink(uri) ?? uri;
 
         // Update the latest URI using the provider
         ref.read(intentProvider.notifier).setLatestUri(latestUri);
@@ -92,7 +93,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         // Update the initial URI using the provider
         ref.read(intentProvider.notifier).setInitialUri(uri);
 
-        final latestUri = await UrlProviderHandler.handleUniversalLink(uri) ?? uri;
+        final latestUri = await urlProviderHandler.handleUniversalLink(uri) ?? uri;
 
         // Update the latest URI using the provider
         ref.read(intentProvider.notifier).setLatestUri(latestUri);

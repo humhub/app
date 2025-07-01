@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/components/accept_all.dart';
+import 'package:humhub/components/settings_button.dart';
 import 'package:humhub/components/toast.dart';
 import 'package:humhub/pages/settings/components/language_switcher.dart';
 import 'package:humhub/l10n/generated/app_localizations.dart';

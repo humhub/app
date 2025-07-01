@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'animated_padding_component.dart';
 import 'package:humhub/l10n/generated/app_localizations.dart';
 
 class BottomNavigation extends StatefulWidget {
@@ -55,7 +54,8 @@ class BottomNavigationState extends State<BottomNavigation> with TickerProviderS
             ),
             Expanded(
               flex: 5,
-              child: AnimatedPaddingComponent(
+              child: AnimatedPadding(
+                duration: const Duration(milliseconds: 500),
                 padding: _getPadding(selectedIndex),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

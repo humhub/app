@@ -34,6 +34,8 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
   StreamSubscription? _sub;
   final appLinks = AppLinks();
 
+  final UrlProviderHandler urlProviderHandler = UrlProviderHandler();
+
   @override
   void initState() {
     logInfo([_err, _initialUri, _latestUri, _sub]);
@@ -58,7 +60,7 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
       // the foreground or in the background.
       _sub = appLinks.uriLinkStream.listen((Uri? uri) async {
         if (!mounted && uri == null) return;
-        _latestUri = await UrlProviderHandler.handleUniversalLink(uri!) ?? uri;
+        _latestUri = await urlProviderHandler.handleUniversalLink(uri!) ?? uri;
         String? redirectUrl = _latestUri?.toString();
         if (redirectUrl != null && Keys.navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
@@ -89,7 +91,7 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
         Uri? uri = await appLinks.getInitialLink();
         if (uri == null) return;
         setState(() => _initialUri = uri);
-        _latestUri = await UrlProviderHandler.handleUniversalLink(uri) ?? uri;
+        _latestUri = await urlProviderHandler.handleUniversalLink(uri) ?? uri;
         String? redirectUrl = _latestUri.toString();
         if (Keys.navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);

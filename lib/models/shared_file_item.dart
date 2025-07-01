@@ -91,7 +91,7 @@ class SharedFileItemError extends SharedFileItem {
     return SharedFileItemError(
       error: json['error'] as bool,
       name: json['name'] as String? ?? '',
-      size: int.tryParse(json['size'].toString()) ?? 0, // Handle possible string size
+      size: int.tryParse(json['size'].toString()) ?? 0,
       errors: (json['errors'] as List<dynamic>).map((e) => e as String).toList(),
     );
   }

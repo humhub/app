@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:ui';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
@@ -22,7 +21,6 @@ void main() {
 
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
     final ref = ProviderContainer();
     final app = await HumHub.initApp();
     HumHub instance = await ref.read(humHubProvider).getInstance();

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class PageAnimationContainer extends StatefulWidget {
+class PageAnimation extends StatefulWidget {
   final List<Widget> children;
   final Duration fadeDuration;
   final Curve fadeCurve;
   final Function(int, int)? navigationCallback;
 
-  const PageAnimationContainer({
+  const PageAnimation({
     super.key,
     required this.children,
     this.fadeDuration = const Duration(milliseconds: 500),
@@ -15,10 +15,10 @@ class PageAnimationContainer extends StatefulWidget {
   });
 
   @override
-  PageAnimationContainerState createState() => PageAnimationContainerState();
+  PageAnimationState createState() => PageAnimationState();
 }
 
-class PageAnimationContainerState extends State<PageAnimationContainer> with TickerProviderStateMixin {
+class PageAnimationState extends State<PageAnimation> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -46,7 +46,7 @@ class PageAnimationContainerState extends State<PageAnimationContainer> with Tic
   }
 
   @override
-  void didUpdateWidget(PageAnimationContainer oldWidget) {
+  void didUpdateWidget(PageAnimation oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.children.length != oldWidget.children.length) {

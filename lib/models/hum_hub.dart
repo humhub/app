@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:humhub/app_flavored.dart';
 import 'package:humhub/app_opener.dart';
+import 'package:humhub/models/env_config.dart';
 import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/settings/provider.dart';
@@ -159,6 +160,7 @@ class HumHub {
 
   static Future<Widget> initApp() async {
     await Firebase.initializeApp();
+    EnvConfig.init();
     Loggy.initLoggy(
       logPrinter: const GlobalLog(),
     );

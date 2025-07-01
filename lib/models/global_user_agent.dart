@@ -12,7 +12,7 @@ class GlobalUserAgent {
     } else if (Platform.isAndroid) {
       return _android;
     } else {
-      return "Unknown User Agent"; // Fallback for unsupported platforms
+      return "Unknown User Agent";
     }
   }
 }
