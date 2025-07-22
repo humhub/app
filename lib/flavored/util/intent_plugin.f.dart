@@ -8,9 +8,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/flavored/web_view.f.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/init_from_url.dart';
+import 'package:humhub/util/intent/intent_state.dart';
 import 'package:humhub/util/intent/mail_link_provider.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:loggy/loggy.dart';
+import 'package:humhub/models/file_upload_settings.dart';
+import 'package:humhub/util/providers.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 bool _initialUriIsHandled = false;
 
@@ -28,20 +32,16 @@ class IntentPluginF extends ConsumerStatefulWidget {
 
 class IntentPluginFState extends ConsumerState<IntentPluginF> {
   StreamSubscription? intentDataStreamSubscription;
-  Object? _err;
-  Uri? _initialUri;
-  Uri? _latestUri;
   StreamSubscription? _sub;
   final appLinks = AppLinks();
 
   @override
   void initState() {
-    logInfo([_err, _initialUri, _latestUri, _sub]);
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _handleInitialUri();
       _subscribeToUriStream();
+      _handleFileSharing();
     });
   }
 
@@ -52,21 +52,27 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
 
   /// Handle incoming links - the ones that the app will recieve from the OS
   /// while already started.
+  /// TODO: This method is same as from intent_plugin.dart reuse it.
   Future<void> _subscribeToUriStream() async {
     if (!kIsWeb) {
       // It will handle app links while the app is already started - be it in
       // the foreground or in the background.
       _sub = appLinks.uriLinkStream.listen((Uri? uri) async {
         if (!mounted && uri == null) return;
-        _latestUri = await UrlProviderHandler.handleUniversalLink(uri!) ?? uri;
-        String? redirectUrl = _latestUri?.toString();
-        if (redirectUrl != null && Keys.navigatorKey.currentState != null) {
+        final latestUri = await UrlProviderHandler.handleUniversalLink(uri!) ?? uri;
+
+        ref.read(intentProvider.notifier).setLatestUri(latestUri);
+
+        logInfo('IntentPlugin._subscribeToUriStream', latestUri);
+
+        String? redirectUrl = latestUri.toString();
+        if (Keys.navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         }
-        _err = null;
+        ref.read(intentProvider.notifier).setError(null);
       }, onError: (err) {
         if (kDebugMode) {
-          print(err);
+          ref.read(intentProvider.notifier).setError(err);
         }
       });
     }
@@ -86,11 +92,18 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
     if (!_initialUriIsHandled) {
       _initialUriIsHandled = true;
       try {
-        Uri? uri = await appLinks.getInitialLink();
-        if (uri == null) return;
-        setState(() => _initialUri = uri);
-        _latestUri = await UrlProviderHandler.handleUniversalLink(uri) ?? uri;
-        String? redirectUrl = _latestUri.toString();
+        final uri = await appLinks.getInitialLink();
+        if (uri == null || !mounted) return;
+
+        // Update the initial URI using the provider
+        final latestUri = await UrlProviderHandler.handleUniversalLink(uri) ?? uri;
+
+        // Update the latest URI using the provider
+        ref.read(intentProvider.notifier).setLatestUri(latestUri);
+
+        logInfo('IntentPlugin._handleInitialUri', latestUri);
+
+        String redirectUrl = latestUri.toString();
         if (Keys.navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         } else {
@@ -101,10 +114,34 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
         logError('Failed to get initial uri');
       } on FormatException catch (err) {
         if (!mounted) return;
+        ref.read(intentProvider.notifier).setError(err);
         logError('Malformed initial uri');
-        setState(() => _err = err);
       }
     }
+  }
+
+  void _handleFileSharing() {
+    intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen(
+          (List<SharedMediaFile> value) {
+        // Update shared files using the provider
+        ref.read(intentProvider.notifier).setSharedFiles(value);
+
+        logInfo('Received shared files: $value');
+      },
+      onError: (err) {
+        // Update error using the provider
+        ref.read(intentProvider.notifier).setError(err);
+        logError('Error receiving shared files: $err');
+      },
+    );
+
+    ReceiveSharingIntent.instance.getInitialMedia().then((mediaList) {
+      if (mediaList.isEmpty) return;
+      FileUploadSettings? settings = ref.read(humHubProvider).fileUploadSettings;
+      if (settings == null) return;
+      ref.read(intentProvider.notifier).setSharedFiles(mediaList);
+      logInfo('Initial shared files: $mediaList');
+    });
   }
 
   Future<bool> tryNavigateWithOpener(String redirectUrl) async {
@@ -118,5 +155,12 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
     });
     Keys.navigatorKey.currentState!.pushNamed(WebViewF.path, arguments: redirectUrl);
     return isNewRouteSameAsCurrent;
+  }
+
+  @override
+  void dispose() {
+    intentDataStreamSubscription?.cancel();
+    _sub?.cancel();
+    super.dispose();
   }
 }
