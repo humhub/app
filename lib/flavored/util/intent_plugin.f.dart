@@ -59,7 +59,8 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
       // the foreground or in the background.
       _sub = appLinks.uriLinkStream.listen((Uri? uri) async {
         if (!mounted && uri == null) return;
-        final latestUri = await UrlProviderHandler.handleUniversalLink(uri!) ?? uri;
+        Uri? latestUri = await UrlProviderHandler.handleUniversalLink(uri!);
+        if(latestUri == null) return;
 
         ref.read(intentProvider.notifier).setLatestUri(latestUri);
 
@@ -96,7 +97,8 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
         if (uri == null || !mounted) return;
 
         // Update the initial URI using the provider
-        final latestUri = await UrlProviderHandler.handleUniversalLink(uri) ?? uri;
+        Uri? latestUri = await UrlProviderHandler.handleUniversalLink(uri);
+        if(latestUri == null) return;
 
         // Update the latest URI using the provider
         ref.read(intentProvider.notifier).setLatestUri(latestUri);

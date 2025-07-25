@@ -5,11 +5,11 @@ import 'package:loggy/loggy.dart';
 class UrlProviderHandler {
   static Future<Uri?> handleUniversalLink(Uri url) async {
     if (_isHumHubUrl(url)) {
-      return _handleHumHubUrl(url);
+      return _handleHumHubUrl(url) ?? url;
     } else if (_isBrevoUrl(url)) {
-      return await _handleUniversalLinkBrevo(url);
+      return await _handleUniversalLinkBrevo(url) ?? url;
     }
-    return null;
+    return validateHttpHttpsUrl(url);
   }
 
   static bool _isHumHubUrl(Uri url) {
@@ -50,5 +50,12 @@ class UrlProviderHandler {
       logError('Error while handling universal link: $e');
       return null;
     }
+  }
+
+  static Uri? validateHttpHttpsUrl(Uri url) {
+    if (url.scheme == 'http' || url.scheme == 'https') {
+      return url;
+    }
+    return null;
   }
 }
