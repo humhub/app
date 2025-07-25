@@ -13,8 +13,11 @@ import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/util/black_list_rules.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
+import 'package:humhub/util/file_upload_manager.dart';
 import 'package:humhub/util/init_from_url.dart';
+import 'package:humhub/util/intent/intent_state.dart';
 import 'package:humhub/util/loading_provider.dart';
+import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/show_dialog.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
@@ -75,20 +78,22 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         backgroundColor: HexColor(instance.manifest.themeColor),
         body: SafeArea(
           bottom: false,
-          child: InAppWebView(
-            initialUrlRequest: _initialRequest,
-            initialSettings: WebViewGlobalController.settings(),
-            pullToRefreshController: pullToRefreshController,
-            shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
-            shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
-            onWebViewCreated: _onWebViewCreated,
-            onCreateWindow: _onCreateWindow,
-            onLoadStop: _onLoadStop,
-            onLoadStart: _onLoadStart,
-            onReceivedError: _onLoadError,
-            onProgressChanged: _onProgressChanged,
-            onDownloadStartRequest: _onDownloadStartRequest,
-            onLongPressHitTestResult: WebViewGlobalController.onLongPressHitTestResult,
+          child: FileUploadManagerWidget(
+            child: InAppWebView(
+              initialUrlRequest: _initialRequest,
+              initialSettings: WebViewGlobalController.settings(),
+              pullToRefreshController: pullToRefreshController,
+              shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
+              shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
+              onWebViewCreated: _onWebViewCreated,
+              onCreateWindow: _onCreateWindow,
+              onLoadStop: _onLoadStop,
+              onLoadStart: _onLoadStart,
+              onReceivedError: _onLoadError,
+              onProgressChanged: _onProgressChanged,
+              onDownloadStartRequest: _onDownloadStartRequest,
+              onLongPressHitTestResult: WebViewGlobalController.onLongPressHitTestResult,
+            ),
           ),
         ),
       ),
@@ -235,6 +240,16 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           );
         }
         break;
+      case ChannelAction.fileUploadSettings:
+        logInfo('Action: fileUploadSettings');
+        FileUploadSettingsChannelData data = message.data as FileUploadSettingsChannelData;
+        ref.read(humHubProvider.notifier).setFileUploadSettings(data.settings);
+        FileUploadManager(
+            webViewController: WebViewGlobalController.value!,
+            intentNotifier: ref.read(intentProvider.notifier),
+            fileUploadSettings: data.settings,
+            context: context)
+            .upload();
       default:
         break;
     }
@@ -330,17 +345,17 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
                           ),
                           downloadProgress.toStringAsFixed(0) == "100"
                               ? const Icon(
-                                  Icons.check,
-                                  color: Colors.green,
-                                  size: 25,
-                                )
+                            Icons.check,
+                            color: Colors.green,
+                            size: 25,
+                          )
                               : Text(
-                                  downloadProgress.toStringAsFixed(0),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                            downloadProgress.toStringAsFixed(0),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                         ],
                       ),
                     ],
