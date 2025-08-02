@@ -9,6 +9,7 @@ import 'package:humhub/app_flavored.dart';
 import 'package:humhub/app_opener.dart';
 import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/models/remote_config.dart';
 import 'package:humhub/pages/settings/provider.dart';
 import 'package:humhub/util/log.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
@@ -48,6 +49,7 @@ class HumHub {
   final bool isAndroid = Platform.isAndroid;
   List<Manifest> history;
   FileUploadSettings? fileUploadSettings;
+  RemoteConfig? remoteConfig;
 
   HumHub({
     this.manifest,
@@ -58,6 +60,7 @@ class HumHub {
     this.pushToken,
     List<Manifest>? history,
     this.fileUploadSettings,
+    this.remoteConfig,
   }) : history = history ?? [];
 
   Map<String, dynamic> toJson() => {
@@ -69,6 +72,7 @@ class HumHub {
         'pushToken': pushToken,
         'history': history.map((manifest) => manifest.toJson()).toList(),
         'fileUploadSettings': fileUploadSettings?.toJson(),
+        'remoteConfig': remoteConfig?.toJson(),
       };
 
   factory HumHub.fromJson(Map<String, dynamic> json) {
@@ -81,6 +85,7 @@ class HumHub {
       pushToken: json['pushToken'],
       history: json['history'] != null ? List<Manifest>.from(json['history'].map((json) => Manifest.fromJson(json))) : [],
       fileUploadSettings: json['fileUploadSettings'] != null ? FileUploadSettings.fromJson(json['fileUploadSettings']) : null,
+      remoteConfig: json['remoteConfig'] != null ? RemoteConfig.fromJson(json['remoteConfig']) : null,
     );
   }
 
@@ -156,6 +161,30 @@ class HumHub {
         'x-humhub-app-opener-state': openerState.headerValue,
         'x-humhub-app-is-multi-instance': '1',
       };
+
+  HumHub copyWith({
+    Manifest? manifest,
+    String? manifestUrl,
+    OpenerState? openerState,
+    String? randomHash,
+    String? appVersion,
+    String? pushToken,
+    List<Manifest>? history,
+    FileUploadSettings? fileUploadSettings,
+    RemoteConfig? remoteConfig,
+  }) {
+    return HumHub(
+      manifest: manifest ?? this.manifest,
+      manifestUrl: manifestUrl ?? this.manifestUrl,
+      openerState: openerState ?? this.openerState,
+      randomHash: randomHash ?? this.randomHash,
+      appVersion: appVersion ?? this.appVersion,
+      pushToken: pushToken ?? this.pushToken,
+      history: history ?? List<Manifest>.from(this.history),
+      fileUploadSettings: fileUploadSettings ?? this.fileUploadSettings,
+      remoteConfig: remoteConfig ?? this.remoteConfig,
+    );
+  }
 
   static Future<Widget> initApp() async {
     await Firebase.initializeApp();

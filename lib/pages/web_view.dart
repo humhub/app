@@ -185,7 +185,8 @@ class WebViewAppState extends ConsumerState<WebView> {
       return NavigationActionPolicy.CANCEL;
     }
     // For SSO
-    if (!url.startsWith(_manifest.baseUrl) && action.isForMainFrame) {
+    bool? isDomainTrusted = ref.read(humHubProvider).remoteConfig?.isTrustedDomain(action.request.url!.uriValue) ?? false;
+    if ((!url.startsWith(_manifest.baseUrl) && action.isForMainFrame) && !isDomainTrusted) {
       logInfo('SSO detected, launching AuthInAppBrowser for $url');
       _authBrowser.launchUrl(action.request);
       return NavigationActionPolicy.CANCEL;
