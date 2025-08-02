@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/file_upload_settings.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/models/remote_config.dart';
 import 'package:humhub/util/storage_service.dart';
 
 class HumHubNotifier extends ChangeNotifier {
@@ -19,6 +20,7 @@ class HumHubNotifier extends ChangeNotifier {
   String? get pushToken => _humHubInstance.pushToken;
   String? get manifestUrl => _humHubInstance.manifestUrl;
   Map<String, String> get customHeaders => _humHubInstance.customHeaders;
+  RemoteConfig? get remoteConfig => _humHubInstance.remoteConfig;
   List<Manifest> get history => _humHubInstance.history;
   FileUploadSettings? get fileUploadSettings => _humHubInstance.fileUploadSettings;
 
@@ -39,6 +41,7 @@ class HumHubNotifier extends ChangeNotifier {
       history: instance.history,
       manifestUrl: instance.manifestUrl,
       fileUploadSettings: instance.fileUploadSettings,
+      remoteConfig: instance.remoteConfig,
     );
     _humHubInstance.manifest = copy.manifest;
     _humHubInstance.openerState = copy.openerState;
@@ -48,6 +51,8 @@ class HumHubNotifier extends ChangeNotifier {
     _humHubInstance.history = copy.history;
     _humHubInstance.history = copy.history;
     _humHubInstance.fileUploadSettings = copy.fileUploadSettings;
+    _humHubInstance.fileUploadSettings = copy.fileUploadSettings;
+    _humHubInstance.remoteConfig = copy.remoteConfig;
     _updateSafeStorage();
     notifyListeners();
   }
@@ -68,6 +73,7 @@ class HumHubNotifier extends ChangeNotifier {
     List<Manifest>? history,
     String? manifestUrl,
     FileUploadSettings? fileUploadSettings,
+    RemoteConfig? remoteConfig,
   }) {
     HumHub instance = HumHub(
       openerState: openerState ?? this.openerState,
@@ -78,6 +84,7 @@ class HumHubNotifier extends ChangeNotifier {
       history: history ?? this.history,
       manifestUrl: manifestUrl ?? this.manifestUrl,
       fileUploadSettings: fileUploadSettings ?? this.fileUploadSettings,
+      remoteConfig: remoteConfig ?? this.remoteConfig,
     );
     _humHubInstance.manifest = instance.manifest;
     _humHubInstance.openerState = instance.openerState;

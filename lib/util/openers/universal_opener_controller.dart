@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/models/remote_config.dart';
 import 'package:humhub/util/crypt.dart';
 import 'package:loggy/loggy.dart';
 import '../api_provider.dart';
@@ -82,9 +83,10 @@ class UniversalOpenerController {
       Manifest manifest = asyncData!.value!;
       String hash = Crypt.generateRandomString(32);
       HumHub? lastInstance = await getLastInstance();
-      HumHub instance = HumHub(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl, history: lastInstance?.history);
-      humhub = instance;
-      return instance;
+      humhub = HumHub(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl, history: lastInstance?.history);
+      RemoteConfig? remoteConfig = await RemoteConfig.get(manifest, humhub.customHeaders);
+      humhub = humhub.copyWith(remoteConfig: remoteConfig);
+      return humhub;
     }
   }
 

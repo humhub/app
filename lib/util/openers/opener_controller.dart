@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/models/remote_config.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/crypt.dart';
 import 'package:humhub/util/providers.dart';
@@ -144,6 +145,8 @@ class OpenerController {
       }
       await ref.read(humHubProvider.notifier).addOrUpdateHistory(manifest);
       HumHub instance = ref.read(humHubProvider).copyWith(manifest: manifest, randomHash: hash, manifestUrl: manifestUrl);
+      RemoteConfig? remoteConfig = await RemoteConfig.get(manifest, instance.customHeaders);
+      instance = instance.copyWith(remoteConfig: remoteConfig);
       await ref.read(humHubProvider.notifier).setInstance(instance);
     }
   }
