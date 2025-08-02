@@ -1,14 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:humhub/models/file_upload_settings.dart';
+import 'package:humhub/util/extensions.dart';
 import 'package:loggy/loggy.dart';
 
 import 'manifest.dart';
 
 class RemoteConfig {
-  final String appName;
-  final String appVersion;
-  final FileUploadSettings fileUploadSettings;
-  final List<Uri> whiteListedDomains;
+  final String? appName;
+  final String? appVersion;
+  final FileUploadSettings? fileUploadSettings;
+  final List<Uri>? whiteListedDomains;
 
   RemoteConfig({
     required this.appName,
@@ -30,8 +31,8 @@ class RemoteConfig {
     return {
       'appName': appName,
       'appVersion': appVersion,
-      'fileUploadSettings': fileUploadSettings.toJson(),
-      'whiteListedDomains': whiteListedDomains.map((uri) => uri.toString()).toList(),
+      'fileUploadSettings': fileUploadSettings?.toJson(),
+      'whiteListedDomains': whiteListedDomains?.map((uri) => uri.toString()).toList(),
     };
   }
 
@@ -55,9 +56,10 @@ class RemoteConfig {
   }
 
   bool isTrustedDomain(Uri uri) {
+    if (whiteListedDomains.isNullOrEmpty) return false;
     final String inputBase = '${uri.scheme}://${uri.authority}';
 
-    return whiteListedDomains.any((trustedUri) {
+    return whiteListedDomains!.any((trustedUri) {
       final trustedBase = '${trustedUri.scheme}://${trustedUri.authority}';
       return inputBase == trustedBase;
     });
