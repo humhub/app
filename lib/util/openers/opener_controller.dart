@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
@@ -44,7 +43,7 @@ final searchBarVisibilityNotifier = StateNotifierProvider<VisibilityNotifier, bo
 
 class OpenerController {
   late AsyncValue<Manifest>? asyncData;
-  bool doesViewExist = false;
+  // bool doesViewExist = false;
   TextEditingController urlTextController = TextEditingController();
   late String? postcodeErrorMessage;
   final String formUrlKey = "redirect_url";
@@ -88,21 +87,6 @@ class OpenerController {
     return manifestUrl;
   }
 
-  checkHumHubModuleView(String url) async {
-    List<String> substrings = [
-      '/user/auth/external',
-      'humhub.modules.ui.view',
-      '/user/auth/microsoft',
-      'user%2Fauth%2Fexternal',
-      'user%2Fauth%2Fmicrosoft'
-    ];
-    Response? response;
-    response = await Dio().get(Uri.parse(url).toString(), options: Options(maxRedirects: 10)).catchError((err) {
-      return Response(data: "Did not find any of the validation substrings", statusCode: 404, requestOptions: RequestOptions());
-    });
-    doesViewExist = response.statusCode == 200 && substrings.any((substring) => response?.data.contains(substring));
-  }
-
   initHumHub() async {
     // Validate the URL format and if !value.isEmpty
     if (!helper.validate()) return;
@@ -119,14 +103,11 @@ class OpenerController {
     }
     // Get the manifest.json for given url.
     String? manifestUrl = await findManifest(helper.model[formUrlKey]!);
-    if (asyncData!.hasValue && manifestUrl != null) {
-      await checkHumHubModuleView(asyncData!.value!.startUrl);
-    }
     // If manifest.json does not exist the url is incorrect.
     // This is a temp. fix the validator expect sync function this is established workaround.
     // In the future we could define our own TextFormField that would also validate the API responses.
     // But it this is not acceptable I can suggest simple popup or tempPopup.
-    if (asyncData!.hasError || !doesViewExist || manifestUrl == null) {
+    if (asyncData!.hasError || manifestUrl == null) {
       logError("Open URL error: $asyncData");
       String value = urlTextController.text;
       urlTextController.text = error404;
@@ -151,7 +132,7 @@ class OpenerController {
     }
   }
 
-  bool get allOk => !(asyncData == null || asyncData!.hasError || !doesViewExist);
+  bool get allOk => !(asyncData == null || asyncData!.hasError);
   String? validateUrl(String? value, BuildContext context) {
     if (value == error404) return AppLocalizations.of(context)!.error_404;
     if (value == noConnection) {

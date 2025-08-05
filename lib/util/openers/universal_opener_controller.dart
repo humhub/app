@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
@@ -13,7 +11,7 @@ import '../storage_service.dart';
 
 class UniversalOpenerController {
   late AsyncValue<Manifest>? asyncData;
-  bool doesViewExist = false;
+  // bool doesViewExist = false;
   final String url;
   late HumHub humhub;
 
@@ -51,21 +49,6 @@ class UniversalOpenerController {
     return urls;
   }
 
-  checkHumHubModuleView(String url) async {
-    List<String> substrings = [
-      '/user/auth/external',
-      'humhub.modules.ui.view',
-      '/user/auth/microsoft',
-      'user%2Fauth%2Fexternal',
-      'user%2Fauth%2Fmicrosoft'
-    ];
-    Response? response;
-    response = await Dio().get(Uri.parse(url).toString(), options: Options(maxRedirects: 10)).catchError((err) {
-      return Response(data: "Did not find any of the validation substrings", statusCode: 404, requestOptions: RequestOptions());
-    });
-    doesViewExist = response.statusCode == 200 && substrings.any((substring) => response?.data.contains(substring));
-  }
-
   Future<HumHub?> initHumHub() async {
     var hasConnection = await ConnectivityPlugin.hasConnectivity;
     if (!hasConnection) {
@@ -73,10 +56,7 @@ class UniversalOpenerController {
       return null;
     }
     String? manifestUrl = await findManifest(url);
-    if (asyncData!.hasValue && manifestUrl != null) {
-      await checkHumHubModuleView(asyncData!.value!.startUrl);
-    }
-    if (asyncData!.hasError || !doesViewExist || manifestUrl == null) {
+    if (asyncData!.hasError || manifestUrl == null) {
       asyncData = null;
       return null;
     } else {
