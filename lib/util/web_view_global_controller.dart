@@ -186,9 +186,9 @@ class WebViewGlobalController {
 
   // Android: env(safe-area-*) does not return the correct value when the device has the system navigation enabled
   // iOS: OK
-  static void setWebViewSafeAreaPadding({required EdgeInsets safeArea}) {
+  static Future<void> setWebViewSafeAreaPadding({required EdgeInsets safeArea}) async {
     if (Platform.isAndroid) {
-      value?.evaluateJavascript(source: """
+      await value?.evaluateJavascript(source: """
       (function() {
         var style = document.createElement('style');
         style.innerHTML = `
