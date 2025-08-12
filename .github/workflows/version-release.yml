@@ -186,6 +186,11 @@ jobs:
       - name: Install pub dependencies
         run: flutter pub get
 
+      - name: Install flutterfire CLI
+        run: |
+          dart pub global activate flutterfire_cli
+          echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+
       - name: Extract version
         id: extract_version
         run: echo "version=$(echo ${{ github.ref }} | sed -e 's/^refs\/tags\/v//' -e 's/-.*//')" >> $GITHUB_ENV
