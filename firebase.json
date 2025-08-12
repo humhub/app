@@ -1,0 +1,30 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "humhub-push-service",
+          "appId": "1:21392898126:android:61c84e1edb8b78f708ab1f",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "humhub-push-service",
+          "appId": "1:21392898126:ios:d4f4e884a9ca908008ab1f",
+          "uploadDebugSymbols": true,
+          "fileOutput": "ios/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "humhub-push-service",
+          "configurations": {
+            "android": "1:21392898126:android:61c84e1edb8b78f708ab1f",
+            "ios": "1:21392898126:ios:d4f4e884a9ca908008ab1f"
+          }
+        }
+      }
+    }
+  }
+}
