@@ -51,12 +51,14 @@ class WebViewAppState extends ConsumerState<WebView> {
   late URLRequest _initialRequest;
   late PullToRefreshController _pullToRefreshController;
   HeadlessInAppWebView? _headlessWebView;
-  late EdgeInsets initSafeArea = MediaQuery.of(context).padding;
-  bool keyboardVisible = false;
   bool _isInit = false;
 
   StreamSubscription<List<ConnectivityResult>>? _subscription;
+  StreamSubscription<bool>? _keyboardSubscription;
   final KeyboardVisibilityController _keyboardVisibilityController = KeyboardVisibilityController();
+  EdgeInsets get keyboardPadding => MediaQuery.of(context).padding.copyWith(bottom: 0);
+  EdgeInsets get initSafeArea => MediaQuery.of(context).padding;
+  bool keyboardVisible = false;
 
   @override
   void initState() {
@@ -69,10 +71,9 @@ class WebViewAppState extends ConsumerState<WebView> {
       }
     });
 
-    _keyboardVisibilityController.onChange.listen((bool visible) {
-      if (!mounted) return;
+    _keyboardSubscription = _keyboardVisibilityController.onChange.listen((bool visible) async {
       keyboardVisible = visible;
-      WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: !keyboardVisible ? initSafeArea : MediaQuery.of(context).padding.copyWith(bottom: 0));
+      await WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: !keyboardVisible ? initSafeArea : keyboardPadding);
     });
   }
 
@@ -169,7 +170,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
-    WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: !keyboardVisible ? initSafeArea : MediaQuery.of(context).padding.copyWith(bottom: 0));
+    await WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: !keyboardVisible ? initSafeArea : keyboardPadding);
 
     if (WebViewGlobalController.isCommonURIScheme(webUri: action.request.url!)) {
       return WebViewGlobalController.handleCommonURISchemes(webUri: action.request.url!);
@@ -252,13 +253,13 @@ class WebViewAppState extends ConsumerState<WebView> {
     return Future.value(true);
   }
 
-  _onLoadStop(InAppWebViewController controller, Uri? url) {
+  _onLoadStop(InAppWebViewController controller, Uri? url) async {
     logDebug('Page load stopped: $url');
     if (url!.path.contains('/user/auth/login')) WebViewGlobalController.setLoginForm();
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
-    WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: !keyboardVisible ? initSafeArea : MediaQuery.of(context).padding.copyWith(bottom: 0));
+    await WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: !keyboardVisible ? initSafeArea : keyboardPadding);
 
     LoadingProvider.of(ref).dismissAll();
   }
@@ -268,7 +269,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
-    WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: !keyboardVisible ? initSafeArea : MediaQuery.of(context).padding.copyWith(bottom: 0));
+    await WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: !keyboardVisible ? initSafeArea : keyboardPadding);
   }
 
   _onProgressChanged(InAppWebViewController controller, int progress) {
@@ -507,6 +508,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     logInfo('Disposing WebView and controllers');
     if (_headlessWebView != null) _headlessWebView!.dispose();
     _subscription?.cancel();
+    _keyboardSubscription?.cancel();
     super.dispose();
   }
 }
