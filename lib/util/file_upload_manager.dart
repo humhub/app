@@ -122,7 +122,7 @@ class FileUploadManager {
       return errors;
     }
 
-    for (SharedMediaFile file in files!) {
+    for (SharedMediaFile file in files) {
       if (fileUploadSettings!.allowedExtensions != null && !fileUploadSettings!.allowedExtensions!.contains(file.fileExtension)) {
         errors.add(AppLocalizations.of(context)!.file_type_not_supported(file.thumbnail ?? '', file.type.value));
         logWarning('FileUploadManager: File type not supported: ${file.fileExtension}');
