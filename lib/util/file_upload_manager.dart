@@ -104,6 +104,16 @@ class FileUploadManager {
       logError(errors);
       return errors;
     }
+
+    for (SharedMediaFile file in files!) {
+      final filePath = file.path;
+      if (!File(filePath).existsSync()) {
+        errors.add('File does not exist: ${file.path}');
+        logError(errors);
+        return errors;
+      }
+    }
+
     if (_filesSizeMb(files) > fileUploadSettings!.effectiveMaxFileSize) {
       int limit = fileUploadSettings!.effectiveMaxFileSize.round();
       logWarning('FileUploadManager: Files too big (limit: $limit MB)');
