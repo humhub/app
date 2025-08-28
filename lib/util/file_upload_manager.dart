@@ -294,8 +294,8 @@ class FileUploadManager {
     }).join('&');
 
     String jsCode = """
-    \$('#globalModal').modal('show');
-    \$('#globalModal .modal-content').load('${fileUploadSettings!.shareIntendTargetUrl}?$guids');
+    humhub.modules.ui.modal.global.show();
+    humhub.modules.ui.modal.global.load('${fileUploadSettings!.shareIntendTargetUrl}?$guids');
   """;
 
     await webViewController.evaluateJavascript(source: jsCode);
