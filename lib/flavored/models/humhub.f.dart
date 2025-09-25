@@ -15,8 +15,7 @@ class HumHubF extends HumHub {
     String? randomHash,
     super.appVersion,
     super.pushToken,
-  }) : super(
-            randomHash: Crypt.generateRandomString(32));
+  }) : super(randomHash: Crypt.generateRandomString(32));
 
   @override
   Map<String, String> get customHeaders => {
@@ -27,8 +26,4 @@ class HumHubF extends HumHub {
         'x-humhub-app-is-android': isAndroid ? '1' : '0',
         'x-humhub-app-ostate': openerState.headerValue
       };
-
-  static Future<HumHubF> initialize() async {
-    return HumHubF();
-  }
 }

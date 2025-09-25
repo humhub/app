@@ -9,7 +9,6 @@ import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
 
 void main() {
-  // Catch Flutter framework errors
   FlutterError.onError = (FlutterErrorDetails details) {
     logError('Flutter framework error: ${details.exception}', details.exception, details.stack);
     Zone.current.handleUncaughtError(details.exception, details.stack ?? StackTrace.current);
