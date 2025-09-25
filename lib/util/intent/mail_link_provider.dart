@@ -11,11 +11,12 @@ class UrlProviderHandler {
     }
     return validateHttpHttpsUrl(url);
   }
-
+  // TODO RX 2
   static bool _isHumHubUrl(Uri url) {
     return url.toString().contains('go.humhub.com');
   }
 
+  // TODO RX 3
   static bool _isBrevoUrl(Uri url) {
     return url.toString().contains('r.mail.inforisque.fr');
   }

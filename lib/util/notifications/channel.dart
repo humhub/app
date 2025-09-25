@@ -46,6 +46,7 @@ class NotificationChannel {
 
   static Future<NotificationChannel> getChannel() async {
     switch (GlobalPackageInfo.info.packageName) {
+      // TODO RX 4
       case 'com.humhub.app':
         logInfo('NotificationChannel: Using default channel');
         return const NotificationChannel();

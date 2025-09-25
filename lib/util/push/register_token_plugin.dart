@@ -10,6 +10,7 @@ import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/push/provider.dart';
 import 'package:loggy/loggy.dart';
 
+// TODO RX No need for this component
 class RegisterToken extends ConsumerWidget {
   final Widget child;
 
