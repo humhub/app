@@ -26,7 +26,7 @@ void main() {
     final ref = ProviderContainer();
     final app = await HumHub.initApp();
     HumHub instance = await ref.read(humHubProvider).getInstance();
-    await MyRouter.initInitialRoute(instance);
+    await AppRouter.initInitialRoute(instance);
     runApp(UncontrolledProviderScope(
       container: ref,
       child: app,

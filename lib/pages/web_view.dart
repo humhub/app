@@ -157,7 +157,7 @@ class WebViewAppState extends ConsumerState<WebView> {
       url = controller.url;
     }
     if (args == null) {
-      _manifest = m.MyRouter.initParams;
+      _manifest = m.AppRouter.initParams;
     }
     if (args is ManifestWithRemoteMsg) {
       ManifestWithRemoteMsg manifestPush = args;

@@ -206,6 +206,7 @@ class HumHub {
       [Permission.notification, Permission.camera, Permission.microphone, Permission.storage, Permission.photos],
     );
     switch (GlobalPackageInfo.info.packageName) {
+      // TODO RX1 bundle_id
       case 'com.humhub.app':
         return const OpenerApp();
       default:
