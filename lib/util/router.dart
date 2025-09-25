@@ -1,8 +1,6 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:humhub/models/hum_hub.dart';
-import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/console.dart';
 import 'package:humhub/pages/help/help.dart';
 import 'package:humhub/pages/opener/opener.dart';
@@ -77,14 +75,4 @@ class AppRouter {
         return WebView.path;
     }
   }
-}
-
-class ManifestWithRemoteMsg {
-  final Manifest _manifest;
-  final RemoteMessage _remoteMessage;
-
-  RemoteMessage get remoteMessage => _remoteMessage;
-  Manifest get manifest => _manifest;
-
-  ManifestWithRemoteMsg(this._manifest, this._remoteMessage);
 }

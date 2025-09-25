@@ -1,5 +1,4 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-part 'event.g.dart';
 
 class PushEvent extends RemoteMessage {
   final PushEventData parsedData;
@@ -40,7 +39,10 @@ class PushEventData {
     this.notificationCount,
   );
 
-  factory PushEventData.fromJson(Map<String, dynamic> json) => _$PushEventDataFromJson(json);
+  factory PushEventData.fromJson(Map<String, dynamic> json) {
+    return PushEventData(json['notification_title'] as String?, json['notification_body'] as String?, json['channel'] as String?,
+        json['channel_payload'] as String?, json['url'] as String?, json['notification_count'] as String?);
+  }
 }
 
 class SimpleNotification {
@@ -49,7 +51,12 @@ class SimpleNotification {
 
   SimpleNotification(this.title, this.body);
 
-  factory SimpleNotification.fromJson(Map<String, dynamic> json) => _$SimpleNotificationFromJson(json);
+  factory SimpleNotification.fromJson(Map<String, dynamic> json) {
+    return SimpleNotification(
+      json['title'] as String,
+      json['body'] as String,
+    );
+  }
 }
 
 class PushEventRefreshStore {
@@ -61,5 +68,10 @@ class PushEventRefreshStore {
 
   PushEventRefreshStore(this.storeId, this.familyId);
 
-  factory PushEventRefreshStore.fromJson(Map<String, dynamic> json) => _$PushEventRefreshStoreFromJson(json);
+  factory PushEventRefreshStore.fromJson(Map<String, dynamic> json) {
+    return PushEventRefreshStore(
+      json['store_id'] as String?,
+      json['family_id'],
+    );
+  }
 }

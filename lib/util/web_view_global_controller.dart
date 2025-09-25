@@ -104,7 +104,6 @@ class WebViewGlobalController {
           logError('Could not launch ${webUri.toString()}');
         }
 
-        // Return cancel navigation policy
         return NavigationActionPolicy.CANCEL;
       }
     } catch (er) {

@@ -1,18 +1,24 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/util/auth_in_app_browser.dart';
+import 'package:loggy/loggy.dart';
+import 'package:open_file/open_file.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/models/manifest_with_remote_msg.dart';
 import 'package:humhub/pages/opener/opener.dart';
+import 'package:humhub/pages/console.dart';
+import 'package:humhub/l10n/generated/app_localizations.dart';
+import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/util/black_list_rules.dart';
 import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/const.dart';
@@ -23,18 +29,12 @@ import 'package:humhub/util/file_upload_manager.dart';
 import 'package:humhub/util/init_from_url.dart';
 import 'package:humhub/util/intent/intent_state.dart';
 import 'package:humhub/util/loading_provider.dart';
-import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
+import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/push/provider.dart';
-import 'package:humhub/util/router.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
-import 'package:loggy/loggy.dart';
-import 'package:open_file/open_file.dart';
 import 'package:humhub/util/router.dart' as m;
-import 'package:url_launcher/url_launcher.dart';
-import 'package:humhub/l10n/generated/app_localizations.dart';
 
-import 'console.dart';
 
 class WebView extends ConsumerStatefulWidget {
   const WebView({super.key});
