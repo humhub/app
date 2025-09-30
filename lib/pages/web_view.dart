@@ -258,6 +258,7 @@ class WebViewAppState extends ConsumerState<WebView> {
 
   _onLoadStop(InAppWebViewController controller, Uri? url) async {
     logDebug('Page load stopped: $url');
+    // TODO RX
     if (url!.path.contains('/user/auth/login')) WebViewGlobalController.setLoginForm();
     WebViewGlobalController.ajaxSetHeaders(headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();

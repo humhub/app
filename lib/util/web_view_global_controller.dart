@@ -28,6 +28,7 @@ class WebViewGlobalController {
   /// @return `true` if the URL should open in a new window, `false` otherwise.
   static bool openCreateWindowInWebView({required String url, required Manifest manifest}) {
     String? baseUrl = manifest.startUrl;
+    // TODO RX
     if (url.startsWith('$baseUrl/file/file/download')) return true;
     if (url.startsWith('$baseUrl/u')) return true;
     if (url.startsWith('$baseUrl/s')) return true;
