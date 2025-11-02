@@ -43,3 +43,18 @@ humhub/app-inforisque-leclub@master:
   - l10n.yaml
   - pubspec.lock
   - pubspec.yaml
+humhub/app-asb@main:
+  - source: assets/
+    deleteOrphaned: true
+    exclude: |
+      .env
+  - source: lib/
+    deleteOrphaned: true
+  - source: test/
+    deleteOrphaned: true
+  - .gitignore
+  - .metadata
+  - analysis_options.yaml
+  - l10n.yaml
+  - pubspec.lock
+  - pubspec.yaml
