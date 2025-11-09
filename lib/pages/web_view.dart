@@ -14,7 +14,6 @@ import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/opener/opener.dart';
 import 'package:humhub/util/black_list_rules.dart';
-import 'package:humhub/util/connectivity_plugin.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/crypt.dart';
 import 'package:humhub/util/extensions.dart';
@@ -34,6 +33,7 @@ import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:humhub/l10n/generated/app_localizations.dart';
 
+import '../components/connectivity_wrapper.dart';
 import 'console.dart';
 
 class WebView extends ConsumerStatefulWidget {
@@ -63,14 +63,6 @@ class WebViewAppState extends ConsumerState<WebView> {
   @override
   void initState() {
     super.initState();
-    _subscription = Connectivity().onConnectivityChanged.listen((results) {
-      final hasConnection = results.any((r) => r != ConnectivityResult.none);
-      if (hasConnection) {
-        // Internet is back
-        WebViewGlobalController.value?.reload();
-      }
-    });
-
     _keyboardSubscription = _keyboardVisibilityController.onChange.listen((bool visible) async {
       keyboardVisible = visible;
       await WebViewGlobalController.setWebViewSafeAreaPadding(safeArea: !keyboardVisible ? initKeyboardPadding : noKeyboardBottomPadding);
@@ -108,6 +100,14 @@ class WebViewAppState extends ConsumerState<WebView> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<ConnectivityState>(
+      connectivityStateProvider,
+      (previous, current) {
+        if (previous != null && !previous.hasInternet && current.hasInternet) {
+          WebViewGlobalController.value?.reload();
+        }
+      },
+    );
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: HexColor(_manifest.themeColor),
@@ -285,7 +285,6 @@ class WebViewAppState extends ConsumerState<WebView> {
   void _onReceivedError(InAppWebViewController controller, WebResourceRequest request, WebResourceError error) {
     if ([WebResourceErrorType.NOT_CONNECTED_TO_INTERNET, WebResourceErrorType.TIMEOUT].contains(error.type)) {
       logWarning('No internet connection detected');
-      NoConnectionDialog.show(context);
       LoadingProvider.of(ref).dismissAll();
     }
   }

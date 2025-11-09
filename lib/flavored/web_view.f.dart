@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/app_flavored.dart';
+import 'package:humhub/components/connectivity_wrapper.dart';
 import 'package:humhub/flavored/models/humhub.f.dart';
 import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
@@ -70,6 +71,14 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<ConnectivityState>(
+      connectivityStateProvider,
+      (previous, current) {
+        if (previous != null && !previous.hasInternet && current.hasInternet) {
+          WebViewGlobalController.value?.reload();
+        }
+      },
+    );
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) => exitApp(context, ref),
@@ -245,10 +254,10 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         FileUploadSettingsChannelData data = message.data as FileUploadSettingsChannelData;
         ref.read(humHubProvider.notifier).setFileUploadSettings(data.settings);
         FileUploadManager(
-            webViewController: WebViewGlobalController.value!,
-            intentNotifier: ref.read(intentProvider.notifier),
-            fileUploadSettings: data.settings,
-            context: context)
+                webViewController: WebViewGlobalController.value!,
+                intentNotifier: ref.read(intentProvider.notifier),
+                fileUploadSettings: data.settings,
+                context: context)
             .upload();
       default:
         break;
@@ -345,17 +354,17 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
                           ),
                           downloadProgress.toStringAsFixed(0) == "100"
                               ? const Icon(
-                            Icons.check,
-                            color: Colors.green,
-                            size: 25,
-                          )
+                                  Icons.check,
+                                  color: Colors.green,
+                                  size: 25,
+                                )
                               : Text(
-                            downloadProgress.toStringAsFixed(0),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
+                                  downloadProgress.toStringAsFixed(0),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ],
                       ),
                     ],

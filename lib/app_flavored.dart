@@ -11,6 +11,8 @@ import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/storage_service.dart';
 import 'package:humhub/l10n/generated/app_localizations.dart';
 
+import 'components/connectivity_wrapper.dart';
+
 class FlavoredApp extends ConsumerStatefulWidget {
   const FlavoredApp({super.key});
 
@@ -36,7 +38,7 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
                   localizationsDelegates: AppLocalizations.localizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
                   navigatorKey: Keys.navigatorKey,
-                  builder: (context, child) => child!,
+                  builder: (context, child) => ConnectivityWrapper(child: child!),
                   theme: ThemeData(
                     fontFamily: 'OpenSans',
                   ),

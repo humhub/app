@@ -24,6 +24,19 @@ class HexColor extends Color {
   HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }
 
+extension LighterExtension on Color {
+  Color lighten([double amount = 0.1]) {
+    assert(amount >= 0 && amount <= 1);
+
+    final hsl = HSLColor.fromColor(this);
+    final lightened = hsl.withLightness(
+      (hsl.lightness + amount).clamp(0.0, 1.0),
+    );
+
+    return lightened.toColor();
+  }
+}
+
 extension AsyncValueX<T> on AsyncValue<T> {
   bool get isLoading => asData == null;
 
