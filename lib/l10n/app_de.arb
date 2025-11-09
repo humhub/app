@@ -22,8 +22,8 @@
   "more_info_third_par": "Alle Informationen unter:",
   "more_info_pro_edition": "Besuchen Sie HumHub.com",
 
-  "connectivity_popup_title": "Keine Verbindung möglich.",
-  "connectivity_popup_content": "Bitte überprüfe deine Internetverbindung und versuche es erneut.",
+  "connectivity_popup_title": "Keine Internetverbindung",
+  "connectivity_popup_content": "Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut",
 
   "web_view_exit_popup_title": "Bist du sicher?",
   "web_view_exit_popup_content": "Möchtest du die App verlassen?",

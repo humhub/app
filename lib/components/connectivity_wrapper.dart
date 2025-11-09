@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:humhub/l10n/generated/app_localizations.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class ConnectivityWrapper extends ConsumerWidget {
@@ -76,9 +77,9 @@ class NoInternetPopup extends StatelessWidget {
               color: Colors.red,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'No Internet Connection',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.connectivity_popup_title,
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
@@ -86,8 +87,8 @@ class NoInternetPopup extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Please check your connection and try again',
+            Text(
+              AppLocalizations.of(context)!.connectivity_popup_content,
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.black54,

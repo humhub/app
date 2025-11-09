@@ -23,8 +23,8 @@
   "more_info_third_par": "All information can be found here:",
   "more_info_pro_edition": "Visit HumHub.com",
 
-  "connectivity_popup_title": "No Connection",
-  "connectivity_popup_content": "Please check your internet connection and try again.",
+  "connectivity_popup_title": "No Internet Connection",
+  "connectivity_popup_content": "Please check your connection and try again",
 
   "web_view_exit_popup_title": "Are you sure?",
   "web_view_exit_popup_content": "Do you want to exit an App?",
