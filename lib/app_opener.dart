@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/components/connectivity_wrapper.dart';
 import 'package:humhub/util/app_theme.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/intent/intent_plugin.dart';
@@ -34,7 +35,7 @@ class OpenerApp extends ConsumerWidget {
                   localizationsDelegates: AppLocalizations.localizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
                   locale: overrideLocale,
-                  builder: (context, child) => child!,
+                  builder: (context, child) => ConnectivityWrapper(child: child!),
                   theme: appTheme,
                 ),
               ),

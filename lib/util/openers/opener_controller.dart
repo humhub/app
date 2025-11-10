@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/components/connectivity_wrapper.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/models/remote_config.dart';
@@ -9,7 +10,6 @@ import 'package:humhub/util/providers.dart';
 import 'package:loggy/loggy.dart';
 import 'package:rive/rive.dart';
 import '../api_provider.dart';
-import '../connectivity_plugin.dart';
 import '../form_helper.dart';
 import 'package:humhub/l10n/generated/app_localizations.dart';
 
@@ -92,7 +92,7 @@ class OpenerController {
     if (!helper.validate()) return;
     helper.save();
 
-    var hasConnection = await ConnectivityPlugin.hasConnectivity;
+    var hasConnection = await ConnectivityState.hasConnection;
     if (!hasConnection) {
       String value = urlTextController.text;
       urlTextController.text = noConnection;

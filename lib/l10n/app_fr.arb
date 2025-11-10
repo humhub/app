@@ -22,8 +22,8 @@
   "more_info_third_par": "Toutes les informations peuvent être trouvées ici :",
   "more_info_pro_edition": "Visitez HumHub.com",
 
-  "connectivity_popup_title": "Pas de connexion",
-  "connectivity_popup_content": "Veuillez vérifier votre connexion Internet et réessayer.",
+  "connectivity_popup_title": "Pas de connexion Internet",
+  "connectivity_popup_content": "Veuillez vérifier votre connexion et réessayer",
 
   "web_view_exit_popup_title": "Êtes-vous sûr ?",
   "web_view_exit_popup_content": "Voulez-vous quitter l'application ?",

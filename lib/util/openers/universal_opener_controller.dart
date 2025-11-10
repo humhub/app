@@ -5,8 +5,8 @@ import 'package:humhub/models/manifest.dart';
 import 'package:humhub/models/remote_config.dart';
 import 'package:humhub/util/crypt.dart';
 import 'package:loggy/loggy.dart';
+import '../../components/connectivity_wrapper.dart';
 import '../api_provider.dart';
-import '../connectivity_plugin.dart';
 import '../storage_service.dart';
 
 class UniversalOpenerController {
@@ -50,7 +50,7 @@ class UniversalOpenerController {
   }
 
   Future<HumHub?> initHumHub() async {
-    var hasConnection = await ConnectivityPlugin.hasConnectivity;
+    var hasConnection = await ConnectivityState.hasConnection;
     if (!hasConnection) {
       asyncData = null;
       return null;
