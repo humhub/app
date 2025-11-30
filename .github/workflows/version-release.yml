@@ -115,7 +115,6 @@ jobs:
     name: Test lab tests
     needs: [ build_android ]
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
     strategy:
       matrix:
         include:
