@@ -1,9 +1,9 @@
 name: version-release
 
 on:
-  push:
-    tags:
-      - "v*"
+#  push:
+#    tags:
+#      - "v*"
   workflow_dispatch:
     branches: [ f-internal-54 ]
 
