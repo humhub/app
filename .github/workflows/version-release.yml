@@ -144,7 +144,7 @@ jobs:
         with:
           arg-spec: firebase-tests.yml:android${{ matrix.android-version }}
         env:
-          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_TEST_LAB_SERVICE_ACCOUNT }}
+          SERVICE_ACCOUNT: ${{ secrets.PLAYSTORE_ACCOUNT_KEY }}
 
 #  release_android:
 #    name: Release APK to Google Play
