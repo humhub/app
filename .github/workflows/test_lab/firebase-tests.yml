@@ -1,0 +1,26 @@
+android13:
+  type: robo
+  app: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+  device:
+    - model: pixel7
+      version: 33
+      locale: en
+      orientation: portrait
+
+android14:
+  type: robo
+  app: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+  device:
+    - model: pixel8
+      version: 34
+      locale: en
+      orientation: portrait
+
+android15:
+  type: robo
+  app: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+  device:
+    - model: pixel9
+      version: 35
+      locale: en
+      orientation: portrait

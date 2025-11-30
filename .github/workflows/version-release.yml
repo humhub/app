@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    branches: [ f-internal-54 ]
 
 jobs:
   version:
@@ -16,7 +18,8 @@ jobs:
           fetch-depth: 0
       - name: Extract version from tag name
         id: extract_version
-        run: echo "version=$(echo ${{ github.ref }} | sed -e 's/^v//' -e 's/-.*//')" >> $GITHUB_ENV
+        # run: echo "version=$(echo ${{ github.ref }} | sed -e 's/^v//' -e 's/-.*//')" >> $GITHUB_ENV
+        run: echo "version=1.0.1" >> $GITHUB_ENV
       - name: Write version to file
         run: echo $version > version.txt
       - name: Upload version.txt
@@ -106,6 +109,34 @@ jobs:
         with:
           name: APKs
           path: build/app/outputs/flutter-apk/*.apk
+
+  test_android_firebase:
+    name: Test lab tests
+    needs: [ build_android ]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    strategy:
+      matrix:
+        android-version: [13, 14, 15]
+        device-model: ['pixel7', 'pixel8', 'pixel9']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get APKs from artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: APKs
+          path: build/app/outputs/flutter-apk
+
+      - name: Run Firebase Test Lab - Android ${{ matrix.android-version }} (${{ matrix.device-model }}, API ${{ matrix.android-version + 30 }})
+        uses: asadmansr/Firebase-Test-Lab-Action@v1.0
+        with:
+          arg-spec: firebase-tests.yml:android${{ matrix.android-version }}
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_TEST_LAB_SERVICE_ACCOUNT }}
 
   release_android:
     name: Release APK to Google Play
