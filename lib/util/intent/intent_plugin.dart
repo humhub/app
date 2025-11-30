@@ -58,7 +58,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         if (!mounted || uri == null) return;
 
         Uri? latestUri = await UrlProviderHandler.handleUniversalLink(uri);
-        if(latestUri == null) return;
+        if (latestUri == null) return;
 
         // Update the latest URI using the provider
         ref.read(intentProvider.notifier).setLatestUri(latestUri);
@@ -94,7 +94,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         ref.read(intentProvider.notifier).setInitialUri(uri);
 
         Uri? latestUri = await UrlProviderHandler.handleUniversalLink(uri);
-        if(latestUri == null) return;
+        if (latestUri == null) return;
 
         // Update the latest URI using the provider
         ref.read(intentProvider.notifier).setLatestUri(latestUri);
@@ -122,14 +122,12 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   /// Handle file sharing using `receive_sharing_intent`
   void _handleFileSharing() {
     intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen(
-          (List<SharedMediaFile> value) {
-        // Update shared files using the provider
-        ref.read(intentProvider.notifier).setSharedFiles(value);
-
-        logInfo('Received shared files: $value');
+      (List<SharedMediaFile> mediaList) {
+        mediaList.removeWhere((file) => file.type == SharedMediaType.url || file.type == SharedMediaType.text);
+        ref.read(intentProvider.notifier).setSharedFiles(mediaList);
+        logInfo('Received shared files: $mediaList');
       },
       onError: (err) {
-        // Update error using the provider
         ref.read(intentProvider.notifier).setError(err);
         logError('Error receiving shared files: $err');
       },
@@ -139,6 +137,7 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
       if (mediaList.isEmpty) return;
       FileUploadSettings? settings = ref.read(humHubProvider).fileUploadSettings;
       if (settings == null) return;
+      mediaList.removeWhere((file) => file.type == SharedMediaType.url || file.type == SharedMediaType.text);
       ref.read(intentProvider.notifier).setSharedFiles(mediaList);
       logInfo('Initial shared files: $mediaList');
     });
