@@ -5,6 +5,7 @@ on:
 #    tags:
 #      - "v*"
   workflow_dispatch:
+  push:
     branches: [ f-internal-54 ]
 
 jobs:
