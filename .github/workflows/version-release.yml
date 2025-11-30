@@ -117,8 +117,16 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     strategy:
       matrix:
-        android-version: [13, 14, 15]
-        device-model: ['pixel7', 'pixel8', 'pixel9']
+        include:
+          - android-version: 13
+            device-model: pixel7
+            api-level: 33
+          - android-version: 14
+            device-model: pixel8
+            api-level: 34
+          - android-version: 15
+            device-model: pixel9
+            api-level: 35
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -131,7 +139,7 @@ jobs:
           name: APKs
           path: build/app/outputs/flutter-apk
 
-      - name: Run Firebase Test Lab - Android ${{ matrix.android-version }} (${{ matrix.device-model }}, API ${{ matrix.android-version + 30 }})
+      - name: Run Firebase Test Lab - Android ${{ matrix.android-version }} (${{ matrix.device-model }}, API ${{ matrix.api-level }})
         uses: asadmansr/Firebase-Test-Lab-Action@v1.0
         with:
           arg-spec: firebase-tests.yml:android${{ matrix.android-version }}
