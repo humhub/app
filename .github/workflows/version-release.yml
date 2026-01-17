@@ -132,7 +132,7 @@ jobs:
   build_ios:
     name: Build IPA
     needs: [version]
-    runs-on: macos-15
+    runs-on: macos-latest
     permissions:
       contents: write
     steps:
