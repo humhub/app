@@ -132,7 +132,7 @@ jobs:
   build_ios:
     name: Build IPA
     needs: [version]
-    runs-on: macos-latest
+    runs-on: macos-15
     permissions:
       contents: write
     steps:
@@ -143,7 +143,7 @@ jobs:
       - name: Select Xcode version
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.2.0'
+          xcode-version: latest-stable
       - name: Install the Apple certificate and provisioning profile
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.APPSTORE_BUILD_CERTIFICATE_BASE64 }}
@@ -246,7 +246,7 @@ jobs:
   release_ios:
     name: Release IPA to TestFlight
     needs: [ build_ios ]
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - name: Checkout
         uses: actions/checkout@v3
