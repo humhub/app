@@ -197,6 +197,8 @@ jobs:
           pod repo update
           pod install --repo-update
           cd ..
+      - name: Flutter precache
+        run: flutter precache --ios
 
       - name: Install flutterfire CLI
         run: |
