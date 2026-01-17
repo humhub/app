@@ -11,10 +11,10 @@ import 'package:humhub/util/init_from_url.dart';
 import 'package:humhub/util/intent/intent_state.dart';
 import 'package:humhub/util/intent/mail_link_provider.dart';
 import 'package:humhub/util/loading_provider.dart';
+import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 import 'package:loggy/loggy.dart';
 import 'package:humhub/models/file_upload_settings.dart';
 import 'package:humhub/util/providers.dart';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 bool _initialUriIsHandled = false;
 

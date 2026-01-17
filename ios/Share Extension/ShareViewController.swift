@@ -1,4 +1,4 @@
-import receive_sharing_intent
+import listen_sharing_intent
 
 class ShareViewController: RSIShareViewController {
     override func viewDidLoad() {

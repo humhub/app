@@ -12,7 +12,7 @@ import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/show_dialog.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 import 'package:humhub/l10n/generated/app_localizations.dart';
 
 import 'intent/intent_state.dart';
