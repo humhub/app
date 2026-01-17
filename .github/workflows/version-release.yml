@@ -186,14 +186,12 @@ jobs:
       - name: Flutter doctor
         run: flutter doctor -v
 
-      - name: Install pub dependencies
-        run: flutter pub get
-
-      - name: Reinstall CocoaPods
+      - name: Reset + install iOS pods (correct order)
         run: |
           flutter clean
+          flutter pub get
+          
           rm -rf ios/Pods ios/Podfile.lock
-          rm -rf ~/Library/Developer/Xcode/DerivedData/*
           cd ios
           pod repo update
           pod install --repo-update
