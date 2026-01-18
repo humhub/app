@@ -143,7 +143,7 @@ jobs:
       - name: Select Xcode version
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: 25.0.0
+          xcode-version: 16.4.0
       - name: Install the Apple certificate and provisioning profile
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.APPSTORE_BUILD_CERTIFICATE_BASE64 }}
