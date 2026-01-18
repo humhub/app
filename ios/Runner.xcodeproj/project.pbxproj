@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -16,6 +16,8 @@
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		B28891EE7BB0944D80B3D20E /* Pods_Share_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 555C777A40D502AF824E6740 /* Pods_Share_Extension.framework */; };
 		D9EB115029D4BEFD00B77775 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D9EB114F29D4BEFD00B77775 /* GoogleService-Info.plist */; };
+		F61D252A2F1CF3F90012D401 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F61D25252F1CF3F90012D401 /* MainInterface.storyboard */; };
+		F61D252B2F1CF3F90012D401 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61D25272F1CF3F90012D401 /* ShareViewController.swift */; };
 		F65851052AC2EF210036C268 /* RunnerProfile.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = F6025A732AC02D3D001D4FD8 /* RunnerProfile.entitlements */; };
 		F65851062AC2EF210036C268 /* Runner.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = D9895F6A29D4AEFD00F6E619 /* Runner.entitlements */; };
 		F6AD2E792D74B07A00161496 /* Share Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F6AD2E6F2D74B07A00161496 /* Share Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -80,22 +82,12 @@
 		DE280BBB60DBA7CDB0C32BC1 /* Pods-Share Extension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Share Extension.debug.xcconfig"; path = "Target Support Files/Pods-Share Extension/Pods-Share Extension.debug.xcconfig"; sourceTree = "<group>"; };
 		F3198AB5E14144EC0FAA38C5 /* Pods-Share Extension.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Share Extension.profile.xcconfig"; path = "Target Support Files/Pods-Share Extension/Pods-Share Extension.profile.xcconfig"; sourceTree = "<group>"; };
 		F6025A732AC02D3D001D4FD8 /* RunnerProfile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RunnerProfile.entitlements; sourceTree = "<group>"; };
+		F61D25232F1CF3F90012D401 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F61D25242F1CF3F90012D401 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		F61D25262F1CF3F90012D401 /* Share Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Share Extension.entitlements"; sourceTree = "<group>"; };
+		F61D25272F1CF3F90012D401 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		F6AD2E6F2D74B07A00161496 /* Share Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Share Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		F6AD2E7E2D74B07A00161496 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = F6AD2E6E2D74B07A00161496 /* Share Extension */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		F6AD2E702D74B07A00161496 /* Share Extension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (F6AD2E7E2D74B07A00161496 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "Share Extension"; sourceTree = "<group>"; };
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		97C146EB1CF9000F007C117D /* Frameworks */ = {
@@ -156,7 +148,7 @@
 				D9EB114F29D4BEFD00B77775 /* GoogleService-Info.plist */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
-				F6AD2E702D74B07A00161496 /* Share Extension */,
+				F61D25282F1CF3F90012D401 /* Share Extension */,
 				97C146EF1CF9000F007C117D /* Products */,
 				27711A3E88C462A848B64FCC /* Pods */,
 				75FC01E917032AA077D58A52 /* Frameworks */,
@@ -187,6 +179,17 @@
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		F61D25282F1CF3F90012D401 /* Share Extension */ = {
+			isa = PBXGroup;
+			children = (
+				F61D25232F1CF3F90012D401 /* Info.plist */,
+				F61D25252F1CF3F90012D401 /* MainInterface.storyboard */,
+				F61D25262F1CF3F90012D401 /* Share Extension.entitlements */,
+				F61D25272F1CF3F90012D401 /* ShareViewController.swift */,
+			);
+			path = "Share Extension";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -230,9 +233,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				F6AD2E702D74B07A00161496 /* Share Extension */,
 			);
 			name = "Share Extension";
 			productName = "Share Extension";
@@ -296,6 +296,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F61D252A2F1CF3F90012D401 /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -445,6 +446,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F61D252B2F1CF3F90012D401 /* ShareViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -473,6 +475,14 @@
 				97C147001CF9000F007C117D /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		F61D25252F1CF3F90012D401 /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F61D25242F1CF3F90012D401 /* Base */,
+			);
+			name = MainInterface.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
