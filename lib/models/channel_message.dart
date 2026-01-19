@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'file_upload_settings.dart';
 
 /// Enum representing different channel actions
-enum ChannelAction { showOpener, hideOpener, registerFcmDevice, unregisterFcmDevice, updateNotificationCount, nativeConsole, fileUploadSettings, none }
+enum ChannelAction { showOpener, hideOpener, registerFcmDevice, unregisterFcmDevice, updateNotificationCount, nativeConsole, fileUploadSettings, openExternal, none }
 
 /// Abstract class to encapsulate the logic for channel data
 abstract class ChannelData {
@@ -54,6 +54,8 @@ class ChannelMessage {
         return ChannelAction.nativeConsole;
       case "fileUploadSettings":
         return ChannelAction.fileUploadSettings;
+      case "openExternal":
+        return ChannelAction.openExternal;
       default:
         return ChannelAction.none;
     }

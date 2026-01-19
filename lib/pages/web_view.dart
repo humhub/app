@@ -350,6 +350,14 @@ class WebViewAppState extends ConsumerState<WebView> {
                 context: context)
             .upload();
         break;
+      case ChannelAction.openExternal:
+        logInfo('Action: openExternal');
+        final raw = message.url;
+        if (raw == null || raw.isEmpty) return;
+        final uri = Uri.tryParse(raw);
+        if (uri == null || !(uri.isScheme('http') || uri.isScheme('https'))) return;
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        break;
       case ChannelAction.none:
         logInfo('Action: none');
         break;
