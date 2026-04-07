@@ -5,7 +5,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:humhub/l10n/generated/app_localizations.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
-class ConnectivityWrapper extends ConsumerWidget {
+class ConnectivityWrapper extends ConsumerStatefulWidget {
   final Widget child;
 
   const ConnectivityWrapper({
@@ -14,13 +14,67 @@ class ConnectivityWrapper extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConnectivityWrapper> createState() =>
+      _ConnectivityWrapperState();
+}
+
+class _ConnectivityWrapperState extends ConsumerState<ConnectivityWrapper>
+    with WidgetsBindingObserver {
+  bool _appIsResumed = true;
+  bool _ignoreOfflineAfterResume = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        setState(() {
+          _appIsResumed = true;
+          _ignoreOfflineAfterResume = true;
+        });
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        setState(() {
+          _appIsResumed = false;
+        });
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final connectivityState = ref.watch(connectivityStateProvider);
+    final shouldIgnorePopup = !_appIsResumed ||
+        (_ignoreOfflineAfterResume && !connectivityState.hasInternet);
+
+    if (_ignoreOfflineAfterResume && connectivityState.hasInternet) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _ignoreOfflineAfterResume = false;
+          });
+        }
+      });
+    }
 
     return Stack(
       children: [
-        child,
-        if (connectivityState.shouldShowPopup)
+        widget.child,
+        if (connectivityState.shouldShowPopup && !shouldIgnorePopup)
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
@@ -115,7 +169,8 @@ class ConnectivityState {
   });
 
   static Future<bool> get hasConnection async {
-    List<ConnectivityResult> connectivityResult = await Connectivity().checkConnectivity();
+    List<ConnectivityResult> connectivityResult =
+        await Connectivity().checkConnectivity();
     return !connectivityResult.contains(ConnectivityResult.none);
   }
 }
@@ -128,7 +183,8 @@ final connectivityStateProvider = Provider<ConnectivityState>((ref) {
 
   final hasInternet = connectivityAsync.whenData((results) {
         final isConnected = !results.contains(ConnectivityResult.none);
-        final hasInternetValue = hasInternetAsync.whenData((value) => value).value ?? true;
+        final hasInternetValue =
+            hasInternetAsync.whenData((value) => value).value ?? true;
         return isConnected && hasInternetValue;
       }).value ??
       true;
