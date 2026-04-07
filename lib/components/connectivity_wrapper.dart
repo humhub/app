@@ -21,7 +21,9 @@ class ConnectivityWrapper extends ConsumerStatefulWidget {
 class _ConnectivityWrapperState extends ConsumerState<ConnectivityWrapper>
     with WidgetsBindingObserver {
   bool _appIsResumed = true;
-  bool _ignoreOfflineAfterResume = false;
+  bool _awaitingResumeConnectivityConfirmation = false;
+  bool _isConfirmingResumeConnectivity = false;
+  bool _resumeConfirmedOffline = false;
 
   @override
   void initState() {
@@ -41,7 +43,9 @@ class _ConnectivityWrapperState extends ConsumerState<ConnectivityWrapper>
       case AppLifecycleState.resumed:
         setState(() {
           _appIsResumed = true;
-          _ignoreOfflineAfterResume = true;
+          _awaitingResumeConnectivityConfirmation = true;
+          _isConfirmingResumeConnectivity = false;
+          _resumeConfirmedOffline = false;
         });
         break;
       case AppLifecycleState.inactive:
@@ -50,26 +54,63 @@ class _ConnectivityWrapperState extends ConsumerState<ConnectivityWrapper>
       case AppLifecycleState.detached:
         setState(() {
           _appIsResumed = false;
+          _awaitingResumeConnectivityConfirmation = false;
+          _isConfirmingResumeConnectivity = false;
+          _resumeConfirmedOffline = false;
         });
         break;
     }
   }
 
+  Future<void> _confirmConnectivityAfterResume() async {
+    if (_isConfirmingResumeConnectivity) {
+      return;
+    }
+
+    setState(() {
+      _isConfirmingResumeConnectivity = true;
+    });
+
+    final hasConnection = await ConnectivityState.hasConnection;
+    final hasInternet = await InternetConnectionCheckerPlus().hasConnection;
+    final isOffline = !hasConnection || !hasInternet;
+
+    if (!mounted || !_awaitingResumeConnectivityConfirmation) {
+      return;
+    }
+
+    setState(() {
+      _awaitingResumeConnectivityConfirmation = false;
+      _isConfirmingResumeConnectivity = false;
+      _resumeConfirmedOffline = isOffline;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final connectivityState = ref.watch(connectivityStateProvider);
-    final shouldIgnorePopup = !_appIsResumed ||
-        (_ignoreOfflineAfterResume && !connectivityState.hasInternet);
-
-    if (_ignoreOfflineAfterResume && connectivityState.hasInternet) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          setState(() {
-            _ignoreOfflineAfterResume = false;
-          });
-        }
-      });
+    if (_appIsResumed && _awaitingResumeConnectivityConfirmation) {
+      if (connectivityState.hasInternet) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() {
+              _awaitingResumeConnectivityConfirmation = false;
+              _isConfirmingResumeConnectivity = false;
+              _resumeConfirmedOffline = false;
+            });
+          }
+        });
+      } else if (!_isConfirmingResumeConnectivity) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _confirmConnectivityAfterResume();
+          }
+        });
+      }
     }
+
+    final shouldIgnorePopup = !_appIsResumed ||
+        (_awaitingResumeConnectivityConfirmation && !_resumeConfirmedOffline);
 
     return Stack(
       children: [
