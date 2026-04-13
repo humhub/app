@@ -23,7 +23,7 @@ class _ConnectivityWrapperState extends ConsumerState<ConnectivityWrapper>
   bool _appIsResumed = true;
   bool _awaitingResumeConnectivityConfirmation = false;
   bool _isConfirmingResumeConnectivity = false;
-  bool _resumeConfirmedOffline = false;
+  bool _showOfflinePopup = false;
 
   @override
   void initState() {
@@ -45,7 +45,12 @@ class _ConnectivityWrapperState extends ConsumerState<ConnectivityWrapper>
           _appIsResumed = true;
           _awaitingResumeConnectivityConfirmation = true;
           _isConfirmingResumeConnectivity = false;
-          _resumeConfirmedOffline = false;
+          _showOfflinePopup = false;
+        });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _handleResumeConnectivityState(ref.read(connectivityStateProvider));
+          }
         });
         break;
       case AppLifecycleState.inactive:
@@ -56,9 +61,32 @@ class _ConnectivityWrapperState extends ConsumerState<ConnectivityWrapper>
           _appIsResumed = false;
           _awaitingResumeConnectivityConfirmation = false;
           _isConfirmingResumeConnectivity = false;
-          _resumeConfirmedOffline = false;
+          _showOfflinePopup = false;
         });
         break;
+    }
+  }
+
+  void _handleResumeConnectivityState(ConnectivityState connectivityState) {
+    if (!_appIsResumed || !_awaitingResumeConnectivityConfirmation) {
+      return;
+    }
+
+    if (connectivityState.isLoading) {
+      return;
+    }
+
+    if (connectivityState.hasInternet) {
+      setState(() {
+        _awaitingResumeConnectivityConfirmation = false;
+        _isConfirmingResumeConnectivity = false;
+        _showOfflinePopup = false;
+      });
+      return;
+    }
+
+    if (!_isConfirmingResumeConnectivity) {
+      _confirmConnectivityAfterResume();
     }
   }
 
@@ -82,40 +110,54 @@ class _ConnectivityWrapperState extends ConsumerState<ConnectivityWrapper>
     setState(() {
       _awaitingResumeConnectivityConfirmation = false;
       _isConfirmingResumeConnectivity = false;
-      _resumeConfirmedOffline = isOffline;
+      _showOfflinePopup = _appIsResumed && isOffline;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final connectivityState = ref.watch(connectivityStateProvider);
-    if (_appIsResumed && _awaitingResumeConnectivityConfirmation) {
-      if (connectivityState.hasInternet) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            setState(() {
-              _awaitingResumeConnectivityConfirmation = false;
-              _isConfirmingResumeConnectivity = false;
-              _resumeConfirmedOffline = false;
-            });
-          }
-        });
-      } else if (!_isConfirmingResumeConnectivity) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            _confirmConnectivityAfterResume();
-          }
+    ref.listen<ConnectivityState>(connectivityStateProvider,
+        (previous, current) {
+      if (!_appIsResumed) {
+        if (_showOfflinePopup) {
+          setState(() {
+            _showOfflinePopup = false;
+          });
+        }
+        return;
+      }
+
+      if (current.isLoading) {
+        return;
+      }
+
+      if (_awaitingResumeConnectivityConfirmation) {
+        _handleResumeConnectivityState(current);
+        return;
+      }
+
+      if (current.hasInternet) {
+        if (_showOfflinePopup) {
+          setState(() {
+            _showOfflinePopup = false;
+          });
+        }
+        return;
+      }
+
+      if (!_showOfflinePopup) {
+        setState(() {
+          _showOfflinePopup = true;
         });
       }
-    }
+    });
 
-    final shouldIgnorePopup = !_appIsResumed ||
-        (_awaitingResumeConnectivityConfirmation && !_resumeConfirmedOffline);
+    ref.watch(connectivityStateProvider);
 
     return Stack(
       children: [
         widget.child,
-        if (connectivityState.shouldShowPopup && !shouldIgnorePopup)
+        if (_showOfflinePopup)
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
