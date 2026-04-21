@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 class GlobalUserAgent {
   static const String _ios =
@@ -6,13 +7,23 @@ class GlobalUserAgent {
   static const String _android =
       "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.6778.81 Mobile Safari/537.36";
 
-  static String get value {
+  static bool get _isTabletViewport {
+    final FlutterView view = PlatformDispatcher.instance.views.first;
+    final double shortestSide =
+        view.physicalSize.shortestSide / view.devicePixelRatio;
+    return shortestSide >= 600;
+  }
+
+  static String? get value {
     if (Platform.isIOS) {
+      if (_isTabletViewport) {
+        return null;
+      }
       return _ios;
     } else if (Platform.isAndroid) {
       return _android;
     } else {
-      return "Unknown User Agent"; // Fallback for unsupported platforms
+      return null;
     }
   }
 }
