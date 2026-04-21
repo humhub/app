@@ -219,6 +219,7 @@ class WebViewGlobalController {
   }
 
   static InAppWebViewSettings settings({bool zoom = false}) {
+    final userAgent = GlobalUserAgent.value;
     return InAppWebViewSettings(
       useShouldOverrideUrlLoading: true,
       useShouldInterceptFetchRequest: false,
@@ -230,7 +231,7 @@ class WebViewGlobalController {
       mediaPlaybackRequiresUserGesture: false,
       domStorageEnabled: true,
       supportZoom: zoom ? true : false,
-      userAgent: GlobalUserAgent.value,
+      userAgent: userAgent,
       applicationNameForUserAgent: GlobalPackageInfo.info.appName,
       allowFileAccessFromFileURLs: true,
       allowUniversalAccessFromFileURLs: true,

@@ -12,6 +12,7 @@ class AuthInAppBrowser extends InAppBrowser {
   late InAppBrowserClassSettings settings;
   final Function concludeAuth;
   AuthInAppBrowser({required this.manifest, required this.concludeAuth}) {
+    final userAgent = GlobalUserAgent.value;
     settings = InAppBrowserClassSettings(
       browserSettings: InAppBrowserSettings(
         hideUrlBar: true,
@@ -25,7 +26,7 @@ class AuthInAppBrowser extends InAppBrowser {
       webViewSettings: InAppWebViewSettings(
           javaScriptEnabled: true,
           useShouldOverrideUrlLoading: true,
-          userAgent: GlobalUserAgent.value,
+          userAgent: userAgent,
           applicationNameForUserAgent: GlobalPackageInfo.info.appName),
     );
   }
