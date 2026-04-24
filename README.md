@@ -2,7 +2,7 @@
   <tr>
     <td align="center" valign="top" width="50%" style="border:none !important; padding: 0px 24px 12px 24px;">
       <a href="https://apps.apple.com/us/app/humhub/id6446092274" style="padding: 15px;">
-        <img src="assets/images/get_it_on_app_store.png" alt="Download on the App Store" height="56" style="padding: 15px;">
+        <img src="assets/images/get_it_on_app_store.png" alt="Download on the App Store" height="56" width="177" style="padding: 15px;">
       </a>
       <br><br>
       <a href="https://apps.apple.com/us/app/humhub/id6446092274">
@@ -11,7 +11,7 @@
     </td>
     <td align="center" valign="top" width="50%" style="border:none !important; padding: 0 24px 12px 24px;">
       <a href="https://play.google.com/store/apps/details?id=com.humhub.app">
-        <img src="assets/images/get_it_on_google_play.png" alt="Get it on Google Play" height="56">
+        <img src="assets/images/get_it_on_google_play.png" alt="Get it on Google Play" height="56" width="177">
       </a>
       <br><br>
       <a href="https://play.google.com/store/apps/details?id=com.humhub.app">
