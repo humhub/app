@@ -1,11 +1,19 @@
-<table border="0" cellpadding="0" cellspacing="0" align="center">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
-    <td align="center" valign="top" style="border:none !important; padding: 0 24px 12px 24px;">
+    <td align="center" valign="top" width="50%" style="border:none !important; padding: 0 24px 12px 24px;">
+      <a href="https://apps.apple.com/us/app/humhub/id6446092274">
+        <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="56">
+      </a>
+      <br><br>
       <a href="https://apps.apple.com/us/app/humhub/id6446092274">
         <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fapps.apple.com%2Fus%2Fapp%2Fhumhub%2Fid6446092274" alt="QR code for the HumHub App Store listing" width="160" height="160">
       </a>
     </td>
-    <td align="center" valign="top" style="border:none !important; padding: 0 24px 12px 24px;">
+    <td align="center" valign="top" width="50%" style="border:none !important; padding: 0 24px 12px 24px;">
+      <a href="https://play.google.com/store/apps/details?id=com.humhub.app">
+        <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="56">
+      </a>
+      <br><br>
       <a href="https://play.google.com/store/apps/details?id=com.humhub.app">
         <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.humhub.app" alt="QR code for the HumHub Google Play listing" width="160" height="160">
       </a>
