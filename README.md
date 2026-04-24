@@ -2,7 +2,7 @@
   <tr>
     <td align="center" valign="top" width="50%" style="border:none !important; padding: 0 24px 12px 24px;">
       <a href="https://apps.apple.com/us/app/humhub/id6446092274">
-        <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="56">
+        <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="56" style="padding: 15px;">
       </a>
       <br><br>
       <a href="https://apps.apple.com/us/app/humhub/id6446092274">
