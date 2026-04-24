@@ -44,10 +44,6 @@ The mobile app provides direct access to a HumHub network from a phone or tablet
 - upload and share files, photos, and videos
 - staying connected away from a desktop browser
 
-## Contributing
-
-Development setup, run commands, verification, and platform notes live in [`CONTRIBUTING.md`](./CONTRIBUTING.md).
-
 ## Open Source
 
 This project is part of the broader HumHub open source ecosystem.
