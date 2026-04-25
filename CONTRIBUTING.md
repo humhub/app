@@ -4,10 +4,11 @@ Thanks for contributing to the HumHub mobile app.
 
 ## How To Contribute
 
-1. Fork the repository and create a branch for your change.
-2. Keep changes focused and avoid mixing unrelated fixes in one pull request.
-3. Run the relevant verification steps before opening a pull request.
-4. Open a pull request with a clear description of the problem, the change, and any testing you ran.
+1. [Create an issue](https://github.com/humhub/app/issues) to describe your idea. 
+2. Fork the repository and create a branch for your change.
+3. Keep changes focused and avoid mixing unrelated fixes in one pull request.
+4. Run the relevant verification steps before opening a pull request.
+5. Open a pull request with a clear description of the problem, the change, and any testing you ran.
 
 For larger changes, bug fixes with behavior impact, or platform-specific work, include enough context in the pull request so reviewers can reproduce and validate the change.
 
