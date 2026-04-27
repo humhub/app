@@ -27,13 +27,7 @@ The official open source mobile app for HumHub.
 
 This repository contains the Flutter app used to access HumHub networks on iPhone, iPad, and Android devices.
 
-## What Is HumHub?
-
-HumHub is open source software for social intranets, internal communities, and collaboration platforms. It is used to organize communication, content, spaces, and user interaction inside a private or branded network.
-
-HumHub can be self-hosted or operated as a managed service.
-
-## What This App Is For
+## What this App is for
 
 The mobile app provides direct access to a HumHub network from a phone or tablet. It is intended to cover common mobile workflows such as:
 
