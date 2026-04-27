@@ -14,11 +14,11 @@ For larger changes, bug fixes with behavior impact, or platform-specific work, i
 
 ## Requirements
 
-- Flutter `3.29.0`
+- Flutter
 - Xcode / CocoaPods for iOS development
 - Android SDK for Android development
 
-If you use FVM, the repo is already pinned to Flutter `3.29.0` in `.fvmrc`.
+If you use FVM, the repo is already pinned in `.fvmrc`.
 
 ## Get Started
 
