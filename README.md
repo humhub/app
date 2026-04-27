@@ -23,7 +23,7 @@
 
 # HumHub Mobile App
 
-The official open source mobile app for HumHub.
+The official open source mobile app for [HumHub](https://www.humhub.com/).
 
 This repository contains the Flutter app used to access HumHub networks on iPhone, iPad, and Android devices.
 
@@ -31,12 +31,11 @@ This repository contains the Flutter app used to access HumHub networks on iPhon
 
 The mobile app provides direct access to a HumHub network from a phone or tablet. It is intended to cover common mobile workflows such as:
 
-- open your HumHub instance quickly
-- follow activity streams and spaces
-- receive push notifications
+- Direct access to your HumHub instances
+- Receive real-time mobile push notifications
 - open shared links directly in the app
 - upload and share files, photos, and videos
-- staying connected away from a desktop browser
+- staying connected while away from a desktop browser
 
 ## Open Source
 
