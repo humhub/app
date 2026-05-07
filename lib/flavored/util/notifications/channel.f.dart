@@ -14,6 +14,9 @@ class NotificationChannelF extends NotificationChannel {
   ///
   @override
   Future<void> onTap(String? payload) async {
+    if (payload != null) {
+      payload = await NotificationChannel.normalizePushPayload(payload);
+    }
     if (payload != null && Keys.navigatorKey.currentState != null) {
       bool isNewRouteSameAsCurrent = false;
       Keys.navigatorKey.currentState!.popUntil((route) {

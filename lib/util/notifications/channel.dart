@@ -4,6 +4,7 @@ import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/init_from_url.dart';
+import 'package:humhub/util/intent/mail_link_provider.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:loggy/loggy.dart';
 
@@ -17,10 +18,26 @@ class NotificationChannel {
       this.name = 'Redirect app notifications',
       this.description = 'These notifications are redirect the user to specific url in a payload.'});
 
+  static Future<String> normalizePushPayload(String payload) async {
+    try {
+      final uri = Uri.parse(payload);
+      if (!uri.toString().contains('go.humhub.com')) return payload;
+
+      final resolvedUri = await UrlProviderHandler.handleUniversalLink(uri);
+      return resolvedUri?.toString() ?? payload;
+    } catch (e) {
+      logError('NotificationChannel: Failed to normalize payload: $e');
+      return payload;
+    }
+  }
+
   /// If the WebView is not opened yet or the app is not running the onTap will wake up the app or redirect to the WebView.
   /// If app is already running in WebView mode then the state of [WebView] will be updated with new url.
   ///
   Future<void> onTap(String? payload) async {
+    if (payload != null) {
+      payload = await normalizePushPayload(payload);
+    }
     if (payload != null && Keys.navigatorKey.currentState != null) {
       logDebug('NotificationChannel: Received payload: $payload');
       bool isNewRouteSameAsCurrent = false;
