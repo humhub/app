@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/flavored/web_view.f.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/init_from_url.dart';
+import 'package:humhub/util/intent/app_link_settings.dart';
 import 'package:humhub/util/intent/intent_state.dart';
 import 'package:humhub/util/intent/mail_link_provider.dart';
 import 'package:humhub/util/loading_provider.dart';
@@ -15,8 +16,10 @@ import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 import 'package:loggy/loggy.dart';
 import 'package:humhub/models/file_upload_settings.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:humhub/util/show_dialog.dart';
 
 bool _initialUriIsHandled = false;
+bool _appLinkPopupShown = false;
 
 class IntentPluginF extends ConsumerStatefulWidget {
   final Widget child;
@@ -39,10 +42,32 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showAppLinkSettingsPopupIfNeeded();
       _handleInitialUri();
       _subscribeToUriStream();
       _handleFileSharing();
     });
+  }
+
+  void _showAppLinkSettingsPopupIfNeeded() {
+    if (_appLinkPopupShown || !AppLinkSettings.state.shouldShowDisabledDialog) {
+      return;
+    }
+
+    final dialogContext = Keys.navigatorKey.currentContext;
+    if (dialogContext == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showAppLinkSettingsPopupIfNeeded();
+      });
+      return;
+    }
+
+    _appLinkPopupShown = true;
+    ShowDialog.of(dialogContext).intentLinksDisabledPopup(
+      onOpenSettings: () {
+        AppLinkSettings.openOpenByDefaultSettings();
+      },
+    );
   }
 
   @override
@@ -60,7 +85,7 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
       _sub = appLinks.uriLinkStream.listen((Uri? uri) async {
         if (!mounted && uri == null) return;
         Uri? latestUri = await UrlProviderHandler.handleUniversalLink(uri!);
-        if(latestUri == null) return;
+        if (latestUri == null) return;
 
         ref.read(intentProvider.notifier).setLatestUri(latestUri);
 
@@ -98,7 +123,7 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
 
         // Update the initial URI using the provider
         Uri? latestUri = await UrlProviderHandler.handleUniversalLink(uri);
-        if(latestUri == null) return;
+        if (latestUri == null) return;
 
         // Update the latest URI using the provider
         ref.read(intentProvider.notifier).setLatestUri(latestUri);
@@ -123,8 +148,9 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
   }
 
   void _handleFileSharing() {
-    intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen(
-          (List<SharedMediaFile> value) {
+    intentDataStreamSubscription =
+        ReceiveSharingIntent.instance.getMediaStream().listen(
+      (List<SharedMediaFile> value) {
         // Update shared files using the provider
         ref.read(intentProvider.notifier).setSharedFiles(value);
 
@@ -139,7 +165,8 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
 
     ReceiveSharingIntent.instance.getInitialMedia().then((mediaList) {
       if (mediaList.isEmpty) return;
-      FileUploadSettings? settings = ref.read(humHubProvider).fileUploadSettings;
+      FileUploadSettings? settings =
+          ref.read(humHubProvider).fileUploadSettings;
       if (settings == null) return;
       ref.read(intentProvider.notifier).setSharedFiles(mediaList);
       logInfo('Initial shared files: $mediaList');
@@ -155,7 +182,8 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
       }
       return true;
     });
-    Keys.navigatorKey.currentState!.pushNamed(WebViewF.path, arguments: redirectUrl);
+    Keys.navigatorKey.currentState!
+        .pushNamed(WebViewF.path, arguments: redirectUrl);
     return isNewRouteSameAsCurrent;
   }
 

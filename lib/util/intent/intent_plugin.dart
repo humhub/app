@@ -8,15 +8,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/file_upload_settings.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
+import 'package:humhub/util/intent/app_link_settings.dart';
 import 'package:humhub/util/intent/mail_link_provider.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/providers.dart';
+import 'package:humhub/util/show_dialog.dart';
 import 'package:loggy/loggy.dart';
 import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 
 import 'intent_state.dart';
 
 bool _initialUriIsHandled = false;
+bool _appLinkPopupShown = false;
 
 class IntentPlugin extends ConsumerStatefulWidget {
   final Widget child;
@@ -39,10 +42,32 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showAppLinkSettingsPopupIfNeeded();
       _handleInitialUri();
       _subscribeToUriStream();
       _handleFileSharing();
     });
+  }
+
+  void _showAppLinkSettingsPopupIfNeeded() {
+    if (_appLinkPopupShown || !AppLinkSettings.state.shouldShowDisabledDialog) {
+      return;
+    }
+
+    final dialogContext = Keys.navigatorKey.currentContext;
+    if (dialogContext == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showAppLinkSettingsPopupIfNeeded();
+      });
+      return;
+    }
+
+    _appLinkPopupShown = true;
+    ShowDialog.of(dialogContext).intentLinksDisabledPopup(
+      onOpenSettings: () {
+        AppLinkSettings.openOpenByDefaultSettings();
+      },
+    );
   }
 
   @override
@@ -105,9 +130,11 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
         if (Keys.navigatorKey.currentState != null) {
           tryNavigateWithOpener(redirectUrl);
         } else {
-          UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
+          UniversalOpenerController opener =
+              UniversalOpenerController(url: redirectUrl);
           await opener.initHumHub();
-          Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
+          Keys.navigatorKey.currentState!
+              .pushNamed(WebView.path, arguments: opener);
         }
       } on PlatformException {
         logError('Failed to get initial uri');
@@ -121,9 +148,12 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
 
   /// Handle file sharing using `receive_sharing_intent`
   void _handleFileSharing() {
-    intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen(
+    intentDataStreamSubscription =
+        ReceiveSharingIntent.instance.getMediaStream().listen(
       (List<SharedMediaFile> mediaList) {
-        mediaList.removeWhere((file) => file.type == SharedMediaType.url || file.type == SharedMediaType.text);
+        mediaList.removeWhere((file) =>
+            file.type == SharedMediaType.url ||
+            file.type == SharedMediaType.text);
         ref.read(intentProvider.notifier).setSharedFiles(mediaList);
         logInfo('Received shared files: $mediaList');
       },
@@ -135,9 +165,12 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
 
     ReceiveSharingIntent.instance.getInitialMedia().then((mediaList) {
       if (mediaList.isEmpty) return;
-      FileUploadSettings? settings = ref.read(humHubProvider).fileUploadSettings;
+      FileUploadSettings? settings =
+          ref.read(humHubProvider).fileUploadSettings;
       if (settings == null) return;
-      mediaList.removeWhere((file) => file.type == SharedMediaType.url || file.type == SharedMediaType.text);
+      mediaList.removeWhere((file) =>
+          file.type == SharedMediaType.url ||
+          file.type == SharedMediaType.text);
       ref.read(intentProvider.notifier).setSharedFiles(mediaList);
       logInfo('Initial shared files: $mediaList');
     });
@@ -153,7 +186,8 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
       }
       return true;
     });
-    UniversalOpenerController opener = UniversalOpenerController(url: redirectUrl);
+    UniversalOpenerController opener =
+        UniversalOpenerController(url: redirectUrl);
     await opener.initHumHub();
     Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
     return isNewRouteSameAsCurrent;

@@ -16,7 +16,8 @@ class ShowDialog {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.connectivity_popup_title),
-          content: Text(AppLocalizations.of(context)!.connectivity_popup_content),
+          content:
+              Text(AppLocalizations.of(context)!.connectivity_popup_content),
           actions: [
             TextButton(
               child: Text(AppLocalizations.of(context)!.ok.toUpperCase()),
@@ -34,8 +35,37 @@ class ShowDialog {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return ErrorListPopup(title: AppLocalizations.of(context)!.file_sharing_error, errors: errors);
+          return ErrorListPopup(
+              title: AppLocalizations.of(context)!.file_sharing_error,
+              errors: errors);
         });
+  }
+
+  intentLinksDisabledPopup({required VoidCallback onOpenSettings}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+              AppLocalizations.of(context)!.intent_links_disabled_popup_title),
+          content: Text(AppLocalizations.of(context)!
+              .intent_links_disabled_popup_content),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(AppLocalizations.of(context)!.close),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                onOpenSettings();
+              },
+              child: Text(AppLocalizations.of(context)!.settings),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
@@ -51,9 +81,11 @@ class ErrorListPopup extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(6.0),
       ),
-      title: Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+      title: Text(title,
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
       content: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
+        constraints:
+            BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
