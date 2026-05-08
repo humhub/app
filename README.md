@@ -25,23 +25,24 @@
 
 The official open source mobile app for [HumHub](https://www.humhub.com/).
 
-This repository contains the Flutter app used to access HumHub networks on iPhone, iPad, and Android devices.
+Built with Flutter, the HumHub Mobile App provides a fast and easy way to access your HumHub networks on Android & iOS devices.
 
-## What this App is for
+## Features
 
-The mobile app provides direct access to a HumHub network from a phone or tablet. It is intended to cover common mobile workflows such as:
+The app is built for everyday collaboration and communication on smartphones and tablets, offering:
 
-- Direct access to your HumHub instances
-- Receive real-time mobile push notifications
-- open shared links directly in the app
-- upload and share files, photos, and videos
-- staying connected while away from a desktop browser
+- Access one or multiple HumHub networks
+- Receive real-time push notifications
+- Open shared HumHub links directly in the app
+- Upload and share files, photos, and videos
+- Stay connected while on the go
 
 ## Open Source
 
-This project is part of the broader HumHub open source ecosystem.
+HumHub is an open source platform for social intranets, collaboration, and online communities.
+The HumHub mobile app extends the HumHub experience to mobile devices and helps teams and communities stay connected anywhere.
 
-To learn more about HumHub itself, visit:
+Learn more about HumHub:
 
 - https://www.humhub.com/
 - https://github.com/humhub
