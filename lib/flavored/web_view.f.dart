@@ -139,7 +139,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       return NavigationActionPolicy.CANCEL;
     }
     // For all other external links
-    if (!url.startsWith(instance.manifest.startUrl) && !action.isForMainFrame) {
+    if (!url.startsWith(instance.manifest.startUrl)) {
       await launchUrl(action.request.url!.uriValue,
           mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
