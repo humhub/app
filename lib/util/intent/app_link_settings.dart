@@ -23,6 +23,12 @@ class AppLinkSettings {
     hostDeclared: false,
   );
 
+  static const AppLinkSettingsState _defaultState = AppLinkSettingsState(
+    supported: false,
+    enabled: true,
+    hostDeclared: false,
+  );
+
   static AppLinkSettingsState get state => _state;
 
   static String get headerValue => _state.enabled ? 'true' : 'false';
@@ -42,12 +48,10 @@ class AppLinkSettings {
         enabled: response['enabled'] != false,
         hostDeclared: response['hostDeclared'] == true,
       );
+    } on MissingPluginException {
+      _state = _defaultState;
     } on PlatformException {
-      _state = const AppLinkSettingsState(
-        supported: false,
-        enabled: true,
-        hostDeclared: false,
-      );
+      _state = _defaultState;
     }
 
     return _state;
@@ -57,6 +61,8 @@ class AppLinkSettings {
     try {
       return await _channel.invokeMethod<bool>('openOpenByDefaultSettings') ??
           false;
+    } on MissingPluginException {
+      return false;
     } on PlatformException {
       return false;
     }
