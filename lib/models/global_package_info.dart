@@ -1,9 +1,20 @@
 import 'package:package_info_plus/package_info_plus.dart';
 
 class GlobalPackageInfo {
-  static late PackageInfo info;
+  static PackageInfo? _info;
+
+  static PackageInfo get info =>
+      _info ??
+      PackageInfo(
+        appName: '',
+        packageName: '',
+        version: '1.0.0',
+        buildNumber: '',
+        buildSignature: '',
+      );
 
   static Future<void> init() async {
-    info = await PackageInfo.fromPlatform();
+    _info = await PackageInfo.fromPlatform();
+    return;
   }
 }

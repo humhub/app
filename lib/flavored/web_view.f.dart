@@ -8,6 +8,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/app_flavored.dart';
 import 'package:humhub/flavored/models/humhub.f.dart';
+import 'package:humhub/models/feature_flag.dart';
 import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/util/black_list_rules.dart';
@@ -73,6 +74,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(humHubFRemoteConfigProvider);
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) => exitApp(context, ref),
@@ -128,12 +130,16 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       return NavigationActionPolicy.CANCEL;
     }
     // For SSO
-    if (!url.startsWith(instance.manifest.baseUrl) && action.isForMainFrame) {
+    if (!FeatureFlag.supportsAuthClientRedirect &&
+        !url.startsWith(instance.manifest.startUrl) &&
+        action.isForMainFrame) {
+      logInfo(
+          'Legacy flavored SSO detected, launching AuthInAppBrowser for $url');
       _authBrowser.launchUrl(action.request);
       return NavigationActionPolicy.CANCEL;
     }
     // For all other external links
-    if (!url.startsWith(instance.manifest.baseUrl) && !action.isForMainFrame) {
+    if (!url.startsWith(instance.manifest.startUrl) && !action.isForMainFrame) {
       await launchUrl(action.request.url!.uriValue,
           mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
@@ -237,6 +243,18 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   Future<void> _handleJSMessage(
       ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
     switch (message.action) {
+      case ChannelAction.authClientRedirect:
+        final data = message.data as AuthClientRedirectChannelData;
+        data.handle(
+          isSupported: FeatureFlag.supportsAuthClientRedirect,
+          onIgnored: logInfo,
+          onLaunchable: (request, url) {
+            logInfo(
+                'Launching flavored AuthInAppBrowser from authClientRedirect for $url');
+            _authBrowser.launchUrl(request);
+          },
+        );
+        break;
       case ChannelAction.registerFcmDevice:
         String? token = ref.read(pushTokenProvider).value ??
             await FirebaseMessaging.instance.getTokenSafe();

@@ -21,6 +21,7 @@ class AuthInAppBrowser extends InAppBrowser {
         shouldCloseOnBackButtonPressed: true,
         toolbarTopBackgroundColor: Colors.white,
         toolbarTopTintColor: HexColor(manifest.themeColor),
+        toolbarTopTranslucent: false,
         presentationStyle: ModalPresentationStyle.PAGE_SHEET,
       ),
       webViewSettings: InAppWebViewSettings(
@@ -32,10 +33,11 @@ class AuthInAppBrowser extends InAppBrowser {
   }
 
   @override
-  Future<NavigationActionPolicy?>? shouldOverrideUrlLoading(NavigationAction navigationAction) async {
+  Future<NavigationActionPolicy?>? shouldOverrideUrlLoading(
+      NavigationAction navigationAction) async {
     logInfo("Browser closed!");
 
-    if (navigationAction.request.url!.origin.startsWith(manifest.baseUrl)) {
+    if (navigationAction.request.url!.toString().startsWith(manifest.startUrl)) {
       concludeAuth(navigationAction.request);
       return NavigationActionPolicy.CANCEL;
     }

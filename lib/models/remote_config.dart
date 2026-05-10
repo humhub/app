@@ -22,8 +22,13 @@ class RemoteConfig {
     return RemoteConfig(
       appName: json['appName'] as String,
       appVersion: json['appVersion'] as String,
-      fileUploadSettings: FileUploadSettings.fromJson(json['fileUploadSettings'] as Map<String, dynamic>),
-      whiteListedDomains: (json['whiteListedDomains'] as List<dynamic>).map((e) => Uri.tryParse(e as String)).where((uri) => uri != null).cast<Uri>().toList(),
+      fileUploadSettings: FileUploadSettings.fromJson(
+          json['fileUploadSettings'] as Map<String, dynamic>),
+      whiteListedDomains: (json['whiteListedDomains'] as List<dynamic>)
+          .map((e) => Uri.tryParse(e as String))
+          .where((uri) => uri != null)
+          .cast<Uri>()
+          .toList(),
     );
   }
 
@@ -32,11 +37,13 @@ class RemoteConfig {
       'appName': appName,
       'appVersion': appVersion,
       'fileUploadSettings': fileUploadSettings?.toJson(),
-      'whiteListedDomains': whiteListedDomains?.map((uri) => uri.toString()).toList(),
+      'whiteListedDomains':
+          whiteListedDomains?.map((uri) => uri.toString()).toList(),
     };
   }
 
-  static Future<RemoteConfig?> get(Manifest manifest, Map<String, dynamic>? headers) async {
+  static Future<RemoteConfig?> get(
+      Manifest manifest, Map<String, dynamic>? headers) async {
     try {
       final response = await Dio().get(
         '${manifest.startUrl}/mobile-app/get-settings',

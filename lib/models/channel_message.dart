@@ -1,9 +1,22 @@
 import 'dart:convert';
 
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
 import 'file_upload_settings.dart';
 
 /// Enum representing different channel actions
-enum ChannelAction { showOpener, hideOpener, registerFcmDevice, unregisterFcmDevice, updateNotificationCount, nativeConsole, fileUploadSettings, openExternal, none }
+enum ChannelAction {
+  showOpener,
+  hideOpener,
+  registerFcmDevice,
+  unregisterFcmDevice,
+  updateNotificationCount,
+  nativeConsole,
+  fileUploadSettings,
+  openExternal,
+  authClientRedirect,
+  none
+}
 
 /// Abstract class to encapsulate the logic for channel data
 abstract class ChannelData {
@@ -20,6 +33,8 @@ abstract class ChannelData {
         return UpdateNotificationCountChannelData.fromJson(type, json);
       case "fileUploadSettings":
         return FileUploadSettingsChannelData.fromJson(type, json);
+      case "authClientRedirect":
+        return AuthClientRedirectChannelData.fromJson(type, json);
       default:
         return DefaultChannelData(type);
     }
@@ -56,6 +71,8 @@ class ChannelMessage {
         return ChannelAction.fileUploadSettings;
       case "openExternal":
         return ChannelAction.openExternal;
+      case "authClientRedirect":
+        return ChannelAction.authClientRedirect;
       default:
         return ChannelAction.none;
     }
@@ -83,7 +100,8 @@ class RegisterFcmPushChannelData extends ChannelData {
 
   RegisterFcmPushChannelData(super.type, this.url);
 
-  factory RegisterFcmPushChannelData.fromJson(String type, Map<String, dynamic> json) {
+  factory RegisterFcmPushChannelData.fromJson(
+      String type, Map<String, dynamic> json) {
     return RegisterFcmPushChannelData(type, json['url'] as String?);
   }
 }
@@ -94,7 +112,8 @@ class UpdateNotificationCountChannelData extends ChannelData {
 
   UpdateNotificationCountChannelData(super.type, this.count);
 
-  factory UpdateNotificationCountChannelData.fromJson(String type, Map<String, dynamic> json) {
+  factory UpdateNotificationCountChannelData.fromJson(
+      String type, Map<String, dynamic> json) {
     return UpdateNotificationCountChannelData(type, json['count'] as int);
   }
 }
@@ -105,10 +124,49 @@ class FileUploadSettingsChannelData extends ChannelData {
 
   FileUploadSettingsChannelData(super.type, this.settings);
 
-  factory FileUploadSettingsChannelData.fromJson(String type, Map<String, dynamic> json) {
+  factory FileUploadSettingsChannelData.fromJson(
+      String type, Map<String, dynamic> json) {
     return FileUploadSettingsChannelData(
       type,
       FileUploadSettings.fromJson(json),
     );
+  }
+}
+
+class AuthClientRedirectChannelData extends ChannelData {
+  final String? url;
+
+  const AuthClientRedirectChannelData(super.type, this.url);
+
+  factory AuthClientRedirectChannelData.fromJson(
+      String type, Map<String, dynamic> json) {
+    return AuthClientRedirectChannelData(type, json['url'] as String?);
+  }
+
+  void handle({
+    required bool isSupported,
+    required void Function(URLRequest request, String url) onLaunchable,
+    void Function(String message)? onIgnored,
+  }) {
+    if (!isSupported) {
+      onIgnored?.call(
+          'Ignoring authClientRedirect message because app feature flags do not support it');
+      return;
+    }
+
+    if (url == null || url!.isEmpty) {
+      onIgnored
+          ?.call('Ignoring authClientRedirect message because url is empty');
+      return;
+    }
+
+    final uri = Uri.tryParse(url!);
+    if (uri == null || !(uri.isScheme('http') || uri.isScheme('https'))) {
+      onIgnored
+          ?.call('Ignoring authClientRedirect message because url is invalid');
+      return;
+    }
+
+    onLaunchable(URLRequest(url: WebUri(url!)), url!);
   }
 }
