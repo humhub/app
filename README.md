@@ -45,5 +45,3 @@ To learn more about HumHub itself, visit:
 
 - https://www.humhub.com/
 - https://github.com/humhub
-
-Version bump
