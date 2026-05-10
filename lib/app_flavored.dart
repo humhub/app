@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/flavored/models/humhub.f.dart';
 import 'package:humhub/flavored/util/intent_plugin.f.dart';
 import 'package:humhub/flavored/util/router.f.dart';
+import 'package:humhub/models/remote_config.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/plugin.dart';
@@ -23,6 +24,7 @@ class FlavoredApp extends ConsumerStatefulWidget {
 class FlavoredAppState extends ConsumerState<FlavoredApp> {
   @override
   Widget build(BuildContext context) {
+    ref.watch(humHubFRemoteConfigProvider);
     SecureStorageService.clearSecureStorageOnReinstall();
     return LoadingProvider(
       child: IntentPluginF(
@@ -35,10 +37,12 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
                   debugShowCheckedModeBanner: false,
                   initialRoute: RouterF.initRoute,
                   routes: RouterF.routes,
-                  localizationsDelegates: AppLocalizations.localizationsDelegates,
+                  localizationsDelegates:
+                      AppLocalizations.localizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
                   navigatorKey: Keys.navigatorKey,
-                  builder: (context, child) => ConnectivityWrapper(child: child!),
+                  builder: (context, child) =>
+                      ConnectivityWrapper(child: child!),
                   theme: ThemeData(
                     fontFamily: 'OpenSans',
                   ),
@@ -54,4 +58,9 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
 
 final humHubFProvider = Provider<HumHubF>((ref) {
   return HumHubF();
+});
+
+final humHubFRemoteConfigProvider = FutureProvider<RemoteConfig?>((ref) async {
+  final instance = ref.read(humHubFProvider);
+  return RemoteConfig.get(instance.manifest, instance.customHeaders);
 });

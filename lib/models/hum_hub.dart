@@ -69,7 +69,6 @@ class HumHub {
         'manifestUri': manifestUrl,
         'openerState': openerState.isShown,
         'randomHash': randomHash,
-        'appVersion': appVersion,
         'pushToken': pushToken,
         'history': history.map((manifest) => manifest.toJson()).toList(),
         'fileUploadSettings': fileUploadSettings?.toJson(),
@@ -85,7 +84,6 @@ class HumHub {
           ? OpenerState.shown
           : OpenerState.hidden,
       randomHash: json['randomHash'],
-      appVersion: json['appVersion'],
       pushToken: json['pushToken'],
       history: json['history'] != null
           ? List<Manifest>.from(
@@ -170,7 +168,7 @@ class HumHub {
 
   Map<String, String> get customHeaders => {
         'x-humhub-app-token': randomHash ?? '',
-        'x-humhub-app': appVersion ?? '1.0.0',
+        'x-humhub-app': GlobalPackageInfo.info.version,
         'x-humhub-app-is-ios': isIos ? '1' : '0',
         'x-humhub-app-is-android': isAndroid ? '1' : '0',
         'x-humhub-app-opener-state': openerState.headerValue,

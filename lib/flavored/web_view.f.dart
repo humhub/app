@@ -73,6 +73,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(humHubFRemoteConfigProvider);
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) => exitApp(context, ref),
@@ -128,12 +129,16 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       return NavigationActionPolicy.CANCEL;
     }
     // For SSO
-    if (!url.startsWith(instance.manifest.baseUrl) && action.isForMainFrame) {
+    if (!_supportsAuthClientRedirect &&
+        !url.startsWith(instance.manifest.startUrl) &&
+        action.isForMainFrame) {
+      logInfo(
+          'Legacy flavored SSO detected, launching AuthInAppBrowser for $url');
       _authBrowser.launchUrl(action.request);
       return NavigationActionPolicy.CANCEL;
     }
     // For all other external links
-    if (!url.startsWith(instance.manifest.baseUrl) && !action.isForMainFrame) {
+    if (!url.startsWith(instance.manifest.startUrl) && !action.isForMainFrame) {
       await launchUrl(action.request.url!.uriValue,
           mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
@@ -237,6 +242,18 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   Future<void> _handleJSMessage(
       ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
     switch (message.action) {
+      case ChannelAction.authClientRedirect:
+        final data = message.data as AuthClientRedirectChannelData;
+        data.handle(
+          isSupported: _supportsAuthClientRedirect,
+          onIgnored: logInfo,
+          onLaunchable: (request, url) {
+            logInfo(
+                'Launching flavored AuthInAppBrowser from authClientRedirect for $url');
+            _authBrowser.launchUrl(request);
+          },
+        );
+        break;
       case ChannelAction.registerFcmDevice:
         String? token = ref.read(pushTokenProvider).value ??
             await FirebaseMessaging.instance.getTokenSafe();
@@ -277,6 +294,15 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       default:
         break;
     }
+  }
+
+  bool get _supportsAuthClientRedirect {
+    final remoteConfig = ref.read(humHubFRemoteConfigProvider).asData?.value;
+    final supportsAuthClientRedirect =
+        remoteConfig?.supportsAuthClientRedirect == true;
+    logDebug(
+        'Flavored authClientRedirect supported: $supportsAuthClientRedirect (${remoteConfig?.appVersion ?? 'unknown'})');
+    return supportsAuthClientRedirect;
   }
 
   Future<bool> exitApp(context, ref) async {
