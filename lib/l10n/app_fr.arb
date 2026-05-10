@@ -79,6 +79,8 @@
   },
   "file_sharing_error": "Erreur de partage de fichier",
   "close": "Fermer",
+  "intent_links_disabled_popup_title": "L'ouverture des liens pris en charge est désactivée",
+  "intent_links_disabled_popup_content": "Les liens de Humhub s'ouvriront dans votre navigateur tant que vous n'aurez pas réactivé les adresses Web prises en charge pour cette application.",
 
   "language_en": "Anglais",
   "language_de": "Allemand",

@@ -79,6 +79,8 @@
   },
   "file_sharing_error": "Fehler bei Dateifreigabe",
   "close": "Schließen",
+  "intent_links_disabled_popup_title": "Unterstützte Links sind deaktiviert",
+  "intent_links_disabled_popup_content": "Links von Humhub werden im Browser geöffnet, bis Sie die unterstützten Webadressen für diese App wieder aktivieren.",
 
   "language_en": "Englisch",
   "language_de": "Deutsch",

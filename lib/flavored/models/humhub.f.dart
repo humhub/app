@@ -3,6 +3,7 @@ import 'package:humhub/flavored/models/manifest.f.dart';
 import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/util/crypt.dart';
+import 'package:humhub/util/intent/app_link_settings.dart';
 
 class HumHubF extends HumHub {
   @override
@@ -24,6 +25,7 @@ class HumHubF extends HumHub {
         'x-humhub-app-bundle-id': GlobalPackageInfo.info.packageName,
         'x-humhub-app-is-ios': isIos ? '1' : '0',
         'x-humhub-app-is-android': isAndroid ? '1' : '0',
-        'x-humhub-app-ostate': openerState.headerValue
+        'x-humhub-app-ostate': openerState.headerValue,
+        'x-humhub-app-intent-enabled': AppLinkSettings.headerValue,
       };
 }
