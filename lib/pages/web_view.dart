@@ -181,7 +181,7 @@ class WebViewAppState extends ConsumerState<WebView> {
       return NavigationActionPolicy.CANCEL;
     }
     // For all other external links
-    if (!url.startsWith(_manifest.startUrl) && !action.isForMainFrame && action.navigationType == NavigationType.LINK_ACTIVATED) {
+    if (!url.startsWith(_manifest.startUrl)) {
       logInfo('External link detected, launching external application for $url');
       await launchUrl(action.request.url!.uriValue, mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
