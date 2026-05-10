@@ -368,9 +368,10 @@ class WebViewAppState extends ConsumerState<WebView> {
   }
 
   bool get _supportsAuthClientRedirect {
-    final remoteConfig = ref.read(humHubProvider).remoteConfig;
-    final supportsAuthClientRedirect = remoteConfig?.supportsAuthClientRedirect == true;
-    logDebug('authClientRedirect supported: $supportsAuthClientRedirect (${remoteConfig?.appVersion ?? 'unknown'})');
+    final supportsAuthClientRedirect =
+        ref.read(humHubProvider).supportsAuthClientRedirect;
+    logDebug(
+        'authClientRedirect supported by feature flags: $supportsAuthClientRedirect');
     return supportsAuthClientRedirect;
   }
 

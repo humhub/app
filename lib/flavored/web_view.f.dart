@@ -8,6 +8,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/app_flavored.dart';
 import 'package:humhub/flavored/models/humhub.f.dart';
+import 'package:humhub/models/feature_flag.dart';
 import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/util/black_list_rules.dart';
@@ -129,7 +130,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       return NavigationActionPolicy.CANCEL;
     }
     // For SSO
-    if (!_supportsAuthClientRedirect &&
+    if (!FeatureFlag.supportsAuthClientRedirect &&
         !url.startsWith(instance.manifest.startUrl) &&
         action.isForMainFrame) {
       logInfo(
@@ -245,7 +246,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       case ChannelAction.authClientRedirect:
         final data = message.data as AuthClientRedirectChannelData;
         data.handle(
-          isSupported: _supportsAuthClientRedirect,
+          isSupported: FeatureFlag.supportsAuthClientRedirect,
           onIgnored: logInfo,
           onLaunchable: (request, url) {
             logInfo(
@@ -294,15 +295,6 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       default:
         break;
     }
-  }
-
-  bool get _supportsAuthClientRedirect {
-    final remoteConfig = ref.read(humHubFRemoteConfigProvider).asData?.value;
-    final supportsAuthClientRedirect =
-        remoteConfig?.supportsAuthClientRedirect == true;
-    logDebug(
-        'Flavored authClientRedirect supported: $supportsAuthClientRedirect (${remoteConfig?.appVersion ?? 'unknown'})');
-    return supportsAuthClientRedirect;
   }
 
   Future<bool> exitApp(context, ref) async {

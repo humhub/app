@@ -6,7 +6,6 @@ import 'package:loggy/loggy.dart';
 import 'manifest.dart';
 
 class RemoteConfig {
-  static const String _authClientRedirectVersion = '1.18.3';
   final String? appName;
   final String? appVersion;
   final FileUploadSettings? fileUploadSettings;
@@ -71,54 +70,5 @@ class RemoteConfig {
       final trustedBase = '${trustedUri.scheme}://${trustedUri.authority}';
       return inputBase == trustedBase;
     });
-  }
-
-  bool get supportsAuthClientRedirect =>
-      _compareVersions(appVersion, _authClientRedirectVersion) >= 0;
-
-  static int _compareVersions(String? current, String target) {
-    final currentParts = _parseVersion(current);
-    final targetParts = _parseVersion(target);
-
-    if (currentParts == null || targetParts == null) {
-      return -1;
-    }
-
-    for (var index = 0; index < 3; index++) {
-      final difference = currentParts[index] - targetParts[index];
-      if (difference != 0) {
-        return difference;
-      }
-    }
-
-    return 0;
-  }
-
-  static List<int>? _parseVersion(String? version) {
-    if (version == null || version.isEmpty) {
-      return null;
-    }
-
-    final normalizedVersion = version.split('+').first.split('-').first.trim();
-    final parts = normalizedVersion.split('.');
-    if (parts.isEmpty) {
-      return null;
-    }
-
-    final parsed = <int>[];
-    for (var index = 0; index < 3; index++) {
-      if (index >= parts.length) {
-        parsed.add(0);
-        continue;
-      }
-
-      final value = int.tryParse(parts[index]);
-      if (value == null) {
-        return null;
-      }
-      parsed.add(value);
-    }
-
-    return parsed;
   }
 }

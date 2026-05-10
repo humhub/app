@@ -150,7 +150,7 @@ class AuthClientRedirectChannelData extends ChannelData {
   }) {
     if (!isSupported) {
       onIgnored?.call(
-          'Ignoring authClientRedirect message because remote config version does not support it');
+          'Ignoring authClientRedirect message because app feature flags do not support it');
       return;
     }
 
