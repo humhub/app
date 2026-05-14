@@ -35,7 +35,7 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
                 builder: (context) => MaterialApp(
                   scaffoldMessengerKey: Keys.scaffoldMessengerStateKey,
                   debugShowCheckedModeBanner: false,
-                  initialRoute: RouterF.initRoute,
+                  initialRoute: '/',
                   routes: RouterF.routes,
                   localizationsDelegates:
                       AppLocalizations.localizationsDelegates,

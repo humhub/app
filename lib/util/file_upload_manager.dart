@@ -107,6 +107,9 @@ class FileUploadManager {
 
     for (SharedMediaFile file in files!) {
       final filePath = file.path;
+      if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+        continue;
+      }
       if (!File(filePath).existsSync()) {
         errors.add('File does not exist: ${file.path}');
         logError(errors);

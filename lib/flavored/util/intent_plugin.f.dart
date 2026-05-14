@@ -21,6 +21,12 @@ import 'package:humhub/util/show_dialog.dart';
 bool _initialUriIsHandled = false;
 bool _appLinkPopupShown = false;
 
+List<SharedMediaFile> _filterSharedFiles(List<SharedMediaFile> files) {
+  files.removeWhere((file) =>
+      file.type == SharedMediaType.url || file.type == SharedMediaType.text);
+  return files;
+}
+
 class IntentPluginF extends ConsumerStatefulWidget {
   final Widget child;
 
@@ -151,10 +157,13 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
     intentDataStreamSubscription =
         ReceiveSharingIntent.instance.getMediaStream().listen(
       (List<SharedMediaFile> value) {
-        // Update shared files using the provider
-        ref.read(intentProvider.notifier).setSharedFiles(value);
+        final filtered = _filterSharedFiles(value);
+        if (filtered.isEmpty) return;
 
-        logInfo('Received shared files: $value');
+        // Update shared files using the provider
+        ref.read(intentProvider.notifier).setSharedFiles(filtered);
+
+        logInfo('Received shared files: $filtered');
       },
       onError: (err) {
         // Update error using the provider
@@ -168,8 +177,11 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
       FileUploadSettings? settings =
           ref.read(humHubProvider).fileUploadSettings;
       if (settings == null) return;
-      ref.read(intentProvider.notifier).setSharedFiles(mediaList);
-      logInfo('Initial shared files: $mediaList');
+      final filtered = _filterSharedFiles(mediaList);
+      if (filtered.isEmpty) return;
+
+      ref.read(intentProvider.notifier).setSharedFiles(filtered);
+      logInfo('Initial shared files: $filtered');
     });
   }
 
