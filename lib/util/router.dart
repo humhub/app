@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/console.dart';
+import 'package:humhub/pages/auth_web_view.dart';
 import 'package:humhub/pages/help/help.dart';
 import 'package:humhub/pages/opener/opener.dart';
 import 'package:humhub/pages/settings/settings.dart';
@@ -44,6 +45,12 @@ class AppRouter {
         DeviceOrientation.landscapeRight,
       ]);
       return const WebView();
+    },
+    AuthWebView.path: (context) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+      return const AuthWebView();
     },
     '/help': (context) {
       SystemChrome.setPreferredOrientations([

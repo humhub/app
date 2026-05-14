@@ -7,10 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/util/auth_in_app_browser.dart';
+import 'package:humhub/models/auth_web_view_args.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/pages/auth_web_view.dart';
 import 'package:humhub/pages/opener/opener.dart';
 import 'package:humhub/util/black_list_rules.dart';
 import 'package:humhub/util/const.dart';
@@ -44,7 +45,6 @@ class WebView extends ConsumerStatefulWidget {
 
 class WebViewAppState extends ConsumerState<WebView> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  late AuthInAppBrowser _authBrowser;
   late Manifest _manifest;
   late URLRequest _initialRequest;
   late PullToRefreshController _pullToRefreshController;
@@ -79,12 +79,6 @@ class WebViewAppState extends ConsumerState<WebView> {
         onRefresh: () async {
           WebViewGlobalController.value
               ?.loadUrl(urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl(), headers: ref.read(humHubProvider).customHeaders));
-        },
-      );
-      _authBrowser = AuthInAppBrowser(
-        manifest: _manifest,
-        concludeAuth: (URLRequest request) {
-          _concludeAuth(request);
         },
       );
       _isInit = true;
@@ -176,8 +170,8 @@ class WebViewAppState extends ConsumerState<WebView> {
     // For SSO
     bool? isDomainTrusted = ref.read(humHubProvider).remoteConfig?.isTrustedDomain(action.request.url!.uriValue) ?? false;
     if ((!url.startsWith(_manifest.startUrl) && action.isForMainFrame) && !_supportsAuthClientRedirect && !isDomainTrusted) {
-      logInfo('Legacy SSO detected, launching AuthInAppBrowser for $url');
-      _authBrowser.launchUrl(action.request);
+      logInfo('Legacy SSO detected, launching AuthWebView for $url');
+      unawaited(_launchAuthWebView(action.request));
       return NavigationActionPolicy.CANCEL;
     }
     // For all other external links
@@ -277,9 +271,21 @@ class WebViewAppState extends ConsumerState<WebView> {
   }
 
   _concludeAuth(URLRequest request) {
-    _authBrowser.close();
     WebViewGlobalController.value!.clearHistory();
     WebViewGlobalController.value!.loadUrl(urlRequest: request);
+  }
+
+  Future<void> _launchAuthWebView(URLRequest request) async {
+    final result = await Navigator.of(context).pushNamed(
+      AuthWebView.path,
+      arguments: AuthWebViewArgs(
+        manifest: _manifest,
+        request: request,
+      ),
+    );
+
+    if (!mounted || result is! URLRequest) return;
+    _concludeAuth(result);
   }
 
   Future<void> _handleJSMessage(ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
@@ -290,8 +296,8 @@ class WebViewAppState extends ConsumerState<WebView> {
           isSupported: _supportsAuthClientRedirect,
           onIgnored: logInfo,
           onLaunchable: (request, url) {
-            logInfo('Launching AuthInAppBrowser from authClientRedirect for $url');
-            _authBrowser.launchUrl(request);
+            logInfo('Launching AuthWebView from authClientRedirect for $url');
+            unawaited(_launchAuthWebView(request));
           },
         );
         break;

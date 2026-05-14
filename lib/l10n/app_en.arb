@@ -29,6 +29,13 @@
   "web_view_exit_popup_title": "Are you sure?",
   "web_view_exit_popup_content": "Do you want to exit an App?",
 
+  "auth_web_view_back": "Back",
+  "auth_web_view_go_back": "Go Back",
+  "auth_web_view_go_forward": "Go Forward",
+  "auth_web_view_share": "Share",
+  "auth_web_view_reload": "Reload",
+  "auth_web_view_close": "Close",
+
   "file_download": "File downloaded",
   "generic_error": "Oops! Something went wrong.",
 

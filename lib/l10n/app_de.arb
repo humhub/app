@@ -28,6 +28,13 @@
   "web_view_exit_popup_title": "Bist du sicher?",
   "web_view_exit_popup_content": "Möchtest du die App verlassen?",
 
+  "auth_web_view_back": "Zurück",
+  "auth_web_view_go_back": "Zurück",
+  "auth_web_view_go_forward": "Vorwärts",
+  "auth_web_view_share": "Teilen",
+  "auth_web_view_reload": "Neu laden",
+  "auth_web_view_close": "Schließen",
+
   "file_download": "Datei heruntergeladen",
   "generic_error": "Uups! Etwas ist schiefgelaufen.",
 

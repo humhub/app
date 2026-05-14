@@ -7,9 +7,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/app_flavored.dart';
+import 'package:humhub/models/auth_web_view_args.dart';
+import 'package:humhub/pages/auth_web_view.dart';
 import 'package:humhub/flavored/models/humhub.f.dart';
 import 'package:humhub/models/feature_flag.dart';
-import 'package:humhub/util/auth_in_app_browser.dart';
 import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/util/black_list_rules.dart';
 import 'package:humhub/util/const.dart';
@@ -37,7 +38,6 @@ class WebViewF extends ConsumerStatefulWidget {
 }
 
 class FlavoredWebViewState extends ConsumerState<WebViewF> {
-  late AuthInAppBrowser _authBrowser;
   HeadlessInAppWebView? headlessWebView;
   late HumHubF instance;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -47,12 +47,6 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   @override
   void initState() {
     instance = ref.read(humHubFProvider);
-    _authBrowser = AuthInAppBrowser(
-      manifest: ref.read(humHubFProvider).manifest,
-      concludeAuth: (URLRequest request) {
-        _concludeAuth(request);
-      },
-    );
     super.initState();
 
     pullToRefreshController = PullToRefreshController(
@@ -134,8 +128,8 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         !url.startsWith(instance.manifest.startUrl) &&
         action.isForMainFrame) {
       logInfo(
-          'Legacy flavored SSO detected, launching AuthInAppBrowser for $url');
-      _authBrowser.launchUrl(action.request);
+          'Legacy flavored SSO detected, launching AuthWebView for $url');
+      unawaited(_launchAuthWebView(action.request));
       return NavigationActionPolicy.CANCEL;
     }
     // For all other external links
@@ -236,8 +230,20 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   }
 
   void _concludeAuth(URLRequest request) {
-    _authBrowser.close();
     WebViewGlobalController.value!.loadUrl(urlRequest: request);
+  }
+
+  Future<void> _launchAuthWebView(URLRequest request) async {
+    final result = await Navigator.of(context).pushNamed(
+      AuthWebView.path,
+      arguments: AuthWebViewArgs(
+        manifest: instance.manifest,
+        request: request,
+      ),
+    );
+
+    if (!mounted || result is! URLRequest) return;
+    _concludeAuth(result);
   }
 
   Future<void> _handleJSMessage(
@@ -250,8 +256,8 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           onIgnored: logInfo,
           onLaunchable: (request, url) {
             logInfo(
-                'Launching flavored AuthInAppBrowser from authClientRedirect for $url');
-            _authBrowser.launchUrl(request);
+                'Launching flavored AuthWebView from authClientRedirect for $url');
+            unawaited(_launchAuthWebView(request));
           },
         );
         break;
