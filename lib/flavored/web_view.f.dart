@@ -124,11 +124,10 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       return NavigationActionPolicy.CANCEL;
     }
     // For SSO
-    if (!FeatureFlag.supportsAuthClientRedirect &&
+    if (!_supportsAuthClientRedirect &&
         !url.startsWith(instance.manifest.startUrl) &&
         action.isForMainFrame) {
-      logInfo(
-          'Legacy flavored SSO detected, launching AuthWebView for $url');
+      logInfo('Legacy flavored SSO detected, launching AuthWebView for $url');
       unawaited(_launchAuthWebView(action.request));
       return NavigationActionPolicy.CANCEL;
     }
@@ -254,7 +253,15 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         data.handle(
           isSupported: FeatureFlag.supportsAuthClientRedirect,
           onIgnored: logInfo,
-          onLaunchable: (request, url) {
+          onLaunchable: (request, url) async {
+            if (_supportsAuthClientRedirect) {
+              logInfo(
+                  'Launching flavored browser from authClientRedirect for $url');
+              await launchUrl(request.url!.uriValue,
+                  mode: LaunchMode.externalApplication);
+              return;
+            }
+
             logInfo(
                 'Launching flavored AuthWebView from authClientRedirect for $url');
             unawaited(_launchAuthWebView(request));
@@ -301,6 +308,15 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       default:
         break;
     }
+  }
+
+  bool get _supportsAuthClientRedirect {
+    final remoteConfig = ref.read(humHubFRemoteConfigProvider).asData?.value;
+    final supportsAuthClientRedirect =
+        remoteConfig?.supportsAuthClientRedirect == true;
+    logDebug(
+        'Flavored authClientRedirect supported by backend version: $supportsAuthClientRedirect (${remoteConfig?.appVersion ?? 'unknown'})');
+    return supportsAuthClientRedirect;
   }
 
   Future<bool> exitApp(context, ref) async {

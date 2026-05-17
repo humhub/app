@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -145,7 +146,8 @@ class AuthClientRedirectChannelData extends ChannelData {
 
   void handle({
     required bool isSupported,
-    required void Function(URLRequest request, String url) onLaunchable,
+    required FutureOr<void> Function(URLRequest request, String url)
+        onLaunchable,
     void Function(String message)? onIgnored,
   }) {
     if (!isSupported) {
