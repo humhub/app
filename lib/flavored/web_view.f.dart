@@ -57,10 +57,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         if (Platform.isAndroid) {
           WebViewGlobalController.value?.reload();
         } else if (Platform.isIOS) {
-          WebViewGlobalController.value?.loadUrl(
-              urlRequest: URLRequest(
-                  url: await WebViewGlobalController.value?.getUrl(),
-                  headers: instance.customHeaders));
+          WebViewGlobalController.value?.loadUrl(urlRequest: URLRequest(url: await WebViewGlobalController.value?.getUrl(), headers: instance.customHeaders));
         }
       },
     );
@@ -91,8 +88,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
               onReceivedError: _onLoadError,
               onProgressChanged: _onProgressChanged,
               onDownloadStartRequest: _onDownloadStartRequest,
-              onLongPressHitTestResult:
-                  WebViewGlobalController.onLongPressHitTestResult,
+              onLongPressHitTestResult: WebViewGlobalController.onLongPressHitTestResult,
             ),
           ),
         ),
@@ -111,8 +107,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     return URLRequest(url: WebUri(url), headers: instance.customHeaders);
   }
 
-  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
-      InAppWebViewController controller, NavigationAction action) async {
+  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(InAppWebViewController controller, NavigationAction action) async {
     // 1st check if url is not def. app url and open it in a browser or inApp.
     WebViewGlobalController.ajaxSetHeaders(headers: instance.customHeaders);
     WebViewGlobalController.listenToImageOpen();
@@ -124,27 +119,19 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       return NavigationActionPolicy.CANCEL;
     }
     // For SSO
-    if (!_supportsAuthClientRedirect &&
-        !url.startsWith(instance.manifest.startUrl) &&
-        action.isForMainFrame) {
+    if (!_supportsAuthClientRedirect && !url.startsWith(instance.manifest.startUrl) && action.isForMainFrame) {
       logInfo('Legacy flavored SSO detected, launching AuthWebView for $url');
       unawaited(_launchAuthWebView(action.request));
       return NavigationActionPolicy.CANCEL;
     }
     // For all other external links
     if (!url.startsWith(instance.manifest.startUrl)) {
-      await launchUrl(action.request.url!.uriValue,
-          mode: LaunchMode.externalApplication);
+      await launchUrl(action.request.url!.uriValue, mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
-    if (Platform.isAndroid ||
-        action.navigationType == NavigationType.LINK_ACTIVATED ||
-        action.navigationType == NavigationType.FORM_SUBMITTED) {
-      Map<String, String> mergedMap = {
-        ...instance.customHeaders,
-        ...?action.request.headers
-      };
+    if (Platform.isAndroid || action.navigationType == NavigationType.LINK_ACTIVATED || action.navigationType == NavigationType.FORM_SUBMITTED) {
+      Map<String, String> mergedMap = {...instance.customHeaders, ...?action.request.headers};
       URLRequest newRequest = action.request.copyWith(headers: mergedMap);
       controller.loadUrl(urlRequest: newRequest);
       return NavigationActionPolicy.CANCEL;
@@ -159,8 +146,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     await controller.addWebMessageListener(
       WebMessageListener(
         jsObjectName: "flutterChannel",
-        onPostMessage:
-            (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
+        onPostMessage: (inMessage, sourceOrigin, isMainFrame, replyProxy) async {
           ChannelMessage message = ChannelMessage.fromJson(inMessage!.data);
           await _handleJSMessage(message, headlessWebView!);
         },
@@ -169,18 +155,15 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     WebViewGlobalController.setValue(controller);
   }
 
-  Future<FetchRequest?> _shouldInterceptFetchRequest(
-      InAppWebViewController controller, FetchRequest request) async {
+  Future<FetchRequest?> _shouldInterceptFetchRequest(InAppWebViewController controller, FetchRequest request) async {
     request.headers?.addAll(instance.customHeaders);
     return request;
   }
 
-  Future<bool> _onCreateWindow(InAppWebViewController controller,
-      CreateWindowAction createWindowAction) async {
+  Future<bool> _onCreateWindow(InAppWebViewController controller, CreateWindowAction createWindowAction) async {
     final urlToOpen = createWindowAction.request.url;
     if (urlToOpen == null) return Future.value(false);
-    if (WebViewGlobalController.openCreateWindowInWebView(
-        url: urlToOpen.rawValue, manifest: instance.manifest)) {
+    if (WebViewGlobalController.openCreateWindowInWebView(url: urlToOpen.rawValue, manifest: instance.manifest)) {
       controller.loadUrl(urlRequest: createWindowAction.request);
       return Future.value(false);
     }
@@ -195,11 +178,9 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   Future<void> _onLoadStop(InAppWebViewController controller, Uri? url) async {
     // Disable remember me checkbox on login and set def. value to true: check if the page is actually login page, if it is inject JS that hides element
     if (url!.path.contains('/user/auth/login')) {
-      WebViewGlobalController.value!.evaluateJavascript(
-          source: "document.querySelector('#login-rememberme').checked=true");
-      WebViewGlobalController.value!.evaluateJavascript(
-          source:
-              "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
+      WebViewGlobalController.value!.evaluateJavascript(source: "document.querySelector('#login-rememberme').checked=true");
+      WebViewGlobalController.value!
+          .evaluateJavascript(source: "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
     }
     WebViewGlobalController.ajaxSetHeaders(headers: instance.customHeaders);
     WebViewGlobalController.listenToImageOpen();
@@ -213,8 +194,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     WebViewGlobalController.appendViewportFitCover();
   }
 
-  void _onLoadError(InAppWebViewController controller,
-      WebResourceRequest request, WebResourceError error) async {
+  void _onLoadError(InAppWebViewController controller, WebResourceRequest request, WebResourceError error) async {
     logError(error);
     if (error.description == 'net::ERR_INTERNET_DISCONNECTED') {
       ShowDialog.of(context).noInternetPopup();
@@ -245,32 +225,28 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     _concludeAuth(result);
   }
 
-  Future<void> _handleJSMessage(
-      ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
+  Future<void> _handleJSMessage(ChannelMessage message, HeadlessInAppWebView headlessWebView) async {
     switch (message.action) {
       case ChannelAction.authClientRedirect:
+
         final data = message.data as AuthClientRedirectChannelData;
         data.handle(
           isSupported: FeatureFlag.supportsAuthClientRedirect,
           onIgnored: logInfo,
           onLaunchable: (request, url) async {
             if (_supportsAuthClientRedirect) {
-              logInfo(
-                  'Launching flavored browser from authClientRedirect for $url');
-              await launchUrl(request.url!.uriValue,
-                  mode: LaunchMode.externalApplication);
+              logInfo('Launching flavored AuthWebView from authClientRedirect for $url');
+              unawaited(_launchAuthWebView(request));
               return;
             }
 
-            logInfo(
-                'Launching flavored AuthWebView from authClientRedirect for $url');
-            unawaited(_launchAuthWebView(request));
+            logInfo('Launching flavored browser from authClientRedirect for $url');
+            await launchUrl(request.url!.uriValue, mode: LaunchMode.externalApplication);
           },
         );
         break;
       case ChannelAction.registerFcmDevice:
-        String? token = ref.read(pushTokenProvider).value ??
-            await FirebaseMessaging.instance.getTokenSafe();
+        String? token = ref.read(pushTokenProvider).value ?? await FirebaseMessaging.instance.getTokenSafe();
         if (token != null) {
           WebViewGlobalController.ajaxPost(
             url: message.url!,
@@ -280,8 +256,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         }
         break;
       case ChannelAction.updateNotificationCount:
-        UpdateNotificationCountChannelData data =
-            message.data as UpdateNotificationCountChannelData;
+        UpdateNotificationCountChannelData data = message.data as UpdateNotificationCountChannelData;
         AppBadgePlus.updateBadge(data.count);
         break;
       case ChannelAction.unregisterFcmDevice:
@@ -296,8 +271,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         break;
       case ChannelAction.fileUploadSettings:
         logInfo('Action: fileUploadSettings');
-        FileUploadSettingsChannelData data =
-            message.data as FileUploadSettingsChannelData;
+        FileUploadSettingsChannelData data = message.data as FileUploadSettingsChannelData;
         ref.read(humHubProvider.notifier).setFileUploadSettings(data.settings);
         FileUploadManager(
                 webViewController: WebViewGlobalController.value!,
@@ -312,10 +286,9 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
 
   bool get _supportsAuthClientRedirect {
     final remoteConfig = ref.read(humHubFRemoteConfigProvider).asData?.value;
-    final supportsAuthClientRedirect =
-        remoteConfig?.supportsAuthClientRedirect == true;
+    final supportsAuthClientRedirect = instance.forceV2AuthClient || remoteConfig?.supportsAuthClientRedirect == true;
     logDebug(
-        'Flavored authClientRedirect supported by backend version: $supportsAuthClientRedirect (${remoteConfig?.appVersion ?? 'unknown'})');
+        'Flavored authClientRedirect supported: $supportsAuthClientRedirect (FORCE_V2_AUTH_CLIENT=${instance.forceV2AuthClient}, backend=${remoteConfig?.appVersion ?? 'unknown'})');
     return supportsAuthClientRedirect;
   }
 
@@ -328,11 +301,9 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       final exitConfirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0))),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
           title: Text(AppLocalizations.of(context)!.web_view_exit_popup_title),
-          content:
-              Text(AppLocalizations.of(context)!.web_view_exit_popup_content),
+          content: Text(AppLocalizations.of(context)!.web_view_exit_popup_content),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -351,8 +322,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     }
   }
 
-  void _onDownloadStartRequest(InAppWebViewController controller,
-      DownloadStartRequest downloadStartRequest) async {
+  void _onDownloadStartRequest(InAppWebViewController controller, DownloadStartRequest downloadStartRequest) async {
     PersistentBottomSheetController? persistentController;
     //bool isBottomSheetVisible = false;
 
@@ -372,8 +342,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         isDone = true;
         Keys.scaffoldMessengerStateKey.currentState?.showSnackBar(
           SnackBar(
-            content: Text(
-                '${AppLocalizations.of(context)!.file_download}: $filename'),
+            content: Text('${AppLocalizations.of(context)!.file_download}: $filename'),
             action: SnackBarAction(
               label: AppLocalizations.of(context)!.open,
               onPressed: () {
@@ -389,22 +358,19 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         downloadTimer = Timer(const Duration(seconds: 1), () {
           // Show the persistent bottom sheet if not already shown
           if (!isDone) {
-            persistentController =
-                _scaffoldKey.currentState!.showBottomSheet((context) {
+            persistentController = _scaffoldKey.currentState!.showBottomSheet((context) {
               return Container(
                 width: MediaQuery.of(context).size.width,
                 height: 100,
                 color: const Color(0xff313033),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         "${AppLocalizations.of(context)!.downloading}...",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.white),
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                       ),
                       Stack(
                         alignment: Alignment.center,

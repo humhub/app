@@ -7,10 +7,13 @@ import 'package:humhub/util/crypt.dart';
 import 'package:humhub/util/intent/app_link_settings.dart';
 
 class HumHubF extends HumHub {
+  static const bool _defaultForceV2AuthClient = false;
+
   @override
   ManifestF get manifest => ManifestF.fromEnv();
   @override
   String get manifestUrl => dotenv.env['MANIFEST_URL']!;
+  bool get forceV2AuthClient => dotenv.env['FORCE_V2_AUTH_CLIENT'] == null ? _defaultForceV2AuthClient : dotenv.env['FORCE_V2_AUTH_CLIENT']!.toLowerCase() == 'true';
 
   HumHubF({
     super.openerState,
