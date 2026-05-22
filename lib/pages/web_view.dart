@@ -316,7 +316,6 @@ class WebViewAppState extends ConsumerState<WebView> {
   }
 
   _concludeAuth(URLRequest request) {
-    WebViewGlobalController.value!.clearHistory();
     WebViewGlobalController.value!.loadUrl(urlRequest: request);
   }
 
