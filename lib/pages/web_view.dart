@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -199,8 +198,8 @@ class WebViewAppState extends ConsumerState<WebView> {
       unawaited(_launchAuthWebView(action.request));
       return NavigationActionPolicy.CANCEL;
     }
-    // For all other external links
-    if (!url.startsWith(_manifest.startUrl)) {
+    // For all other external links (main frame only — iframes/embeds are allowed to load inline)
+    if (!url.startsWith(_manifest.startUrl) && action.isForMainFrame) {
       logInfo(
           'External link detected, launching external application for $url');
       await launchUrl(action.request.url!.uriValue,
@@ -282,7 +281,6 @@ class WebViewAppState extends ConsumerState<WebView> {
     await WebViewGlobalController.setWebViewSafeAreaPadding(
         safeArea:
             !keyboardVisible ? initKeyboardPadding : noKeyboardBottomPadding);
-
     LoadingProvider.of(ref).dismissAll();
   }
 
@@ -380,9 +378,6 @@ class WebViewAppState extends ConsumerState<WebView> {
         break;
       case ChannelAction.updateNotificationCount:
         logInfo('Action: updateNotificationCount');
-        UpdateNotificationCountChannelData data =
-            message.data as UpdateNotificationCountChannelData;
-        AppBadgePlus.updateBadge(data.count);
         break;
       case ChannelAction.nativeConsole:
         logInfo('Action: nativeConsole');
