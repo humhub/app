@@ -1,4 +1,3 @@
-import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -103,11 +102,5 @@ class PushPluginState extends ConsumerState<PushPlugin> {
 
 Future<void> _handleData(RemoteMessage message, BuildContext context, WidgetRef ref) async {
   // Here we handle the data that we get form an push notification.
-  PushEventData data = PushEvent(message).parsedData;
-  try {
-    AppBadgePlus.updateBadge(int.parse(data.notificationCount!));
-    // Set icon badge count if notificationCount exist in push.
-  } catch (e) {
-    logError(e);
-  }
+  // PushEventData data = PushEvent(message).parsedData;
 }
