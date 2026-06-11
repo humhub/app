@@ -47,6 +47,8 @@
   "settings": "Settings",
   "connect": "Connect",
   "open": "Open",
+  "share": "Share",
+  "save": "Save to device",
   "cancel" : "Cancel",
   "url": "url",
   "back": "Back",
