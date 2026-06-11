@@ -46,6 +46,8 @@
   "settings": "Paramètres",
   "connect": "Connecter",
   "open": "Ouvrir",
+  "share": "Partager",
+  "save": "Enregistrer sur l'appareil",
   "cancel": "Annuler",
   "url": "URL",
   "back": "Retour",
