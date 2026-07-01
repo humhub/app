@@ -117,13 +117,19 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     if (BlackListRules.check(url)) {
       return NavigationActionPolicy.CANCEL;
     }
-    // For SSO
-    if (!_supportsAuthClientRedirect && !url.startsWith(instance.manifest.startUrl) && action.isForMainFrame) {
-      logInfo('Legacy flavored SSO detected, launching AuthWebView for $url');
-      unawaited(_launchAuthWebView(action.request));
+    // Whitelisted domains and legacy SSO open in In-App Browser; all other external URLs in External Browser
+    final remoteConfig = ref.read(humHubFRemoteConfigProvider).asData?.value;
+    bool isDomainTrusted = remoteConfig?.isTrustedDomain(action.request.url!.uriValue) ?? false;
+    if (!url.startsWith(instance.manifest.startUrl) && action.isForMainFrame) {
+      if (isDomainTrusted || !_supportsAuthClientRedirect) {
+        logInfo('Whitelisted/SSO domain, launching AuthWebView for $url');
+        unawaited(_launchAuthWebView(action.request));
+        return NavigationActionPolicy.CANCEL;
+      }
+      await launchUrl(action.request.url!.uriValue, mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
     }
-    // For all other external links
+    // For non-main-frame external links
     if (!url.startsWith(instance.manifest.startUrl)) {
       await launchUrl(action.request.url!.uriValue, mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
@@ -166,12 +172,18 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       controller.loadUrl(urlRequest: createWindowAction.request);
       return Future.value(false);
     }
+    final remoteConfig = ref.read(humHubFRemoteConfigProvider).asData?.value;
+    bool isDomainTrusted = remoteConfig?.isTrustedDomain(urlToOpen.uriValue) ?? false;
+    if (isDomainTrusted) {
+      unawaited(_launchAuthWebView(createWindowAction.request));
+      return Future.value(true);
+    }
     if (await canLaunchUrl(urlToOpen)) {
       await launchUrl(urlToOpen, mode: LaunchMode.externalApplication);
     } else {
       logError('Could not launch $urlToOpen');
     }
-    return Future.value(true); // Allow creating a new window.
+    return Future.value(true);
   }
 
   Future<void> _onLoadStop(InAppWebViewController controller, Uri? url) async {

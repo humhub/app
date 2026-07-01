@@ -185,21 +185,18 @@ class WebViewAppState extends ConsumerState<WebView> {
       logInfo('Blocked navigation to $url by blacklist rules');
       return NavigationActionPolicy.CANCEL;
     }
-    // For SSO
-    bool? isDomainTrusted = ref
+    // Whitelisted domains and legacy SSO open in In-App Browser; all other external URLs in External Browser
+    bool isDomainTrusted = ref
             .read(humHubProvider)
             .remoteConfig
             ?.isTrustedDomain(action.request.url!.uriValue) ??
         false;
-    if ((!url.startsWith(_manifest.startUrl) && action.isForMainFrame) &&
-        !_supportsAuthClientRedirect &&
-        !isDomainTrusted) {
-      logInfo('Legacy SSO detected, launching AuthWebView for $url');
-      unawaited(_launchAuthWebView(action.request));
-      return NavigationActionPolicy.CANCEL;
-    }
-    // For all other external links (main frame only — iframes/embeds are allowed to load inline)
     if (!url.startsWith(_manifest.startUrl) && action.isForMainFrame) {
+      if (isDomainTrusted || !_supportsAuthClientRedirect) {
+        logInfo('Whitelisted/SSO domain, launching AuthWebView for $url');
+        unawaited(_launchAuthWebView(action.request));
+        return NavigationActionPolicy.CANCEL;
+      }
       logInfo(
           'External link detected, launching external application for $url');
       await launchUrl(action.request.url!.uriValue,
@@ -258,6 +255,16 @@ class WebViewAppState extends ConsumerState<WebView> {
     )) {
       controller.loadUrl(urlRequest: createWindowAction.request);
       return Future.value(false);
+    }
+
+    bool isDomainTrusted = ref
+            .read(humHubProvider)
+            .remoteConfig
+            ?.isTrustedDomain(urlToOpen.uriValue) ??
+        false;
+    if (isDomainTrusted) {
+      unawaited(_launchAuthWebView(createWindowAction.request));
+      return Future.value(true);
     }
 
     if (await canLaunchUrl(urlToOpen)) {

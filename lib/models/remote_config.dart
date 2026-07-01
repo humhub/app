@@ -10,7 +10,7 @@ class RemoteConfig {
   final String? appName;
   final String? appVersion;
   final FileUploadSettings? fileUploadSettings;
-  final List<Uri>? whiteListedDomains;
+  final List<String>? whiteListedDomains;
 
   RemoteConfig({
     required this.appName,
@@ -26,9 +26,8 @@ class RemoteConfig {
       fileUploadSettings: FileUploadSettings.fromJson(
           json['fileUploadSettings'] as Map<String, dynamic>),
       whiteListedDomains: (json['whiteListedDomains'] as List<dynamic>)
-          .map((e) => Uri.tryParse(e as String))
-          .where((uri) => uri != null)
-          .cast<Uri>()
+          .map((e) => e as String)
+          .where((s) => s.isNotEmpty)
           .toList(),
     );
   }
@@ -38,8 +37,7 @@ class RemoteConfig {
       'appName': appName,
       'appVersion': appVersion,
       'fileUploadSettings': fileUploadSettings?.toJson(),
-      'whiteListedDomains':
-          whiteListedDomains?.map((uri) => uri.toString()).toList(),
+      'whiteListedDomains': whiteListedDomains,
     };
   }
 
@@ -65,11 +63,17 @@ class RemoteConfig {
 
   bool isTrustedDomain(Uri uri) {
     if (whiteListedDomains.isNullOrEmpty) return false;
+    final String fullUrl = uri.toString();
     final String inputBase = '${uri.scheme}://${uri.authority}';
 
-    return whiteListedDomains!.any((trustedUri) {
-      final trustedBase = '${trustedUri.scheme}://${trustedUri.authority}';
-      return inputBase == trustedBase;
+    return whiteListedDomains!.any((pattern) {
+      if (pattern.endsWith('*')) {
+        final prefix = pattern.substring(0, pattern.length - 1);
+        return fullUrl.startsWith(prefix);
+      }
+      final patternUri = Uri.tryParse(pattern);
+      if (patternUri == null) return false;
+      return inputBase == '${patternUri.scheme}://${patternUri.authority}';
     });
   }
 
