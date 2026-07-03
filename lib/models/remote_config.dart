@@ -11,12 +11,14 @@ class RemoteConfig {
   final String? appVersion;
   final FileUploadSettings? fileUploadSettings;
   final List<Uri>? whiteListedDomains;
+  final List<String>? whiteListedUrls;
 
   RemoteConfig({
     required this.appName,
     required this.appVersion,
     required this.fileUploadSettings,
     required this.whiteListedDomains,
+    required this.whiteListedUrls,
   });
 
   factory RemoteConfig.fromJson(Map<String, dynamic> json) {
@@ -25,11 +27,19 @@ class RemoteConfig {
       appVersion: json['appVersion'] as String,
       fileUploadSettings: FileUploadSettings.fromJson(
           json['fileUploadSettings'] as Map<String, dynamic>),
-      whiteListedDomains: (json['whiteListedDomains'] as List<dynamic>)
-          .map((e) => Uri.tryParse(e as String))
-          .where((uri) => uri != null)
-          .cast<Uri>()
-          .toList(),
+      whiteListedDomains: json['whiteListedDomains'] == null
+          ? null
+          : (json['whiteListedDomains'] as List<dynamic>)
+              .map((e) => Uri.tryParse(e as String))
+              .where((uri) => uri != null)
+              .cast<Uri>()
+              .toList(),
+      whiteListedUrls: json['whiteListedUrls'] == null
+          ? null
+          : (json['whiteListedUrls'] as List<dynamic>)
+              .map((e) => e as String)
+              .where((s) => s.isNotEmpty)
+              .toList(),
     );
   }
 
@@ -40,6 +50,7 @@ class RemoteConfig {
       'fileUploadSettings': fileUploadSettings?.toJson(),
       'whiteListedDomains':
           whiteListedDomains?.map((uri) => uri.toString()).toList(),
+      'whiteListedUrls': whiteListedUrls,
     };
   }
 
@@ -61,6 +72,15 @@ class RemoteConfig {
       logError('Error getting settings: $err');
       return null;
     }
+  }
+
+  bool isTrustedUrl(Uri uri) {
+    if (whiteListedUrls.isNullOrEmpty) return false;
+    final String fullUrl = uri.toString();
+    return whiteListedUrls!.any((pattern) {
+      final regexStr = RegExp.escape(pattern).replaceAll(r'\*', r'[^/?#]*');
+      return RegExp('^$regexStr').hasMatch(fullUrl);
+    });
   }
 
   bool isTrustedDomain(Uri uri) {
