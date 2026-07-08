@@ -120,7 +120,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     // Route external main-frame URLs based on whiteListedUrls presence
     final remoteConfig = ref.read(humHubFRemoteConfigProvider).asData?.value;
     if (!url.startsWith(instance.manifest.startUrl) && action.isForMainFrame) {
-      if (remoteConfig?.whiteListedUrls == null) {
+      if (remoteConfig?.whiteListedUrls == null && remoteConfig?.authClientUrls == null) {
         logInfo('Legacy SSO detected, launching AuthWebView for $url');
         unawaited(_launchAuthWebView(action.request));
         return NavigationActionPolicy.CANCEL;
@@ -177,7 +177,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       return Future.value(false);
     }
     final remoteConfig = ref.read(humHubFRemoteConfigProvider).asData?.value;
-    if (remoteConfig?.whiteListedUrls == null ||
+    if ((remoteConfig?.whiteListedUrls == null && remoteConfig?.authClientUrls == null) ||
         remoteConfig!.isTrustedUrl(urlToOpen.uriValue)) {
       unawaited(_launchAuthWebView(createWindowAction.request));
       return Future.value(true);
