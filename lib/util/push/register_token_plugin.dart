@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/util/api_provider.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/providers.dart';
@@ -22,8 +23,10 @@ class RegisterToken extends ConsumerWidget {
   Widget build(context, ref) {
     final firebaseInitializedL = ref.watch(firebaseInitialized);
     final initialized = firebaseInitializedL.isLoaded;
+    final loggedIn = ref.watch(humHubProvider.select((n) => n.openerState == OpenerState.hidden));
     return _RegisterToken(
       ready: initialized,
+      loggedIn: loggedIn,
       child: child,
     );
   }
@@ -31,10 +34,12 @@ class RegisterToken extends ConsumerWidget {
 
 class _RegisterToken extends ConsumerStatefulWidget {
   final bool ready;
+  final bool loggedIn;
   final Widget child;
 
   const _RegisterToken({
     required this.ready,
+    required this.loggedIn,
     required this.child,
   });
 
@@ -77,7 +82,8 @@ class _RegisterTokenState extends ConsumerState<_RegisterToken> {
   @override
   void didUpdateWidget(oldWidget) {
     final isReady = !oldWidget.ready && widget.ready;
-    if (isReady) {
+    final justLoggedIn = !oldWidget.loggedIn && widget.loggedIn && widget.ready;
+    if (isReady || justLoggedIn) {
       unawaited(_maybeRegisterToken());
     }
     super.didUpdateWidget(oldWidget);
