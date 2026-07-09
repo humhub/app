@@ -111,6 +111,9 @@ class WebViewAppState extends ConsumerState<WebView> {
               onWebViewCreated: _onWebViewCreated,
               shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
               onCreateWindow: _onCreateWindow,
+              onConsoleMessage: (cntr, msg){
+                logInfo(msg);
+              },
               onLoadStop: _onLoadStop,
               onLoadStart: _onLoadStart,
               onProgressChanged: _onProgressChanged,
@@ -185,23 +188,20 @@ class WebViewAppState extends ConsumerState<WebView> {
       logInfo('Blocked navigation to $url by blacklist rules');
       return NavigationActionPolicy.CANCEL;
     }
-    // For SSO
-    bool? isDomainTrusted = ref
-            .read(humHubProvider)
-            .remoteConfig
-            ?.isTrustedDomain(action.request.url!.uriValue) ??
-        false;
-    if ((!url.startsWith(_manifest.startUrl) && action.isForMainFrame) &&
-        !_supportsAuthClientRedirect &&
-        !isDomainTrusted) {
-      logInfo('Legacy SSO detected, launching AuthWebView for $url');
-      unawaited(_launchAuthWebView(action.request));
-      return NavigationActionPolicy.CANCEL;
-    }
-    // For all other external links (main frame only — iframes/embeds are allowed to load inline)
+    // Route external main-frame URLs based on whiteListedUrls presence
+    final remoteConfig = ref.read(humHubProvider).remoteConfig;
     if (!url.startsWith(_manifest.startUrl) && action.isForMainFrame) {
-      logInfo(
-          'External link detected, launching external application for $url');
+      if (remoteConfig?.whiteListedUrls == null && remoteConfig?.authClientUrls == null) {
+        logInfo('Legacy SSO detected, launching AuthWebView for $url');
+        unawaited(_launchAuthWebView(action.request));
+        return NavigationActionPolicy.CANCEL;
+      }
+      if (remoteConfig!.isTrustedUrl(action.request.url!.uriValue)) {
+        logInfo('Whitelisted URL, launching AuthWebView for $url');
+        unawaited(_launchAuthWebView(action.request));
+        return NavigationActionPolicy.CANCEL;
+      }
+      logInfo('External link detected, launching external application for $url');
       await launchUrl(action.request.url!.uriValue,
           mode: LaunchMode.externalApplication);
       return NavigationActionPolicy.CANCEL;
@@ -258,6 +258,13 @@ class WebViewAppState extends ConsumerState<WebView> {
     )) {
       controller.loadUrl(urlRequest: createWindowAction.request);
       return Future.value(false);
+    }
+
+    final remoteConfig = ref.read(humHubProvider).remoteConfig;
+    if ((remoteConfig?.whiteListedUrls == null && remoteConfig?.authClientUrls == null) ||
+        remoteConfig!.isTrustedUrl(urlToOpen.uriValue)) {
+      unawaited(_launchAuthWebView(createWindowAction.request));
+      return Future.value(true);
     }
 
     if (await canLaunchUrl(urlToOpen)) {

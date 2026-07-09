@@ -167,6 +167,9 @@ class _AuthWebViewState extends State<AuthWebView> {
           initialSettings: WebViewGlobalController.settings(),
           onWebViewCreated: _onWebViewCreated,
           shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
+          onWebContentProcessDidTerminate: (controller) async {
+            await controller.reload();
+          },
           onReceivedHttpError: (controller, request, errorResponse) {},
           onLoadStart: (controller, url) {},
           onLoadStop: (controller, url) {},

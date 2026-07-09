@@ -11,25 +11,30 @@ class RemoteConfig {
   final String? appVersion;
   final FileUploadSettings? fileUploadSettings;
   final List<Uri>? whiteListedDomains;
+  final List<String>? whiteListedUrls;
+  final List<String>? authClientUrls;
 
   RemoteConfig({
     required this.appName,
     required this.appVersion,
     required this.fileUploadSettings,
     required this.whiteListedDomains,
+    required this.whiteListedUrls,
+    required this.authClientUrls,
   });
 
   factory RemoteConfig.fromJson(Map<String, dynamic> json) {
     return RemoteConfig(
       appName: json['appName'] as String,
       appVersion: json['appVersion'] as String,
-      fileUploadSettings: FileUploadSettings.fromJson(
-          json['fileUploadSettings'] as Map<String, dynamic>),
-      whiteListedDomains: (json['whiteListedDomains'] as List<dynamic>)
-          .map((e) => Uri.tryParse(e as String))
-          .where((uri) => uri != null)
-          .cast<Uri>()
-          .toList(),
+      fileUploadSettings: FileUploadSettings.fromJson(json['fileUploadSettings'] as Map<String, dynamic>),
+      whiteListedDomains: json['whiteListedDomains'] == null
+          ? null
+          : (json['whiteListedDomains'] as List<dynamic>).map((e) => Uri.tryParse(e as String)).where((uri) => uri != null).cast<Uri>().toList(),
+      whiteListedUrls:
+          json['whiteListedUrls'] == null ? null : (json['whiteListedUrls'] as List<dynamic>).map((e) => e as String).where((s) => s.isNotEmpty).toList(),
+      authClientUrls:
+          json['authClientUrls'] == null ? null : (json['authClientUrls'] as List<dynamic>).map((e) => e as String).where((s) => s.isNotEmpty).toList(),
     );
   }
 
@@ -38,13 +43,13 @@ class RemoteConfig {
       'appName': appName,
       'appVersion': appVersion,
       'fileUploadSettings': fileUploadSettings?.toJson(),
-      'whiteListedDomains':
-          whiteListedDomains?.map((uri) => uri.toString()).toList(),
+      'whiteListedDomains': whiteListedDomains?.map((uri) => uri.toString()).toList(),
+      'whiteListedUrls': whiteListedUrls,
+      'authClientUrls': authClientUrls,
     };
   }
 
-  static Future<RemoteConfig?> get(
-      Manifest manifest, Map<String, dynamic>? headers) async {
+  static Future<RemoteConfig?> get(Manifest manifest, Map<String, dynamic>? headers) async {
     try {
       final response = await Dio().get(
         '${manifest.startUrl}/mobile-app/get-settings',
@@ -63,6 +68,16 @@ class RemoteConfig {
     }
   }
 
+  bool isTrustedUrl(Uri uri) {
+    final combined = [...?whiteListedUrls, ...?authClientUrls];
+    if (combined.isEmpty) return false;
+    final String fullUrl = uri.toString();
+    return combined.any((pattern) {
+      final regexStr = RegExp.escape(pattern).replaceAll(r'\*', r'[^/?#]*');
+      return RegExp('^$regexStr').hasMatch(fullUrl);
+    });
+  }
+
   bool isTrustedDomain(Uri uri) {
     if (whiteListedDomains.isNullOrEmpty) return false;
     final String inputBase = '${uri.scheme}://${uri.authority}';
@@ -73,8 +88,7 @@ class RemoteConfig {
     });
   }
 
-  bool get supportsAuthClientRedirect =>
-      _compareVersions(appVersion, _authClientRedirectVersion) >= 0;
+  bool get supportsAuthClientRedirect => _compareVersions(appVersion, _authClientRedirectVersion) >= 0;
 
   static int _compareVersions(String? current, String target) {
     final currentParts = _parseVersion(current);
