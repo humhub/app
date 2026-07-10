@@ -23,7 +23,7 @@ import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/show_dialog.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
-import 'package:open_file/open_file.dart';
+import 'package:humhub/components/file_actions_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:humhub/l10n/generated/app_localizations.dart';
 import 'package:humhub/util/file_download_manager.dart';
@@ -353,17 +353,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         // Hide the bottom sheet if it is visible
         Navigator.popUntil(context, ModalRoute.withName(WebViewF.path));
         isDone = true;
-        Keys.scaffoldMessengerStateKey.currentState?.showSnackBar(
-          SnackBar(
-            content: Text('${AppLocalizations.of(context)!.file_download}: $filename'),
-            action: SnackBarAction(
-              label: AppLocalizations.of(context)!.open,
-              onPressed: () {
-                OpenFile.open(file.path);
-              },
-            ),
-          ),
-        );
+        FileActionsBottomSheet.show(context, file, filename);
       },
       onStart: () async {
         downloadProgress = 0;

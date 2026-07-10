@@ -65,6 +65,7 @@ dependencies:
   flutter_svg: ^2.0.9
   flutter_styled_toast: ^2.2.1
   open_file: ^3.5.10
+  flutter_file_dialog: ^3.0.3
   flutter_keyboard_visibility: ^6.0.0
   internet_connection_checker_plus: ^1.0.1
 

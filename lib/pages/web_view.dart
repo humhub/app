@@ -27,8 +27,8 @@ import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/router.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
+import 'package:humhub/components/file_actions_bottom_sheet.dart';
 import 'package:loggy/loggy.dart';
-import 'package:open_file/open_file.dart';
 import 'package:humhub/util/router.dart' as m;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:humhub/l10n/generated/app_localizations.dart';
@@ -503,19 +503,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         Navigator.popUntil(context, ModalRoute.withName(WebView.path));
         logInfo('Download succeeded: $filename at ${file.path}');
         isDone = true;
-        Keys.scaffoldMessengerStateKey.currentState?.showSnackBar(
-          SnackBar(
-            content: Text(
-                '${AppLocalizations.of(context)!.file_download}: $filename'),
-            action: SnackBarAction(
-              label: AppLocalizations.of(context)!.open,
-              onPressed: () {
-                //file.open();
-                OpenFile.open(file.path);
-              },
-            ),
-          ),
-        );
+        FileActionsBottomSheet.show(context, file, filename);
       },
       onStart: () async {
         downloadProgress = 0;
