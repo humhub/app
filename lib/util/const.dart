@@ -4,6 +4,10 @@ class Keys{
   static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 }
 
+/// Notifies [RouteAware] pages (e.g. WebView) when a route pushed on top of them is popped,
+/// so they can restore orientation/UI state that the popped route may have overridden.
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 class Assets {
   static String logo = "assets/images/logo.png";
   static String settings = "assets/images/icons/settings.svg";
