@@ -36,12 +36,13 @@ class WebViewF extends ConsumerStatefulWidget {
   FlavoredWebViewState createState() => FlavoredWebViewState();
 }
 
-class FlavoredWebViewState extends ConsumerState<WebViewF> {
+class FlavoredWebViewState extends ConsumerState<WebViewF> with RouteAware {
   HeadlessInAppWebView? headlessWebView;
   late HumHubF instance;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late PullToRefreshController pullToRefreshController;
   late double downloadProgress = 0;
+  bool _isRouteObserverSubscribed = false;
 
   @override
   void initState() {
@@ -60,6 +61,27 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         }
       },
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isRouteObserverSubscribed) {
+      routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
+      _isRouteObserverSubscribed = true;
+    }
+  }
+
+  /// Called when a route pushed on top of WebViewF (e.g. AuthWebView) is popped.
+  /// That screen locks orientation to portrait, and since popping back doesn't
+  /// re-run WebViewF's own route builder, the lock would otherwise persist.
+  @override
+  void didPopNext() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
   }
 
   @override
@@ -435,6 +457,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
 
   @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     super.dispose();
     if (headlessWebView != null) {
       headlessWebView!.dispose();

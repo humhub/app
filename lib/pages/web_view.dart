@@ -43,7 +43,7 @@ class WebView extends ConsumerStatefulWidget {
   WebViewAppState createState() => WebViewAppState();
 }
 
-class WebViewAppState extends ConsumerState<WebView> {
+class WebViewAppState extends ConsumerState<WebView> with RouteAware {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late Manifest _manifest;
   late URLRequest _initialRequest;
@@ -88,8 +88,23 @@ class WebViewAppState extends ConsumerState<WebView> {
                   headers: ref.read(humHubProvider).customHeaders));
         },
       );
+      routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
       _isInit = true;
     }
+  }
+
+  /// Called when a route pushed on top of WebView (e.g. Settings, Console, Help,
+  /// AuthWebView) is popped. Those screens lock orientation to portrait, and since
+  /// popping back doesn't re-run WebView's own route builder, the lock would
+  /// otherwise persist indefinitely.
+  @override
+  void didPopNext() {
+    logInfo('VERIFY_PROBE: WebView.didPopNext firing, restoring landscape+portrait orientation');
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
   }
 
   @override
@@ -592,6 +607,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     logInfo('Disposing WebView and controllers');
     if (_headlessWebView != null) _headlessWebView!.dispose();
     _keyboardSubscription?.cancel();
+    routeObserver.unsubscribe(this);
     super.dispose();
   }
 }

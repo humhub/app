@@ -28,6 +28,7 @@ class OpenerApp extends ConsumerWidget {
               child: OverrideLocale(
                 builder: (overrideLocale) => MaterialApp(
                   navigatorKey: Keys.navigatorKey,
+                  navigatorObservers: [routeObserver],
                   scaffoldMessengerKey: Keys.scaffoldMessengerStateKey,
                   debugShowCheckedModeBanner: false,
                   initialRoute: AppRouter.initRoute,

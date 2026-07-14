@@ -34,6 +34,7 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
               builder: (overrideLocale) => Builder(
                 builder: (context) => MaterialApp(
                   scaffoldMessengerKey: Keys.scaffoldMessengerStateKey,
+                  navigatorObservers: [routeObserver],
                   debugShowCheckedModeBanner: false,
                   initialRoute: '/',
                   routes: RouterF.routes,
