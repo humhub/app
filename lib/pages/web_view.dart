@@ -104,6 +104,7 @@ class WebViewAppState extends ConsumerState<WebView> {
           onPopInvokedWithResult: (didPop, result) => exitApp(context, ref),
           child: FileUploadManagerWidget(
             child: InAppWebView(
+              preventGestureDelay: true,
               initialUrlRequest: _initialRequest,
               initialSettings: WebViewGlobalController.settings(),
               pullToRefreshController: _pullToRefreshController,

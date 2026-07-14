@@ -75,6 +75,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
           bottom: false,
           child: FileUploadManagerWidget(
             child: InAppWebView(
+              preventGestureDelay: true,
               initialUrlRequest: _initialRequest,
               initialSettings: WebViewGlobalController.settings(),
               pullToRefreshController: pullToRefreshController,
