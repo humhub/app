@@ -1,15 +1,40 @@
 import 'dart:async';
 
-import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
-import 'package:humhub/util/api_provider.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/push/provider.dart';
+import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
+
+/// Fetches a fresh FCM token (never trusts a previously cached one, since the
+/// backend may have discarded a registration without the app knowing) and
+/// registers it against the currently active, authenticated instance webview.
+Future<void> registerPushToken(WidgetRef ref) async {
+  final token = await FirebaseMessaging.instance.getTokenSafe();
+  if (token == null) {
+    logInfo('Firebase reported null token.');
+    return;
+  }
+
+  final humHub = ref.read(humHubProvider);
+  final startUrl = humHub.manifest?.startUrl;
+  if (startUrl == null || WebViewGlobalController.value == null) {
+    logInfo('No active instance session, skipping token registration name: PushPlugin');
+    return;
+  }
+
+  logInfo('Registering Firebase token $token name: PushPlugin');
+  WebViewGlobalController.ajaxPost(
+    url: '$startUrl/fcm-push/token/update-mobile-app',
+    data: '{ token: \'$token\' }',
+    headers: humHub.customHeaders,
+  );
+  ref.read(humHubProvider).setToken(token);
+}
 
 class RegisterToken extends ConsumerWidget {
   final Widget child;
@@ -48,43 +73,28 @@ class _RegisterToken extends ConsumerStatefulWidget {
 }
 
 class _RegisterTokenState extends ConsumerState<_RegisterToken> {
-  Future<void> _maybeRegisterToken() async {
-    final token = await FirebaseMessaging.instance.getTokenSafe();
-    if (token == null) {
-      logInfo('Firebase reported null token.');
-      return;
-    }
+  StreamSubscription<String>? _tokenRefreshSubscription;
 
-    final cachedToken = ref.read(humHubProvider).pushToken;
-    logInfo('Firebase token is $token name: PushPlugin');
-    if (cachedToken == token) {
-      logInfo('Firebase token already registered name: PushPlugin');
-      return;
-    }
-    final result = await APIProvider.of(ref).request(
-      _registerToken(token),
-    );
-    if (!result.isError) {
-      logInfo('Registered Firebase token, caching it name: PushPlugin');
-      ref.read(humHubProvider).setToken(token);
-    }
+  @override
+  void initState() {
+    super.initState();
+    _tokenRefreshSubscription = FirebaseMessaging.instance.onTokenRefresh.listen((_) {
+      unawaited(registerPushToken(ref));
+    });
   }
 
-  Future<void> Function(Dio dio) _registerToken(String? token) => (dio) async {
-        await dio.post(
-          '/fcm-push/token/update',
-          data: {
-            'token': token,
-          },
-        );
-      };
+  @override
+  void dispose() {
+    _tokenRefreshSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   void didUpdateWidget(oldWidget) {
     final isReady = !oldWidget.ready && widget.ready;
     final justLoggedIn = !oldWidget.loggedIn && widget.loggedIn && widget.ready;
     if (isReady || justLoggedIn) {
-      unawaited(_maybeRegisterToken());
+      unawaited(registerPushToken(ref));
     }
     super.didUpdateWidget(oldWidget);
   }

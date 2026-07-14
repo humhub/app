@@ -49,7 +49,7 @@ class WebViewGlobalController {
     _value = newValue;
   }
 
-  static void ajaxPost({required String url, required String data, Map<String, String>? headers}) {
+  static void ajaxPost({required String url, required String data, Map<String, String>? headers}) async {
     String jsonHeaders = jsonEncode(headers);
     String jsCode4 = """
           \$.ajax({
@@ -60,7 +60,8 @@ class WebViewGlobalController {
               async: false, // IMPORTANT: it needs to be sync
           });
     """;
-    value?.evaluateJavascript(source: jsCode4);
+    dynamic res = await value?.evaluateJavascript(source: jsCode4);
+    logInfo(res);
   }
 
   static void ajaxSetHeaders({Map<String, String>? headers}) {

@@ -25,6 +25,7 @@ import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/push/provider.dart';
+import 'package:humhub/util/push/register_token_plugin.dart';
 import 'package:humhub/util/router.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
@@ -106,6 +107,7 @@ class WebViewAppState extends ConsumerState<WebView> {
             child: InAppWebView(
               initialUrlRequest: _initialRequest,
               initialSettings: WebViewGlobalController.settings(),
+              preventGestureDelay: true,
               pullToRefreshController: _pullToRefreshController,
               shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
               onWebViewCreated: _onWebViewCreated,
@@ -238,6 +240,9 @@ class WebViewAppState extends ConsumerState<WebView> {
       ),
     );
     WebViewGlobalController.setValue(controller);
+    if (ref.read(humHubProvider).openerState == OpenerState.hidden) {
+      unawaited(registerPushToken(ref));
+    }
   }
 
   Future<FetchRequest?> _shouldInterceptFetchRequest(
