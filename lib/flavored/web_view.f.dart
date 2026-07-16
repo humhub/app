@@ -225,7 +225,12 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   }
 
   void _concludeAuth(URLRequest request) {
-    WebViewGlobalController.value!.loadUrl(urlRequest: request);
+    Map<String, String> mergedMap = {
+      ...instance.customHeaders,
+      ...?request.headers,
+    };
+    WebViewGlobalController.value!
+        .loadUrl(urlRequest: request.copyWith(headers: mergedMap));
   }
 
   Future<void> _launchAuthWebView(URLRequest request) async {

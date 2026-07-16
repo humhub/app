@@ -335,7 +335,12 @@ class WebViewAppState extends ConsumerState<WebView> {
   }
 
   _concludeAuth(URLRequest request) {
-    WebViewGlobalController.value!.loadUrl(urlRequest: request);
+    Map<String, String> mergedMap = {
+      ...ref.read(humHubProvider).customHeaders,
+      ...?request.headers,
+    };
+    WebViewGlobalController.value!
+        .loadUrl(urlRequest: request.copyWith(headers: mergedMap));
   }
 
   Future<void> _launchAuthWebView(URLRequest request) async {
