@@ -111,7 +111,6 @@ class WebViewAppState extends ConsumerState<WebView> {
               preventGestureDelay: true,
               initialUrlRequest: _initialRequest,
               initialSettings: WebViewGlobalController.settings(),
-              preventGestureDelay: true,
               pullToRefreshController: _pullToRefreshController,
               shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
               onWebViewCreated: _onWebViewCreated,
