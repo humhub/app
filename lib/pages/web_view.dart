@@ -116,9 +116,6 @@ class WebViewAppState extends ConsumerState<WebView> {
               onWebViewCreated: _onWebViewCreated,
               shouldInterceptFetchRequest: _shouldInterceptFetchRequest,
               onCreateWindow: _onCreateWindow,
-              onConsoleMessage: (cntr, msg){
-                logInfo(msg);
-              },
               onLoadStop: _onLoadStop,
               onLoadStart: _onLoadStart,
               onProgressChanged: _onProgressChanged,
