@@ -47,12 +47,12 @@ class DataSharingConsentNotifier extends AutoDisposeNotifier<DataSharingConsentS
 
   Future<void> setSendErrorReports(bool value) async {
     state = state.copyWith(sendErrorReports: value);
-    await SecureStorageService.instance.write(key: SecureStorageService.keys.keyErrorReports, value: value.toString());
+    await SecureStorageService.write(key: SecureStorageService.keys.keyErrorReports, value: value.toString());
   }
 
   Future<void> setSendDeviceIdentifiers(bool value) async {
     state = state.copyWith(sendDeviceIdentifiers: value);
-    await SecureStorageService.instance.write(key: SecureStorageService.keys.keyDeviceIdentifiers, value: value.toString());
+    await SecureStorageService.write(key: SecureStorageService.keys.keyDeviceIdentifiers, value: value.toString());
   }
 }
 

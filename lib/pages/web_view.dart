@@ -146,7 +146,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     }
     if (args is UniversalOpenerController) {
       UniversalOpenerController controller = args;
-      ref.read(humHubProvider).setInstance(controller.humhub);
+      Future(() => ref.read(humHubProvider).setInstance(controller.humhub));
       _manifest = controller.humhub.manifest!;
       url = controller.url;
     }

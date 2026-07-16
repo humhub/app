@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -34,7 +35,22 @@ class SecureStorageService {
 
   /// Marks that user has visited settings.
   static Future<void> setVisitedSettings() async {
-    await _instance.write(key: keys.hasVisitedSettings, value: 'true');
+    await write(key: keys.hasVisitedSettings, value: 'true');
+  }
+
+  /// Writes to secure storage, recovering from a stale Keychain entry left behind
+  /// by a restored backup (where the "first run" flag came back `true` along with it).
+  static Future<void> write({required String key, required String? value}) async {
+    try {
+      await _instance.write(key: key, value: value);
+    } on PlatformException catch (e) {
+      if (e.code == '-25299') {
+        await _instance.delete(key: key);
+        await _instance.write(key: key, value: value);
+      } else {
+        rethrow;
+      }
+    }
   }
 }
 

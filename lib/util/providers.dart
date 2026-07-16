@@ -149,9 +149,9 @@ class HumHubNotifier extends ChangeNotifier {
 
     String lastUrl = (_humHubInstance.manifestUrl != null ? _humHubInstance.manifestUrl! : this.lastUrl);
 
-    await SecureStorageService.instance.write(key: SecureStorageService.keys.humhubInstance, value: jsonString);
+    await SecureStorageService.write(key: SecureStorageService.keys.humhubInstance, value: jsonString);
 
-    await SecureStorageService.instance.write(key: SecureStorageService.keys.lastInstanceUrl, value: lastUrl);
+    await SecureStorageService.write(key: SecureStorageService.keys.lastInstanceUrl, value: lastUrl);
   }
 }
 
