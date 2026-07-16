@@ -38,7 +38,6 @@ Future<void> registerPushToken(WidgetRef ref) async {
     data: '{ token: \'$token\' }',
     headers: humHub.customHeaders,
   );
-  logInfo(res);
   final success = res is Map && res['status'] == 200;
   if (!success) {
     logError('Failed to register push token name: PushPlugin, response: ${jsonEncode(res)}');
