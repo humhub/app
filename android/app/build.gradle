@@ -36,6 +36,12 @@ android {
     compileSdk = 36
     ndkVersion flutter.ndkVersion
 
+    externalNativeBuild {
+        cmake {
+            version "3.31.5"
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -55,7 +61,7 @@ android {
 
     defaultConfig {
         applicationId "com.humhub.app"
-        minSdkVersion 23
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

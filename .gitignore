@@ -33,6 +33,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+/ios/build/
 /android/app/.cxx/
 lib/l10n/generated/
 
