@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/providers.dart';
-import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
 
@@ -21,6 +21,11 @@ Future<void> registerPushToken(WidgetRef ref) async {
   }
 
   final humHub = ref.read(humHubProvider);
+  if (humHub.openerState != OpenerState.hidden) {
+    logInfo('Opener is not hidden, skipping token registration name: PushPlugin');
+    return;
+  }
+
   final startUrl = humHub.manifest?.startUrl;
   if (startUrl == null || WebViewGlobalController.value == null) {
     logInfo('No active instance session, skipping token registration name: PushPlugin');
@@ -28,15 +33,25 @@ Future<void> registerPushToken(WidgetRef ref) async {
   }
 
   logInfo('Registering Firebase token $token name: PushPlugin');
-  WebViewGlobalController.ajaxPost(
+  final res = await WebViewGlobalController.ajaxPost(
     url: '$startUrl/fcm-push/token/update-mobile-app',
     data: '{ token: \'$token\' }',
     headers: humHub.customHeaders,
   );
+  logInfo(res);
+  final success = res is Map && res['status'] == 200;
+  if (!success) {
+    logError('Failed to register push token name: PushPlugin, response: ${jsonEncode(res)}');
+  }
+
   ref.read(humHubProvider).setToken(token);
 }
 
-class RegisterToken extends ConsumerWidget {
+/// Re-registers the FCM token whenever Firebase rotates it. Post-login
+/// registration is handled by the webview itself once it settles (see
+/// `WebViewAppState._scheduleTokenRegistrationCheck` in `lib/pages/web_view.dart`),
+/// since only it knows when the page has actually finished loading.
+class RegisterToken extends ConsumerStatefulWidget {
   final Widget child;
 
   const RegisterToken({
@@ -45,34 +60,10 @@ class RegisterToken extends ConsumerWidget {
   });
 
   @override
-  Widget build(context, ref) {
-    final firebaseInitializedL = ref.watch(firebaseInitialized);
-    final initialized = firebaseInitializedL.isLoaded;
-    final loggedIn = ref.watch(humHubProvider.select((n) => n.openerState == OpenerState.hidden));
-    return _RegisterToken(
-      ready: initialized,
-      loggedIn: loggedIn,
-      child: child,
-    );
-  }
+  ConsumerState<RegisterToken> createState() => _RegisterTokenState();
 }
 
-class _RegisterToken extends ConsumerStatefulWidget {
-  final bool ready;
-  final bool loggedIn;
-  final Widget child;
-
-  const _RegisterToken({
-    required this.ready,
-    required this.loggedIn,
-    required this.child,
-  });
-
-  @override
-  _RegisterTokenState createState() => _RegisterTokenState();
-}
-
-class _RegisterTokenState extends ConsumerState<_RegisterToken> {
+class _RegisterTokenState extends ConsumerState<RegisterToken> {
   StreamSubscription<String>? _tokenRefreshSubscription;
 
   @override
@@ -87,16 +78,6 @@ class _RegisterTokenState extends ConsumerState<_RegisterToken> {
   void dispose() {
     _tokenRefreshSubscription?.cancel();
     super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(oldWidget) {
-    final isReady = !oldWidget.ready && widget.ready;
-    final justLoggedIn = !oldWidget.loggedIn && widget.loggedIn && widget.ready;
-    if (isReady || justLoggedIn) {
-      unawaited(registerPushToken(ref));
-    }
-    super.didUpdateWidget(oldWidget);
   }
 
   @override

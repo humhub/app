@@ -51,6 +51,9 @@ class WebViewAppState extends ConsumerState<WebView> {
   late PullToRefreshController _pullToRefreshController;
   HeadlessInAppWebView? _headlessWebView;
   bool _isInit = false;
+  Timer? _pageIdleTimer;
+  bool _pushTokenRegistered = false;
+  static const _pageIdleDuration = Duration(seconds: 5);
 
   StreamSubscription<bool>? _keyboardSubscription;
   final KeyboardVisibilityController _keyboardVisibilityController =
@@ -240,9 +243,16 @@ class WebViewAppState extends ConsumerState<WebView> {
       ),
     );
     WebViewGlobalController.setValue(controller);
-    if (ref.read(humHubProvider).openerState == OpenerState.hidden) {
+  }
+
+  void _scheduleTokenRegistrationCheck() {
+    _pageIdleTimer?.cancel();
+    _pageIdleTimer = Timer(_pageIdleDuration, () {
+      if (_pushTokenRegistered) return;
+      if (ref.read(humHubProvider).openerState != OpenerState.hidden) return;
+      _pushTokenRegistered = true;
       unawaited(registerPushToken(ref));
-    }
+    });
   }
 
   Future<FetchRequest?> _shouldInterceptFetchRequest(
@@ -287,10 +297,12 @@ class WebViewAppState extends ConsumerState<WebView> {
         safeArea:
             !keyboardVisible ? initKeyboardPadding : noKeyboardBottomPadding);
     LoadingProvider.of(ref).dismissAll();
+    _scheduleTokenRegistrationCheck();
   }
 
   void _onLoadStart(InAppWebViewController controller, Uri? url) async {
     logDebug('Page load started: $url');
+    _pageIdleTimer?.cancel();
     WebViewGlobalController.ajaxSetHeaders(
         headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
@@ -602,6 +614,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     logInfo('Disposing WebView and controllers');
     if (_headlessWebView != null) _headlessWebView!.dispose();
     _keyboardSubscription?.cancel();
+    _pageIdleTimer?.cancel();
     super.dispose();
   }
 }
