@@ -25,6 +25,7 @@ import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/push/provider.dart';
+import 'package:humhub/util/push/register_token_plugin.dart';
 import 'package:humhub/util/router.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:humhub/components/file_actions_bottom_sheet.dart';
@@ -50,6 +51,9 @@ class WebViewAppState extends ConsumerState<WebView> {
   late PullToRefreshController _pullToRefreshController;
   HeadlessInAppWebView? _headlessWebView;
   bool _isInit = false;
+  Timer? _pageIdleTimer;
+  bool _pushTokenRegistered = false;
+  static const _pageIdleDuration = Duration(seconds: 5);
 
   StreamSubscription<bool>? _keyboardSubscription;
   final KeyboardVisibilityController _keyboardVisibilityController =
@@ -107,6 +111,7 @@ class WebViewAppState extends ConsumerState<WebView> {
               preventGestureDelay: true,
               initialUrlRequest: _initialRequest,
               initialSettings: WebViewGlobalController.settings(),
+              preventGestureDelay: true,
               pullToRefreshController: _pullToRefreshController,
               shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
               onWebViewCreated: _onWebViewCreated,
@@ -241,6 +246,16 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.setValue(controller);
   }
 
+  void _scheduleTokenRegistrationCheck() {
+    _pageIdleTimer?.cancel();
+    _pageIdleTimer = Timer(_pageIdleDuration, () {
+      if (_pushTokenRegistered) return;
+      if (ref.read(humHubProvider).openerState != OpenerState.hidden) return;
+      _pushTokenRegistered = true;
+      unawaited(registerPushToken(ref));
+    });
+  }
+
   Future<FetchRequest?> _shouldInterceptFetchRequest(
       InAppWebViewController controller, FetchRequest request) async {
     logDebug("_shouldInterceptFetchRequest");
@@ -290,10 +305,12 @@ class WebViewAppState extends ConsumerState<WebView> {
         safeArea:
             !keyboardVisible ? initKeyboardPadding : noKeyboardBottomPadding);
     LoadingProvider.of(ref).dismissAll();
+    _scheduleTokenRegistrationCheck();
   }
 
   void _onLoadStart(InAppWebViewController controller, Uri? url) async {
     logDebug('Page load started: $url');
+    _pageIdleTimer?.cancel();
     WebViewGlobalController.ajaxSetHeaders(
         headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
@@ -593,6 +610,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     logInfo('Disposing WebView and controllers');
     if (_headlessWebView != null) _headlessWebView!.dispose();
     _keyboardSubscription?.cancel();
+    _pageIdleTimer?.cancel();
     super.dispose();
   }
 }
