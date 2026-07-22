@@ -211,6 +211,40 @@ class WebViewGlobalController {
     value!.evaluateJavascript(source: "document.querySelector('#account-login-form > div.form-group.field-login-rememberme').style.display='none';");
   }
 
+  /// iOS WKWebView (unlike Safari, which restores session cookies as a
+  /// deliberate UX feature, and unlike Android's WebView, which never evicts
+  /// them at all) discards session-only cookies (no Expires/Max-Age, e.g.
+  /// PHPSESSID) the moment the app process ends. External auth (SAML/OIDC)
+  /// only ever gets a session cookie from HumHub, so those logins don't
+  /// survive an app restart on iOS. Re-set any such cookie for our own
+  /// domain with a far-future expiry so the OS treats it as persistent.
+  ///
+  /// Runs on every page load (not just right after login), so the window
+  /// keeps sliding forward for as long as the user keeps opening the app.
+  static Future<void> persistSessionCookies(
+      {required String forUrl,
+      Duration renewalPeriod = const Duration(days: 90)}) async {
+    if (!Platform.isIOS) return;
+    final url = WebUri(forUrl);
+    final cookies = await CookieManager.instance().getCookies(url: url);
+    final expiresDate =
+        DateTime.now().add(renewalPeriod).millisecondsSinceEpoch;
+    for (final cookie in cookies) {
+      if (cookie.isSessionOnly != true) continue;
+      await CookieManager.instance().setCookie(
+        url: url,
+        name: cookie.name,
+        value: cookie.value.toString(),
+        domain: cookie.domain,
+        path: cookie.path ?? '/',
+        isSecure: cookie.isSecure,
+        isHttpOnly: cookie.isHttpOnly,
+        sameSite: cookie.sameSite,
+        expiresDate: expiresDate,
+      );
+    }
+  }
+
   static Future<void> zoomOut() async {
     bool? canZoomOut = true;
     while (canZoomOut ?? false) {

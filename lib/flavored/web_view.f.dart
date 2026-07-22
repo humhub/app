@@ -201,6 +201,8 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
     WebViewGlobalController.ajaxSetHeaders(headers: instance.customHeaders);
     WebViewGlobalController.listenToImageOpen();
     WebViewGlobalController.appendViewportFitCover();
+    unawaited(WebViewGlobalController.persistSessionCookies(
+        forUrl: instance.manifest.startUrl));
     LoadingProvider.of(ref).dismissAll();
   }
 

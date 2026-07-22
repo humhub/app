@@ -300,6 +300,8 @@ class WebViewAppState extends ConsumerState<WebView> {
     await WebViewGlobalController.setWebViewSafeAreaPadding(
         safeArea:
             !keyboardVisible ? initKeyboardPadding : noKeyboardBottomPadding);
+    unawaited(WebViewGlobalController.persistSessionCookies(
+        forUrl: _manifest.startUrl));
     LoadingProvider.of(ref).dismissAll();
     _scheduleTokenRegistrationCheck();
   }
