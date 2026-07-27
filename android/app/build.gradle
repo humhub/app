@@ -32,7 +32,6 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace 'com.humhub.app'
-    compileSdkVersion 35
     compileSdk = 36
     ndkVersion flutter.ndkVersion
 
@@ -62,7 +61,7 @@ android {
     defaultConfig {
         applicationId "com.humhub.app"
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
