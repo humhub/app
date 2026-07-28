@@ -61,12 +61,12 @@ class Manifest {
 
   factory Manifest.fromJson(Map<String, dynamic> json) {
     return Manifest(
-      display: json['display'] as String,
-      startUrl: json['start_url'] as String,
-      shortName: json['short_name'] as String,
-      name: json['name'] as String,
-      backgroundColor: json['background_color'] as String,
-      themeColor: json['theme_color'] as String,
+      display: json['display'].toString(),
+      startUrl: json['start_url'].toString(),
+      shortName: json['short_name'].toString(),
+      name: json['name'].toString(),
+      backgroundColor: json['background_color'].toString(),
+      themeColor: json['theme_color'].toString(),
       icons: (json['icons'] as List<dynamic>?)
           ?.map((icon) => ManifestIcon.fromJson(icon as Map<String, dynamic>))
           .toList(),
