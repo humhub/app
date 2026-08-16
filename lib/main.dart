@@ -9,7 +9,7 @@ import 'package:humhub/util/intent/app_link_settings.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/router.dart';
 import 'package:loggy/loggy.dart';
-
+// bump
 void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
     logError('Flutter framework error: ${details.exception}', details.exception,
