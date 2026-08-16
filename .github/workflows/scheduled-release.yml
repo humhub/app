@@ -1,0 +1,66 @@
+name: scheduled-release
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'   # weekly check, Monday 06:00 UTC
+  workflow_dispatch: {}    # allow manual "run now" for testing
+
+jobs:
+  check-and-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Find latest release tag
+        id: last_tag
+        run: |
+          tag=$(git tag -l 'v*' --sort=-creatordate | head -n1)
+          if [ -z "$tag" ]; then
+            echo "No existing v* tag found — skipping automated release; first release must be tagged manually."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Check age of last release and new commits
+        id: check
+        if: steps.last_tag.outputs.skip != 'true'
+        run: |
+          tag=${{ steps.last_tag.outputs.tag }}
+          tag_epoch=$(git log -1 --format=%ct "$tag")
+          now_epoch=$(date +%s)
+          days_since=$(( (now_epoch - tag_epoch) / 86400 ))
+          new_commits=$(git rev-list "$tag"..HEAD --count)
+          echo "Last release '$tag' was $days_since day(s) ago; $new_commits new commit(s) since then."
+          if [ "$days_since" -lt 30 ]; then
+            echo "reason=not_due" >> "$GITHUB_OUTPUT"
+          elif [ "$new_commits" -eq 0 ]; then
+            echo "reason=no_changes" >> "$GITHUB_OUTPUT"
+          else
+            echo "reason=release" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compute next version
+        id: next
+        if: steps.check.outputs.reason == 'release'
+        run: |
+          tag=${{ steps.last_tag.outputs.tag }}
+          ver=$(echo "$tag" | sed -e 's/^v//' -e 's/-.*//')
+          major=$(echo "$ver" | cut -d. -f1)
+          minor=$(echo "$ver" | cut -d. -f2)
+          patch=$(echo "$ver" | cut -d. -f3)
+          next="v${major}.${minor}.$((patch + 1))"
+          echo "next_tag=$next" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push next tag
+        if: steps.check.outputs.reason == 'release'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.next.outputs.next_tag }}" -m "Scheduled auto-release"
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          git push origin "${{ steps.next.outputs.next_tag }}"
