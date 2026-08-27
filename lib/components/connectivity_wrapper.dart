@@ -63,6 +63,13 @@ class _ConnectivityWrapperState extends ConsumerState<ConnectivityWrapper>
           _isConfirmingResumeConnectivity = false;
           _showOfflinePopup = false;
         });
+        if (state == AppLifecycleState.paused ||
+            state == AppLifecycleState.hidden) {
+          // Release cached/decoded image bitmaps while backgrounded so they
+          // don't count against the app's background memory footprint.
+          PaintingBinding.instance.imageCache.clear();
+          PaintingBinding.instance.imageCache.clearLiveImages();
+        }
         break;
     }
   }
