@@ -117,6 +117,34 @@ class WebViewGlobalController {
     return commonSchemes.contains(webUri.scheme) ? true : false;
   }
 
+  /// Whether [action]'s request should be intercepted (CANCEL) and reloaded
+  /// with custom headers reattached.
+  ///
+  /// Android's WebView always re-invokes shouldOverrideUrlLoading, so it is
+  /// safe to unconditionally reattach there (existing behavior).
+  ///
+  /// WKWebView (iOS) drops custom HTTP headers across HTTP redirects but only
+  /// calls shouldOverrideUrlLoading again for the redirected request with
+  /// navigationType == OTHER. We intercept OTHER only when our identifying
+  /// header is missing from the outgoing request — once reattached and
+  /// reloaded, the header IS present on the next call, so this returns false
+  /// and we ALLOW, avoiding an infinite reload loop.
+  static bool shouldReattachCustomHeaders({
+    required NavigationAction action,
+    String headerKeyToCheck = 'x-humhub-app',
+  }) {
+    if (Platform.isAndroid) return true;
+    if (action.navigationType == NavigationType.LINK_ACTIVATED ||
+        action.navigationType == NavigationType.FORM_SUBMITTED) {
+      return true;
+    }
+    final requestHeaders = action.request.headers;
+    final hasHeader = requestHeaders != null &&
+        requestHeaders.keys
+            .any((k) => k.toLowerCase() == headerKeyToCheck.toLowerCase());
+    return !hasHeader;
+  }
+
   static Future<void> listenToImageOpen() async {
     // Inject JavaScript to monitor changes to the blueimp-gallery element
     bool opened = false;

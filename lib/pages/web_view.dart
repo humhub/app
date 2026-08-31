@@ -209,9 +209,7 @@ class WebViewAppState extends ConsumerState<WebView> {
       return NavigationActionPolicy.CANCEL;
     }
     // 2nd Append customHeader if url is in app redirect and CANCEL the requests without custom headers
-    if (Platform.isAndroid ||
-        action.navigationType == NavigationType.LINK_ACTIVATED ||
-        action.navigationType == NavigationType.FORM_SUBMITTED) {
+    if (WebViewGlobalController.shouldReattachCustomHeaders(action: action)) {
       Map<String, String> mergedMap = {
         ...?_initialRequest.headers,
         ...?action.request.headers
