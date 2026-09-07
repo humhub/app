@@ -89,6 +89,9 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
               onProgressChanged: _onProgressChanged,
               onDownloadStartRequest: _onDownloadStartRequest,
               onLongPressHitTestResult: WebViewGlobalController.onLongPressHitTestResult,
+              onPermissionRequest: (controller, request) async {
+                return PermissionResponse(resources: request.resources, action: PermissionResponseAction.GRANT);
+              },
             ),
           ),
         ),
