@@ -71,6 +71,11 @@ dependencies:
 
 dependency_overrides:
   url_launcher_android: 6.3.9
+  flutter_inappwebview_android:
+    git:
+      url: https://github.com/humhub-contrib/flutter_inappwebview.git
+      path: flutter_inappwebview_android
+      ref: a5e6afe632687f5fa06fb04bf0a24e562e77febc
   quick_actions_platform_interface:
     git:
       url: https://github.com/PrimozRatej/packages
