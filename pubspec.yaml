@@ -67,7 +67,6 @@ dependencies:
   open_file: ^3.5.10
   flutter_file_dialog: ^3.0.3
   flutter_keyboard_visibility: ^6.0.0
-  internet_connection_checker_plus: ^1.0.1
 
 dependency_overrides:
   url_launcher_android: 6.3.9
