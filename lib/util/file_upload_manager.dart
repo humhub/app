@@ -66,11 +66,12 @@ class FileUploadManager {
       return;
     }
     logDebug('FileUploadManager: Prepared request data for upload');
-    ajaxPostFiles(
+    await ajaxPostFiles(
       data: requestData,
-      onResponse: (files) {
+      onResponse: (files, uploadError) {
         logInfo('FileUploadManager: Received upload response');
-        List<String>? errors = _validateResponse(files);
+        if (!context.mounted) return;
+        List<String>? errors = _validateResponse(files, uploadError);
         if (!errors.isNullOrEmpty) {
           logWarning('FileUploadManager: Response validation errors: $errors');
           ShowDialog.of(context).intentErrors(errors!);
@@ -139,12 +140,14 @@ class FileUploadManager {
   /// Validates the upload response
   ///
   /// [files] is the list of shared file items returned from the upload
+  /// [uploadError] is a human-readable status/error description when the AJAX request itself failed
   /// Returns a list of error messages, or null if no errors
-  List<String>? _validateResponse(List<SharedFileItem>? files) {
+  List<String>? _validateResponse(List<SharedFileItem>? files, [String? uploadError]) {
     List<String> errors = [];
     if (files.isNullOrEmpty) {
       logError('FileUploadManager: No files uploaded in response');
-      errors.add(AppLocalizations.of(context)!.no_files_uploaded);
+      String message = AppLocalizations.of(context)!.no_files_uploaded;
+      errors.add(uploadError != null ? '$message ($uploadError)' : message);
       logError(errors);
       return errors;
     }
@@ -201,88 +204,83 @@ class FileUploadManager {
 
   /// Performs an AJAX POST request to upload files
   ///
-  /// [data] is the file data to be uploaded
-  /// [onResponse] is a callback function to handle the response
+  /// [data] is the file data to be uploaded. The data (which can be several MB for photos) is passed
+  /// as a [callAsyncJavaScript] argument rather than being inlined into the JS source: inlining it
+  /// (e.g. via `evaluateJavascript(source: "...JSON.parse('$jsonData')...")`) can fail on Android
+  /// WebView for large payloads and breaks on filenames containing a single quote.
+  /// [onResponse] is a callback function to handle the response. [files] is the parsed list of
+  /// uploaded files on success, or null on failure; [uploadError] carries a human-readable
+  /// status/error description when the AJAX request itself failed.
   Future<void> ajaxPostFiles({
     required List<dynamic> data,
-    Function(List<SharedFileItem>? files)? onResponse,
+    void Function(List<SharedFileItem>? files, String? uploadError)? onResponse,
   }) async {
-    String jsonHeaders = jsonEncode(requestHeaders ?? {});
-    String jsonData = jsonEncode(data);
+    const String jsCode = """
+        var formData = new FormData();
 
-    String jsCode = """
-        new Promise((resolve, reject) => {
-            try {
-              var formData = new FormData();
-              var parsedData = JSON.parse('$jsonData');
-    
-              for (var key in parsedData) {
-                var value = parsedData[key];
-                var binaryString = atob(value.base64);
-                var binaryLength = binaryString.length;
-                var binaryArray = new Uint8Array(binaryLength);
-    
-                for (var i = 0; i < binaryLength; i++) {
-                  binaryArray[i] = binaryString.charCodeAt(i);
-                }
-    
-                var blob = new Blob([binaryArray], { type: value.mimeType });
-                var file = new File([blob], value.filename, { type: value.mimeType });
-                formData.append('files[]', file);
+        for (var key in files) {
+          var value = files[key];
+          var binaryString = atob(value.base64);
+          var binaryLength = binaryString.length;
+          var binaryArray = new Uint8Array(binaryLength);
+
+          for (var i = 0; i < binaryLength; i++) {
+            binaryArray[i] = binaryString.charCodeAt(i);
+          }
+
+          var blob = new Blob([binaryArray], { type: value.mimeType });
+          var file = new File([blob], value.filename, { type: value.mimeType });
+          formData.append('files[]', file);
+        }
+
+        return new Promise((resolve) => {
+          try {
+            \$.ajax({
+              url: uploadUrl,
+              method: 'POST',
+              data: formData,
+              processData: false,
+              contentType: false,
+              headers: headers,
+              success: function(data) {
+                resolve({ success: true, data: data });
+              },
+              error: function(xhr) {
+                resolve({
+                  success: false,
+                  status: xhr.status || 'unknown',
+                  error: xhr.responseText || xhr.statusText
+                });
               }
-    
-              \$.ajax({
-                url: '${fileUploadSettings!.fileUploadUrl}',
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: JSON.parse('$jsonHeaders'),
-                success: function(data) {
-                  window.flutter_inappwebview.callHandler('onAjaxSuccess', data);
-                  resolve(data);
-                },
-                error: function(xhr) {
-                  var error = {
-                    status: xhr.status || 'unknown',
-                    error: xhr.responseText || xhr.statusText
-                  };
-                  window.flutter_inappwebview.callHandler('onAjaxError', error);
-                  reject(error);
-                }
-              });
-            } catch (e) {
-              console.error('Error in AJAX request:', e);
-              window.flutter_inappwebview.callHandler('onAjaxError', { 
-                status: 'exception', 
-                error: e.message 
-              });
-              reject(e);
-            }
-          });
+            });
+          } catch (e) {
+            resolve({ success: false, status: 'exception', error: e.message });
+          }
+        });
       """;
 
-    await webViewController.evaluateJavascript(source: jsCode);
-    if (onResponse != null) {
-      webViewController.addJavaScriptHandler(
-        handlerName: 'onAjaxSuccess',
-        callback: (args) {
-          if (args.isNotEmpty) {
-            onResponse(SharedFileItem.listFromJson(args[0]['files']));
-          } else {
-            onResponse(null);
-          }
-        },
-      );
+    CallAsyncJavaScriptResult? result = await webViewController.callAsyncJavaScript(
+      functionBody: jsCode,
+      arguments: {
+        'files': data,
+        'headers': requestHeaders ?? {},
+        'uploadUrl': fileUploadSettings!.fileUploadUrl,
+      },
+    );
 
-      webViewController.addJavaScriptHandler(
-        handlerName: 'onAjaxError',
-        callback: (args) {
-          logError('FileUploadManager: AJAX upload error: $args');
-          onResponse(null);
-        },
-      );
+    if (onResponse == null) return;
+
+    dynamic value = result?.value;
+    if (value is Map && value['success'] == true) {
+      dynamic responseFiles = value['data'] is Map ? value['data']['files'] : null;
+      onResponse(responseFiles is List ? SharedFileItem.listFromJson(responseFiles) : null, null);
+      return;
     }
+
+    String status = (value is Map ? value['status'] : null)?.toString() ?? 'unknown';
+    String error = (value is Map ? value['error'] : null)?.toString() ?? result?.error ?? 'unknown error';
+    logError('FileUploadManager: AJAX upload error: status=$status, error=$error');
+    onResponse(null, 'status: $status, error: $error');
   }
 
   /// Shows a modal dialog for sharing uploaded files
