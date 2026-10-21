@@ -5,13 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:humhub/models/file_upload_settings.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/intent/app_link_settings.dart';
 import 'package:humhub/util/intent/mail_link_provider.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
-import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/show_dialog.dart';
 import 'package:loggy/loggy.dart';
 import 'package:listen_sharing_intent/listen_sharing_intent.dart';
@@ -165,9 +163,6 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
 
     ReceiveSharingIntent.instance.getInitialMedia().then((mediaList) {
       if (mediaList.isEmpty) return;
-      FileUploadSettings? settings =
-          ref.read(humHubProvider).fileUploadSettings;
-      if (settings == null) return;
       mediaList.removeWhere((file) =>
           file.type == SharedMediaType.url ||
           file.type == SharedMediaType.text);

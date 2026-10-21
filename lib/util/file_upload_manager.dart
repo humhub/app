@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
@@ -40,50 +41,106 @@ class FileUploadManager {
     this.requestHeaders,
   });
 
+  static bool _isUploading = false;
+
+  static Timer? _uploadWatchdog;
+
   /// Initiates the file upload process
   ///
   /// [showShareModal] determines whether to show a web share modal after upload
   Future<void> upload({bool showShareModal = true}) async {
     logInfo('FileUploadManager: Starting upload process');
+    if (_isUploading) {
+      logDebug('FileUploadManager: Upload already in progress');
+      return;
+    }
     if (!context.mounted || intentNotifier.currentState.isSharedFilesNullOrEmpty) {
       logWarning('FileUploadManager: No files to upload or context not mounted');
       return;
     }
-    List<SharedMediaFile>? files = intentNotifier.useSharedFiles()!;
+    final FileUploadSettings? settings = fileUploadSettings;
+    if (settings == null) {
+      logWarning('FileUploadManager: Upload settings are not available yet; keeping shared files pending');
+      return;
+    }
+    final List<SharedMediaFile>? pendingFiles = intentNotifier.pendingSharedFiles;
+    if (pendingFiles == null || pendingFiles.isEmpty) {
+      return;
+    }
+    final List<SharedMediaFile> files = pendingFiles;
+
+    _isUploading = true;
+    _uploadWatchdog?.cancel();
+    _uploadWatchdog = Timer(const Duration(minutes: 2), _finishUpload);
+
     logDebug('FileUploadManager: Files to upload: ${files.map((f) => f.path).toList()}');
-    List<String>? errors = _validateRequest(files);
-    if (!errors.isNullOrEmpty) {
-      logWarning('FileUploadManager: Validation errors: $errors');
-      ShowDialog.of(context).intentErrors(errors!);
-      return;
-    }
-    List<dynamic> requestData = await _getRequestData(files, fileUploadSettings!);
-    if (requestData.isNullOrEmpty) {
-      logError('FileUploadManager: Failed to prepare request data');
-      if (context.mounted) {
-        ShowDialog.of(context).intentErrors([AppLocalizations.of(context)!.unexpected_error]);
+    try {
+      List<String>? errors = _validateRequest(files);
+      if (!errors.isNullOrEmpty) {
+        logWarning('FileUploadManager: Validation errors: $errors');
+        intentNotifier.clearSharedFiles(files);
+        _finishUpload();
+        ShowDialog.of(context).intentErrors(errors!);
+        return;
       }
+      List<dynamic> requestData = await _getRequestData(files, settings);
+      if (requestData.isNullOrEmpty) {
+        logError('FileUploadManager: Failed to prepare request data');
+        intentNotifier.clearSharedFiles(files);
+        _finishUpload();
+        if (context.mounted) {
+          ShowDialog.of(context).intentErrors([AppLocalizations.of(context)!.unexpected_error]);
+        }
+        return;
+      }
+      logDebug('FileUploadManager: Prepared request data for upload');
+      await ajaxPostFiles(
+        data: requestData,
+        onResponse: (uploadedFiles, statusCode) {
+          _finishUpload();
+          logInfo('FileUploadManager: Received upload response');
+          if (uploadedFiles == null && _isUnauthorized(statusCode)) {
+            logInfo('FileUploadManager: Upload not authorized yet (status: $statusCode), keeping shared files pending');
+            return;
+          }
+          intentNotifier.clearSharedFiles(files);
+          if (!context.mounted) return;
+          List<String>? responseErrors = _validateResponse(uploadedFiles);
+          if (!responseErrors.isNullOrEmpty) {
+            logWarning('FileUploadManager: Response validation errors: $responseErrors');
+            ShowDialog.of(context).intentErrors(responseErrors!);
+            _uploadIfPending(showShareModal);
+            return;
+          }
+          List<SharedFileItemSuccess> successFiles = uploadedFiles!.whereType<SharedFileItemSuccess>().toList();
+          if (showShareModal) {
+            logInfo('FileUploadManager: Upload success for files: ${successFiles.map((f) => f.name).toList()}');
+            _showFileShareModal(successFiles);
+          }
+          _uploadIfPending(showShareModal);
+        },
+      );
+    } catch (e) {
+      _finishUpload();
+      logError('FileUploadManager: Upload failed: $e');
+      rethrow;
+    }
+  }
+
+  void _uploadIfPending(bool showShareModal) {
+    if (!context.mounted || intentNotifier.currentState.isSharedFilesNullOrEmpty) {
       return;
     }
-    logDebug('FileUploadManager: Prepared request data for upload');
-    ajaxPostFiles(
-      data: requestData,
-      onResponse: (files) {
-        logInfo('FileUploadManager: Received upload response');
-        List<String>? errors = _validateResponse(files);
-        if (!errors.isNullOrEmpty) {
-          logWarning('FileUploadManager: Response validation errors: $errors');
-          ShowDialog.of(context).intentErrors(errors!);
-          return;
-        }
-        List<SharedFileItemSuccess> successFiles = files!.whereType<SharedFileItemSuccess>().toList();
-        if (showShareModal) {
-          logInfo('FileUploadManager: Upload success for files: ${successFiles.map((f) => f.name).toList()}');
-          _showFileShareModal(successFiles);
-        }
-      },
-    );
+    unawaited(upload(showShareModal: showShareModal));
   }
+
+  static void _finishUpload() {
+    _uploadWatchdog?.cancel();
+    _uploadWatchdog = null;
+    _isUploading = false;
+  }
+
+  static bool _isUnauthorized(int? statusCode) => statusCode == 401 || statusCode == 403;
 
   /// Validates the upload request
   ///
@@ -91,13 +148,6 @@ class FileUploadManager {
   /// Returns a list of error messages, or null if no errors
   List<String>? _validateRequest(List<SharedMediaFile>? files) {
     List<String> errors = [];
-    if (fileUploadSettings == null) {
-      logError('FileUploadManager: Sharing not supported');
-      errors.add(AppLocalizations.of(context)!.sharing_not_supported);
-      logError(errors);
-      return errors;
-    }
-
     if (files.isNullOrEmpty) {
       logError('FileUploadManager: No files to share');
       errors.add(AppLocalizations.of(context)!.no_files_to_share);
@@ -205,7 +255,7 @@ class FileUploadManager {
   /// [onResponse] is a callback function to handle the response
   Future<void> ajaxPostFiles({
     required List<dynamic> data,
-    Function(List<SharedFileItem>? files)? onResponse,
+    Function(List<SharedFileItem>? files, int? statusCode)? onResponse,
   }) async {
     String jsonHeaders = jsonEncode(requestHeaders ?? {});
     String jsonData = jsonEncode(data);
@@ -262,15 +312,14 @@ class FileUploadManager {
           });
       """;
 
-    await webViewController.evaluateJavascript(source: jsCode);
     if (onResponse != null) {
       webViewController.addJavaScriptHandler(
         handlerName: 'onAjaxSuccess',
         callback: (args) {
           if (args.isNotEmpty) {
-            onResponse(SharedFileItem.listFromJson(args[0]['files']));
+            onResponse(SharedFileItem.listFromJson(args[0]['files']), null);
           } else {
-            onResponse(null);
+            onResponse(null, null);
           }
         },
       );
@@ -279,10 +328,17 @@ class FileUploadManager {
         handlerName: 'onAjaxError',
         callback: (args) {
           logError('FileUploadManager: AJAX upload error: $args');
-          onResponse(null);
+          int? statusCode;
+          if (args.isNotEmpty && args[0] is Map) {
+            final dynamic status = (args[0] as Map)['status'];
+            statusCode = status is int ? status : int.tryParse(status?.toString() ?? '');
+          }
+          onResponse(null, statusCode);
         },
       );
     }
+
+    await webViewController.evaluateJavascript(source: jsCode);
   }
 
   /// Shows a modal dialog for sharing uploaded files
@@ -317,6 +373,34 @@ class FileUploadManager {
   }
 }
 
+Future<void> uploadPendingSharedFiles({
+  required WidgetRef ref,
+  required BuildContext context,
+}) async {
+  final InAppWebViewController? controller = WebViewGlobalController.value;
+  if (controller == null) {
+    return;
+  }
+  if (ref.read(intentProvider).isSharedFilesNullOrEmpty) {
+    return;
+  }
+  final FileUploadSettings? settings =
+      await ref.read(humHubProvider.notifier).resolveFileUploadSettings();
+  if (settings == null) {
+    logWarning('FileUploadManager: Upload settings are not available yet; keeping shared files pending');
+    return;
+  }
+  if (!context.mounted) {
+    return;
+  }
+  await FileUploadManager(
+    webViewController: controller,
+    intentNotifier: ref.read(intentProvider.notifier),
+    fileUploadSettings: settings,
+    context: context,
+  ).upload();
+}
+
 /// Widget that manages file uploads in the context of the widget tree
 class FileUploadManagerWidget extends ConsumerStatefulWidget {
   final Widget child;
@@ -332,12 +416,7 @@ class _FileUploadManagerWidgetState extends ConsumerState<FileUploadManagerWidge
     ref.listen(
       intentProvider,
       (previous, next) async {
-        FileUploadManager(
-                webViewController: WebViewGlobalController.value!,
-                intentNotifier: ref.read(intentProvider.notifier),
-                fileUploadSettings: ref.read(humHubProvider).fileUploadSettings,
-                context: context)
-            .upload();
+        uploadPendingSharedFiles(ref: ref, context: context);
       },
     );
 

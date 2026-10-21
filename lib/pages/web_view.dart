@@ -20,7 +20,6 @@ import 'package:humhub/util/extensions.dart';
 import 'package:humhub/util/file_download_manager.dart';
 import 'package:humhub/util/file_upload_manager.dart';
 import 'package:humhub/util/init_from_url.dart';
-import 'package:humhub/util/intent/intent_state.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/openers/universal_opener_controller.dart';
@@ -301,6 +300,9 @@ class WebViewAppState extends ConsumerState<WebView> {
     unawaited(WebViewGlobalController.persistSessionCookies(
         forUrl: _manifest.startUrl));
     LoadingProvider.of(ref).dismissAll();
+    if (mounted) {
+      unawaited(uploadPendingSharedFiles(ref: ref, context: context));
+    }
     _scheduleTokenRegistrationCheck();
   }
 
@@ -426,12 +428,7 @@ class WebViewAppState extends ConsumerState<WebView> {
         FileUploadSettingsChannelData data =
             message.data as FileUploadSettingsChannelData;
         ref.read(humHubProvider.notifier).setFileUploadSettings(data.settings);
-        FileUploadManager(
-                webViewController: WebViewGlobalController.value!,
-                intentNotifier: ref.read(intentProvider.notifier),
-                fileUploadSettings: ref.read(humHubProvider).fileUploadSettings,
-                context: context)
-            .upload();
+        uploadPendingSharedFiles(ref: ref, context: context);
         break;
       case ChannelAction.openExternal:
         logInfo('Action: openExternal');
