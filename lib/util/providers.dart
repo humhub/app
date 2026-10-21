@@ -7,6 +7,7 @@ import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/models/remote_config.dart';
 import 'package:humhub/util/storage_service.dart';
+import 'package:loggy/loggy.dart';
 
 class HumHubNotifier extends ChangeNotifier {
   final HumHub _humHubInstance;
@@ -24,7 +25,8 @@ class HumHubNotifier extends ChangeNotifier {
   bool get supportsAuthClientRedirect => FeatureFlag.supportsAuthClientRedirect;
   RemoteConfig? get remoteConfig => _humHubInstance.remoteConfig;
   List<Manifest> get history => _humHubInstance.history;
-  FileUploadSettings? get fileUploadSettings => _humHubInstance.fileUploadSettings;
+  FileUploadSettings? get fileUploadSettings =>
+      _humHubInstance.fileUploadSettings ?? _humHubInstance.remoteConfig?.fileUploadSettings;
 
   void setOpenerState(OpenerState state) {
     _humHubInstance.openerState = state;
@@ -63,6 +65,35 @@ class HumHubNotifier extends ChangeNotifier {
     _humHubInstance.fileUploadSettings = settings;
     _updateSafeStorage();
     notifyListeners();
+  }
+
+  Future<FileUploadSettings?>? _fileUploadSettingsRequest;
+  Future<FileUploadSettings?> resolveFileUploadSettings() {
+    final FileUploadSettings? current = fileUploadSettings;
+    if (current != null) {
+      return Future.value(current);
+    }
+    return _fileUploadSettingsRequest ??= _fetchFileUploadSettings()
+        .whenComplete(() => _fileUploadSettingsRequest = null);
+  }
+
+  Future<FileUploadSettings?> _fetchFileUploadSettings() async {
+    final Manifest? manifest = _humHubInstance.manifest;
+    if (manifest == null) {
+      logWarning('HumHubNotifier: Cannot fetch file upload settings without an instance');
+      return fileUploadSettings;
+    }
+    logInfo('HumHubNotifier: Fetching file upload settings from ${manifest.startUrl}');
+    final RemoteConfig? remoteConfig = await RemoteConfig.get(manifest, customHeaders);
+    if (remoteConfig == null) {
+      logWarning('HumHubNotifier: Could not fetch remote config for file upload settings');
+      return fileUploadSettings;
+    }
+    _humHubInstance.remoteConfig = remoteConfig;
+    _humHubInstance.fileUploadSettings = remoteConfig.fileUploadSettings;
+    await _updateSafeStorage();
+    notifyListeners();
+    return fileUploadSettings;
   }
 
   HumHub copyWith({

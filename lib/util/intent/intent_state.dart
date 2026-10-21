@@ -17,6 +17,8 @@ class IntentState {
     this.latestUri,
   }) : _sharedFiles = sharedFiles;
 
+  List<SharedMediaFile>? get sharedFiles => _sharedFiles;
+
   bool get isSharedFilesNullOrEmpty => _sharedFiles.isNullOrEmpty;
 
   IntentState copyWith({
@@ -61,12 +63,11 @@ class IntentNotifier extends StateNotifier<IntentState> {
     state = state.copyWith(latestUri: uri);
   }
 
-  List<SharedMediaFile>? useSharedFiles() {
-    final files = state._sharedFiles;
-    if (files != null) {
-      state = state.copyWith(sharedFiles: []);
-    }
-    return files;
+  List<SharedMediaFile>? get pendingSharedFiles => state.sharedFiles;
+
+  void clearSharedFiles([List<SharedMediaFile>? expected]) {
+    if (expected != null && !identical(state.sharedFiles, expected)) return;
+    state = state.copyWith(sharedFiles: []);
   }
 }
 
