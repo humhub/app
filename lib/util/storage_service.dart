@@ -60,4 +60,5 @@ class _Keys {
   String keyErrorReports = 'send_error_reports';
   String keyDeviceIdentifiers = 'send_device_identifiers';
   String hasVisitedSettings = 'hasVisitedSettings';
+  String keyAppLockEnabled = 'app_lock_enabled';
 }

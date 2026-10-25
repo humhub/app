@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:humhub/components/app_lock_gate.dart';
 import 'package:humhub/flavored/models/humhub.f.dart';
 import 'package:humhub/flavored/util/intent_plugin.f.dart';
 import 'package:humhub/flavored/util/router.f.dart';
@@ -42,7 +43,7 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
                   supportedLocales: AppLocalizations.supportedLocales,
                   navigatorKey: Keys.navigatorKey,
                   builder: (context, child) =>
-                      ConnectivityWrapper(child: child!),
+                      AppLockGate(child: ConnectivityWrapper(child: child!)),
                   theme: ThemeData(
                     fontFamily: 'OpenSans',
                   ),

@@ -7,6 +7,7 @@ import 'package:humhub/l10n/generated/app_localizations.dart';
 import 'package:humhub/pages/settings/provider.dart';
 import 'package:humhub/util/storage_service.dart';
 
+import 'components/app_lock_consent.dart';
 import 'components/data_sharing_consent.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
@@ -67,6 +68,10 @@ class SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPro
                       height: 35,
                     ),
                     DataSharingConsent(),
+                    SizedBox(
+                      height: 35,
+                    ),
+                    AppLockConsent(),
                   ],
                 ),
                 Column(
