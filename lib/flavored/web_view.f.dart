@@ -86,6 +86,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
               onLoadStop: _onLoadStop,
               onLoadStart: _onLoadStart,
               onReceivedError: _onLoadError,
+              onWebContentProcessDidTerminate: _onWebContentProcessDidTerminate,
               onProgressChanged: _onProgressChanged,
               onDownloadStartRequest: _onDownloadStartRequest,
               onLongPressHitTestResult: WebViewGlobalController.onLongPressHitTestResult,
@@ -221,6 +222,17 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
       ShowDialog.of(context).noInternetPopup();
     }
     pullToRefreshController.endRefreshing();
+  }
+
+  Future<void> _onWebContentProcessDidTerminate(InAppWebViewController controller) async {
+    logWarning('WebView content process terminated, reloading');
+    final url = await controller.getUrl();
+    if (url == null || !url.rawValue.startsWith(instance.manifest.startUrl)) {
+      logError('Cannot reload WebView after content process termination: URL is missing or not a valid HumHub URL, restarting app');
+      Keys.navigatorKey.currentState?.pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+      return;
+    }
+    controller.loadUrl(urlRequest: URLRequest(url: url, headers: instance.customHeaders));
   }
 
   void _onProgressChanged(controller, progress) async {
