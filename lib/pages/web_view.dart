@@ -119,6 +119,7 @@ class WebViewAppState extends ConsumerState<WebView> {
               onLoadStart: _onLoadStart,
               onProgressChanged: _onProgressChanged,
               onReceivedError: _onReceivedError,
+              onWebContentProcessDidTerminate: _onWebContentProcessDidTerminate,
               onDownloadStartRequest: _onDownloadStartRequest,
               onLongPressHitTestResult:
                   WebViewGlobalController.onLongPressHitTestResult,
@@ -334,6 +335,22 @@ class WebViewAppState extends ConsumerState<WebView> {
       logWarning('No internet connection detected');
       LoadingProvider.of(ref).dismissAll();
     }
+  }
+
+  Future<void> _onWebContentProcessDidTerminate(
+      InAppWebViewController controller) async {
+    logWarning('WebView content process terminated, reloading');
+    final url = await controller.getUrl();
+    if (url == null || !url.rawValue.startsWith(_manifest.startUrl)) {
+      logError(
+          'Cannot reload WebView after content process termination: URL is missing or not a valid HumHub URL, restarting app');
+      Keys.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+          OpenerPage.path, (Route<dynamic> route) => false);
+      return;
+    }
+    controller.loadUrl(
+        urlRequest: URLRequest(
+            url: url, headers: ref.read(humHubProvider).customHeaders));
   }
 
   _concludeAuth(URLRequest request) {
