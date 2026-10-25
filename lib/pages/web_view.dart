@@ -131,6 +131,8 @@ class WebViewAppState extends ConsumerState<WebView> {
                     resources: request.resources,
                     action: PermissionResponseAction.GRANT);
               },
+              onGeolocationPermissionsShowPrompt:
+                  WebViewGlobalController.onGeolocationPermissionsShowPrompt,
             ),
           ),
         ),

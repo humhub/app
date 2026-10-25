@@ -62,6 +62,8 @@
     <string>We need access to your microphone to take videos for sharing in the app.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>We need access your photo library to allow you to upload, view, and manage photos within the app.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>We need access to your location to show it on the map and share it in posts when you choose to.</string>
     <key>NSAppTransportSecurity</key>
     <dict>
         <key>NSAllowsArbitraryLoads</key>
