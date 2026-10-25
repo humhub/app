@@ -6,7 +6,9 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:humhub/models/global_package_info.dart';
 import 'package:humhub/models/global_user_agent.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/util/permission_handler.dart';
 import 'package:loggy/loggy.dart';
+import 'package:permission_handler/permission_handler.dart' as permission_handler;
 import 'package:url_launcher/url_launcher.dart';
 
 class WebViewGlobalController {
@@ -278,6 +280,19 @@ class WebViewGlobalController {
     while (canZoomOut ?? false) {
       canZoomOut = await value?.zoomOut();
     }
+  }
+
+  static Future<GeolocationPermissionShowPromptResponse> onGeolocationPermissionsShowPrompt(
+      InAppWebViewController controller, String origin) async {
+    await PermissionHandler.requestPermissions(
+        [permission_handler.Permission.locationWhenInUse]);
+    final granted =
+        await permission_handler.Permission.locationWhenInUse.isGranted;
+    return GeolocationPermissionShowPromptResponse(
+      origin: origin,
+      allow: granted,
+      retain: true,
+    );
   }
 
   static InAppWebViewSettings settings({bool zoom = false}) {

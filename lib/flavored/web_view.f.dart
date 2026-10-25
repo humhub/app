@@ -93,6 +93,7 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
               onPermissionRequest: (controller, request) async {
                 return PermissionResponse(resources: request.resources, action: PermissionResponseAction.GRANT);
               },
+              onGeolocationPermissionsShowPrompt: WebViewGlobalController.onGeolocationPermissionsShowPrompt,
             ),
           ),
         ),
