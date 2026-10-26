@@ -105,6 +105,17 @@
   "data_sharing_device_id_subtitle": "Used to trace issues across devices and sessions. Helps reproduce bugs more accurately.",
   "data_sharing_saved": "Your choice has been saved.",
 
+  "app_lock_title": "App lock",
+  "app_lock_checkbox_title": "Require device unlock",
+  "app_lock_checkbox_subtitle": "Use Face ID, Touch ID, fingerprint or your device passcode to unlock the app on startup.",
+  "app_lock_unsupported_hint": "Set up a screen lock (PIN, pattern, passcode or biometrics) on your device to use this option.",
+  "app_lock_auth_reason_enable": "Confirm it's you to enable app lock",
+  "app_lock_auth_reason_unlock": "Unlock to continue to HumHub",
+  "app_lock_verification_failed": "Verification failed. App lock was not enabled.",
+  "app_lock_locked_title": "App locked",
+  "app_lock_locked_subtitle": "Unlock your device to continue.",
+  "app_lock_unlock_button": "Unlock",
+
   "accept_all": "Accept all",
   "decline_all": "Decline all"
 }

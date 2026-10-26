@@ -104,6 +104,17 @@
   "data_sharing_device_id_subtitle": "Wird verwendet, um Probleme über Geräte und Sitzungen hinweg nachzuvollziehen. Hilft, Fehler genauer zu reproduzieren.",
   "data_sharing_saved": "Deine Auswahl wurde gespeichert.",
 
+  "app_lock_title": "App-Sperre",
+  "app_lock_checkbox_title": "Geräteentsperrung erforderlich",
+  "app_lock_checkbox_subtitle": "Entsperre die App beim Start mit Face ID, Touch ID, Fingerabdruck oder deinem Gerätecode.",
+  "app_lock_unsupported_hint": "Richte eine Displaysperre (PIN, Muster, Code oder Biometrie) auf deinem Gerät ein, um diese Option zu nutzen.",
+  "app_lock_auth_reason_enable": "Bestätige, dass du es bist, um die App-Sperre zu aktivieren",
+  "app_lock_auth_reason_unlock": "Entsperre, um mit HumHub fortzufahren",
+  "app_lock_verification_failed": "Verifizierung fehlgeschlagen. Die App-Sperre wurde nicht aktiviert.",
+  "app_lock_locked_title": "App gesperrt",
+  "app_lock_locked_subtitle": "Entsperre dein Gerät, um fortzufahren.",
+  "app_lock_unlock_button": "Entsperren",
+
   "accept_all": "Alle akzeptieren",
   "decline_all": "Alle ablehnen"
 }

@@ -104,6 +104,17 @@
   "data_sharing_device_id_subtitle": "Utilisé pour tracer les problèmes sur différents appareils et sessions. Aide à reproduire les bugs plus précisément.",
   "data_sharing_saved": "Votre choix a été enregistré.",
 
+  "app_lock_title": "Verrouillage de l'application",
+  "app_lock_checkbox_title": "Exiger le déverrouillage de l'appareil",
+  "app_lock_checkbox_subtitle": "Utilisez Face ID, Touch ID, l'empreinte digitale ou le code de votre appareil pour déverrouiller l'application au démarrage.",
+  "app_lock_unsupported_hint": "Configurez un verrouillage d'écran (code, schéma, mot de passe ou biométrie) sur votre appareil pour utiliser cette option.",
+  "app_lock_auth_reason_enable": "Confirmez qu'il s'agit bien de vous pour activer le verrouillage de l'application",
+  "app_lock_auth_reason_unlock": "Déverrouillez pour continuer vers HumHub",
+  "app_lock_verification_failed": "Échec de la vérification. Le verrouillage de l'application n'a pas été activé.",
+  "app_lock_locked_title": "Application verrouillée",
+  "app_lock_locked_subtitle": "Déverrouillez votre appareil pour continuer.",
+  "app_lock_unlock_button": "Déverrouiller",
+
   "accept_all": "Tout accepter",
   "decline_all": "Tout refuser"
 }
