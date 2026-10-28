@@ -28,6 +28,27 @@ class HumHubNotifier extends ChangeNotifier {
   FileUploadSettings? get fileUploadSettings =>
       _humHubInstance.fileUploadSettings ?? _humHubInstance.remoteConfig?.fileUploadSettings;
 
+  /// Best-effort URL of the HumHub instance currently configured on this
+  /// device, used as a reachability probe target instead of a fixed
+  /// third-party host. Returns null if no instance has been set up yet.
+  String? get currentInstanceUrl {
+    final baseUrl = manifest?.baseUrl;
+    if (baseUrl != null && baseUrl.isNotEmpty) {
+      return baseUrl;
+    }
+    if (manifestUrl != null && manifestUrl!.isNotEmpty) {
+      return manifestUrl;
+    }
+    try {
+      if (lastUrl.isNotEmpty) {
+        return lastUrl;
+      }
+    } catch (_) {
+      // lastUrl not initialized yet
+    }
+    return null;
+  }
+
   void setOpenerState(OpenerState state) {
     _humHubInstance.openerState = state;
     _updateSafeStorage();

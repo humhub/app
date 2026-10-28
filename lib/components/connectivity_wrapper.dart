@@ -1,9 +1,11 @@
 import 'dart:ui';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:humhub/l10n/generated/app_localizations.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:humhub/util/providers.dart';
 
 class ConnectivityWrapper extends ConsumerStatefulWidget {
   final Widget child;
@@ -107,7 +109,8 @@ class _ConnectivityWrapperState extends ConsumerState<ConnectivityWrapper>
     });
 
     final hasConnection = await ConnectivityState.hasConnection;
-    final hasInternet = await InternetConnectionCheckerPlus().hasConnection;
+    final hasInternet = await ConnectivityState.hasInternetAccess(
+        _resolveProbeUrl(ref.read(humHubProvider)));
     final isOffline = !hasConnection || !hasInternet;
 
     if (!mounted || !_awaitingResumeConnectivityConfirmation) {
@@ -263,6 +266,49 @@ class ConnectivityState {
         await Connectivity().checkConnectivity();
     return !connectivityResult.contains(ConnectivityResult.none);
   }
+
+  /// Probes [targetUrl] with a lightweight HTTP request to confirm actual
+  /// internet reachability, rather than relying on a fixed third-party
+  /// DNS-over-HTTPS host. Any HTTP response (even an error status) counts as
+  /// reachable; only connection-level failures (timeout, no route, DNS
+  /// failure, ...) are treated as offline. If no URL is known yet (e.g. no
+  /// instance configured), there is nothing meaningful to probe, so it
+  /// assumes connectivity.
+  static Future<bool> hasInternetAccess(String? targetUrl) async {
+    if (targetUrl == null || targetUrl.isEmpty) {
+      return true;
+    }
+    final dio = Dio(BaseOptions(
+      connectTimeout: const Duration(seconds: 5),
+      receiveTimeout: const Duration(seconds: 5),
+      validateStatus: (_) => true,
+    ));
+    try {
+      await dio.head(targetUrl);
+      return true;
+    } catch (_) {
+      return false;
+    } finally {
+      dio.close();
+    }
+  }
+}
+
+/// Resolves the URL to use as a reachability probe: the currently
+/// configured/known HumHub instance, or the whitelabeled build's fixed
+/// start URL as a fallback. Returns null if neither is available.
+String? _resolveProbeUrl(HumHubNotifier humHub) {
+  final url = humHub.currentInstanceUrl;
+  if (url != null) {
+    return url;
+  }
+  if (dotenv.isInitialized) {
+    final envUrl = dotenv.env['START_URL'];
+    if (envUrl != null && envUrl.isNotEmpty) {
+      return envUrl;
+    }
+  }
+  return null;
 }
 
 final connectivityStateProvider = Provider<ConnectivityState>((ref) {
@@ -302,7 +348,13 @@ final isConnectedToNetworkInterface = Provider<bool>((ref) {
 });
 
 final hasInternetConnection = StreamProvider<bool>((ref) {
-  return InternetConnectionCheckerPlus().onStatusChange.map((status) {
-    return status == InternetConnectionStatus.connected;
-  });
+  Stream<bool> poll() async* {
+    while (true) {
+      yield await ConnectivityState.hasInternetAccess(
+          _resolveProbeUrl(ref.read(humHubProvider)));
+      await Future.delayed(const Duration(seconds: 5));
+    }
+  }
+
+  return poll();
 });
