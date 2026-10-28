@@ -20,7 +20,7 @@ class AppLockGate extends StatefulWidget {
 
 class _AppLockGateState extends State<AppLockGate>
     with SingleTickerProviderStateMixin {
-  bool _unlocked = false;
+  bool? _unlocked;
   bool _isAuthenticating = false;
   late final AnimationController _pulseController;
 
@@ -31,7 +31,7 @@ class _AppLockGateState extends State<AppLockGate>
       vsync: this,
       duration: const Duration(milliseconds: 1800),
     )..repeat(reverse: true);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _tryUnlock());
+    _tryUnlock();
   }
 
   @override
@@ -64,7 +64,11 @@ class _AppLockGateState extends State<AppLockGate>
 
   @override
   Widget build(BuildContext context) {
-    if (_unlocked) {
+    if (_unlocked == null) {
+      return ColoredBox(color: Theme.of(context).scaffoldBackgroundColor);
+    }
+
+    if (_unlocked!) {
       return widget.child;
     }
 
