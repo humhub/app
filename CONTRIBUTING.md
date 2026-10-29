@@ -93,3 +93,7 @@ pod deintegrate
 pod repo update
 pod install --repo-update
 ```
+
+## Further Documentation
+
+- [App icon badge](docs/app-icon-badge.md): how the unread count of a network reaches the app icon
