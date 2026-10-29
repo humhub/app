@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:humhub/util/app_badge.dart';
 
 import 'file_upload_settings.dart';
 
@@ -109,13 +110,15 @@ class RegisterFcmPushChannelData extends ChannelData {
 
 /// Data class for updating notification count
 class UpdateNotificationCountChannelData extends ChannelData {
-  final int count;
+  /// The unread count shown on the app icon, `null` if the message has no valid count.
+  final int? count;
 
   UpdateNotificationCountChannelData(super.type, this.count);
 
   factory UpdateNotificationCountChannelData.fromJson(
       String type, Map<String, dynamic> json) {
-    return UpdateNotificationCountChannelData(type, json['count'] as int);
+    return UpdateNotificationCountChannelData(
+        type, AppBadge.parseCount(json['count']));
   }
 }
 

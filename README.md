@@ -32,7 +32,7 @@ This repository contains the Flutter app used to access HumHub networks on iPhon
 The mobile app provides direct access to a HumHub network from a phone or tablet. It is intended to cover common mobile workflows such as:
 
 - Direct access to your HumHub instances
-- Receive real-time mobile push notifications
+- Receive real-time mobile push notifications, with the unread count on the app icon
 - open shared links directly in the app
 - upload and share files, photos, and videos
 - staying connected while away from a desktop browser

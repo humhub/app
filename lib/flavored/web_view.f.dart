@@ -11,6 +11,7 @@ import 'package:humhub/pages/auth_web_view.dart';
 import 'package:humhub/flavored/models/humhub.f.dart';
 import 'package:humhub/models/feature_flag.dart';
 import 'package:humhub/models/channel_message.dart';
+import 'package:humhub/util/app_badge.dart';
 import 'package:humhub/util/black_list_rules.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/extensions.dart';
@@ -295,6 +296,8 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         }
         break;
       case ChannelAction.updateNotificationCount:
+        final data = message.data as UpdateNotificationCountChannelData;
+        AppBadge.set(data.count);
         break;
       case ChannelAction.unregisterFcmDevice:
         String? token = ref.read(pushTokenProvider).value;
@@ -305,6 +308,8 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
             headers: instance.customHeaders,
           );
         }
+        // Sent after logout: the unread count of the previous user must not stay on the app icon.
+        AppBadge.clear();
         break;
       case ChannelAction.fileUploadSettings:
         logInfo('Action: fileUploadSettings');

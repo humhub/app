@@ -13,6 +13,7 @@ import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/pages/auth_web_view.dart';
 import 'package:humhub/pages/opener/opener.dart';
+import 'package:humhub/util/app_badge.dart';
 import 'package:humhub/util/black_list_rules.dart';
 import 'package:humhub/util/const.dart';
 import 'package:humhub/util/crypt.dart';
@@ -425,6 +426,8 @@ class WebViewAppState extends ConsumerState<WebView> {
         break;
       case ChannelAction.updateNotificationCount:
         logInfo('Action: updateNotificationCount');
+        final data = message.data as UpdateNotificationCountChannelData;
+        AppBadge.set(data.count);
         break;
       case ChannelAction.nativeConsole:
         logInfo('Action: nativeConsole');
@@ -441,6 +444,8 @@ class WebViewAppState extends ConsumerState<WebView> {
             headers: ref.read(humHubProvider).customHeaders,
           );
         }
+        // Sent after logout: the unread count of the previous user must not stay on the app icon.
+        AppBadge.clear();
         break;
       case ChannelAction.fileUploadSettings:
         logInfo('Action: fileUploadSettings');
