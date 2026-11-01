@@ -40,20 +40,10 @@ class NotificationChannel {
     }
     if (payload != null && Keys.navigatorKey.currentState != null) {
       logDebug('NotificationChannel: Received payload: $payload');
-      bool isNewRouteSameAsCurrent = false;
-      Keys.navigatorKey.currentState!.popUntil((route) {
-        if (route.settings.name == WebView.path) {
-          isNewRouteSameAsCurrent = true;
-        }
-        return true;
-      });
       UniversalOpenerController opener = UniversalOpenerController(url: payload);
       await opener.initHumHub();
-      if (isNewRouteSameAsCurrent) {
-        Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
-        return;
-      }
-      Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
+      Keys.navigatorKey.currentState!
+          .pushNamedAndRemoveUntil(WebView.path, (route) => false, arguments: opener);
     } else {
       if (payload != null) {
         InitFromUrl.setPayload(payload);

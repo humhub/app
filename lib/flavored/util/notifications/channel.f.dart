@@ -18,18 +18,8 @@ class NotificationChannelF extends NotificationChannel {
       payload = await NotificationChannel.normalizePushPayload(payload);
     }
     if (payload != null && Keys.navigatorKey.currentState != null) {
-      bool isNewRouteSameAsCurrent = false;
-      Keys.navigatorKey.currentState!.popUntil((route) {
-        if (route.settings.name == WebViewF.path) {
-          isNewRouteSameAsCurrent = true;
-        }
-        return true;
-      });
-      if (isNewRouteSameAsCurrent) {
-        Keys.navigatorKey.currentState!.pushNamed(WebViewF.path, arguments: payload);
-        return;
-      }
-      Keys.navigatorKey.currentState!.pushNamed(WebViewF.path, arguments: payload);
+      Keys.navigatorKey.currentState!
+          .pushNamedAndRemoveUntil(WebViewF.path, (route) => false, arguments: payload);
     } else {
       if (payload != null) {
         InitFromUrl.setPayload(payload);

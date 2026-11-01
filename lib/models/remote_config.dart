@@ -74,7 +74,7 @@ class RemoteConfig {
     final String fullUrl = uri.toString();
     return combined.any((pattern) {
       final regexStr = RegExp.escape(pattern).replaceAll(r'\*', r'[^/?#]*');
-      return RegExp('^$regexStr').hasMatch(fullUrl);
+      return RegExp('^$regexStr', caseSensitive: false).hasMatch(fullUrl);
     });
   }
 

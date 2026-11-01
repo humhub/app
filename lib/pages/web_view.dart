@@ -11,6 +11,7 @@ import 'package:humhub/models/channel_message.dart';
 import 'package:humhub/models/feature_flag.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/models/remote_config.dart';
 import 'package:humhub/pages/auth_web_view.dart';
 import 'package:humhub/pages/opener/opener.dart';
 import 'package:humhub/util/black_list_rules.dart';
@@ -148,7 +149,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     }
     if (args is UniversalOpenerController) {
       UniversalOpenerController controller = args;
-      Future(() => ref.read(humHubProvider).setInstance(controller.humhub));
+      unawaited(ref.read(humHubProvider).setInstance(controller.humhub));
       _manifest = controller.humhub.manifest!;
       url = controller.url;
     }
@@ -167,11 +168,18 @@ class WebViewAppState extends ConsumerState<WebView> {
         headers: ref.read(humHubProvider).customHeaders);
   }
 
+  bool _isAuthWebViewDestination(RemoteConfig? remoteConfig, Uri url) {
+    return (remoteConfig?.whiteListedUrls == null &&
+            remoteConfig?.authClientUrls == null) ||
+        remoteConfig!.isTrustedUrl(url);
+  }
+
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
       InAppWebViewController controller, NavigationAction action) async {
     WebViewGlobalController.ajaxSetHeaders(
         headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
+    WebViewGlobalController.listenToKeyboardFocus();
     WebViewGlobalController.appendViewportFitCover();
     await WebViewGlobalController.setWebViewSafeAreaPadding(
         safeArea:
@@ -195,13 +203,8 @@ class WebViewAppState extends ConsumerState<WebView> {
     // Route external main-frame URLs based on whiteListedUrls presence
     final remoteConfig = ref.read(humHubProvider).remoteConfig;
     if (!url.startsWith(_manifest.startUrl) && action.isForMainFrame) {
-      if (remoteConfig?.whiteListedUrls == null && remoteConfig?.authClientUrls == null) {
-        logInfo('Legacy SSO detected, launching AuthWebView for $url');
-        unawaited(_launchAuthWebView(action.request));
-        return NavigationActionPolicy.CANCEL;
-      }
-      if (remoteConfig!.isTrustedUrl(action.request.url!.uriValue)) {
-        logInfo('Whitelisted URL, launching AuthWebView for $url');
+      if (_isAuthWebViewDestination(remoteConfig, action.request.url!.uriValue)) {
+        logInfo('Whitelisted/legacy SSO URL, launching AuthWebView for $url');
         unawaited(_launchAuthWebView(action.request));
         return NavigationActionPolicy.CANCEL;
       }
@@ -273,8 +276,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     }
 
     final remoteConfig = ref.read(humHubProvider).remoteConfig;
-    if ((remoteConfig?.whiteListedUrls == null && remoteConfig?.authClientUrls == null) ||
-        remoteConfig!.isTrustedUrl(urlToOpen.uriValue)) {
+    if (_isAuthWebViewDestination(remoteConfig, urlToOpen.uriValue)) {
       unawaited(_launchAuthWebView(createWindowAction.request));
       return Future.value(true);
     }
@@ -296,6 +298,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(
         headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
+    WebViewGlobalController.listenToKeyboardFocus();
     WebViewGlobalController.appendViewportFitCover();
     await WebViewGlobalController.setWebViewSafeAreaPadding(
         safeArea:
@@ -315,6 +318,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     WebViewGlobalController.ajaxSetHeaders(
         headers: ref.read(humHubProvider).customHeaders);
     WebViewGlobalController.listenToImageOpen();
+    WebViewGlobalController.listenToKeyboardFocus();
     WebViewGlobalController.appendViewportFitCover();
     await WebViewGlobalController.setWebViewSafeAreaPadding(
         safeArea:
@@ -330,13 +334,9 @@ class WebViewAppState extends ConsumerState<WebView> {
 
   void _onReceivedError(InAppWebViewController controller,
       WebResourceRequest request, WebResourceError error) {
-    if ([
-      WebResourceErrorType.NOT_CONNECTED_TO_INTERNET,
-      WebResourceErrorType.TIMEOUT
-    ].contains(error.type)) {
-      logWarning('No internet connection detected');
-      LoadingProvider.of(ref).dismissAll();
-    }
+    if (request.isForMainFrame != true) return;
+    logWarning('Main-frame load error: ${error.type} ${error.description}');
+    LoadingProvider.of(ref).dismissAll();
   }
 
   Future<void> _onWebContentProcessDidTerminate(

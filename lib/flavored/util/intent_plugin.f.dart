@@ -185,18 +185,11 @@ class IntentPluginFState extends ConsumerState<IntentPluginF> {
     });
   }
 
-  Future<bool> tryNavigateWithOpener(String redirectUrl) async {
+  Future<void> tryNavigateWithOpener(String redirectUrl) async {
     LoadingProvider.of(ref).showLoading();
-    bool isNewRouteSameAsCurrent = false;
-    Keys.navigatorKey.currentState!.popUntil((route) {
-      if (route.settings.name == WebViewF.path) {
-        isNewRouteSameAsCurrent = true;
-      }
-      return true;
-    });
-    Keys.navigatorKey.currentState!
-        .pushNamed(WebViewF.path, arguments: redirectUrl);
-    return isNewRouteSameAsCurrent;
+    Keys.navigatorKey.currentState!.pushNamedAndRemoveUntil(
+        WebViewF.path, (route) => false,
+        arguments: redirectUrl);
   }
 
   @override

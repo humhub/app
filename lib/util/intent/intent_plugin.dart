@@ -171,21 +171,14 @@ class IntentPluginState extends ConsumerState<IntentPlugin> {
     });
   }
 
-  Future<bool> tryNavigateWithOpener(String redirectUrl) async {
+  Future<void> tryNavigateWithOpener(String redirectUrl) async {
     final latestUri = ref.read(intentProvider).latestUri;
     logInfo('IntentPlugin.tryNavigateWithOpener', latestUri);
-    bool isNewRouteSameAsCurrent = false;
-    Keys.navigatorKey.currentState!.popUntil((route) {
-      if (route.settings.name == WebView.path) {
-        isNewRouteSameAsCurrent = true;
-      }
-      return true;
-    });
     UniversalOpenerController opener =
         UniversalOpenerController(url: redirectUrl);
     await opener.initHumHub();
-    Keys.navigatorKey.currentState!.pushNamed(WebView.path, arguments: opener);
-    return isNewRouteSameAsCurrent;
+    Keys.navigatorKey.currentState!
+        .pushNamedAndRemoveUntil(WebView.path, (route) => false, arguments: opener);
   }
 
   @override

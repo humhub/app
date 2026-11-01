@@ -135,6 +135,7 @@ class WebViewGlobalController {
     required NavigationAction action,
     String headerKeyToCheck = 'x-humhub-app',
   }) {
+    if (!action.isForMainFrame) return false;
     if (Platform.isAndroid) return true;
     if (action.navigationType == NavigationType.LINK_ACTIVATED ||
         action.navigationType == NavigationType.FORM_SUBMITTED) {
@@ -214,11 +215,8 @@ class WebViewGlobalController {
   """);
   }
 
-  // Android: env(safe-area-*) does not return the correct value when the device has the system navigation enabled
-  // iOS: OK
   static Future<void> setWebViewSafeAreaPadding({required EdgeInsets safeArea}) async {
-    if (Platform.isAndroid) {
-      await value?.evaluateJavascript(source: """
+    await value?.evaluateJavascript(source: """
       (function() {
         var style = document.createElement('style');
         style.innerHTML = `
@@ -232,7 +230,33 @@ class WebViewGlobalController {
         document.head.appendChild(style);
       })();
     """);
-    }
+  }
+
+  static Future<void> listenToKeyboardFocus() async {
+    await _value?.evaluateJavascript(source: """
+      (function() {
+        if (window.__hhKeyboardFocusListenerAdded) return;
+        window.__hhKeyboardFocusListenerAdded = true;
+
+        function scrollFocusedIntoView() {
+          var target = document.activeElement;
+          if (!target || typeof target.scrollIntoView !== 'function') return;
+          var tag = target.tagName;
+          if (tag !== 'INPUT' && tag !== 'TEXTAREA' && !target.isContentEditable) return;
+          target.scrollIntoView({block: 'center', behavior: 'smooth'});
+        }
+
+        document.addEventListener('focusin', function() {
+          setTimeout(scrollFocusedIntoView, 300);
+        });
+
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', function() {
+            setTimeout(scrollFocusedIntoView, 50);
+          });
+        }
+      })();
+    """);
   }
 
   static void setLoginForm() {
@@ -305,7 +329,7 @@ class WebViewGlobalController {
       supportMultipleWindows: true,
       useHybridComposition: true,
       allowsInlineMediaPlayback: true,
-      mediaPlaybackRequiresUserGesture: false,
+      mediaPlaybackRequiresUserGesture: true,
       domStorageEnabled: true,
       supportZoom: zoom ? true : false,
       userAgent: userAgent,
