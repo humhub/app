@@ -63,6 +63,13 @@ jobs:
           echo "storeFile=./keystore.jks" >> android/key.properties
       - name: Convert base64 to keystore.jks
         run: echo -n "${{ secrets.PLAYSTORE_KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+      - name: Write google-services.json from secret
+        run: |
+          if [ -z "${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}" ]; then
+            echo "::error::FIREBASE_GOOGLE_SERVICES_JSON_BASE64 secret is not set. Add it under repo Settings > Secrets and variables > Actions before releasing."
+            exit 1
+          fi
+          echo -n "${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > android/app/google-services.json
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.15
         with:
@@ -144,6 +151,13 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: 26.3
+      - name: Write GoogleService-Info.plist from secret
+        run: |
+          if [ -z "${{ secrets.FIREBASE_GOOGLE_SERVICE_INFO_PLIST_BASE64 }}" ]; then
+            echo "::error::FIREBASE_GOOGLE_SERVICE_INFO_PLIST_BASE64 secret is not set. Add it under repo Settings > Secrets and variables > Actions before releasing."
+            exit 1
+          fi
+          echo -n "${{ secrets.FIREBASE_GOOGLE_SERVICE_INFO_PLIST_BASE64 }}" | base64 --decode > ios/GoogleService-Info.plist
       - name: Install the Apple certificate and provisioning profile
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.APPSTORE_BUILD_CERTIFICATE_BASE64 }}

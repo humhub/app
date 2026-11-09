@@ -50,3 +50,8 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+
+# Firebase config - contains project secrets, injected by CI from secrets.
+# See CONTRIBUTING.md for local setup.
+/android/app/google-services.json
+/ios/GoogleService-Info.plist
