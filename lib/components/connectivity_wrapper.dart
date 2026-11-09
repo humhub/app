@@ -10,9 +10,16 @@ import 'package:humhub/util/providers.dart';
 class ConnectivityWrapper extends ConsumerStatefulWidget {
   final Widget child;
 
+  /// Called whenever the app transitions back to [AppLifecycleState.resumed]
+  /// (including returning from background, not just a cold start). Used to
+  /// refresh state that only used to be loaded on process start, such as the
+  /// SSO trusted-URL config.
+  final VoidCallback? onResumed;
+
   const ConnectivityWrapper({
     super.key,
     required this.child,
+    this.onResumed,
   });
 
   @override
@@ -49,6 +56,7 @@ class _ConnectivityWrapperState extends ConsumerState<ConnectivityWrapper>
           _isConfirmingResumeConnectivity = false;
           _showOfflinePopup = false;
         });
+        widget.onResumed?.call();
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             _handleResumeConnectivityState(ref.read(connectivityStateProvider));
