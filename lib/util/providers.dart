@@ -117,6 +117,30 @@ class HumHubNotifier extends ChangeNotifier {
     return fileUploadSettings;
   }
 
+  /// Re-fetches [RemoteConfig] (including the SSO trusted-URL whitelist) from
+  /// the server. The cached config used to decide whether an SSO link opens
+  /// in the in-app AuthWebView or externally only used to be refreshed on a
+  /// cold app start, so an app update applied while a user stayed logged in
+  /// kept using a stale whitelist until the app was fully relaunched. Call
+  /// this when the app resumes from background to keep it current without
+  /// requiring a fresh process start.
+  Future<void> refreshRemoteConfig() async {
+    final Manifest? manifest = _humHubInstance.manifest;
+    if (manifest == null) {
+      return;
+    }
+    logInfo('HumHubNotifier: Refreshing remote config from ${manifest.startUrl}');
+    final RemoteConfig? remoteConfig = await RemoteConfig.get(manifest, customHeaders);
+    if (remoteConfig == null) {
+      logWarning('HumHubNotifier: Could not refresh remote config');
+      return;
+    }
+    _humHubInstance.remoteConfig = remoteConfig;
+    _humHubInstance.fileUploadSettings = remoteConfig.fileUploadSettings;
+    await _updateSafeStorage();
+    notifyListeners();
+  }
+
   HumHub copyWith({
     OpenerState? openerState,
     Manifest? manifest,

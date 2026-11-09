@@ -42,8 +42,12 @@ class FlavoredAppState extends ConsumerState<FlavoredApp> {
                       AppLocalizations.localizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
                   navigatorKey: Keys.navigatorKey,
-                  builder: (context, child) =>
-                      AppLockGate(child: ConnectivityWrapper(child: child!)),
+                  builder: (context, child) => AppLockGate(
+                    child: ConnectivityWrapper(
+                      onResumed: () => ref.invalidate(humHubFRemoteConfigProvider),
+                      child: child!,
+                    ),
+                  ),
                   theme: ThemeData(
                     fontFamily: 'OpenSans',
                   ),

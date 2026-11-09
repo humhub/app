@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/components/app_lock_gate.dart';
@@ -8,6 +10,7 @@ import 'package:humhub/util/intent/intent_plugin.dart';
 import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/override_locale.dart';
+import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/quick_actions/quick_action_handler.dart';
 import 'package:humhub/util/router.dart';
@@ -36,7 +39,12 @@ class OpenerApp extends ConsumerWidget {
                   localizationsDelegates: AppLocalizations.localizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
                   locale: overrideLocale,
-                  builder: (context, child) => AppLockGate(child: ConnectivityWrapper(child: child!)),
+                  builder: (context, child) => AppLockGate(
+                    child: ConnectivityWrapper(
+                      onResumed: () => unawaited(ref.read(humHubProvider).refreshRemoteConfig()),
+                      child: child!,
+                    ),
+                  ),
                   theme: appTheme,
                 ),
               ),
