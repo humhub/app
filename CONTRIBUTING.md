@@ -63,6 +63,31 @@ The env-backed values currently used by the app are:
 
 If `assets/.env` is missing, flavored mode should not be expected to run correctly.
 
+## Firebase Config
+
+`android/app/google-services.json` and `ios/GsoogleService-Info.plist` are not committed
+to this repo (see `.gitignore`) and are not HumHub's real Firebase project to share.
+Official release builds get the real files injected from GitHub Actions secrets
+(`FIREBASE_GOOGLE_SERVICES_JSON_BASE64` / `FIREBASE_GOOGLE_SERVICE_INFO_PLIST_BASE64`) in
+`version-release.yml`.
+
+Both the Android Gradle build (`com.google.gms.google-services` plugin) and the iOS
+project expect these files to be present on disk, so for local `flutter run`/`flutter
+build` you need to add your own copy of each at those paths, from your own Firebase
+project (same `com.humhub.app`-style package/bundle ID, or your own if you're
+white-labeling). Do not commit real Firebase credentials.
+
+### Generating the CI secret values (maintainers only)
+
+`FIREBASE_GOOGLE_SERVICES_JSON_BASE64` and `FIREBASE_GOOGLE_SERVICE_INFO_PLIST_BASE64` are
+the two repo secrets `version-release.yml` needs (repo Settings → Secrets and variables →
+Actions → "New repository secret"). Their value is just the file, base64-encoded:
+
+```bash
+base64 -i android/app/google-services.json | pbcopy
+base64 -i ios/GoogleService-Info.plist | pbcopy
+```
+
 ## Verification
 
 Run the same core checks used in CI:
