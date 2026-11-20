@@ -53,7 +53,7 @@ Optionally require Face ID, Touch ID, fingerprint, or your device's PIN/passcode
 Connect to and store multiple HumHub networks on a single device. Switch between previously visited networks, add a new one at any time, or remove a saved network you no longer need.
 
 ### App icon badge
-When your network sends push notifications, the app icon can show a badge for unread activity. The badge is cleared automatically as soon as you open the app.
+The app icon shows a badge with your unread count: unseen notifications and, if the network uses the messenger, unread conversations, added up over all networks you are connected to. The network picker shows the count of each network.
 
 ### Offline detection
 If your device loses internet access — or the HumHub server becomes unreachable — while you're using the app, including when resuming from the background, you'll see a clear offline notice with a retry option instead of a broken or blank screen.

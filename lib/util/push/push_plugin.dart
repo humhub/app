@@ -10,6 +10,7 @@ import 'package:humhub/util/notifications/channel.dart';
 import 'package:humhub/util/notifications/plugin.dart';
 import 'package:humhub/util/notifications/service.dart';
 import 'package:humhub/util/push/provider.dart';
+import 'package:humhub/util/push/push_unread_count.dart';
 import 'package:humhub/util/push/register_token_plugin.dart';
 import 'package:loggy/loggy.dart';
 
@@ -36,6 +37,8 @@ class PushPluginState extends ConsumerState<PushPlugin> {
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       logInfo("Firebase messaging onMessage");
+      // In the foreground, the OS does not apply the unread count of visible or silent messages.
+      applyUnreadCountOfPush(message);
       _handleNotification(
         message,
         NotificationPlugin.of(ref),

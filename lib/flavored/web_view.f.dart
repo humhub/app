@@ -21,6 +21,7 @@ import 'package:humhub/util/loading_provider.dart';
 import 'package:humhub/util/providers.dart';
 import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/show_dialog.dart';
+import 'package:humhub/util/unread_counts.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:loggy/loggy.dart';
 import 'package:humhub/components/file_actions_bottom_sheet.dart';
@@ -47,6 +48,9 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
   void initState() {
     instance = ref.read(humHubFProvider);
     super.initState();
+    // Opening an instance clears its count, like the app start did for the badge before. An instance that
+    // sends `updateNotificationCount` replaces it with what is really unread as soon as its page has loaded.
+    UnreadCounts.set(instance.manifest.startUrl, 0);
 
     pullToRefreshController = PullToRefreshController(
       settings: PullToRefreshSettings(
@@ -295,6 +299,8 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
         }
         break;
       case ChannelAction.updateNotificationCount:
+        final data = message.data as UpdateNotificationCountChannelData;
+        UnreadCounts.set(instance.manifest.startUrl, data.count);
         break;
       case ChannelAction.unregisterFcmDevice:
         String? token = ref.read(pushTokenProvider).value;
@@ -305,6 +311,8 @@ class FlavoredWebViewState extends ConsumerState<WebViewF> {
             headers: instance.customHeaders,
           );
         }
+        // Sent after logout: the unread count of the previous user must not stay on the app icon.
+        UnreadCounts.set(instance.manifest.startUrl, 0);
         break;
       case ChannelAction.fileUploadSettings:
         logInfo('Action: fileUploadSettings');
