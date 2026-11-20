@@ -83,7 +83,7 @@ jobs:
           java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.44.6'
+          flutter-version: '3.47.0'
           channel: 'stable'
       - uses: chkfung/android-version-actions@v1.2.1
         with:
@@ -114,9 +114,13 @@ jobs:
           name: APKs
           path: build/app/outputs/flutter-apk/*.apk
 
+  e2e:
+    name: E2E smoke tests
+    uses: ./.github/workflows/e2e-tests.yml
+
   release_android:
     name: Release APK to Google Play
-    needs: [build_android]
+    needs: [build_android, e2e]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -194,7 +198,7 @@ jobs:
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.44.6'
+          flutter-version: '3.47.0'
           channel: 'stable'
           cache: true
       - name: Flutter doctor
@@ -262,7 +266,7 @@ jobs:
 
   release_ios:
     name: Release IPA to TestFlight
-    needs: [ build_ios ]
+    needs: [ build_ios, e2e ]
     runs-on: macos-15
     steps:
       - name: Checkout

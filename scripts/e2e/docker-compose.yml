@@ -1,0 +1,51 @@
+# Disposable HumHub backend for the e2e smoke tests (see README.md).
+# FOR TESTING ONLY: credentials below are throwaway values for a
+# container that never leaves the CI runner / your machine.
+
+name: humhub-e2e
+
+services:
+  humhub:
+    image: humhub/humhub:${HUMHUB_IMAGE_TAG:-1.18}
+    # The image is published for amd64 only; on Apple Silicon this runs
+    # under emulation.
+    platform: linux/amd64
+    ports:
+      - "${E2E_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./seed_module:/data/modules-custom/e2e:ro
+    environment:
+      - HUMHUB_DEBUG=true
+      # Plain HTTP on :8080, any Host header (emulator connects via 10.0.2.2).
+      - SERVER_NAME=:8080
+      - HUMHUB_CONFIG__COMPONENTS__DB__DSN=mysql:host=db;dbname=humhub
+      - HUMHUB_CONFIG__COMPONENTS__DB__USERNAME=root
+      - HUMHUB_CONFIG__COMPONENTS__DB__PASSWORD=e2e
+      # Unattended install: the installer's console commands are not
+      # registered in production builds, so map them in for the CLI only.
+      - HUMHUB_CLI_CONFIG__CONTROLLER_MAP__INSTALLER=humhub\modules\installer\commands\InstallController
+    healthcheck:
+      # The image's bundled healthcheck script probes https://localhost in
+      # older tags, so check the plain-HTTP listener directly.
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:8080/"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  db:
+    image: mariadb:11
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      - MYSQL_ROOT_PASSWORD=e2e
+      - MYSQL_DATABASE=humhub
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30

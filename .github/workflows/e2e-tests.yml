@@ -1,0 +1,123 @@
+name: e2e-tests
+
+# Runs the integration_test smoke suite on an Android emulator against a
+# disposable HumHub backend in Docker (see scripts/e2e/README.md).
+# Also called by version-release.yml to gate store uploads.
+
+on:
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      humhub_image_tag:
+        description: "humhub/humhub image tag to test against"
+        required: false
+        default: "1.18"
+  pull_request:
+    branches: [master]
+  # TEMP: run on every push while developing the suite; remove before merging.
+  push:
+    branches: [f-internal-172-v2]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
+
+jobs:
+  android:
+    name: Android e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HUMHUB_IMAGE_TAG: ${{ inputs.humhub_image_tag || '1.18' }}
+      EMULATOR_API_LEVEL: 34
+      EMULATOR_OPTIONS: -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim -camera-back none
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Runs in the background while the toolchain and emulator are set up;
+      # awaited right before the tests.
+      - name: Start HumHub backend (background)
+        run: |
+          mkdir -p scripts/e2e/logs
+          nohup scripts/e2e/up.sh > scripts/e2e/logs/up.txt 2>&1 &
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: gradle
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Booting from a cached snapshot instead of cold-booting a fresh AVD.
+      - name: Cache AVD
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.EMULATOR_API_LEVEL }}-google_apis-x86_64-v1
+
+      - name: Create AVD snapshot
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.EMULATOR_API_LEVEL }}
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: ${{ env.EMULATOR_OPTIONS }}
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Wait for HumHub backend
+        timeout-minutes: 10
+        run: |
+          while pgrep -f scripts/e2e/up.sh > /dev/null; do sleep 2; done
+          cat scripts/e2e/logs/up.txt
+          test -f scripts/e2e/.e2e_fixtures.env
+
+      - name: Run e2e tests on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.EMULATOR_API_LEVEL }}
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save ${{ env.EMULATOR_OPTIONS }}
+          disable-animations: true
+          script: scripts/e2e/run_android.sh
+
+      - name: Collect backend logs
+        if: failure()
+        working-directory: scripts/e2e
+        run: |
+          mkdir -p logs
+          docker compose logs --no-color > logs/docker-compose.txt 2>&1 || true
+          docker compose cp humhub:/data/logs logs/humhub || true
+
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-android-logs
+          path: scripts/e2e/logs
+          if-no-files-found: ignore

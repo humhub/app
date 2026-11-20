@@ -55,3 +55,6 @@ app.*.map.json
 # See CONTRIBUTING.md for local setup.
 /android/app/google-services.json
 /ios/GoogleService-Info.plist
+# e2e smoke tests (scripts/e2e)
+/scripts/e2e/.e2e_fixtures.env
+/scripts/e2e/logs/

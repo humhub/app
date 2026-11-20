@@ -36,6 +36,7 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
                 child: Column(
                   children: [
                     TextFormField(
+                      key: const Key('opener_url_field'),
                       keyboardType: TextInputType.url,
                       controller: widget.openerControlLer.urlTextController,
                       cursorColor: Theme.of(context).textTheme.bodySmall?.color,
@@ -76,6 +77,7 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: TextButton(
+                  key: const Key('opener_connect_button'),
                   onPressed: connect,
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.white,
