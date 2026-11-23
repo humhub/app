@@ -73,11 +73,11 @@ void main() {
     });
   });
 
-  group('UnreadCounts.setByUrl', () {
+  group('UnreadCounts.setByUrls', () {
     test('applies a count without URL if only one instance is known', () async {
       await UnreadCounts.sync([community]);
 
-      await UnreadCounts.setByUrl(null, 4);
+      await UnreadCounts.setByUrls([], 4);
 
       expect(UnreadCounts.counts.value, {community: 4});
       expect(badges, [4]);
@@ -86,17 +86,25 @@ void main() {
     test('attributes the count to the instance of the URL', () async {
       await UnreadCounts.sync([community, sandbox]);
 
-      await UnreadCounts.setByUrl('https://sandbox.example.com/notification/entry?id=1', 2);
+      await UnreadCounts.setByUrls(['https://sandbox.example.com/notification/entry?id=1'], 2);
 
       expect(UnreadCounts.counts.value, {community: 0, sandbox: 2});
       expect(badges, [2]);
     });
 
+    test('uses the first URL that belongs to an instance', () async {
+      await UnreadCounts.sync([community, sandbox]);
+
+      await UnreadCounts.setByUrls([null, 'https://other.example.com/', sandbox, community], 2);
+
+      expect(UnreadCounts.counts.value, {community: 0, sandbox: 2});
+    });
+
     test('ignores a count it cannot attribute with several instances', () async {
       await UnreadCounts.sync([community, sandbox]);
 
-      await UnreadCounts.setByUrl(null, 4);
-      await UnreadCounts.setByUrl('https://other.example.com/', 4);
+      await UnreadCounts.setByUrls([], 4);
+      await UnreadCounts.setByUrls([null, 'https://other.example.com/'], 4);
 
       expect(UnreadCounts.counts.value, {community: 0, sandbox: 0});
       expect(badges, isEmpty);
@@ -209,6 +217,44 @@ void main() {
       ));
 
       expect(UnreadCounts.counts.value, {community: 6, sandbox: 0});
+    });
+
+    test('attributes the count via the base URL of the message', () async {
+      await UnreadCounts.sync([community, sandbox]);
+
+      await applyUnreadCountOfPush(const RemoteMessage(
+        data: {'base_url': 'https://sandbox.example.com', 'notification_count': '4'},
+      ));
+
+      expect(UnreadCounts.counts.value, {community: 0, sandbox: 4});
+    });
+
+    test('prefers the base URL over the URL', () async {
+      await UnreadCounts.sync([community, sandbox]);
+
+      await applyUnreadCountOfPush(const RemoteMessage(
+        data: {
+          'base_url': 'https://sandbox.example.com',
+          'url': 'https://community.example.com/notification/entry?id=1',
+          'notification_count': '4',
+        },
+      ));
+
+      expect(UnreadCounts.counts.value, {community: 0, sandbox: 4});
+    });
+
+    test('falls back to the URL for an unknown base URL', () async {
+      await UnreadCounts.sync([community, sandbox]);
+
+      await applyUnreadCountOfPush(const RemoteMessage(
+        data: {
+          'base_url': 'http://community.example.com',
+          'url': 'https://community.example.com/notification/entry?id=1',
+          'notification_count': '4',
+        },
+      ));
+
+      expect(UnreadCounts.counts.value, {community: 4, sandbox: 0});
     });
 
     test('ignores a message without count', () async {

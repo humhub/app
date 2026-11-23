@@ -39,13 +39,17 @@ class UnreadCounts {
     });
   }
 
-  /// Sets the count of the instance [url] belongs to. A count that cannot be attributed this
-  /// way, e.g. the one of a silent push message, is only applied if exactly one instance is
-  /// known. Otherwise it is ignored.
-  static Future<void> setByUrl(String? url, int? count) async {
+  /// Sets the count of the instance the first of [urls] belongs to that matches one. A count
+  /// that cannot be attributed this way, e.g. the one of a silent push message from a server
+  /// that does not send its base URL, is only applied if exactly one instance is known.
+  /// Otherwise it is ignored.
+  static Future<void> setByUrls(Iterable<String?> urls, int? count) async {
     if (count == null || count < 0) return;
     await _change((counts) {
-      final instance = counts.length == 1 ? counts.keys.single : instanceOf(url, counts.keys);
+      final instance = urls.map((url) => instanceOf(url, counts.keys)).firstWhere(
+            (instance) => instance != null,
+            orElse: () => counts.length == 1 ? counts.keys.single : null,
+          );
       if (instance == null) {
         logDebug('UnreadCounts: No instance for a count of $count');
         return null;
