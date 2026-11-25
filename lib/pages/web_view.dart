@@ -149,7 +149,9 @@ class WebViewAppState extends ConsumerState<WebView> {
     }
     if (args is UniversalOpenerController) {
       UniversalOpenerController controller = args;
-      unawaited(ref.read(humHubProvider).setInstance(controller.humhub));
+      // Deferred: setInstance notifies listeners, which must not happen during build.
+      unawaited(Future.microtask(
+          () => ref.read(humHubProvider).setInstance(controller.humhub)));
       _manifest = controller.humhub.manifest!;
       url = controller.url;
     }
@@ -305,10 +307,9 @@ class WebViewAppState extends ConsumerState<WebView> {
             !keyboardVisible ? initKeyboardPadding : noKeyboardBottomPadding);
     unawaited(WebViewGlobalController.persistSessionCookies(
         forUrl: _manifest.startUrl));
+    if (!mounted) return;
     LoadingProvider.of(ref).dismissAll();
-    if (mounted) {
-      unawaited(uploadPendingSharedFiles(ref: ref, context: context));
-    }
+    unawaited(uploadPendingSharedFiles(ref: ref, context: context));
     _scheduleTokenRegistrationCheck();
   }
 

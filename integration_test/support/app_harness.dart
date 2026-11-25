@@ -7,6 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/pages/web_view.dart';
+import 'package:humhub/util/intent/app_link_settings.dart';
+import 'package:humhub/util/providers.dart';
+import 'package:humhub/util/router.dart';
 import 'package:humhub/util/storage_service.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
 
@@ -39,6 +42,10 @@ class AppHarness {
 
     final container = ProviderContainer();
     addTearDown(container.dispose);
+    // Same startup sequence as lib/main.dart.
+    final instance = await container.read(humHubProvider).getInstance();
+    await AppLinkSettings.refresh();
+    await AppRouter.initInitialRoute(instance);
     await tester.pumpWidget(UncontrolledProviderScope(container: container, child: app));
     // The opener's Rive animations never settle, so poll instead of pumpAndSettle.
     await waitUntil(tester, () => find.byKey(openerUrlField).evaluate().isNotEmpty);
