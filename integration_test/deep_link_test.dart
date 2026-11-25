@@ -4,13 +4,14 @@ import 'package:integration_test/integration_test.dart';
 
 import 'support/app_harness.dart';
 import 'support/e2e_env.dart';
+import 'support/e2e_test.dart';
 
 /// OS-level App Link delivery can't be triggered from a test; app_links'
 /// initial and streamed links both end in IntentPluginState.tryNavigateWithOpener.
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('a deep link opens its URL in the WebView', (tester) async {
+  e2eTest('a deep link opens its URL in the WebView', (tester) async {
     final harness = await AppHarness.boot(tester);
 
     final intentPlugin = tester.state<IntentPluginState>(find.byType(IntentPlugin));

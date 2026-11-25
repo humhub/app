@@ -3,11 +3,12 @@ import 'package:integration_test/integration_test.dart';
 
 import 'support/app_harness.dart';
 import 'support/e2e_env.dart';
+import 'support/e2e_test.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('opener connects to the instance and the user can log in', (tester) async {
+  e2eTest('opener connects to the instance and the user can log in', (tester) async {
     final harness = await AppHarness.boot(tester);
 
     await harness.connect(tester);

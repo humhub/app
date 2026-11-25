@@ -124,10 +124,13 @@ jobs:
           docker compose logs --no-color > logs/docker-compose.txt 2>&1 || true
           docker compose cp humhub:/data/logs logs/humhub || true
 
+      # Always uploaded while the suite is being stabilised: includes a screen
+      # recording of every test file and screenshots of failed tests.
       - name: Upload logs
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: e2e-android-logs
           path: scripts/e2e/logs
           if-no-files-found: ignore
+          retention-days: 7

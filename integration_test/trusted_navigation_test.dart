@@ -4,13 +4,14 @@ import 'package:integration_test/integration_test.dart';
 
 import 'support/app_harness.dart';
 import 'support/e2e_env.dart';
+import 'support/e2e_test.dart';
 
 /// humhub/app#368: posts with external (YouTube) links must not pull the
 /// main WebView away from the HumHub instance.
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('a post with an external link keeps the WebView on the instance', (tester) async {
+  e2eTest('a post with an external link keeps the WebView on the instance', (tester) async {
     final harness = await AppHarness.boot(tester);
     await harness.connectAndLogin(tester);
 

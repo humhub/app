@@ -1,16 +1,16 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:humhub/util/notifications/channel.dart';
 import 'package:integration_test/integration_test.dart';
 
 import 'support/app_harness.dart';
 import 'support/e2e_env.dart';
+import 'support/e2e_test.dart';
 
 /// Real FCM delivery can't be triggered from a test; onMessageOpenedApp and
 /// local notification taps both end in NotificationChannel.onTap.
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('tapping a notification opens its URL in the WebView', (tester) async {
+  e2eTest('tapping a notification opens its URL in the WebView', (tester) async {
     final harness = await AppHarness.boot(tester);
 
     await const NotificationChannel().onTap(E2eEnv.deepLinkTargetUrl);
