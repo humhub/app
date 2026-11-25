@@ -356,8 +356,13 @@ final isConnectedToNetworkInterface = Provider<bool>((ref) {
 });
 
 final hasInternetConnection = StreamProvider<bool>((ref) {
+  // The generator keeps running until its next yield after cancellation,
+  // so stop explicitly instead of reading through a disposed ref.
+  var disposed = false;
+  ref.onDispose(() => disposed = true);
+
   Stream<bool> poll() async* {
-    while (true) {
+    while (!disposed) {
       yield await ConnectivityState.hasInternetAccess(
           _resolveProbeUrl(ref.read(humHubProvider)));
       await Future.delayed(const Duration(seconds: 5));
