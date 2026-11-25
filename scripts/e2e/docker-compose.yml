@@ -21,6 +21,10 @@ services:
       - HUMHUB_DEBUG=true
       # Plain HTTP on :8080, any Host header (emulator connects via 10.0.2.2).
       - SERVER_NAME=:8080
+      # Mercure publishes to the base URL (10.0.2.2), which is only reachable
+      # from the emulator, so page renders that push an update hang for 60s
+      # on curl's idle timeout. Live push isn't under test; use polling.
+      - HUMHUB_DOCKER__MERCURE_ENABLE=false
       - HUMHUB_CONFIG__COMPONENTS__DB__DSN=mysql:host=db;dbname=humhub
       - HUMHUB_CONFIG__COMPONENTS__DB__USERNAME=root
       - HUMHUB_CONFIG__COMPONENTS__DB__PASSWORD=e2e
