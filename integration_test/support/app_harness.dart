@@ -76,6 +76,14 @@ class AppHarness {
       })();
     ''');
     await waitForUrl(tester, (url) => !url.path.contains(_loginPath));
+    // getUrl() switches before the next document replaces the login page; JS run
+    // in between (e.g. the share upload) would send the pre-login CSRF token.
+    await waitUntil(tester, () async {
+      if (await webViewController.isLoading()) return false;
+      final loaded = await webViewController.evaluateJavascript(
+          source: "document.readyState === 'complete' && !location.pathname.includes(${jsonEncode(_loginPath)})");
+      return loaded == true;
+    });
   }
 
   Future<void> connectAndLogin(WidgetTester tester) async {
