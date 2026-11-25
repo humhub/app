@@ -19,6 +19,7 @@ const openerUrlField = Key('opener_url_field');
 const openerConnectButton = Key('opener_connect_button');
 
 const _loginPath = '/user/auth/login';
+const _dashboardPath = '/dashboard';
 
 /// Boots the real app (as lib/main.dart does) from a clean state and drives
 /// it against the e2e backend.
@@ -76,14 +77,17 @@ class AppHarness {
       })();
     ''');
     await waitForUrl(tester, (url) => !url.path.contains(_loginPath));
-    // getUrl() switches before the next document replaces the login page; JS run
-    // in between (e.g. the share upload) would send the pre-login CSRF token.
+    // On Android every post-login redirect is cancelled and re-issued from
+    // shouldOverrideUrlLoading, which occasionally stalls and leaves the login
+    // document (and its pre-login CSRF token) in place. Loading the dashboard
+    // directly bypasses that, so later steps run in a fully loaded page.
+    await webViewController.loadUrl(urlRequest: URLRequest(url: WebUri('${E2eEnv.serverUrl}$_dashboardPath')));
     await waitUntil(tester, () async {
       if (await webViewController.isLoading()) return false;
       final loaded = await webViewController.evaluateJavascript(
-          source: "document.readyState === 'complete' && !location.pathname.includes(${jsonEncode(_loginPath)})");
+          source: "document.readyState === 'complete' && location.pathname.startsWith(${jsonEncode(_dashboardPath)})");
       return loaded == true;
-    });
+    }, timeout: const Duration(seconds: 60));
   }
 
   Future<void> connectAndLogin(WidgetTester tester) async {
