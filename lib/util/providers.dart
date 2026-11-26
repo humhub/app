@@ -7,6 +7,7 @@ import 'package:humhub/models/hum_hub.dart';
 import 'package:humhub/models/manifest.dart';
 import 'package:humhub/models/remote_config.dart';
 import 'package:humhub/util/storage_service.dart';
+import 'package:humhub/util/unread_counts.dart';
 import 'package:loggy/loggy.dart';
 
 class HumHubNotifier extends ChangeNotifier {
@@ -178,14 +179,18 @@ class HumHubNotifier extends ChangeNotifier {
   Future<void> removeHistory(Manifest manifest) async {
     _humHubInstance.removeFromHistory(manifest);
     _updateSafeStorage();
+    _syncUnreadCounts();
     notifyListeners();
   }
 
   Future<void> addOrUpdateHistory(Manifest manifest) async {
     _humHubInstance.addOrUpdateHistory(manifest);
     _updateSafeStorage();
+    _syncUnreadCounts();
     notifyListeners();
   }
+
+  Future<void> _syncUnreadCounts() => UnreadCounts.sync(history.map((manifest) => manifest.startUrl));
 
   void setHash(String hash) {
     _humHubInstance.randomHash = hash;

@@ -27,6 +27,7 @@ import 'package:humhub/util/openers/universal_opener_controller.dart';
 import 'package:humhub/util/push/provider.dart';
 import 'package:humhub/util/push/register_token_plugin.dart';
 import 'package:humhub/util/router.dart';
+import 'package:humhub/util/unread_counts.dart';
 import 'package:humhub/util/web_view_global_controller.dart';
 import 'package:humhub/components/file_actions_bottom_sheet.dart';
 import 'package:loggy/loggy.dart';
@@ -80,6 +81,9 @@ class WebViewAppState extends ConsumerState<WebView> {
     super.didChangeDependencies();
     if (!_isInit) {
       _initialRequest = _initRequest;
+      // Opening an instance clears its count, like the app start did for the badge before. An instance that
+      // sends `updateNotificationCount` replaces it with what is really unread as soon as its page has loaded.
+      UnreadCounts.set(_manifest.startUrl, 0);
       logInfo('Initializing WebView with manifest: ${_manifest.name}');
       _pullToRefreshController = PullToRefreshController(
         settings: PullToRefreshSettings(
@@ -425,6 +429,8 @@ class WebViewAppState extends ConsumerState<WebView> {
         break;
       case ChannelAction.updateNotificationCount:
         logInfo('Action: updateNotificationCount');
+        final data = message.data as UpdateNotificationCountChannelData;
+        UnreadCounts.set(_manifest.startUrl, data.count);
         break;
       case ChannelAction.nativeConsole:
         logInfo('Action: nativeConsole');
@@ -441,6 +447,8 @@ class WebViewAppState extends ConsumerState<WebView> {
             headers: ref.read(humHubProvider).customHeaders,
           );
         }
+        // Sent after logout: the unread count of the previous user must not stay on the app icon.
+        UnreadCounts.set(_manifest.startUrl, 0);
         break;
       case ChannelAction.fileUploadSettings:
         logInfo('Action: fileUploadSettings');

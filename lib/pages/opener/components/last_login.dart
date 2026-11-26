@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:humhub/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:humhub/models/manifest.dart';
+import 'package:humhub/util/unread_counts.dart';
 
 class LastLoginWidget extends StatelessWidget {
   final List<Manifest> history;
@@ -130,9 +131,19 @@ class InstanceTile extends StatelessWidget {
                     ),
                   ),
                 const SizedBox(width: 20),
-                Text(
-                  manifest.name,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Expanded(
+                  child: Text(
+                    manifest.name,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                ValueListenableBuilder<Map<String, int>>(
+                  valueListenable: UnreadCounts.counts,
+                  builder: (context, counts, _) {
+                    final count = counts[manifest.startUrl] ?? 0;
+                    return Badge.count(count: count, isLabelVisible: count > 0);
+                  },
                 ),
               ],
             ),

@@ -15,6 +15,7 @@ import 'package:humhub/util/push/push_plugin.dart';
 import 'package:humhub/util/quick_actions/quick_action_handler.dart';
 import 'package:humhub/util/router.dart';
 import 'package:humhub/util/storage_service.dart';
+import 'package:humhub/util/unread_counts.dart';
 import 'package:humhub/l10n/generated/app_localizations.dart';
 
 class OpenerApp extends ConsumerWidget {
@@ -41,7 +42,11 @@ class OpenerApp extends ConsumerWidget {
                   locale: overrideLocale,
                   builder: (context, child) => AppLockGate(
                     child: ConnectivityWrapper(
-                      onResumed: () => unawaited(ref.read(humHubProvider).refreshRemoteConfig()),
+                      onResumed: () {
+                        unawaited(ref.read(humHubProvider).refreshRemoteConfig());
+                        // Push messages handled in the background may have changed them
+                        unawaited(UnreadCounts.load());
+                      },
                       child: child!,
                     ),
                   ),
