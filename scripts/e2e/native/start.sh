@@ -64,10 +64,14 @@ if ! mariadb-admin ping > /dev/null 2>&1; then
     sleep 1
   done
 fi
+# Per local host, not '%': Homebrew's MariaDB has anonymous ''@'localhost'
+# accounts, which would match before 'humhub'@'%' and deny the login.
 mariadb <<'EOF'
 CREATE DATABASE IF NOT EXISTS humhub CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS 'humhub'@'%' IDENTIFIED BY 'e2e';
-GRANT ALL PRIVILEGES ON humhub.* TO 'humhub'@'%';
+CREATE USER IF NOT EXISTS 'humhub'@'localhost' IDENTIFIED BY 'e2e';
+CREATE USER IF NOT EXISTS 'humhub'@'127.0.0.1' IDENTIFIED BY 'e2e';
+GRANT ALL PRIVILEGES ON humhub.* TO 'humhub'@'localhost';
+GRANT ALL PRIVILEGES ON humhub.* TO 'humhub'@'127.0.0.1';
 EOF
 
 if [ -f "$server_pid_file" ] && kill -0 "$(cat "$server_pid_file")" 2> /dev/null; then
