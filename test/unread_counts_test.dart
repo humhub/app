@@ -73,11 +73,11 @@ void main() {
     });
   });
 
-  group('UnreadCounts.setByUrls', () {
+  group('UnreadCounts.setByUrl', () {
     test('applies a count without URL if only one instance is known', () async {
       await UnreadCounts.sync([community]);
 
-      await UnreadCounts.setByUrls([], 4);
+      await UnreadCounts.setByUrl(null, 4);
 
       expect(UnreadCounts.counts.value, {community: 4});
       expect(badges, [4]);
@@ -86,28 +86,79 @@ void main() {
     test('attributes the count to the instance of the URL', () async {
       await UnreadCounts.sync([community, sandbox]);
 
-      await UnreadCounts.setByUrls(['https://sandbox.example.com/notification/entry?id=1'], 2);
+      await UnreadCounts.setByUrl('https://sandbox.example.com/notification/entry?id=1', 2);
 
       expect(UnreadCounts.counts.value, {community: 0, sandbox: 2});
       expect(badges, [2]);
     });
 
-    test('uses the first URL that belongs to an instance', () async {
-      await UnreadCounts.sync([community, sandbox]);
-
-      await UnreadCounts.setByUrls([null, 'https://other.example.com/', sandbox, community], 2);
-
-      expect(UnreadCounts.counts.value, {community: 0, sandbox: 2});
-    });
-
     test('ignores a count it cannot attribute with several instances', () async {
       await UnreadCounts.sync([community, sandbox]);
 
-      await UnreadCounts.setByUrls([], 4);
-      await UnreadCounts.setByUrls([null, 'https://other.example.com/'], 4);
+      await UnreadCounts.setByUrl(null, 4);
+      await UnreadCounts.setByUrl('https://other.example.com/', 4);
 
       expect(UnreadCounts.counts.value, {community: 0, sandbox: 0});
       expect(badges, isEmpty);
+    });
+  });
+
+  group('UnreadCounts.setByBaseUrl', () {
+    test('sets the count of the instance with the base URL', () async {
+      await UnreadCounts.sync([community, sandbox]);
+
+      await UnreadCounts.setByBaseUrl('https://sandbox.example.com', 2);
+
+      expect(UnreadCounts.counts.value, {community: 0, sandbox: 2});
+      expect(badges, [2]);
+    });
+
+    test('ignores an unknown base URL even with a single instance', () async {
+      await UnreadCounts.sync([community]);
+
+      await UnreadCounts.setByBaseUrl('https://other.example.com', 4);
+
+      expect(UnreadCounts.counts.value, {community: 0});
+      expect(badges, isEmpty);
+    });
+
+    test('does not attribute an instance in a sub folder to the one at the root', () async {
+      const root = 'https://www.cuzy.app';
+      await UnreadCounts.sync([root]);
+
+      await UnreadCounts.setByBaseUrl('https://www.cuzy.app/hhtest', 4);
+
+      expect(UnreadCounts.counts.value, {root: 0});
+      expect(badges, isEmpty);
+    });
+  });
+
+  group('UnreadCounts.instanceWithBaseUrl', () {
+    const root = 'https://hub.example.com';
+    const subFolder = 'https://hub.example.com/humhub/';
+
+    test('matches the same URL, ignoring a trailing slash', () {
+      expect(UnreadCounts.instanceWithBaseUrl('https://hub.example.com', [root, subFolder]), root);
+      expect(UnreadCounts.instanceWithBaseUrl('https://hub.example.com/', [root, subFolder]), root);
+      expect(UnreadCounts.instanceWithBaseUrl('https://hub.example.com/humhub', [root, subFolder]), subFolder);
+    });
+
+    test('ignores the case of scheme and host and a default port', () {
+      expect(UnreadCounts.instanceWithBaseUrl('HTTPS://Hub.Example.com', [root]), root);
+      expect(UnreadCounts.instanceWithBaseUrl('https://hub.example.com:443', [root]), root);
+    });
+
+    test('does not match other paths, schemes, hosts or ports', () {
+      expect(UnreadCounts.instanceWithBaseUrl('https://hub.example.com/humhub/s/space', [root, subFolder]), isNull);
+      expect(UnreadCounts.instanceWithBaseUrl('https://hub.example.com/other', [root]), isNull);
+      expect(UnreadCounts.instanceWithBaseUrl('http://hub.example.com', [root]), isNull);
+      expect(UnreadCounts.instanceWithBaseUrl('https://www.hub.example.com', [root]), isNull);
+      expect(UnreadCounts.instanceWithBaseUrl('https://hub.example.com:8443', [root]), isNull);
+    });
+
+    test('is null for invalid URLs', () {
+      expect(UnreadCounts.instanceWithBaseUrl('not a url', [root]), isNull);
+      expect(UnreadCounts.instanceWithBaseUrl('', [root]), isNull);
     });
   });
 
@@ -243,7 +294,7 @@ void main() {
       expect(UnreadCounts.counts.value, {community: 0, sandbox: 4});
     });
 
-    test('falls back to the URL for an unknown base URL', () async {
+    test('ignores the count of an unknown base URL instead of using the URL', () async {
       await UnreadCounts.sync([community, sandbox]);
 
       await applyUnreadCountOfPush(const RemoteMessage(
@@ -254,7 +305,35 @@ void main() {
         },
       ));
 
-      expect(UnreadCounts.counts.value, {community: 4, sandbox: 0});
+      expect(UnreadCounts.counts.value, {community: 0, sandbox: 0});
+      expect(badges, isEmpty);
+    });
+
+    test('ignores a sub folder instance that is not known, also with a single instance', () async {
+      const root = 'https://www.cuzy.app';
+      await UnreadCounts.sync([root]);
+
+      await applyUnreadCountOfPush(const RemoteMessage(
+        data: {
+          'base_url': 'https://www.cuzy.app/hhtest',
+          'url': 'https://www.cuzy.app/hhtest/notification/entry?id=1',
+          'notification_count': '4',
+        },
+      ));
+      await applyUnreadCountOfPush(const RemoteMessage(
+        data: {'base_url': 'https://www.cuzy.app/hhtest', 'notification_count': '4'},
+      ));
+
+      expect(UnreadCounts.counts.value, {root: 0});
+      expect(badges, isEmpty);
+    });
+
+    test('applies a silent message without base URL with a single instance', () async {
+      await UnreadCounts.sync([community]);
+
+      await applyUnreadCountOfPush(const RemoteMessage(data: {'notification_count': '3'}));
+
+      expect(UnreadCounts.counts.value, {community: 3});
     });
 
     test('ignores a message without count', () async {

@@ -39,17 +39,33 @@ class UnreadCounts {
     });
   }
 
-  /// Sets the count of the instance the first of [urls] belongs to that matches one. A count
-  /// that cannot be attributed this way, e.g. the one of a silent push message from a server
-  /// that does not send its base URL, is only applied if exactly one instance is known.
-  /// Otherwise it is ignored.
-  static Future<void> setByUrls(Iterable<String?> urls, int? count) async {
+  /// Sets the count of the instance whose base URL is [baseUrl], see [instanceWithBaseUrl].
+  ///
+  /// The base URL identifies the instance, so a count is ignored if no known instance has it,
+  /// even if the app knows a single instance only: it may come from an instance that was removed
+  /// from the app or that lives in a sub folder of a known one.
+  static Future<void> setByBaseUrl(String baseUrl, int? count) async {
     if (count == null || count < 0) return;
     await _change((counts) {
-      final instance = urls.map((url) => instanceOf(url, counts.keys)).firstWhere(
-            (instance) => instance != null,
-            orElse: () => counts.length == 1 ? counts.keys.single : null,
-          );
+      final instance = instanceWithBaseUrl(baseUrl, counts.keys);
+      if (instance == null) {
+        logDebug('UnreadCounts: No instance with the base URL $baseUrl for a count of $count');
+        return null;
+      }
+      counts[instance] = count;
+      return true;
+    });
+  }
+
+  /// Sets the count of the instance [url] belongs to, see [instanceOf]. For counts without a
+  /// base URL, e.g. of push messages from servers that do not send it yet.
+  ///
+  /// A count that cannot be attributed this way, e.g. the one of a silent push message, is
+  /// only applied if exactly one instance is known. Otherwise it is ignored.
+  static Future<void> setByUrl(String? url, int? count) async {
+    if (count == null || count < 0) return;
+    await _change((counts) {
+      final instance = instanceOf(url, counts.keys) ?? (counts.length == 1 ? counts.keys.single : null);
       if (instance == null) {
         logDebug('UnreadCounts: No instance for a count of $count');
         return null;
@@ -82,7 +98,31 @@ class UnreadCounts {
   /// Reads the stored counts again, see [counts].
   static Future<void> load() => _change((counts) => null);
 
+  /// The instance of [instances] whose base URL is [baseUrl], `null` if there is none.
+  ///
+  /// The base URL equals the `start_url` of the instance's manifest, so they must be the
+  /// same URL: scheme, host, port and path, ignoring a trailing slash.
+  static String? instanceWithBaseUrl(String baseUrl, Iterable<String> instances) {
+    final target = _normalizedBaseUrl(baseUrl);
+    if (target == null) return null;
+    for (final instance in instances) {
+      if (_normalizedBaseUrl(instance) == target) return instance;
+    }
+    return null;
+  }
+
+  static String? _normalizedBaseUrl(String url) {
+    final uri = Uri.tryParse(url.trim());
+    if (uri == null || !uri.hasAuthority) return null;
+    // Uri already lower-cases scheme and host and knows the default port of http and https
+    final path = uri.path.endsWith('/') ? uri.path.substring(0, uri.path.length - 1) : uri.path;
+    return '${uri.scheme}://${uri.host}:${uri.port}$path';
+  }
+
   /// The instance of [instances] that [url] belongs to, `null` if there is none.
+  ///
+  /// [url] may point anywhere into the instance, so the instance whose base URL is the
+  /// longest prefix of it wins.
   static String? instanceOf(String? url, Iterable<String> instances) {
     final target = url == null ? null : Uri.tryParse(url);
     if (target == null || !target.hasAuthority) return null;

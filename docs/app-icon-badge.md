@@ -28,13 +28,19 @@ later.
 | Source | Attributed to | Applied by |
 |---|---|---|
 | `updateNotificationCount` channel message, sent by the web view on every page load and when the count changes on the page | the network open in the web view | `WebView` / `WebViewF` |
-| `notification_count` of a push message in the foreground (iOS, Android) | the network of the message's `base_url` or, if missing, of its `url` (`go.humhub.com` links unwrapped) | `PushPlugin`, `FirebaseMessaging.onMessage` |
+| `notification_count` of a push message in the foreground (iOS, Android) | the network whose base URL is the message's `base_url`; for older servers without it, the network of its `url` (`go.humhub.com` links unwrapped) | `PushPlugin`, `FirebaseMessaging.onMessage` |
 | `notification_count` of a push message in the background (Android; iOS: silent messages only) | as above | `firebaseMessagingBackgroundHandler` |
 | Opening a network in the app, and the `unregisterFcmDevice` channel message, sent on the first page after logout | the network open in the web view, set to `0` | `WebView` / `WebViewF` |
 
-`base_url` is the `start_url` of the network's manifest, sent by fcm-push 2.3.3+ with every push message. A count
-that cannot be attributed is only applied if the app knows exactly one network. This concerns silent push messages
-of older servers, which carry neither `base_url` nor `url`, and messages of networks that are not in the history.
+`base_url` is the `start_url` of the network's manifest, sent by fcm-push 2.3.4+ with every push message. If a
+message carries it, it decides: the count goes to the network with exactly that base URL (scheme, host, port and path,
+ignoring a trailing slash), or is ignored. This also applies if the app knows a single network only, so the count of a
+network that was removed from the app, or of another network in a sub folder of the same host, never shows up on a
+known one.
+
+Messages of older servers without `base_url` are attributed via their `url`, matching the network whose base URL is
+the longest prefix of it. A count that cannot be attributed that way is only applied if the app knows exactly one
+network. This concerns their silent push messages, which carry no `url`.
 
 ```json
 {"type": "updateNotificationCount", "count": 3}
@@ -49,9 +55,9 @@ is no longer reset on app start, so the counts of networks that were not opened 
 
 | What | Requires |
 |---|---|
-| Badge from visible push messages while the app is closed | Fcm driver: fcm-push 2.3.3 ([humhub/fcm-push#115](https://github.com/humhub/fcm-push/pull/115)). Proxy driver: set by push.humhub.com |
+| Badge from visible push messages while the app is closed | Fcm driver: fcm-push 2.3.4 ([humhub/fcm-push#115](https://github.com/humhub/fcm-push/pull/115)). Proxy driver: set by push.humhub.com |
 | Real unread count while the network is open in the app, instead of `0` | fcm-push sending `updateNotificationCount` ([humhub/fcm-push#116](https://github.com/humhub/fcm-push/pull/116)) |
-| Counts corrected after reading in the browser | Silent push messages (Proxy driver only); with several networks only if they carry `base_url` (fcm-push 2.3.3+, push.humhub.com passing it on) |
+| Counts corrected after reading in the browser | Silent push messages (Proxy driver only); with several networks only if they carry `base_url` (fcm-push 2.3.4+) |
 
 ## Platforms
 
@@ -80,8 +86,10 @@ is no longer reset on app start, so the counts of networks that were not opened 
 ## Limitations
 
 - Silent push messages of servers that do not send `base_url` yet carry no network, so with several networks they
-  are ignored. The same applies if the "Base URL" setting of a network differs from the URL it is opened with:
-  push messages sent by queue jobs then carry a `base_url` the app does not know.
+  are ignored.
+- If the "Base URL" setting of a network differs from the URL it is opened with, push messages sent by queue jobs
+  carry a `base_url` the app does not know. Their counts are ignored, even if it is the only network, until the web
+  view sets the count when the network is opened.
 - On iOS, the badge set by the OS while the app is closed shows the count of one network, see above. A Notification
   Service Extension could correct it, but is left out until the planned REST API integration.
 - On Android, numeric badges depend on the launcher, see above.
