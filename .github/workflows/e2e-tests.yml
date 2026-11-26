@@ -142,7 +142,8 @@ jobs:
     # GitHub's Apple Silicon runners can't run Docker, so HumHub runs natively
     # here (scripts/e2e/native/), copied out of the same image as for Android.
     runs-on: macos-15
-    timeout-minutes: 60
+    # The first build takes ~20 min, and `flutter test` rebuilds for each file.
+    timeout-minutes: 90
     env:
       HUMHUB_IMAGE_TAG: ${{ inputs.humhub_image_tag || '1.18' }}
       E2E_BACKEND: native

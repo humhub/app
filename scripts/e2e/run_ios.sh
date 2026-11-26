@@ -71,12 +71,18 @@ rm -rf "$videos_dir" "$screenshots_dir"
 mkdir -p "$videos_dir" "$screenshots_dir"
 
 # HumHub.initApp() awaits the notification permission request, and the test
-# can't answer the system alert. Install the app once and pre-grant it;
-# `flutter test` installs over it, which keeps the permission.
+# can't answer the system alert. So the app is installed and the permission
+# granted before every test file: `flutter test` installs over it, which keeps
+# the permission, but uninstalls the app when it's done.
 echo "Building the app for the simulator..."
 flutter build ios --simulator --debug --target integration_test/app_launch_test.dart 2>&1 | tee "$logs_dir/ios_build.txt"
-xcrun simctl install "$SIMULATOR" build/ios/iphonesimulator/Runner.app
-applesimutils --byId "$SIMULATOR" --bundle "$PACKAGE" --setPermissions notifications=YES > /dev/null
+
+# Whichever build is there (`flutter test` replaces it), it only has to carry
+# the bundle id.
+install_app() {
+  xcrun simctl install "$SIMULATOR" build/ios/iphonesimulator/Runner.app
+  applesimutils --byId "$SIMULATOR" --bundle "$PACKAGE" --setPermissions notifications=YES > /dev/null
+}
 
 xcrun simctl spawn "$SIMULATOR" log stream --level debug --style compact \
   --predicate 'process == "Runner"' > "$logs_dir/simulator.log" 2>&1 &
@@ -89,6 +95,8 @@ xcrun simctl spawn "$SIMULATOR" log stream --style compact \
     *E2E_SCREENSHOT:*)
       name="${line##*E2E_SCREENSHOT:}"
       name="${name//[^a-z0-9-]/}"
+      # log stream's header line repeats the predicate.
+      [ -n "$name" ] || continue
       xcrun simctl io "$SIMULATOR" screenshot "$screenshots_dir/$name.png" > /dev/null 2>&1 < /dev/null
       echo "Screenshot of failed test: $screenshots_dir/$name.png"
       ;;
@@ -126,6 +134,7 @@ for test_file in integration_test/*_test.dart; do
   name="$(basename "$test_file" .dart)"
   # A leftover app process would start the recording before the build.
   xcrun simctl terminate "$SIMULATOR" "$PACKAGE" > /dev/null 2>&1 || true
+  install_app
   start_recording "$name"
   flutter test "$test_file" \
     -d "$SIMULATOR" \
