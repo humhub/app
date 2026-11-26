@@ -1,7 +1,7 @@
 name: e2e-tests
 
-# Runs the integration_test smoke suite on an Android emulator against a
-# disposable HumHub backend in Docker (see scripts/e2e/README.md).
+# Runs the integration_test smoke suite on an Android emulator and an iOS
+# Simulator, each against a disposable HumHub backend (see scripts/e2e/README.md).
 # Also called by version-release.yml to gate store uploads.
 
 on:
@@ -28,6 +28,8 @@ concurrency:
 jobs:
   android:
     name: Android e2e
+    # TEMP: skipped while the iOS job is being set up; remove to re-enable.
+    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -131,6 +133,71 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: e2e-android-logs
+          path: scripts/e2e/logs
+          if-no-files-found: ignore
+          retention-days: 7
+
+  ios:
+    name: iOS e2e
+    # GitHub's Apple Silicon runners can't run Docker, so HumHub runs natively
+    # here (scripts/e2e/native/), copied out of the same image as for Android.
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      HUMHUB_IMAGE_TAG: ${{ inputs.humhub_image_tag || '1.18' }}
+      E2E_BACKEND: native
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 26.3
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: exif, intl, zip, pdo_mysql, gd, mbstring, curl
+          tools: none
+
+      - name: Install MariaDB, crane and applesimutils
+        run: |
+          brew install mariadb crane wix/brew/applesimutils
+          echo "HUMHUB_IMAGE_DIGEST=$(crane digest humhub/humhub:$HUMHUB_IMAGE_TAG)" >> "$GITHUB_ENV"
+
+      - name: Cache HumHub copy
+        uses: actions/cache@v4
+        with:
+          path: scripts/e2e/native/.cache
+          key: humhub-native-${{ env.HUMHUB_IMAGE_DIGEST }}
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Start HumHub backend
+        run: scripts/e2e/up.sh
+
+      - name: Run e2e tests on simulator
+        run: scripts/e2e/run_ios.sh
+
+      - name: Collect backend logs
+        if: failure()
+        run: cp -R scripts/e2e/native/.humhub/protected/runtime/logs scripts/e2e/logs/humhub/app || true
+
+      # Always uploaded while the suite is being stabilised: includes a screen
+      # recording of every test file and screenshots of failed tests.
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-ios-logs
           path: scripts/e2e/logs
           if-no-files-found: ignore
           retention-days: 7

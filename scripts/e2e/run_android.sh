@@ -12,7 +12,9 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 repo_root="$(cd "$script_dir/../.." && pwd)"
-fixtures_file="$script_dir/.e2e_fixtures.env"
+# shellcheck source=lib.sh
+source "$script_dir/lib.sh"
+fixtures_file="$e2e_fixtures_file"
 export DEVICE="${DEVICE:-emulator-5554}"
 export PACKAGE="${PACKAGE:-com.humhub.app}"
 upload_file_name="e2e_upload.txt"
@@ -104,7 +106,6 @@ for test_file in integration_test/*_test.dart; do
   stop_recording "$name"
 done
 
-echo "Checking the shared file reached the backend..."
-(cd "$script_dir" && docker compose exec -T humhub /app/yii e2e/seed/assert-upload "$E2E_USERNAME" "$upload_file_name") || status=1
+e2e_assert_upload "$E2E_USERNAME" "$upload_file_name" || status=1
 
 exit "$status"

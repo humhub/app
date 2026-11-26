@@ -1,26 +1,39 @@
 #!/usr/bin/env bash
 # Starts the disposable HumHub backend for the e2e smoke tests, installs it
 # unattended and seeds fixtures. Writes the fixture URLs to .e2e_fixtures.env
-# (sourced by run_android.sh). Safe to re-run: install/seed only happen once.
+# (sourced by run_android.sh / run_ios.sh). Safe to re-run: install/seed only
+# happen once.
 #
 # Env:
+#   E2E_BACKEND       docker (default, for Android) or native (for iOS), see lib.sh
 #   HUMHUB_IMAGE_TAG  humhub/humhub image tag (default: see docker-compose.yml)
-#   E2E_BASE_URL      URL the device uses to reach the backend
-#                     (default: http://10.0.2.2:8080, the Android emulator's
-#                     alias for the host)
+#   E2E_BASE_URL      URL the device uses to reach the backend (default:
+#                     http://10.0.2.2:8080, the Android emulator's alias for
+#                     the host; http://localhost:8080 for the native backend,
+#                     as the iOS Simulator shares the host's network)
 set -euo pipefail
 
 cd "$(dirname "$0")"
+# shellcheck source=lib.sh
+source lib.sh
 
-E2E_BASE_URL="${E2E_BASE_URL:-http://10.0.2.2:8080}"
+if [ "$E2E_BACKEND" = native ]; then
+  E2E_BASE_URL="${E2E_BASE_URL:-http://localhost:8080}"
+else
+  E2E_BASE_URL="${E2E_BASE_URL:-http://10.0.2.2:8080}"
+fi
 E2E_USERNAME="${E2E_USERNAME:-e2etester}"
 E2E_PASSWORD="${E2E_PASSWORD:-E2e-Pass-1}"
-FIXTURES_FILE=".e2e_fixtures.env"
+FIXTURES_FILE="$e2e_fixtures_file"
 
-yii() { docker compose exec -T humhub /app/yii "$@"; }
+yii() { e2e_yii "$@"; }
 
-echo "Starting HumHub containers..."
-docker compose up -d --wait
+if [ "$E2E_BACKEND" = native ]; then
+  native/start.sh
+else
+  echo "Starting HumHub containers..."
+  docker compose up -d --wait
+fi
 
 if yii settings/list-module admin 2>/dev/null | grep -q installationId; then
   echo "HumHub already installed, skipping install and seed."

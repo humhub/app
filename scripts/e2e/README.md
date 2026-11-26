@@ -1,7 +1,8 @@
 # E2E smoke tests
 
-Runs the `integration_test/` suite on an Android emulator against a
-disposable HumHub instance (official `humhub/humhub` Docker image + MariaDB).
+Runs the `integration_test/` suite on an Android emulator and an iOS
+Simulator against a disposable HumHub instance (official `humhub/humhub`
+image + MariaDB).
 CI: `.github/workflows/e2e-tests.yml` (PRs, manual runs, and as a gate in
 `version-release.yml`).
 
@@ -23,10 +24,29 @@ scripts/e2e/down.sh          # stop and delete all data
   app launches. A failing test also leaves a screenshot of the moment it
   failed in `logs/screenshots/`, named after the test's description (via
   `integration_test/support/e2e_test.dart`). In CI both are in the
-  `e2e-android-logs` artifact, kept for 7 days.
+  `e2e-android-logs` / `e2e-ios-logs` artifacts, kept for 7 days.
 - Pick a HumHub version with `HUMHUB_IMAGE_TAG=1.19 scripts/e2e/up.sh`
   (run `down.sh` first when switching).
 - The image is amd64-only; on Apple Silicon it runs under emulation.
+
+## Run locally on iOS
+
+GitHub's Apple Silicon macOS runners can't run Docker, so for iOS HumHub runs
+natively: PHP's built-in server and MariaDB on the Mac, with HumHub copied
+out of the same `humhub/humhub` image (`native/start.sh`). The simulator
+reaches it at `http://localhost:8080`.
+
+Requires Xcode, PHP 8.2+ (exif, intl, zip, pdo_mysql, gd, mbstring, curl)
+and `brew install mariadb crane wix/brew/applesimutils`.
+
+```bash
+E2E_BACKEND=native scripts/e2e/up.sh     # start, install and seed HumHub
+scripts/e2e/run_ios.sh                   # run the suite (SIMULATOR=<udid> optional)
+E2E_BACKEND=native scripts/e2e/down.sh   # stop and delete all data
+```
+
+`run_ios.sh` creates and reuses a simulator named `humhub-e2e`, and grants
+the notification permission up front, as the test can't answer the alert.
 
 ## What's where
 
@@ -34,11 +54,18 @@ scripts/e2e/down.sh          # stop and delete all data
 - `seed_module/` – tiny HumHub module mounted into the container; its console
   commands create the fixture space/post (`e2e/seed`) and verify the uploaded
   file (`e2e/seed/assert-upload`).
-- `up.sh` – unattended install, test user, fixtures → `.e2e_fixtures.env`.
+- `lib.sh` – shared helpers; `E2E_BACKEND` selects `docker` (default) or
+  `native`.
+- `native/` – the native backend for iOS (`start.sh`, `stop.sh`, router for
+  PHP's built-in server).
+- `up.sh` – unattended install, test user, fixtures → `.e2e_fixtures.env`
+  (`.e2e_fixtures.native.env` for the native backend).
 - `run_android.sh` – runs each test file separately with a screen recording,
   passes the fixtures to the tests via `--dart-define`,
   grants runtime permissions in the background (`grant_permissions.sh`) so
   the app's startup permission request doesn't block, writes `logs/logcat.txt`,
   then checks the upload reached the backend.
-- `integration_test/fixtures/google-services.json` – dummy Firebase config so
-  the app builds without secrets and never talks to the real project.
+- `run_ios.sh` – the same for the iOS Simulator.
+- `integration_test/fixtures/google-services.json`, `GoogleService-Info.plist`
+  – dummy Firebase configs so the app builds without secrets and never talks
+  to the real project.
