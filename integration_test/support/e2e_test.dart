@@ -4,6 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 /// to take a screenshot.
 const _screenshotMarker = 'E2E_SCREENSHOT:';
 
+/// Integration tests on a device have no timeout by default, so a hanging test
+/// (e.g. on a system alert) would block the whole CI job.
+const _testTimeout = Timeout(Duration(minutes: 5));
+
 /// [testWidgets] that requests a screenshot of the device when [body] fails.
 ///
 /// The screenshot is taken on the host (`adb screencap`, `simctl io screenshot`),
@@ -22,7 +26,7 @@ void e2eTest(String description, WidgetTesterCallback body) {
       }
       rethrow;
     }
-  });
+  }, timeout: _testTimeout);
 }
 
 String _slug(String description) =>

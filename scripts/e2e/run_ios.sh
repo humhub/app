@@ -74,8 +74,7 @@ mkdir -p "$videos_dir" "$screenshots_dir"
 # can't answer the system alert. Install the app once and pre-grant it;
 # `flutter test` installs over it, which keeps the permission.
 echo "Building the app for the simulator..."
-flutter build ios --simulator --debug --target integration_test/app_launch_test.dart > "$logs_dir/ios_build.txt" 2>&1 ||
-  { tail -50 "$logs_dir/ios_build.txt"; exit 1; }
+flutter build ios --simulator --debug --target integration_test/app_launch_test.dart 2>&1 | tee "$logs_dir/ios_build.txt"
 xcrun simctl install "$SIMULATOR" build/ios/iphonesimulator/Runner.app
 applesimutils --byId "$SIMULATOR" --bundle "$PACKAGE" --setPermissions notifications=YES > /dev/null
 
