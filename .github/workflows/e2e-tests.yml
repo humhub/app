@@ -29,8 +29,6 @@ concurrency:
 jobs:
   android:
     name: Android e2e
-    # TEMP: skipped while the iOS job is being set up; remove to re-enable.
-    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:

@@ -27,7 +27,8 @@ jobs:
 
   build_android:
     name: Build APK
-    needs: [version]
+    # Builds create the GitHub release, so they wait for the e2e tests too.
+    needs: [version, e2e]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -114,6 +115,8 @@ jobs:
           name: APKs
           path: build/app/outputs/flutter-apk/*.apk
 
+  # Every e2e job (Android, Android API levels, iOS) must pass before anything
+  # is built or released.
   e2e:
     name: E2E smoke tests
     uses: ./.github/workflows/e2e-tests.yml
@@ -142,7 +145,8 @@ jobs:
 
   build_ios:
     name: Build IPA
-    needs: [version]
+    # Builds create the GitHub release, so they wait for the e2e tests too.
+    needs: [version, e2e]
     runs-on: macos-15
     permissions:
       contents: write
