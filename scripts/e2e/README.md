@@ -54,10 +54,10 @@ minutes. Videos are then named after the test's description.
 
 ## Android version compatibility
 
-`.github/workflows/android-compat.yml` runs the app launch test
-(`integration_test/app_launch_test.dart`) on one emulator per API level, from
-the app's minSdk (24) up to its targetSdk (36), see humhub/app#189. It gates
-the Google Play upload in `version-release.yml` and can be started manually.
+The `android_compat` job in `.github/workflows/e2e-tests.yml` runs the app
+launch test (`integration_test/app_launch_test.dart`) on one emulator per API
+level, from the app's minSdk (24) up to its targetSdk (36), see
+humhub/app#189. It runs alongside the other e2e jobs.
 To check one level locally, start an emulator with that API level and run:
 
 ```bash

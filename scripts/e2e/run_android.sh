@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Runs the integration_test suite on an Android emulator against the backend
-# started by up.sh. Used both locally and in CI (.github/workflows/e2e-tests.yml,
-# android-compat.yml).
+# started by up.sh. Used both locally and in CI (.github/workflows/e2e-tests.yml).
 #
 # Usage: run_android.sh [test_file...]
 #   By default runs every integration_test/*_test.dart file separately.

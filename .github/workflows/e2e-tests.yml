@@ -1,7 +1,8 @@
 name: e2e-tests
 
 # Runs the integration_test smoke suite on an Android emulator and an iOS
-# Simulator, each against a disposable HumHub backend (see scripts/e2e/README.md).
+# Simulator, each against a disposable HumHub backend (see scripts/e2e/README.md),
+# and the app launch test on every supported Android API level.
 # Also called by version-release.yml to gate store uploads.
 
 on:
@@ -133,6 +134,111 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: e2e-android-logs
+          path: scripts/e2e/logs
+          if-no-files-found: ignore
+          retention-days: 7
+
+  android_compat:
+    # Checks the app still starts on the Android versions it supports
+    # (humhub/app#189), from minSdk (24) up to targetSdk (36). Runs next to the
+    # full suite.
+    name: Android API ${{ matrix.api-level }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      # Every level's result is wanted, not only the first failure.
+      fail-fast: false
+      matrix:
+        api-level: [24, 26, 28, 30, 33, 36]
+    env:
+      HUMHUB_IMAGE_TAG: ${{ inputs.humhub_image_tag || '1.18' }}
+      EMULATOR_OPTIONS: -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim -camera-back none
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # The test harness needs the backend's fixture values. Runs in the
+      # background while the toolchain and emulator are set up.
+      - name: Start HumHub backend (background)
+        run: |
+          mkdir -p scripts/e2e/logs
+          nohup scripts/e2e/up.sh > scripts/e2e/logs/up.txt 2>&1 &
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: gradle
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Same AVD caching as the android job in e2e-tests.yml.
+      - name: Restore AVD
+        uses: actions/cache/restore@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}-google_apis-x86_64-v1
+
+      - name: Create AVD snapshot
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: ${{ env.EMULATOR_OPTIONS }}
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Save AVD
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: ${{ steps.avd-cache.outputs.cache-primary-key }}
+
+      - name: Wait for HumHub backend
+        timeout-minutes: 10
+        run: |
+          while pgrep -f scripts/e2e/up.sh > /dev/null; do sleep 2; done
+          cat scripts/e2e/logs/up.txt
+          test -f scripts/e2e/.e2e_fixtures.env
+
+      - name: Run app launch test on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save ${{ env.EMULATOR_OPTIONS }}
+          disable-animations: true
+          script: scripts/e2e/run_android.sh integration_test/app_launch_test.dart
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-android-api${{ matrix.api-level }}-logs
           path: scripts/e2e/logs
           if-no-files-found: ignore
           retention-days: 7

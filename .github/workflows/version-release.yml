@@ -118,13 +118,9 @@ jobs:
     name: E2E smoke tests
     uses: ./.github/workflows/e2e-tests.yml
 
-  android_compat:
-    name: Android version compatibility
-    uses: ./.github/workflows/android-compat.yml
-
   release_android:
     name: Release APK to Google Play
-    needs: [build_android, e2e, android_compat]
+    needs: [build_android, e2e]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
