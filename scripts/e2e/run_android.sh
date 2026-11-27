@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+# Runs the integration_test suite on an Android emulator against the backend
+# started by up.sh. Used both locally and in CI (.github/workflows/e2e-tests.yml).
+#
+# Usage: run_android.sh [test_file...]
+#   By default runs every integration_test/*_test.dart file separately.
+#
+# Env:
+#   DEVICE   adb serial of the emulator (default: emulator-5554)
+#   PACKAGE  application id of the app (default: com.humhub.app)
+#
+# Every test file gets its own screen recording in logs/videos/, and a failing
+# test a screenshot in logs/screenshots/ (see integration_test/support/e2e_test.dart).
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+repo_root="$(cd "$script_dir/../.." && pwd)"
+# shellcheck source=lib.sh
+source "$script_dir/lib.sh"
+fixtures_file="$e2e_fixtures_file"
+export DEVICE="${DEVICE:-emulator-5554}"
+export PACKAGE="${PACKAGE:-com.humhub.app}"
+# Unique per run, so an upload left over from an earlier run on the same
+# backend can't make the check pass.
+upload_file_name="e2e_upload_$(date +%s).txt"
+
+if [ ! -f "$fixtures_file" ]; then
+  echo "Missing $fixtures_file, run scripts/e2e/up.sh first." >&2
+  exit 1
+fi
+set -a
+# shellcheck source=/dev/null
+source "$fixtures_file"
+set +a
+
+cd "$repo_root"
+
+# The Gradle google-services plugin needs a config file; use a dummy one so
+# the tests never touch the production Firebase project.
+if [ ! -f android/app/google-services.json ]; then
+  cp integration_test/fixtures/google-services.json android/app/google-services.json
+fi
+
+logs_dir="$script_dir/logs"
+videos_dir="$logs_dir/videos"
+screenshots_dir="$logs_dir/screenshots"
+rm -rf "$videos_dir" "$screenshots_dir"
+mkdir -p "$videos_dir" "$screenshots_dir"
+# Older images (e.g. API 26) can fail to clear the log right after boot.
+adb -s "$DEVICE" logcat -c || true
+adb -s "$DEVICE" logcat > "$logs_dir/logcat.txt" 2>&1 &
+
+"$script_dir/grant_permissions.sh" &
+
+# Takes a screenshot when a failing test asks for one. The test's own output is
+# only printed once it has finished, so watch logcat instead.
+adb -s "$DEVICE" logcat -T 1 -v raw -s flutter | while IFS= read -r line; do
+  case "$line" in
+    *E2E_SCREENSHOT:*)
+      name="${line##*E2E_SCREENSHOT:}"
+      name="${name//[^a-z0-9-]/}"
+      adb -s "$DEVICE" exec-out screencap -p > "$screenshots_dir/$name.png" < /dev/null
+      echo "Screenshot of failed test: $screenshots_dir/$name.png"
+      ;;
+  esac
+done &
+
+trap 'kill $(jobs -p) 2>/dev/null || true' EXIT
+
+# Starts recording once the app is running, so the build is not recorded:
+# screenrecord stops after 3 minutes and the first build alone takes longer.
+start_recording() {
+  (
+    until adb -s "$DEVICE" shell pidof "$PACKAGE" > /dev/null 2>&1; do sleep 0.5; done
+    adb -s "$DEVICE" shell screenrecord --bit-rate 4000000 "/sdcard/e2e_$1.mp4"
+  ) &
+  recorder_pid=$!
+}
+
+stop_recording() {
+  local video="/sdcard/e2e_$1.mp4"
+  adb -s "$DEVICE" shell pkill -INT screenrecord > /dev/null 2>&1 || true
+  # Let screenrecord finish the file; the helper may also still be waiting for
+  # an app that never started.
+  for _ in $(seq 20); do
+    kill -0 "$recorder_pid" 2> /dev/null || break
+    sleep 0.25
+  done
+  pkill -P "$recorder_pid" 2> /dev/null || true
+  kill "$recorder_pid" 2> /dev/null || true
+  sleep 1
+  if adb -s "$DEVICE" shell ls "$video" > /dev/null 2>&1; then
+    adb -s "$DEVICE" pull "$video" "$videos_dir/$1.mp4" > /dev/null
+    adb -s "$DEVICE" shell rm -f "$video"
+  fi
+}
+
+if [ $# -eq 0 ]; then
+  set -- integration_test/*_test.dart
+fi
+
+status=0
+for test_file in "$@"; do
+  name="$(basename "$test_file" .dart)"
+  # Runs all the others in one app; used on iOS.
+  [ "$name" != all_test ] || continue
+  # A leftover app process would start the recording before the build.
+  adb -s "$DEVICE" shell am force-stop "$PACKAGE" > /dev/null 2>&1 || true
+  start_recording "$name"
+  flutter test "$test_file" \
+    -d "$DEVICE" \
+    --dart-define=E2E_SERVER_URL="$E2E_SERVER_URL" \
+    --dart-define=E2E_USERNAME="$E2E_USERNAME" \
+    --dart-define=E2E_PASSWORD="$E2E_PASSWORD" \
+    --dart-define=E2E_EXTERNAL_LINK_POST_URL="$E2E_EXTERNAL_LINK_POST_URL" \
+    --dart-define=E2E_DEEP_LINK_TARGET_URL="$E2E_DEEP_LINK_TARGET_URL" \
+    --dart-define=E2E_UPLOAD_FILE_NAME="$upload_file_name" || status=1
+  stop_recording "$name"
+done
+
+if [[ " $* " == *file_upload_test.dart* ]]; then
+  e2e_assert_upload "$E2E_USERNAME" "$upload_file_name" || status=1
+fi
+
+exit "$status"

@@ -1,0 +1,10 @@
+{
+    "id": "e2e",
+    "name": "E2E Fixtures",
+    "description": "Console commands that seed fixtures for the mobile app e2e smoke tests. Testing only.",
+    "keywords": ["testing"],
+    "version": "1.0.0",
+    "humhub": {
+        "minVersion": "1.18"
+    }
+}

@@ -44,7 +44,9 @@ class SecureStorageService {
     try {
       await _instance.write(key: key, value: value);
     } on PlatformException catch (e) {
-      if (e.code == '-25299') {
+      // On iOS the plugin reports code "Unexpected security result code" with
+      // the OSStatus in details.
+      if (e.code == '-25299' || '${e.details}' == '-25299') {
         await _instance.delete(key: key);
         await _instance.write(key: key, value: value);
       } else {

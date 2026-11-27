@@ -27,7 +27,8 @@ jobs:
 
   build_android:
     name: Build APK
-    needs: [version]
+    # Builds create the GitHub release, so they wait for the e2e tests too.
+    needs: [version, e2e]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -83,7 +84,7 @@ jobs:
           java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.44.6'
+          flutter-version: '3.47.0'
           channel: 'stable'
       - uses: chkfung/android-version-actions@v1.2.1
         with:
@@ -114,6 +115,12 @@ jobs:
           name: APKs
           path: build/app/outputs/flutter-apk/*.apk
 
+  # Every e2e job (Android, Android API levels, iOS) must pass before anything
+  # is built or released.
+  e2e:
+    name: E2E smoke tests
+    uses: ./.github/workflows/e2e-tests.yml
+
   release_android:
     name: Release APK to Google Play
     needs: [build_android]
@@ -138,7 +145,8 @@ jobs:
 
   build_ios:
     name: Build IPA
-    needs: [version]
+    # Builds create the GitHub release, so they wait for the e2e tests too.
+    needs: [version, e2e]
     runs-on: macos-15
     permissions:
       contents: write
@@ -194,7 +202,7 @@ jobs:
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.44.6'
+          flutter-version: '3.47.0'
           channel: 'stable'
           cache: true
       - name: Flutter doctor

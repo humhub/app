@@ -51,12 +51,12 @@ class OpenerPageState extends ConsumerState<OpenerPage> with SingleTickerProvide
       // Delay before showing text field
       ref.read(visibilityProvider.notifier).setVisibility(true);
       Future.delayed(const Duration(milliseconds: 1000), () {
-        ref.read(textFieldVisibilityProvider.notifier).setVisibility(true);
+        if (mounted) ref.read(textFieldVisibilityProvider.notifier).setVisibility(true);
       });
 
       // Delay before showing language switcher
       Future.delayed(const Duration(milliseconds: 700), () {
-        ref.read(languageSwitcherVisibilityProvider.notifier).setVisibility(true);
+        if (mounted) ref.read(languageSwitcherVisibilityProvider.notifier).setVisibility(true);
       });
 
       String? urlIntent = InitFromUrl.usePayload();
