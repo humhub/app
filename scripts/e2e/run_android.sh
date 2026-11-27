@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Runs the integration_test suite on an Android emulator against the backend
-# started by up.sh. Used both locally and in CI (.github/workflows/e2e-tests.yml).
+# started by up.sh. Used both locally and in CI (.github/workflows/e2e-tests.yml,
+# android-compat.yml).
+#
+# Usage: run_android.sh [test_file...]
+#   By default runs every integration_test/*_test.dart file separately.
 #
 # Env:
 #   DEVICE   adb serial of the emulator (default: emulator-5554)
@@ -89,8 +93,12 @@ stop_recording() {
   fi
 }
 
+if [ $# -eq 0 ]; then
+  set -- integration_test/*_test.dart
+fi
+
 status=0
-for test_file in integration_test/*_test.dart; do
+for test_file in "$@"; do
   name="$(basename "$test_file" .dart)"
   # Runs all the others in one app; used on iOS.
   [ "$name" != all_test ] || continue
@@ -108,6 +116,8 @@ for test_file in integration_test/*_test.dart; do
   stop_recording "$name"
 done
 
-e2e_assert_upload "$E2E_USERNAME" "$upload_file_name" || status=1
+if [[ " $* " == *file_upload_test.dart* ]]; then
+  e2e_assert_upload "$E2E_USERNAME" "$upload_file_name" || status=1
+fi
 
 exit "$status"

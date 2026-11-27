@@ -52,6 +52,18 @@ By default it runs `integration_test/all_test.dart`, i.e. every test in one
 app, since each `flutter test` file means another Xcode build of a few
 minutes. Videos are then named after the test's description.
 
+## Android version compatibility
+
+`.github/workflows/android-compat.yml` runs the app launch test
+(`integration_test/app_launch_test.dart`) on one emulator per API level, from
+the app's minSdk (24) up to its targetSdk (36), see humhub/app#189. It gates
+the Google Play upload in `version-release.yml` and can be started manually.
+To check one level locally, start an emulator with that API level and run:
+
+```bash
+scripts/e2e/run_android.sh integration_test/app_launch_test.dart
+```
+
 ## What's where
 
 - `docker-compose.yml` – HumHub + MariaDB, plain HTTP on :8080.
@@ -64,7 +76,7 @@ minutes. Videos are then named after the test's description.
   PHP's built-in server).
 - `up.sh` – unattended install, test user, fixtures → `.e2e_fixtures.env`
   (`.e2e_fixtures.native.env` for the native backend).
-- `run_android.sh` – runs each test file separately with a screen recording,
+- `run_android.sh [test_file...]` – runs each test file separately with a screen recording,
   passes the fixtures to the tests via `--dart-define`,
   grants runtime permissions in the background (`grant_permissions.sh`) so
   the app's startup permission request doesn't block, writes `logs/logcat.txt`,
