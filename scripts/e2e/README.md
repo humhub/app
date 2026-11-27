@@ -42,11 +42,15 @@ and `brew install mariadb crane wix/brew/applesimutils`.
 ```bash
 E2E_BACKEND=native scripts/e2e/up.sh     # start, install and seed HumHub
 scripts/e2e/run_ios.sh                   # run the suite (SIMULATOR=<udid> optional)
+scripts/e2e/run_ios.sh integration_test/login_test.dart   # or single files
 E2E_BACKEND=native scripts/e2e/down.sh   # stop and delete all data
 ```
 
 `run_ios.sh` creates and reuses a simulator named `humhub-e2e`, and grants
 the notification permission up front, as the test can't answer the alert.
+By default it runs `integration_test/all_test.dart`, i.e. every test in one
+app, since each `flutter test` file means another Xcode build of a few
+minutes. Videos are then named after the test's description.
 
 ## What's where
 
@@ -65,7 +69,9 @@ the notification permission up front, as the test can't answer the alert.
   grants runtime permissions in the background (`grant_permissions.sh`) so
   the app's startup permission request doesn't block, writes `logs/logcat.txt`,
   then checks the upload reached the backend.
-- `run_ios.sh` – the same for the iOS Simulator.
+- `run_ios.sh` – the same for the iOS Simulator, all tests in one run
+  (`integration_test/all_test.dart`), recording each test on the markers
+  `e2e_test.dart` prints.
 - `integration_test/fixtures/google-services.json`, `GoogleService-Info.plist`
   – dummy Firebase configs so the app builds without secrets and never talks
   to the real project.

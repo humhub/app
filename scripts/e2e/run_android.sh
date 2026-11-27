@@ -92,6 +92,8 @@ stop_recording() {
 status=0
 for test_file in integration_test/*_test.dart; do
   name="$(basename "$test_file" .dart)"
+  # Runs all the others in one app; used on iOS.
+  [ "$name" != all_test ] || continue
   # A leftover app process would start the recording before the build.
   adb -s "$DEVICE" shell am force-stop "$PACKAGE" > /dev/null 2>&1 || true
   start_recording "$name"

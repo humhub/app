@@ -8,8 +8,14 @@
 #              "humhub-e2e", created with the newest iOS runtime if missing)
 #   PACKAGE    bundle id of the app (default: com.humhub.app)
 #
-# Every test file gets its own screen recording in logs/videos/, and a failing
-# test a screenshot in logs/screenshots/ (see integration_test/support/e2e_test.dart).
+# Usage: run_ios.sh [test_file...]
+#   By default runs integration_test/all_test.dart, i.e. every test in one app
+#   build, as each `flutter test` file means another few-minute Xcode build.
+#   Pass single files to run them separately (e.g. to rule out state leaking
+#   from one test into the next).
+#
+# Every test gets its own screen recording in logs/videos/, and a failing test
+# a screenshot in logs/screenshots/ (see integration_test/support/e2e_test.dart).
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
@@ -61,8 +67,12 @@ print(runtime["identifier"], max(phones)[1])
   SIMULATOR="$(xcrun simctl create humhub-e2e "$device_type" "$runtime")"
 fi
 export SIMULATOR
-xcrun simctl boot "$SIMULATOR" 2> /dev/null || true
-xcrun simctl bootstatus "$SIMULATOR" -b > /dev/null
+# Boots while the app builds.
+(
+  xcrun simctl boot "$SIMULATOR" 2> /dev/null || true
+  xcrun simctl bootstatus "$SIMULATOR" -b > /dev/null
+) &
+boot_pid=$!
 
 logs_dir="$script_dir/logs"
 videos_dir="$logs_dir/videos"
@@ -70,15 +80,27 @@ screenshots_dir="$logs_dir/screenshots"
 rm -rf "$videos_dir" "$screenshots_dir"
 mkdir -p "$videos_dir" "$screenshots_dir"
 
+if [ $# -eq 0 ]; then
+  set -- integration_test/all_test.dart
+fi
+dart_defines=(
+  --dart-define=E2E_SERVER_URL="$E2E_SERVER_URL"
+  --dart-define=E2E_USERNAME="$E2E_USERNAME"
+  --dart-define=E2E_PASSWORD="$E2E_PASSWORD"
+  --dart-define=E2E_EXTERNAL_LINK_POST_URL="$E2E_EXTERNAL_LINK_POST_URL"
+  --dart-define=E2E_DEEP_LINK_TARGET_URL="$E2E_DEEP_LINK_TARGET_URL"
+  --dart-define=E2E_UPLOAD_FILE_NAME="$upload_file_name"
+)
+
 # HumHub.initApp() awaits the notification permission request, and the test
 # can't answer the system alert. So the app is installed and the permission
-# granted before every test file: `flutter test` installs over it, which keeps
-# the permission, but uninstalls the app when it's done.
+# granted before `flutter test`, which installs over it (keeping the
+# permission). Built with the same target and defines as the first test file,
+# so the build in `flutter test` has little left to do.
 echo "Building the app for the simulator..."
-flutter build ios --simulator --debug --target integration_test/app_launch_test.dart 2>&1 | tee "$logs_dir/ios_build.txt"
+flutter build ios --simulator --debug --target "$1" "${dart_defines[@]}" 2>&1 | tee "$logs_dir/ios_build.txt"
+wait "$boot_pid"
 
-# Whichever build is there (`flutter test` replaces it), it only has to carry
-# the bundle id.
 install_app() {
   xcrun simctl install "$SIMULATOR" build/ios/iphonesimulator/Runner.app
   applesimutils --byId "$SIMULATOR" --bundle "$PACKAGE" --setPermissions notifications=YES > /dev/null
@@ -87,16 +109,41 @@ install_app() {
 xcrun simctl spawn "$SIMULATOR" log stream --level debug --style compact \
   --predicate 'process == "Runner"' > "$logs_dir/simulator.log" 2>&1 &
 
-# Takes a screenshot when a failing test asks for one. The test's own output is
-# only printed once it has finished, so watch the device log instead.
+recorder_pid=
+
+start_recording() {
+  xcrun simctl io "$SIMULATOR" recordVideo --codec=h264 --force "$videos_dir/$1.mp4" > /dev/null 2>&1 < /dev/null &
+  recorder_pid=$!
+}
+
+stop_recording() {
+  [ -n "$recorder_pid" ] || return 0
+  # SIGINT lets recordVideo finish the file.
+  kill -INT "$recorder_pid" 2> /dev/null || true
+  for _ in $(seq 40); do
+    kill -0 "$recorder_pid" 2> /dev/null || break
+    sleep 0.25
+  done
+  kill "$recorder_pid" 2> /dev/null || true
+  recorder_pid=
+}
+
+# Records each test and takes a screenshot when a failing test asks for one,
+# on the markers integration_test/support/e2e_test.dart prints. The test's own
+# output is only printed once it has finished, so watch the device log instead.
 xcrun simctl spawn "$SIMULATOR" log stream --style compact \
-  --predicate 'eventMessage CONTAINS "E2E_SCREENSHOT:"' 2> /dev/null | while IFS= read -r line; do
-  case "$line" in
-    *E2E_SCREENSHOT:*)
-      name="${line##*E2E_SCREENSHOT:}"
-      name="${name//[^a-z0-9-]/}"
-      # log stream's header line repeats the predicate.
-      [ -n "$name" ] || continue
+  --predicate 'eventMessage CONTAINS "E2E_"' 2> /dev/null | while IFS= read -r line; do
+  marker="$(grep -oE 'E2E_[A-Z_]+:[a-z0-9-]+' <<< "$line" || true)"
+  name="${marker#*:}"
+  case "$marker" in
+    E2E_TEST_START:*)
+      stop_recording
+      start_recording "$name"
+      ;;
+    E2E_TEST_END:*)
+      stop_recording
+      ;;
+    E2E_SCREENSHOT:*)
       xcrun simctl io "$SIMULATOR" screenshot "$screenshots_dir/$name.png" > /dev/null 2>&1 < /dev/null
       echo "Screenshot of failed test: $screenshots_dir/$name.png"
       ;;
@@ -105,47 +152,14 @@ done &
 
 trap 'kill $(jobs -p) 2>/dev/null || true' EXIT
 
-app_running() {
-  xcrun simctl spawn "$SIMULATOR" launchctl list 2> /dev/null | grep -q "UIKitApplication:$PACKAGE"
-}
-
-# Starts recording once the app is running, so the build is not recorded.
-start_recording() {
-  (
-    until app_running; do sleep 0.5; done
-    exec xcrun simctl io "$SIMULATOR" recordVideo --codec=h264 --force "$videos_dir/$1.mp4"
-  ) > /dev/null 2>&1 &
-  recorder_pid=$!
-}
-
-stop_recording() {
-  # SIGINT lets recordVideo finish the file; before the app started, it just
-  # ends the waiting helper.
-  kill -INT "$recorder_pid" 2> /dev/null || true
-  for _ in $(seq 40); do
-    kill -0 "$recorder_pid" 2> /dev/null || return 0
-    sleep 0.25
-  done
-  kill "$recorder_pid" 2> /dev/null || true
-}
-
 status=0
-for test_file in integration_test/*_test.dart; do
-  name="$(basename "$test_file" .dart)"
-  # A leftover app process would start the recording before the build.
-  xcrun simctl terminate "$SIMULATOR" "$PACKAGE" > /dev/null 2>&1 || true
-  install_app
-  start_recording "$name"
-  flutter test "$test_file" \
-    -d "$SIMULATOR" \
-    --dart-define=E2E_SERVER_URL="$E2E_SERVER_URL" \
-    --dart-define=E2E_USERNAME="$E2E_USERNAME" \
-    --dart-define=E2E_PASSWORD="$E2E_PASSWORD" \
-    --dart-define=E2E_EXTERNAL_LINK_POST_URL="$E2E_EXTERNAL_LINK_POST_URL" \
-    --dart-define=E2E_DEEP_LINK_TARGET_URL="$E2E_DEEP_LINK_TARGET_URL" \
-    --dart-define=E2E_UPLOAD_FILE_NAME="$upload_file_name" || status=1
-  stop_recording
-done
+install_app
+# --no-uninstall keeps the app, and with it the permission, between files.
+flutter test "$@" -d "$SIMULATOR" --no-uninstall "${dart_defines[@]}" || status=1
+
+# A test that hit its own timeout prints no end marker; finish its video.
+sleep 3
+pkill -INT -f "recordVideo.*$videos_dir" 2> /dev/null && sleep 3
 
 e2e_assert_upload "$E2E_USERNAME" "$upload_file_name" || status=1
 
