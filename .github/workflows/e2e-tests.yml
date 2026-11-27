@@ -8,6 +8,9 @@ name: e2e-tests
 
 on:
   workflow_call:
+  # TEMP: run on every push while developing the suite; remove before merging.
+  push:
+    branches: [f-internal-172-v2]
 
 permissions:
   contents: read
