@@ -46,7 +46,8 @@ videos_dir="$logs_dir/videos"
 screenshots_dir="$logs_dir/screenshots"
 rm -rf "$videos_dir" "$screenshots_dir"
 mkdir -p "$videos_dir" "$screenshots_dir"
-adb -s "$DEVICE" logcat -c
+# Older images (e.g. API 26) can fail to clear the log right after boot.
+adb -s "$DEVICE" logcat -c || true
 adb -s "$DEVICE" logcat > "$logs_dir/logcat.txt" 2>&1 &
 
 "$script_dir/grant_permissions.sh" &
