@@ -3,8 +3,8 @@
 Runs the `integration_test/` suite on an Android emulator and an iOS
 Simulator against a disposable HumHub instance (official `humhub/humhub`
 image + MariaDB).
-CI: `.github/workflows/e2e-tests.yml` (PRs, manual runs, and as a gate in
-`version-release.yml`).
+CI: `.github/workflows/e2e-tests.yml`, only run by `version-release.yml` when
+a version tag is pushed; if any job fails, nothing is built or released.
 
 ## Run locally
 

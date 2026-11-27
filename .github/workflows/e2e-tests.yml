@@ -3,25 +3,14 @@ name: e2e-tests
 # Runs the integration_test smoke suite on an Android emulator and an iOS
 # Simulator, each against a disposable HumHub backend (see scripts/e2e/README.md),
 # and the app launch test on every supported Android API level.
-# Also called by version-release.yml to gate store uploads.
+# Only runs as part of version-release.yml, when a version tag is pushed; a
+# failing job stops the release.
 
 on:
   workflow_call:
-  workflow_dispatch:
-    inputs:
-      humhub_image_tag:
-        description: "humhub/humhub image tag to test against"
-        required: false
-        default: "1.18"
-  pull_request:
-    branches: [master]
 
 permissions:
   contents: read
-
-concurrency:
-  group: e2e-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   android:
@@ -29,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      HUMHUB_IMAGE_TAG: ${{ inputs.humhub_image_tag || '1.18' }}
+      HUMHUB_IMAGE_TAG: '1.18'
       EMULATOR_API_LEVEL: 34
       EMULATOR_OPTIONS: -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim -camera-back none
     steps:
@@ -146,7 +135,7 @@ jobs:
       matrix:
         api-level: [24, 26, 28, 30, 33, 36]
     env:
-      HUMHUB_IMAGE_TAG: ${{ inputs.humhub_image_tag || '1.18' }}
+      HUMHUB_IMAGE_TAG: '1.18'
       EMULATOR_OPTIONS: -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim -camera-back none
     steps:
       - name: Checkout
@@ -246,7 +235,7 @@ jobs:
     # Uncached, the app build alone takes ~20 min.
     timeout-minutes: 60
     env:
-      HUMHUB_IMAGE_TAG: ${{ inputs.humhub_image_tag || '1.18' }}
+      HUMHUB_IMAGE_TAG: '1.18'
       E2E_BACKEND: native
     steps:
       - name: Checkout
