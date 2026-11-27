@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:humhub/util/openers/opener_controller.dart';
 import 'package:humhub/l10n/generated/app_localizations.dart';
 
+/// Keys used by the e2e tests (integration_test/).
+const openerUrlField = Key('opener_url_field');
+const openerConnectButton = Key('opener_connect_button');
+
 class SearchBarWidget extends ConsumerStatefulWidget {
   final OpenerController openerControlLer;
 
@@ -36,7 +40,7 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
                 child: Column(
                   children: [
                     TextFormField(
-                      key: const Key('opener_url_field'),
+                      key: openerUrlField,
                       keyboardType: TextInputType.url,
                       controller: widget.openerControlLer.urlTextController,
                       cursorColor: Theme.of(context).textTheme.bodySmall?.color,
@@ -77,7 +81,7 @@ class _SearchBarWidgetState extends ConsumerState<SearchBarWidget> {
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: TextButton(
-                  key: const Key('opener_connect_button'),
+                  key: openerConnectButton,
                   onPressed: connect,
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.white,

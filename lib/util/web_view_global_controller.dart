@@ -51,6 +51,12 @@ class WebViewGlobalController {
     _value = newValue;
   }
 
+  /// Forgets the controller of a WebView from a previous app run (e2e tests).
+  @visibleForTesting
+  static void reset() {
+    _value = null;
+  }
+
   static dynamic ajaxPost({required String url, required String data, Map<String, String>? headers}) async {
     String jsonHeaders = jsonEncode(headers);
     String jsCode4 = """

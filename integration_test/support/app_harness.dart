@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:humhub/models/hum_hub.dart';
+import 'package:humhub/pages/opener/components/search_bar.dart';
 import 'package:humhub/pages/web_view.dart';
 import 'package:humhub/util/intent/app_link_settings.dart';
 import 'package:humhub/util/providers.dart';
@@ -15,8 +15,7 @@ import 'package:humhub/util/web_view_global_controller.dart';
 
 import 'e2e_env.dart';
 
-const openerUrlField = Key('opener_url_field');
-const openerConnectButton = Key('opener_connect_button');
+export 'package:humhub/pages/opener/components/search_bar.dart' show openerUrlField, openerConnectButton;
 
 const _loginPath = '/user/auth/login';
 
@@ -37,6 +36,8 @@ class AppHarness {
     // device, so every test starts from a fresh install state.
     await SecureStorageService.instance.deleteAll();
     await CookieManager.instance().deleteAllCookies();
+    // A previous test's WebView controller would satisfy waitForWebView early.
+    WebViewGlobalController.reset();
     // Otherwise the opener pushes the first-launch settings page over itself.
     await SecureStorageService.setVisitedSettings();
 

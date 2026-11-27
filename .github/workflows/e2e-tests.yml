@@ -21,7 +21,7 @@ permissions:
 
 concurrency:
   group: e2e-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   android:
@@ -41,7 +41,7 @@ jobs:
       - name: Start HumHub backend (background)
         run: |
           mkdir -p scripts/e2e/logs
-          nohup scripts/e2e/up.sh > scripts/e2e/logs/up.txt 2>&1 &
+          nohup sh -c 'scripts/e2e/up.sh; echo $? > scripts/e2e/logs/up.status' > scripts/e2e/logs/up.txt 2>&1 &
 
       - name: Enable KVM
         run: |
@@ -101,7 +101,7 @@ jobs:
         run: |
           while pgrep -f scripts/e2e/up.sh > /dev/null; do sleep 2; done
           cat scripts/e2e/logs/up.txt
-          test -f scripts/e2e/.e2e_fixtures.env
+          test "$(cat scripts/e2e/logs/up.status)" = 0
 
       - name: Run e2e tests on emulator
         uses: reactivecircus/android-emulator-runner@v2
@@ -157,7 +157,7 @@ jobs:
       - name: Start HumHub backend (background)
         run: |
           mkdir -p scripts/e2e/logs
-          nohup scripts/e2e/up.sh > scripts/e2e/logs/up.txt 2>&1 &
+          nohup sh -c 'scripts/e2e/up.sh; echo $? > scripts/e2e/logs/up.status' > scripts/e2e/logs/up.txt 2>&1 &
 
       - name: Enable KVM
         run: |
@@ -216,7 +216,7 @@ jobs:
         run: |
           while pgrep -f scripts/e2e/up.sh > /dev/null; do sleep 2; done
           cat scripts/e2e/logs/up.txt
-          test -f scripts/e2e/.e2e_fixtures.env
+          test "$(cat scripts/e2e/logs/up.status)" = 0
 
       - name: Run app launch test on emulator
         uses: reactivecircus/android-emulator-runner@v2
@@ -266,7 +266,8 @@ jobs:
       - name: Install MariaDB, crane and applesimutils
         run: |
           brew install mariadb crane wix/brew/applesimutils
-          echo "HUMHUB_IMAGE_DIGEST=$(crane digest humhub/humhub:$HUMHUB_IMAGE_TAG)" >> "$GITHUB_ENV"
+          digest="$(crane digest humhub/humhub:$HUMHUB_IMAGE_TAG)"
+          echo "HUMHUB_IMAGE_DIGEST=$digest" >> "$GITHUB_ENV"
 
       - name: Cache HumHub copy
         uses: actions/cache@v4

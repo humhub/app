@@ -57,6 +57,7 @@ app.*.map.json
 /ios/GoogleService-Info.plist
 # e2e smoke tests (scripts/e2e)
 /scripts/e2e/.e2e_fixtures*.env
+/scripts/e2e/.e2e_fixtures*.env.tmp
 /scripts/e2e/native/.humhub/
 /scripts/e2e/native/.cache/
 /scripts/e2e/native/.server.pid

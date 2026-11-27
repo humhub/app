@@ -20,7 +20,9 @@ source "$script_dir/lib.sh"
 fixtures_file="$e2e_fixtures_file"
 export DEVICE="${DEVICE:-emulator-5554}"
 export PACKAGE="${PACKAGE:-com.humhub.app}"
-upload_file_name="e2e_upload.txt"
+# Unique per run, so an upload left over from an earlier run on the same
+# backend can't make the check pass.
+upload_file_name="e2e_upload_$(date +%s).txt"
 
 if [ ! -f "$fixtures_file" ]; then
   echo "Missing $fixtures_file, run scripts/e2e/up.sh first." >&2

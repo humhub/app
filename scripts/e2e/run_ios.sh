@@ -25,7 +25,9 @@ export E2E_BACKEND="${E2E_BACKEND:-native}"
 source "$script_dir/lib.sh"
 fixtures_file="$e2e_fixtures_file"
 export PACKAGE="${PACKAGE:-com.humhub.app}"
-upload_file_name="e2e_upload.txt"
+# Unique per run, so an upload left over from an earlier run on the same
+# backend can't make the check pass.
+upload_file_name="e2e_upload_$(date +%s).txt"
 
 if [ ! -f "$fixtures_file" ]; then
   echo "Missing $fixtures_file, run E2E_BACKEND=$E2E_BACKEND scripts/e2e/up.sh first." >&2
@@ -161,6 +163,8 @@ flutter test "$@" -d "$SIMULATOR" --no-uninstall "${dart_defines[@]}" || status=
 sleep 3
 pkill -INT -f "recordVideo.*$videos_dir" 2> /dev/null && sleep 3
 
-e2e_assert_upload "$E2E_USERNAME" "$upload_file_name" || status=1
+if [[ " $* " == *all_test.dart* || " $* " == *file_upload_test.dart* ]]; then
+  e2e_assert_upload "$E2E_USERNAME" "$upload_file_name" || status=1
+fi
 
 exit "$status"

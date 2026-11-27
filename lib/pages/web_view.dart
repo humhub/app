@@ -144,6 +144,7 @@ class WebViewAppState extends ConsumerState<WebView> {
   URLRequest get _initRequest {
     final args = ModalRoute.of(context)!.settings.arguments;
     String? url;
+    Map<String, String> headers = ref.read(humHubProvider).customHeaders;
     if (args is Manifest) {
       _manifest = args;
     }
@@ -152,6 +153,8 @@ class WebViewAppState extends ConsumerState<WebView> {
       // Deferred: setInstance notifies listeners, which must not happen during build.
       unawaited(Future.microtask(
           () => ref.read(humHubProvider).setInstance(controller.humhub)));
+      // The provider still holds the previous instance until then.
+      headers = controller.humhub.customHeaders;
       _manifest = controller.humhub.manifest!;
       url = controller.url;
     }
@@ -166,8 +169,7 @@ class WebViewAppState extends ConsumerState<WebView> {
     String? payloadFromPush = InitFromUrl.usePayload();
     if (payloadFromPush != null) url = payloadFromPush;
     return URLRequest(
-        url: WebUri(url ?? _manifest.startUrl),
-        headers: ref.read(humHubProvider).customHeaders);
+        url: WebUri(url ?? _manifest.startUrl), headers: headers);
   }
 
   bool _isAuthWebViewDestination(RemoteConfig? remoteConfig, Uri url) {

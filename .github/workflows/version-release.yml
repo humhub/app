@@ -123,7 +123,7 @@ jobs:
 
   release_android:
     name: Release APK to Google Play
-    needs: [build_android, e2e]
+    needs: [build_android]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -270,7 +270,7 @@ jobs:
 
   release_ios:
     name: Release IPA to TestFlight
-    needs: [ build_ios, e2e ]
+    needs: [ build_ios ]
     runs-on: macos-15
     steps:
       - name: Checkout

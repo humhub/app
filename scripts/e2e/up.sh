@@ -51,12 +51,20 @@ else
 
   echo "Seeding fixtures..."
   yii module/enable e2e
+  # Written to a temp file first, so a failed seed leaves no fixtures file
+  # that looks complete.
   {
     echo "E2E_SERVER_URL=$E2E_BASE_URL"
     echo "E2E_USERNAME=$E2E_USERNAME"
     echo "E2E_PASSWORD=$E2E_PASSWORD"
     yii e2e/seed "$E2E_USERNAME"
-  } > "$FIXTURES_FILE"
+  } > "$FIXTURES_FILE.tmp"
+  mv "$FIXTURES_FILE.tmp" "$FIXTURES_FILE"
+fi
+
+if [ ! -f "$FIXTURES_FILE" ]; then
+  echo "HumHub is installed but $FIXTURES_FILE is missing; run down.sh and up.sh again." >&2
+  exit 1
 fi
 
 echo "HumHub is up on http://localhost:${E2E_PORT:-8080} (device URL: $E2E_BASE_URL)"
