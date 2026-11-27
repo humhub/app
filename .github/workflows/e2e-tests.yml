@@ -172,37 +172,6 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # Same AVD caching as the android job in e2e-tests.yml.
-      - name: Restore AVD
-        uses: actions/cache/restore@v4
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.api-level }}-google_apis-x86_64-v1
-
-      - name: Create AVD snapshot
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          target: google_apis
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: ${{ env.EMULATOR_OPTIONS }}
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
-
-      - name: Save AVD
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: ${{ steps.avd-cache.outputs.cache-primary-key }}
-
       - name: Wait for HumHub backend
         timeout-minutes: 10
         run: |
@@ -217,7 +186,9 @@ jobs:
           target: google_apis
           arch: x86_64
           force-avd-creation: false
-          emulator-options: -no-snapshot-save ${{ env.EMULATOR_OPTIONS }}
+          # Cold boot: restoring a cached snapshot left API 26 and 28 without
+          # system services ("Can't find service: settings") and adb hanging.
+          emulator-options: -no-snapshot ${{ env.EMULATOR_OPTIONS }}
           disable-animations: true
           script: scripts/e2e/run_android.sh integration_test/app_launch_test.dart
 
