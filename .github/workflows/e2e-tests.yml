@@ -15,9 +15,6 @@ on:
         default: "1.18"
   pull_request:
     branches: [master]
-  # TEMP: run on every push while developing the suite; remove before merging.
-  push:
-    branches: [f-internal-172-v2]
 
 permissions:
   contents: read
